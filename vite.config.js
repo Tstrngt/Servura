@@ -11,8 +11,10 @@ export default defineConfig({
     build: {
         rollupOptions: {
             output: {
-                manualChunks: {
-                    vendor: ['alpinejs'],
+                manualChunks(id) {
+                    if (id.includes('alpinejs')) {
+                        return 'vendor';
+                    }
                 },
             },
         },
