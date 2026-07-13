@@ -87,16 +87,48 @@ sudo ./provision-ubuntu24.sh
 
 3. **Deploy de applicatie:**
 ```bash
-# Als servura gebruiker
-sudo su - servura
+# Ga naar parent directory en maak schone installatie
+cd /var/www
+sudo rm -rf Servura
+sudo -u servura git clone https://github.com/Tstrngt/Servura.git Servura
+
+# Ga naar de Servura directory
 cd /var/www/Servura
-git clone https://github.com/Tstrngt/Servura.git .
-composer install --no-dev --optimize-autoloader
-php artisan key:generate
-cp .env.example .env
-nano .env  # Configureer met database wachtwoord
-php artisan migrate --force
-php artisan db:seed --force
+
+# Maak missende directories aan
+sudo mkdir -p bootstrap/cache
+
+# Zet juiste permissions
+sudo chown -R servura:www-data /var/www/Servura
+sudo chmod -R 755 /var/www/Servura
+sudo chmod -R 777 /var/www/Servura/storage
+sudo chmod -R 777 /var/www/Servura/bootstrap/cache
+
+# Installeer dependencies
+sudo -u servura composer install --no-dev --optimize-autoloader
+
+# Genereer application key
+sudo -u servura php artisan key:generate
+
+# Configureer .env bestand
+sudo -u servura cp .env.example .env
+sudo -u servura nano .env  # Gebruik database wachtwoord van provisioning script
+
+# Draai database migraties en seeders
+sudo -u servura php artisan migrate --force
+sudo -u servura php artisan db:seed --force
+
+# Optimaliseer voor productie
+sudo -u servura php artisan cache:clear
+sudo -u servura php artisan config:clear
+sudo -u servura php artisan route:clear
+sudo -u servura php artisan view:clear
+sudo -u servura php artisan config:cache
+sudo -u servura php artisan route:cache
+sudo -u servura php artisan view:cache
+
+# Restart services
+sudo systemctl restart php8.3-fpm nginx
 ```
 
 **Gedetailleerde instructies:** Zie `INSTALLATION_UBUNTU24.md`

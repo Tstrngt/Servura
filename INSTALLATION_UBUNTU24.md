@@ -91,28 +91,38 @@ sudo certbot renew --dry-run
 ### Stap 6: Deploy de Servura Applicatie
 
 ```bash
-# Switch naar servura gebruiker
-sudo su - servura
+# Ga naar parent directory en maak schone installatie
+cd /var/www
+sudo rm -rf Servura
+sudo -u servura git clone https://github.com/Tstrngt/Servura.git Servura
 
-# Clone de repository in de web directory
+# Ga naar de Servura directory
 cd /var/www/Servura
-git clone https://github.com/Tstrngt/Servura.git .
+
+# Maak missende directories aan (essentieel voor Laravel)
+sudo mkdir -p bootstrap/cache
+
+# Zet juiste permissions
+sudo chown -R servura:www-data /var/www/Servura
+sudo chmod -R 755 /var/www/Servura
+sudo chmod -R 777 /var/www/Servura/storage
+sudo chmod -R 777 /var/www/Servura/bootstrap/cache
 
 # Installeer PHP dependencies
-composer install --no-dev --optimize-autoloader
+sudo -u servura composer install --no-dev --optimize-autoloader
 
 # Installeer Node dependencies en build assets
-npm install
-npm run build
+sudo -u servura npm install
+sudo -u servura npm run build
 
 # Maak .env bestand aan
-cp .env.example .env
+sudo -u servura cp .env.example .env
 
 # Genereer application key
-php artisan key:generate
+sudo -u servura php artisan key:generate
 
 # Bewerk .env bestand
-nano .env
+sudo -u servura nano .env
 ```
 
 **Belangrijke .env instellingen:**
@@ -128,34 +138,25 @@ DB_PASSWORD=HET_WACHTWOORD_VAN_HET_PROVISIONING_SCRIPT
 
 ```bash
 # Draai database migraties
-php artisan migrate --force
+sudo -u servura php artisan migrate --force
 
 # Draai seeders voor testdata
-php artisan db:seed --force
+sudo -u servura php artisan db:seed --force
 
 # Optimaliseer voor productie
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
+sudo -u servura php artisan cache:clear
+sudo -u servura php artisan config:clear
+sudo -u servura php artisan route:clear
+sudo -u servura php artisan view:clear
 
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+sudo -u servura php artisan config:cache
+sudo -u servura php artisan route:cache
+sudo -u servura php artisan view:cache
 ```
 
-### Stap 8: Permissions en Services
+### Stap 8: Services Restart
 
 ```bash
-# Terug naar root gebruiker
-exit
-
-# Set juiste permissions
-sudo chown -R servura:www-data /var/www/Servura
-sudo chmod -R 755 /var/www/Servura
-sudo chmod -R 777 /var/www/Servura/storage
-sudo chmod -R 777 /var/www/Servura/bootstrap/cache
-
 # Restart services
 sudo systemctl restart php8.3-fpm nginx
 ```
@@ -223,6 +224,69 @@ Na installatie kunt u inloggen met:
 
 ## 🔍 Probleem Oplossen
 
+### Git Clone Probleem (Niet-lege map)
+
+```bash
+# Als "destination path '.' already exists" error:
+cd /var/www
+sudo rm -rf Servura
+sudo -u servura git clone https://github.com/Tstrngt/Servura.git Servura
+```
+
+### Composer Issues
+
+**Package niet gevonden (laravel/notifications, laravel/mail):**
+```bash
+# Deze packages zijn al gefixt in de composer.json
+# Indien nodig, clear cache en herinstalleer:
+sudo -u servura composer clear-cache
+sudo -u servura composer install --no-dev --optimize-autoloader
+```
+
+**Permissions denied bij composer.lock:**
+```bash
+# Fix permissions
+sudo chown -R servura:www-data /var/www/Servura
+sudo chmod -R 755 /var/www/Servura
+sudo chmod -R 777 /var/www/Servura/storage
+sudo chmod -R 777 /var/www/Servura/bootstrap/cache
+```
+
+**Security advisories error:**
+```bash
+# Gebruik --ignore-platform-reqs indien nodig
+sudo -u servura composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+```
+
+### Laravel Kernel Class Niet Gevonden
+
+```bash
+# Dit is opgelost door missende bestanden aan te maken
+# Indien nodig, controleer of deze bestanden bestaan:
+ls -la app/Console/Kernel.php
+ls -la app/Exceptions/Handler.php
+ls -la app/Providers/
+```
+
+### Bootstrap/Cache Directory Probleem
+
+```bash
+# Maak de directory aan met juiste permissions
+sudo mkdir -p /var/www/Servura/bootstrap/cache
+sudo chown -R servura:www-data /var/www/Servura/bootstrap/cache
+sudo chmod -R 777 /var/www/Servura/bootstrap/cache
+```
+
+### Route Bestanden Missen
+
+```bash
+# Controleer of route bestanden bestaan
+ls -la routes/api.php
+ls -la routes/console.php
+
+# Indien missend, zijn deze al aangemaakt in de repository
+```
+
 ### PHP Extensions Niet Beschikbaar
 
 ```bash
@@ -243,27 +307,26 @@ mysql -u servura -p servura
 sudo systemctl status mysql
 ```
 
-### Permissions Problemen
+### Complete Fix Sequence
+
+Als u meerdere problemen ondervindt, gebruik deze complete sequence:
 
 ```bash
-# Fix storage permissions
+cd /var/www
+sudo rm -rf Servura
+sudo -u servura git clone https://github.com/Tstrngt/Servura.git Servura
+cd /var/www/Servura
+sudo mkdir -p bootstrap/cache
 sudo chown -R servura:www-data /var/www/Servura
 sudo chmod -R 755 /var/www/Servura
 sudo chmod -R 777 /var/www/Servura/storage
 sudo chmod -R 777 /var/www/Servura/bootstrap/cache
-```
-
-### Composer Issues
-
-```bash
-# Update Composer
-sudo composer self-update
-
-# Clear composer cache
-composer clear-cache
-
-# Install dependencies zonder dev packages
-composer install --no-dev --optimize-autoloader
+sudo -u servura composer install --no-dev --optimize-autoloader
+sudo -u servura php artisan key:generate
+sudo -u servura cp .env.example .env
+sudo -u servura nano .env
+sudo -u servura php artisan migrate --force
+sudo -u servura php artisan db:seed --force
 ```
 
 ## 🔄 Maintenance
