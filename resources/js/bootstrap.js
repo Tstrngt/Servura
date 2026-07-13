@@ -1,6 +1,6 @@
-import _ from 'lodash';
-
-window._ = _;
+// Lodash is not needed for basic functionality
+// import _ from 'lodash';
+// window._ = _;
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
