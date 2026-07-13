@@ -107,11 +107,13 @@ sudo chmod -R 777 /var/www/Servura/bootstrap/cache
 # Installeer dependencies
 sudo -u servura composer install --no-dev --optimize-autoloader
 
+# Maak .env bestand aan (vereist voor key:generate)
+sudo -u servura cp .env.example .env
+
 # Genereer application key
 sudo -u servura php artisan key:generate
 
 # Configureer .env bestand
-sudo -u servura cp .env.example .env
 sudo -u servura nano .env  # Gebruik database wachtwoord van provisioning script
 
 # Draai database migraties en seeders

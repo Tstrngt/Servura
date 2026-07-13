@@ -115,7 +115,7 @@ sudo -u servura composer install --no-dev --optimize-autoloader
 sudo -u servura npm install
 sudo -u servura npm run build
 
-# Maak .env bestand aan
+# Maak .env bestand aan (vereist voor key:generate)
 sudo -u servura cp .env.example .env
 
 # Genereer application key
@@ -268,6 +268,14 @@ ls -la app/Exceptions/Handler.php
 ls -la app/Providers/
 ```
 
+### .env File Bestaat Niet (key:generate error)
+
+```bash
+# Als "file_get_contents(.env): Failed to open stream" error:
+sudo -u servura cp .env.example .env
+sudo -u servura php artisan key:generate
+```
+
 ### Bootstrap/Cache Directory Probleem
 
 ```bash
@@ -322,8 +330,8 @@ sudo chmod -R 755 /var/www/Servura
 sudo chmod -R 777 /var/www/Servura/storage
 sudo chmod -R 777 /var/www/Servura/bootstrap/cache
 sudo -u servura composer install --no-dev --optimize-autoloader
-sudo -u servura php artisan key:generate
 sudo -u servura cp .env.example .env
+sudo -u servura php artisan key:generate
 sudo -u servura nano .env
 sudo -u servura php artisan migrate --force
 sudo -u servura php artisan db:seed --force
