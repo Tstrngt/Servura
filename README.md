@@ -111,6 +111,9 @@ sudo -u servura composer install --no-dev --optimize-autoloader
 sudo chmod +x setup-storage.sh
 sudo ./setup-storage.sh
 
+# Maak cache table aan (indien nodig)
+sudo -u servura php artisan migrate --force
+
 # Maak .env bestand aan (vereist voor key:generate)
 sudo -u servura cp .env.example .env
 
