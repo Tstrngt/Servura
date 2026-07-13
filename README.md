@@ -69,19 +69,9 @@ De actuele projectstatus wordt bijgehouden in `PROGRESS.md`. Dit document is de 
 
 ## 📋 Installatie
 
-### ⚠️ Ubuntu 26.04 LTS - Belangrijk!
+### 🎯 Ubuntu 24.04 LTS - Aanbevolen
 
-De originele `provision.sh` heeft problemen op Ubuntu 26.04. Gebruik de nieuwe versie:
-
-```bash
-# Gebruik het Ubuntu 26.04 specifieke script
-sudo chmod +x provision-ubuntu26.sh
-sudo ./provision-ubuntu26.sh
-```
-
-Of volg de gedetailleerde installatie gids: `INSTALLATION_UBUNTU.md`
-
-### Server Setup (Ubuntu 26.04 LTS)
+**Ubuntu 24.04 LTS is de stabiele en aanbevolen keuze voor productie servers.**
 
 1. **Clone de repository op de server:**
 ```bash
@@ -89,29 +79,37 @@ git clone https://github.com/Tstrngt/Servura.git
 cd Servura
 ```
 
-2. **Gebruik het Ubuntu 26.04 provisioning script:**
+2. **Draai het provisioning script:**
 ```bash
-sudo chmod +x provision-ubuntu26-no-ppa.sh
-sudo ./provision-ubuntu26-no-ppa.sh
+sudo chmod +x provision-ubuntu24.sh
+sudo ./provision-ubuntu24.sh
 ```
 
-3. **Configureer de applicatie:**
+3. **Deploy de applicatie:**
 ```bash
 # Als servura gebruiker
 sudo su - servura
 cd /var/www/Servura
-
-# Genereer application key
+git clone https://github.com/Tstrngt/Servura.git .
+composer install --no-dev --optimize-autoloader
 php artisan key:generate
-
-# Bewerk .env met database wachtwoord van provisioning
-nano .env
+cp .env.example .env
+nano .env  # Configureer met database wachtwoord
+php artisan migrate --force
+php artisan db:seed --force
 ```
 
-4. **Deploy de applicatie:**
+**Gedetailleerde instructies:** Zie `INSTALLATION_UBUNTU24.md`
+
+---
+
+### ⚠️ Ubuntu 26.04 LTS - Experimenteel
+
+Ubuntu 26.04 is experimenteel en kan problemen hebben. Gebruik alleen als u specifiek deze versie nodig heeft:
+
 ```bash
-# Als servura gebruiker
-./deploy.sh
+sudo chmod +x provision-ubuntu26-no-ppa.sh
+sudo ./provision-ubuntu26-no-ppa.sh
 ```
 
 ### Lokale Ontwikkeling
