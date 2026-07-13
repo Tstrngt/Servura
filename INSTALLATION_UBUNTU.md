@@ -30,19 +30,32 @@ sudo apt install -y curl wget git unzip zip software-properties-common \
     htop vim ufw fail2ban logrotate build-essential
 ```
 
-### Stap 2: PHP 8.3 Installeren (Ubuntu 26.04 Methode)
+### Stap 2: PHP Installeren (Automatische Detectie)
 
-Ubuntu 26.04 heeft PHP 8.3 in de standaard repositories:
+Het nieuwe provisioning script detecteert automatisch de beschikbare PHP versie:
 
 ```bash
-# Installeer PHP 8.3 en extensions
-sudo apt install -y php8.3 php8.3-fpm php8.3-mysql php8.3-xml php8.3-mbstring \
-    php8.3-curl php8.3-zip php8.3-bcmath php8.3-gd php8.3-intl \
-    php8.3-tokenizer php8.3-dom php8.3-pdo php8.3-pdo-mysql \
-    php8.3-sqlite3 php8.3-opcache
+# Gebruik het verbeterde provisioning script
+sudo chmod +x provision-ubuntu26-fixed.sh
+sudo ./provision-ubuntu26-fixed.sh
+```
 
-# Installeer ImageMagick PHP binding (indien nodig)
-sudo apt install -y imagemagick php8.3-imagick || echo "Imagick niet beschikbaar, wordt overgeslagen"
+**Wat dit script doet:**
+- Detecteert automatisch de beschikbare PHP versie (8.1, 8.2, of 8.3)
+- Installeert de juiste PHP extensions
+- Valt terug op Ondrej's PPA indien nodig
+- Configureert alles correct voor de gedetecteerde versie
+
+**Handmatige PHP installatie (optioneel):**
+```bash
+# Controleer beschikbare PHP versies
+apt-cache search ^php[0-9]+\.[0-9]+$ | awk '{print $1}'
+
+# Installeer de gevonden versie (vervang 8.2 met de gevonden versie)
+sudo apt install -y php8.2 php8.2-fpm php8.2-mysql php8.2-xml php8.2-mbstring \
+    php8.2-curl php8.2-zip php8.2-bcmath php8.2-gd php8.2-intl \
+    php8.2-tokenizer php8.2-dom php8.2-pdo php8.2-pdo-mysql \
+    php8.2-sqlite3 php8.2-opcache
 ```
 
 ### Stap 3: Web Server en Database

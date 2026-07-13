@@ -91,15 +91,15 @@ cd Servura
 
 2. **Gebruik het Ubuntu 26.04 provisioning script:**
 ```bash
-sudo chmod +x provision-ubuntu26.sh
-sudo ./provision-ubuntu26.sh
+sudo chmod +x provision-ubuntu26-fixed.sh
+sudo ./provision-ubuntu26-fixed.sh
 ```
 
 3. **Configureer de applicatie:**
 ```bash
 # Als servura gebruiker
 sudo su - servura
-cd /var/www/servura
+cd /var/www/Servura
 
 # Genereer application key
 php artisan key:generate
