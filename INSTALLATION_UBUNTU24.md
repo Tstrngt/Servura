@@ -115,6 +115,10 @@ sudo -u servura composer install --no-dev --optimize-autoloader
 sudo -u servura npm install
 sudo -u servura npm run build
 
+# Maak benodigde storage directories aan
+sudo chmod +x setup-storage.sh
+sudo ./setup-storage.sh
+
 # Maak .env bestand aan (vereist voor key:generate)
 sudo -u servura cp .env.example .env
 
@@ -293,6 +297,26 @@ ls -la routes/api.php
 ls -la routes/console.php
 
 # Indien missend, zijn deze al aangemaakt in de repository
+```
+
+### Storage Directories Missen (Cache/View Errors)
+
+```bash
+# Gebruik het setup-storage.sh script
+sudo chmod +x setup-storage.sh
+sudo ./setup-storage.sh
+
+# Of handmatig aanmaken
+sudo mkdir -p storage/framework/cache
+sudo mkdir -p storage/framework/sessions
+sudo mkdir -p storage/framework/testing
+sudo mkdir -p storage/framework/views
+sudo mkdir -p storage/app/public
+sudo mkdir -p storage/logs
+
+# Zet juiste permissions
+sudo chown -R servura:www-data storage
+sudo chmod -R 777 storage/framework storage/app/public storage/logs
 ```
 
 ### PHP Extensions Niet Beschikbaar

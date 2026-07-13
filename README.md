@@ -107,6 +107,10 @@ sudo chmod -R 777 /var/www/Servura/bootstrap/cache
 # Installeer dependencies
 sudo -u servura composer install --no-dev --optimize-autoloader
 
+# Maak benodigde storage directories aan
+sudo chmod +x setup-storage.sh
+sudo ./setup-storage.sh
+
 # Maak .env bestand aan (vereist voor key:generate)
 sudo -u servura cp .env.example .env
 
