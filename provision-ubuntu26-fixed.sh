@@ -52,22 +52,30 @@ apt install -y curl wget git unzip zip software-properties-common \
 detect_php_version() {
     log "Detecting available PHP version..."
     
-    # Try to find available PHP versions
-    AVAILABLE_VERSIONS=$(apt-cache search ^php[0-9]+\.[0-9]+$ | awk '{print $1}' | sed 's/php//')
+    # Try to find available PHP versions - more precise search
+    AVAILABLE_VERSIONS=$(apt-cache search '^php[0-9]\+\.[0-9]\+$' 2>/dev/null | awk '{print $1}' | grep -E '^php[0-9]+\.[0-9]+$' | sed 's/php//')
     
     if [[ -z "$AVAILABLE_VERSIONS" ]]; then
         log "No PHP versions found in default repositories, adding PPA..."
         # Add Ondrej's PPA as fallback
         add-apt-repository ppa:ondrej/php -y
         apt update
-        AVAILABLE_VERSIONS=$(apt-cache search ^php[0-9]+\.[0-9]+$ | awk '{print $1}' | sed 's/php//')
+        AVAILABLE_VERSIONS=$(apt-cache search '^php[0-9]\+\.[0-9]\+$' 2>/dev/null | awk '{print $1}' | grep -E '^php[0-9]+\.[0-9]+$' | sed 's/php//')
     fi
     
-    # Sort versions and pick the latest stable version
-    PHP_VERSION=$(echo "$AVAILABLE_VERSIONS" | sort -V | tail -n1)
+    # Filter out invalid versions and keep only stable versions (8.0, 8.1, 8.2, 8.3)
+    STABLE_VERSIONS=$(echo "$AVAILABLE_VERSIONS" | grep -E '^[0-9]+\.[0-9]+$' | grep -E '^(8\.[0-3])$' | sort -V)
     
-    if [[ -z "$PHP_VERSION" ]]; then
-        error "No PHP version could be found. Please check your repositories."
+    if [[ -z "$STABLE_VERSIONS" ]]; then
+        # Fallback to PHP 8.1 if no stable versions found
+        log "No stable PHP versions found, defaulting to PHP 8.1"
+        PHP_VERSION="8.1"
+        # Add PPA to ensure PHP 8.1 is available
+        add-apt-repository ppa:ondrej/php -y
+        apt update
+    else
+        # Pick the latest stable version
+        PHP_VERSION=$(echo "$STABLE_VERSIONS" | tail -n1)
     fi
     
     log "Found PHP version: $PHP_VERSION"
