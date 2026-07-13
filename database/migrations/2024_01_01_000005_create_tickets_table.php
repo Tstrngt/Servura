@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamp('resolved_at')->nullable();
             $table->timestamp('closed_at')->nullable();
             $table->text('resolution_notes')->nullable();
-            $timestamps();
+            $table->timestamps();
             
             $table->index(['user_id', 'status']);
             $table->index(['status', 'priority']);
