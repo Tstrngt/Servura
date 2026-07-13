@@ -69,30 +69,48 @@ De actuele projectstatus wordt bijgehouden in `PROGRESS.md`. Dit document is de 
 
 ## 📋 Installatie
 
-### Server Setup
+### ⚠️ Ubuntu 26.04 LTS - Belangrijk!
 
-1. Clone de repository op de server:
+De originele `provision.sh` heeft problemen op Ubuntu 26.04. Gebruik de nieuwe versie:
+
+```bash
+# Gebruik het Ubuntu 26.04 specifieke script
+sudo chmod +x provision-ubuntu26.sh
+sudo ./provision-ubuntu26.sh
+```
+
+Of volg de gedetailleerde installatie gids: `INSTALLATION_UBUNTU.md`
+
+### Server Setup (Ubuntu 26.04 LTS)
+
+1. **Clone de repository op de server:**
 ```bash
 git clone https://github.com/Tstrngt/servura.git
 cd servura
 ```
 
-*Vervang `UW_GEBRUIKERSNAAM` met uw daadwerkelijke GitHub gebruikersnaam.*
-
-2. Draai het provisioning script:
+2. **Gebruik het Ubuntu 26.04 provisioning script:**
 ```bash
-sudo chmod +x provision.sh
-sudo ./provision.sh
+sudo chmod +x provision-ubuntu26.sh
+sudo ./provision-ubuntu26.sh
 ```
 
-3. Configureer omgevingsvariabelen:
+3. **Configureer de applicatie:**
 ```bash
-cp .env.example .env
-# Bewerk .env met de juiste waarden
+# Als servura gebruiker
+sudo su - servura
+cd /var/www/servura
+
+# Genereer application key
+php artisan key:generate
+
+# Bewerk .env met database wachtwoord van provisioning
+nano .env
 ```
 
-4. Deploy de applicatie:
+4. **Deploy de applicatie:**
 ```bash
+# Als servura gebruiker
 ./deploy.sh
 ```
 
@@ -107,6 +125,7 @@ npm install
 2. Start de development server:
 ```bash
 npm run dev
+php artisan serve
 ```
 
 ## Beheer
