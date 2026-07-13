@@ -58,14 +58,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [CustomerDashboard::class, 'index'])->name('dashboard');
         
         // Tickets
-        Route::get('/tickets', [Customer\TicketController::class, 'index'])->name('tickets.index');
-        Route::get('/tickets/aanmaken', [Customer\TicketController::class, 'create'])->name('tickets.create');
-        Route::post('/tickets', [Customer\TicketController::class, 'store'])->name('tickets.store');
-        Route::get('/tickets/{ticket}', [Customer\TicketController::class, 'show'])->name('tickets.show');
-        Route::post('/tickets/{ticket}/reageren', [Customer\TicketController::class, 'reply'])->name('tickets.reply');
-        Route::post('/tickets/{ticket}/sluiten', [Customer\TicketController::class, 'close'])->name('tickets.close');
-        Route::get('/tickets/attachments/{attachment}/download', [Customer\TicketController::class, 'downloadAttachment'])->name('tickets.attachments.download');
-        Route::get('/tickets/attachments/{attachment}/preview', [Customer\TicketController::class, 'previewAttachment'])->name('tickets.attachments.preview');
+        Route::get('/tickets', [App\Http\Controllers\Customer\TicketController::class, 'index'])->name('tickets.index');
+        Route::get('/tickets/aanmaken', [App\Http\Controllers\Customer\TicketController::class, 'create'])->name('tickets.create');
+        Route::post('/tickets', [App\Http\Controllers\Customer\TicketController::class, 'store'])->name('tickets.store');
+        Route::get('/tickets/{ticket}', [App\Http\Controllers\Customer\TicketController::class, 'show'])->name('tickets.show');
+        Route::post('/tickets/{ticket}/reageren', [App\Http\Controllers\Customer\TicketController::class, 'reply'])->name('tickets.reply');
+        Route::post('/tickets/{ticket}/sluiten', [App\Http\Controllers\Customer\TicketController::class, 'close'])->name('tickets.close');
+        Route::get('/tickets/attachments/{attachment}/download', [App\Http\Controllers\Customer\TicketController::class, 'downloadAttachment'])->name('tickets.attachments.download');
+        Route::get('/tickets/attachments/{attachment}/preview', [App\Http\Controllers\Customer\TicketController::class, 'previewAttachment'])->name('tickets.attachments.preview');
     });
     
     // Admin routes
