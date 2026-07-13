@@ -46,7 +46,7 @@ apt update && apt upgrade -y
 log "Installing basic utilities..."
 apt install -y curl wget git unzip zip software-properties-common \
     apt-transport-https ca-certificates gnupg lsb-release \
-    htop vim ufw fail2ban logrotate build-expected
+    htop vim ufw fail2ban logrotate build-essential
 
 # Function to detect available PHP version
 detect_php_version() {
