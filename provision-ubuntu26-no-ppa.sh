@@ -1,0 +1,537 @@
+#!/bin/bash
+
+# Servura Server Provisioning Script
+# Ubuntu 26.04 LTS - No PPA version (uses default repositories only)
+
+set -e  # Exit on any error
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Logging
+log() {
+    echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
+}
+
+warn() {
+    echo -e "${YELLOW}[$(date +'%Y-%m-%d %H:%M:%S')] WARNING: $1${NC}"
+}
+
+error() {
+    echo -e "${RED}[$(date +'%Y-%m-%d %H:%M:%S')] ERROR: $1${NC}"
+    exit 1
+}
+
+# Check if running as root
+if [[ $EUID -ne 0 ]]; then
+   error "This script must be run as root (use sudo)"
+fi
+
+log "Starting Servura server provisioning for Ubuntu 26.04 (No PPA)..."
+
+# Check Ubuntu version
+UBUNTU_VERSION=$(lsb_release -rs)
+if [[ "$UBUNTU_VERSION" != "26.04" ]]; then
+    warn "This script is optimized for Ubuntu 26.04. You are running $UBUNTU_VERSION"
+fi
+
+# Update system
+log "Updating system packages..."
+apt update && apt upgrade -y
+
+# Install basic utilities
+log "Installing basic utilities..."
+apt install -y curl wget git unzip zip software-properties-common \
+    apt-transport-https ca-certificates gnupg lsb-release \
+    htop vim ufw fail2ban logrotate build-essential
+
+# Function to detect available PHP version (no PPA)
+detect_php_version() {
+    log "Detecting available PHP version in default repositories..."
+    
+    # Try to find available PHP versions in default repositories only
+    AVAILABLE_VERSIONS=$(apt-cache search '^php[0-9]\+\.[0-9]\+$' 2>/dev/null | awk '{print $1}' | grep -E '^php[0-9]+\.[0-9]+$' | sed 's/php//')
+    
+    # Filter out invalid versions and keep only reasonable versions
+    STABLE_VERSIONS=$(echo "$AVAILABLE_VERSIONS" | grep -E '^[0-9]+\.[0-9]+$' | grep -E '^(7\.[4-9]|8\.[0-9])$' | sort -V)
+    
+    if [[ -z "$STABLE_VERSIONS" ]]; then
+        error "No PHP versions found in default repositories. Ubuntu 26.04 should have PHP available. Please check your system."
+    fi
+    
+    # Pick the latest available version
+    PHP_VERSION=$(echo "$STABLE_VERSIONS" | tail -n1)
+    
+    log "Found PHP version: $PHP_VERSION"
+    echo "$PHP_VERSION"
+}
+
+# Detect PHP version
+PHP_VERSION=$(detect_php_version)
+
+# Install PHP and extensions
+log "Installing PHP $PHP_VERSION and extensions..."
+apt install -y php$PHP_VERSION php$PHP_VERSION-fpm php$PHP_VERSION-mysql php$PHP_VERSION-xml php$PHP_VERSION-mbstring \
+    php$PHP_VERSION-curl php$PHP_VERSION-zip php$PHP_VERSION-bcmath php$PHP_VERSION-gd php$PHP_VERSION-intl \
+    php$PHP_VERSION-tokenizer php$PHP_VERSION-dom php$PHP_VERSION-pdo php$PHP_VERSION-pdo-mysql \
+    php$PHP_VERSION-sqlite3 php$PHP_VERSION-opcache
+
+# Try to install ImageMagick PHP binding
+if apt install -y php$PHP_VERSION-imagick 2>/dev/null; then
+    log "ImageMagick PHP extension installed successfully"
+else
+    warn "ImageMagick PHP extension not available, continuing without it"
+fi
+
+# Install Nginx
+log "Installing Nginx..."
+apt install -y nginx
+
+# Install MySQL
+log "Installing MySQL Server..."
+apt install -y mysql-server
+
+# Install Redis
+log "Installing Redis..."
+apt install -y redis-server
+
+# Install Composer
+log "Installing Composer..."
+curl -sS https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
+chmod +x /usr/local/bin/composer
+
+# Install Node.js 18 (stable for Ubuntu 26.04)
+log "Installing Node.js 18..."
+curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+apt install -y nodejs
+
+# Verify Node.js installation
+NODE_VERSION=$(node --version)
+log "Node.js version: $NODE_VERSION"
+if [[ ! "$NODE_VERSION" =~ ^v18\. ]]; then
+    warn "Node.js version might not be optimal. Expected v18.x, got $NODE_VERSION"
+fi
+
+# Install Certbot for SSL
+log "Installing Certbot..."
+apt install -y certbot python3-certbot-nginx
+
+# Create servura user
+log "Creating servura user..."
+if ! id "servura" &>/dev/null; then
+    useradd -m -s /bin/bash servura
+    usermod -aG www-data servura
+fi
+
+# Setup directories
+log "Creating application directories..."
+mkdir -p /var/www/Servura
+mkdir -p /var/log/servura
+mkdir -p /etc/servura
+mkdir -p /var/backups/mysql
+
+# Set permissions
+chown -R servura:www-data /var/www/Servura
+chown -R servura:adm /var/log/servura
+chmod -R 755 /var/www/Servura
+
+# Configure PHP-FPM
+log "Configuring PHP-FPM..."
+cp /etc/php/$PHP_VERSION/fpm/php.ini /etc/php/$PHP_VERSION/fpm/php.ini.backup
+
+# PHP optimizations for production
+cat > /etc/php/$PHP_VERSION/fpm/php.ini << 'EOF'
+memory_limit = 256M
+upload_max_filesize = 10M
+post_max_size = 12M
+max_execution_time = 300
+max_input_vars = 3000
+date.timezone = Europe/Amsterdam
+opcache.enable=1
+opcache.memory_consumption=128
+opcache.interned_strings_buffer=8
+opcache.max_accelerated_files=4000
+opcache.revalidate_freq=2
+opcache.fast_shutdown=1
+EOF
+
+# Configure PHP-FPM pool
+cat > /etc/php/$PHP_VERSION/fpm/pool.d/servura.conf << EOF
+[servura]
+user = www-data
+group = www-data
+listen = /run/php/php$PHP_VERSION-fpm-servura.sock
+listen.owner = www-data
+listen.group = www-data
+listen.mode = 0660
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35
+pm.max_requests = 500
+chdir = /var/www/Servura
+php_admin_value[open_basedir] = /var/www/Servura/:/tmp/
+php_admin_value[upload_tmp_dir] = /tmp
+php_admin_value[session.save_path] = /tmp
+EOF
+
+# Configure Nginx
+log "Configuring Nginx..."
+cat > /etc/nginx/sites-available/servura << EOF
+server {
+    listen 80;
+    server_name _;  # VERVANG DIT MET UW DOMEIN
+    root /var/www/Servura/public;
+    index index.php index.html index.htm;
+
+    client_max_body_size 10M;
+
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
+    }
+
+    location ~ \.php\$ {
+        fastcgi_pass unix:/run/php/php$PHP_VERSION-fpm-servura.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
+        include fastcgi_params;
+        fastcgi_param PATH_INFO \$fastcgi_path_info;
+        fastcgi_read_timeout 300;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
+    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+
+    # Static file caching
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js|woff|woff2|ttf|svg)\$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+EOF
+
+# Enable site
+ln -sf /etc/nginx/sites-available/servura /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+
+# Test Nginx configuration
+if ! nginx -t; then
+    error "Nginx configuration test failed"
+fi
+
+# Configure MySQL
+log "Configuring MySQL..."
+systemctl start mysql
+systemctl enable mysql
+
+# Secure MySQL installation (non-interactive)
+mysql -e "DELETE FROM mysql.user WHERE User='';"
+mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+mysql -e "DROP DATABASE IF EXISTS test;"
+mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+mysql -e "FLUSH PRIVILEGES;"
+
+# Create database and user
+log "Creating Servura database..."
+DB_PASSWORD=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
+echo "DB_PASSWORD=$DB_PASSWORD" > /etc/servura/db_credentials
+chmod 600 /etc/servura/db_credentials
+
+mysql -e "CREATE DATABASE servura CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -e "CREATE USER 'servura'@'localhost' IDENTIFIED BY '$DB_PASSWORD';"
+mysql -e "GRANT ALL PRIVILEGES ON servura.* TO 'servura'@'localhost';"
+mysql -e "FLUSH PRIVILEGES;"
+
+# Configure Redis
+log "Configuring Redis..."
+sed -i 's/supervised no/supervised systemd/' /etc/redis/redis.conf
+systemctl restart redis-server
+
+# Configure Firewall
+log "Configuring UFW firewall..."
+ufw --force reset
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow ssh
+ufw allow 'Nginx Full'
+ufw --force enable
+
+# Configure Fail2Ban
+log "Configuring Fail2Ban..."
+cat > /etc/fail2ban/jail.local << 'EOF'
+[DEFAULT]
+bantime = 3600
+findtime = 600
+maxretry = 3
+destemail = root@localhost
+sender = root@localhost
+mta = sendmail
+
+[sshd]
+enabled = true
+port = ssh
+logpath = /var/log/auth.log
+maxretry = 3
+
+[nginx-http-auth]
+enabled = true
+port = http,https
+logpath = /var/log/nginx/error.log
+
+[nginx-limit-req]
+enabled = true
+port = http,https
+logpath = /var/log/nginx/error.log
+
+[php-url-fopen]
+enabled = true
+port = http,https
+logpath = /var/log/nginx/error.log
+EOF
+
+systemctl restart fail2ban
+
+# Setup automatic security updates
+log "Configuring automatic security updates..."
+apt install -y unattended-upgrades
+cat > /etc/apt/apt.conf.d/50unattended-upgrades << 'EOF'
+Unattended-Upgrade::Allowed-Origins {
+    "${distro_id}:${distro_codename}";
+    "${distro_id}:${distro_codename}-security";
+    "${distro_id}ESMApps:${distro_codename}-apps-security";
+    "${distro_id}ESM:${distro_codename}-infra-security";
+};
+Unattended-Upgrade::Automatic-Reboot "false";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+EOF
+
+cat > /etc/apt/apt.conf.d/20auto-upgrades << 'EOF'
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::AutocleanInterval "7";
+APT::Periodic::Unattended-Upgrade "1";
+EOF
+
+# Setup database backup script
+log "Setting up database backup script..."
+cat > /usr/local/bin/backup-mysql.sh << 'EOF'
+#!/bin/bash
+
+BACKUP_DIR="/var/backups/mysql"
+DB_NAME="servura"
+DB_USER="servura"
+DB_PASSWORD=$(cat /etc/servura/db_credentials | cut -d'=' -f2)
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_FILE="$BACKUP_DIR/servura_backup_$DATE.sql.gz"
+
+# Create backup
+mysqldump -u"$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" | gzip > "$BACKUP_FILE"
+
+# Keep only last 14 days
+find "$BACKUP_DIR" -name "servura_backup_*.sql.gz" -mtime +14 -delete
+
+# Set permissions
+chmod 600 "$BACKUP_FILE"
+chown root:root "$BACKUP_FILE"
+
+echo "Backup completed: $BACKUP_FILE"
+EOF
+
+chmod +x /usr/local/bin/backup-mysql.sh
+
+# Add to crontab for daily backups at 2 AM
+(crontab -l 2>/dev/null; echo "0 2 * * * /usr/local/bin/backup-mysql.sh") | crontab -
+
+# Setup log rotation
+log "Configuring log rotation..."
+cat > /etc/logrotate.d/servura << 'EOF'
+/var/log/servura/*.log {
+    daily
+    missingok
+    rotate 30
+    compress
+    delaycompress
+    notifempty
+    create 644 servura adm
+    postrotate
+        systemctl reload php$PHP_VERSION-fpm
+    endscript
+}
+EOF
+
+# Create environment file template
+log "Creating environment file template..."
+cat > /var/www/Servura/.env.example << 'EOF'
+APP_NAME=Servura
+APP_ENV=production
+APP_KEY=
+APP_DEBUG=false
+APP_URL=https://your-domain.com
+
+LOG_CHANNEL=stack
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=servura
+DB_USERNAME=servura
+DB_PASSWORD=
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=redis
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=redis
+SESSION_LIFETIME=120
+
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.example.com
+MAIL_PORT=587
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@servura.nl
+MAIL_FROM_NAME="${APP_NAME}"
+EOF
+
+chown servura:www-data /var/www/Servura/.env.example
+
+# Start and enable services
+log "Starting and enabling services..."
+systemctl enable php$PHP_VERSION-fpm nginx mysql redis-server fail2ban
+
+systemctl restart php$PHP_VERSION-fpm nginx redis-server
+
+# Create deployment script
+log "Creating deployment script..."
+cat > /var/www/Servura/deploy.sh << 'EOF'
+#!/bin/bash
+
+# Servura Deployment Script
+
+set -e
+
+log() {
+    echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
+}
+
+log "Starting deployment..."
+
+# Navigate to project directory
+cd /var/www/Servura
+
+# Pull latest changes
+if [ -d ".git" ]; then
+    log "Pulling latest changes from Git..."
+    git pull origin main
+else
+    log "Initializing Git repository..."
+    log "Please clone the repository first"
+    exit 1
+fi
+
+# Install dependencies
+log "Installing PHP dependencies..."
+composer install --no-dev --optimize-autoloader
+
+log "Installing Node dependencies..."
+npm install
+npm run build
+
+# Run database migrations
+log "Running database migrations..."
+php artisan migrate --force
+
+# Clear caches
+log "Clearing caches..."
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+
+# Optimize for production
+log "Optimizing for production..."
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Set permissions
+log "Setting permissions..."
+chown -R servura:www-data /var/www/Servura
+chmod -R 755 /var/www/Servura
+chmod -R 777 /var/www/Servura/storage
+chmod -R 777 /var/www/Servura/bootstrap/cache
+
+# Restart services
+log "Restarting services..."
+systemctl restart php$PHP_VERSION-fpm
+systemctl restart nginx
+
+log "Deployment completed successfully!"
+EOF
+
+chmod +x /var/www/Servura/deploy.sh
+chown servura:www-data /var/www/Servura/deploy.sh
+
+# Display completion message
+log "Server provisioning completed!"
+echo ""
+echo "=================================="
+echo "IMPORTANT INFORMATION:"
+echo "=================================="
+echo "PHP Version: $PHP_VERSION"
+echo "Database password saved to: /etc/servura/db_credentials"
+echo "Web root: /var/www/Servura"
+echo "Deployment script: /var/www/Servura/deploy.sh"
+echo ""
+echo "DATABASE PASSWORD:"
+echo "$DB_PASSWORD"
+echo "=================================="
+echo ""
+echo "NEXT STEPS:"
+echo "1. Configure your domain name in /etc/nginx/sites-available/servura"
+echo "2. Set up SSL with: certbot --nginx -d your-domain.com"
+echo "3. Clone the repository: sudo -u servura git clone https://github.com/Tstrngt/Servura.git /var/www/Servura"
+echo "4. Copy .env.example to .env and configure with database password above"
+echo "5. Deploy your application with: sudo -u servura ./deploy.sh"
+echo ""
+echo "Services running:"
+systemctl is-active nginx php$PHP_VERSION-fpm mysql redis-server fail2ban
+echo ""
+echo "Firewall status:"
+ufw status
+echo ""
+echo "PHP Version:"
+php$PHP_VERSION -v
+echo ""
+echo "Node.js Version:"
+node --version
+echo ""
+echo "To continue with application setup, run:"
+echo "sudo -u servura -H bash -c 'cd /var/www/Servura && git clone https://github.com/Tstrngt/Servura.git . && composer install --no-dev --optimize-autoloader && php artisan key:generate'"

@@ -91,8 +91,8 @@ cd Servura
 
 2. **Gebruik het Ubuntu 26.04 provisioning script:**
 ```bash
-sudo chmod +x provision-ubuntu26-fixed.sh
-sudo ./provision-ubuntu26-fixed.sh
+sudo chmod +x provision-ubuntu26-no-ppa.sh
+sudo ./provision-ubuntu26-no-ppa.sh
 ```
 
 3. **Configureer de applicatie:**
