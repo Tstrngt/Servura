@@ -7,6 +7,7 @@ echo "Setting up Laravel storage directories..."
 
 # Create framework directories
 mkdir -p storage/framework/cache
+mkdir -p storage/framework/cache/data
 mkdir -p storage/framework/sessions
 mkdir -p storage/framework/testing
 mkdir -p storage/framework/views
