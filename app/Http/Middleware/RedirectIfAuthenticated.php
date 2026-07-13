@@ -14,9 +14,9 @@ class RedirectIfAuthenticated extends Middleware
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  string|null  ...$guards
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function handle(Request $request, \Closure $next, string ...$guards)
+    public function handle(Request $request, \Closure $next, string ...$guards): \Symfony\Component\HttpFoundation\Response
     {
         $guards = empty($guards) ? [null] : $guards;
 
