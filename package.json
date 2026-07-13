@@ -1,0 +1,21 @@
+{
+    "name": "servura",
+    "version": "1.0.0",
+    "description": "Servura webapp frontend assets",
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "devDependencies": {
+        "@tailwindcss/forms": "^0.5.7",
+        "@tailwindcss/typography": "^0.5.10",
+        "alpinejs": "^3.13.5",
+        "autoprefixer": "^10.4.16",
+        "laravel-vite-plugin": "^1.0.0",
+        "postcss": "^8.4.32",
+        "tailwindcss": "^3.4.0",
+        "vite": "^5.0.10"
+    }
+}

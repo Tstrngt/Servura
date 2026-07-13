@@ -1,0 +1,36 @@
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# Laravel specific
+.idea/
+.vscode/
+*.log
+.DS_Store
+Thumbs.db
+
+# Servura specific
+/storage/app/public/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+
+# Environment and config
+.env.local
+.env.production
+/config/app.php.backup
+
+# Deployment
+/deploy.log
+/backup/
