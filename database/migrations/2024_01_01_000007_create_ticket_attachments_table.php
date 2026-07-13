@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
             $table->foreignId('uploaded_by')->constrained('users')->onDelete('cascade');
-            $string('original_name');
-            $string('file_path');
-            $string('mime_type');
-            $bigInteger('file_size');
-            $timestamps();
+            $table->string('original_name');
+            $table->string('file_path');
+            $table->string('mime_type');
+            $table->bigInteger('file_size');
+            $table->timestamps();
             
             $table->index(['ticket_id', 'created_at']);
             $table->index('uploaded_by');

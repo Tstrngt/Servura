@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $text('message');
-            $boolean('is_internal')->default(false); // For internal notes only visible to staff
-            $timestamps();
+            $table->text('message');
+            $table->boolean('is_internal')->default(false); // For internal notes only visible to staff
+            $table->timestamps();
             
             $table->index(['ticket_id', 'created_at']);
             $table->index('user_id');
