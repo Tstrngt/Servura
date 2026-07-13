@@ -105,15 +105,15 @@ fi
 
 # Setup directories
 log "Creating application directories..."
-mkdir -p /var/www/servura
+mkdir -p /var/www/Servura
 mkdir -p /var/log/servura
 mkdir -p /etc/servura
 mkdir -p /var/backups/mysql
 
 # Set permissions
-chown -R servura:www-data /var/www/servura
+chown -R servura:www-data /var/www/Servura
 chown -R servura:adm /var/log/servura
-chmod -R 755 /var/www/servura
+chmod -R 755 /var/www/Servura
 
 # Configure PHP-FPM
 log "Configuring PHP-FPM..."
@@ -150,8 +150,8 @@ pm.start_servers = 5
 pm.min_spare_servers = 5
 pm.max_spare_servers = 35
 pm.max_requests = 500
-chdir = /var/www/servura
-php_admin_value[open_basedir] = /var/www/servura/:/tmp/
+chdir = /var/www/Servura
+php_admin_value[open_basedir] = /var/www/Servura/:/tmp/
 php_admin_value[upload_tmp_dir] = /tmp
 php_admin_value[session.save_path] = /tmp
 EOF
@@ -162,7 +162,7 @@ cat > /etc/nginx/sites-available/servura << 'EOF'
 server {
     listen 80;
     server_name _;  # VERVANG DIT MET UW DOMEIN
-    root /var/www/servura/public;
+    root /var/www/Servura/public;
     index index.php index.html index.htm;
 
     client_max_body_size 10M;
@@ -357,7 +357,7 @@ EOF
 
 # Create environment file template
 log "Creating environment file template..."
-cat > /var/www/servura/.env.example << 'EOF'
+cat > /var/www/Servura/.env.example << 'EOF'
 APP_NAME=Servura
 APP_ENV=production
 APP_KEY=
@@ -396,7 +396,7 @@ MAIL_FROM_ADDRESS=noreply@servura.nl
 MAIL_FROM_NAME="${APP_NAME}"
 EOF
 
-chown servura:www-data /var/www/servura/.env.example
+chown servura:www-data /var/www/Servura/.env.example
 
 # Start and enable services
 log "Starting and enabling services..."
@@ -406,7 +406,7 @@ systemctl restart php8.3-fpm nginx redis-server
 
 # Create deployment script
 log "Creating deployment script..."
-cat > /var/www/servura/deploy.sh << 'EOF'
+cat > /var/www/Servura/deploy.sh << 'EOF'
 #!/bin/bash
 
 # Servura Deployment Script
@@ -420,7 +420,7 @@ log() {
 log "Starting deployment..."
 
 # Navigate to project directory
-cd /var/www/servura
+cd /var/www/Servura
 
 # Pull latest changes
 if [ -d ".git" ]; then
@@ -459,10 +459,10 @@ php artisan view:cache
 
 # Set permissions
 log "Setting permissions..."
-chown -R servura:www-data /var/www/servura
-chmod -R 755 /var/www/servura
-chmod -R 777 /var/www/servura/storage
-chmod -R 777 /var/www/servura/bootstrap/cache
+chown -R servura:www-data /var/www/Servura
+chmod -R 755 /var/www/Servura
+chmod -R 777 /var/www/Servura/storage
+chmod -R 777 /var/www/Servura/bootstrap/cache
 
 # Restart services
 log "Restarting services..."
@@ -472,8 +472,8 @@ systemctl restart nginx
 log "Deployment completed successfully!"
 EOF
 
-chmod +x /var/www/servura/deploy.sh
-chown servura:www-data /var/www/servura/deploy.sh
+chmod +x /var/www/Servura/deploy.sh
+chown servura:www-data /var/www/Servura/deploy.sh
 
 # Display completion message
 log "Server provisioning completed!"
@@ -482,8 +482,8 @@ echo "=================================="
 echo "IMPORTANT INFORMATION:"
 echo "=================================="
 echo "Database password saved to: /etc/servura/db_credentials"
-echo "Web root: /var/www/servura"
-echo "Deployment script: /var/www/servura/deploy.sh"
+echo "Web root: /var/www/Servura"
+echo "Deployment script: /var/www/Servura/deploy.sh"
 echo ""
 echo "DATABASE PASSWORD:"
 echo "$DB_PASSWORD"
@@ -492,7 +492,7 @@ echo ""
 echo "NEXT STEPS:"
 echo "1. Configure your domain name in /etc/nginx/sites-available/servura"
 echo "2. Set up SSL with: certbot --nginx -d your-domain.com"
-echo "3. Clone the repository: sudo -u servura git clone https://github.com/Tstrngt/servura.git /var/www/servura"
+echo "3. Clone the repository: sudo -u servura git clone https://github.com/Tstrngt/Servura.git /var/www/Servura"
 echo "4. Copy .env.example to .env and configure with database password above"
 echo "5. Deploy your application with: sudo -u servura ./deploy.sh"
 echo ""
@@ -509,4 +509,4 @@ echo "Node.js Version:"
 node --version
 echo ""
 echo "To continue with application setup, run:"
-echo "sudo -u servura -H bash -c 'cd /var/www/servura && git clone https://github.com/Tstrngt/servura.git . && composer install --no-dev --optimize-autoloader && php artisan key:generate'"
+echo "sudo -u servura -H bash -c 'cd /var/www/Servura && git clone https://github.com/Tstrngt/Servura.git . && composer install --no-dev --optimize-autoloader && php artisan key:generate'"

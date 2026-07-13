@@ -8,7 +8,7 @@ Professionele webomgeving voor Servura, een Nederlands bedrijf dat mkb-bedrijven
 
 ## 📁 Repository
 
-**Repository URL**: `https://github.com/Tstrngt/servura`
+**Repository URL**: `https://github.com/Tstrngt/Servura`
 
 *Vervang `UW_GEBRUIKERSNAAM` met uw daadwerkelijke GitHub gebruikersnaam.*
 
@@ -34,8 +34,8 @@ De actuele projectstatus wordt bijgehouden in `PROGRESS.md`. Dit document is de 
 
 1. **Clone de repository**:
    ```bash
-   git clone https://github.com/Tstrngt/servura.git
-   cd servura
+   git clone https://github.com/Tstrngt/Servura.git
+   cd Servura
    ```
 
 2. **Installeer dependencies**:
@@ -85,8 +85,8 @@ Of volg de gedetailleerde installatie gids: `INSTALLATION_UBUNTU.md`
 
 1. **Clone de repository op de server:**
 ```bash
-git clone https://github.com/Tstrngt/servura.git
-cd servura
+git clone https://github.com/Tstrngt/Servura.git
+cd Servura
 ```
 
 2. **Gebruik het Ubuntu 26.04 provisioning script:**

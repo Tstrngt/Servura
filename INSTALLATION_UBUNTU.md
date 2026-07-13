@@ -90,15 +90,15 @@ sudo useradd -m -s /bin/bash servura
 sudo usermod -aG www-data servura
 
 # Maak directories aan
-sudo mkdir -p /var/www/servura
+sudo mkdir -p /var/www/Servura
 sudo mkdir -p /var/log/servura
 sudo mkdir -p /etc/servura
 sudo mkdir -p /var/backups/mysql
 
 # Set permissions
-sudo chown -R servura:www-data /var/www/servura
+sudo chown -R servura:www-data /var/www/Servura
 sudo chown -R servura:adm /var/log/servura
-sudo chmod -R 755 /var/www/servura
+sudo chmod -R 755 /var/www/Servura
 ```
 
 ### Stap 7: PHP Configuratie
@@ -138,8 +138,8 @@ pm.start_servers = 5
 pm.min_spare_servers = 5
 pm.max_spare_servers = 35
 pm.max_requests = 500
-chdir = /var/www/servura
-php_admin_value[open_basedir] = /var/www/servura/:/tmp/
+chdir = /var/www/Servura
+php_admin_value[open_basedir] = /var/www/Servura/:/tmp/
 php_admin_value[upload_tmp_dir] = /tmp
 php_admin_value[session.save_path] = /tmp
 EOF
@@ -153,7 +153,7 @@ sudo tee /etc/nginx/sites-available/servura > /dev/null << 'EOF'
 server {
     listen 80;
     server_name your-domain.com;  # VERVANG DIT
-    root /var/www/servura/public;
+    root /var/www/Servura/public;
     index index.php index.html index.htm;
 
     client_max_body_size 10M;
@@ -271,8 +271,8 @@ sudo systemctl status php8.3-fpm nginx mysql redis-server --no-pager
 sudo su - servura
 
 # Clone repository
-cd /var/www/servura
-git clone https://github.com/Tstrngt/servura.git .
+cd /var/www/Servura
+git clone https://github.com/Tstrngt/Servura.git .
 
 # Installeer dependencies
 composer install --no-dev --optimize-autoloader
@@ -302,7 +302,7 @@ DB_PASSWORD=HET_WACHTWOORD_VUIT_STAP_9
 
 ```bash
 # Blijf als servura gebruiker
-cd /var/www/servura
+cd /var/www/Servura
 
 # Draai migraties
 php artisan migrate --force
@@ -331,7 +331,7 @@ chmod -R 777 storage bootstrap/cache
 exit
 
 # Set ownership
-sudo chown -R servura:www-data /var/www/servura
+sudo chown -R servura:www-data /var/www/Servura
 
 # Restart services
 sudo systemctl restart php8.3-fpm nginx
@@ -412,7 +412,7 @@ sudo apt update && sudo apt upgrade -y
 sudo /usr/local/bin/backup-mysql.sh
 
 # Update applicatie
-cd /var/www/servura && sudo -u servura ./deploy.sh
+cd /var/www/Servura && sudo -u servura ./deploy.sh
 ```
 
 Deze gids zou alle bekende problemen met Ubuntu 26.04 moeten oplossen!
