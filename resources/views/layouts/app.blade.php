@@ -66,10 +66,23 @@
                 </div>
 
                 <!-- CTA Button -->
-                <div class="hidden md:block">
-                    <a href="{{ route('contact') }}" class="btn btn-primary">
-                        Offerte Aanvragen
-                    </a>
+                <div class="hidden md:flex items-center gap-3">
+                    @guest
+                        <a href="{{ route('login') }}" class="nav-link">
+                            Inloggen
+                        </a>
+                        <a href="{{ route('contact') }}" class="btn btn-primary">
+                            Offerte Aanvragen
+                        </a>
+                    @else
+                        <a href="{{ auth()->user()->canAccessAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}" class="nav-link">
+                            {{ auth()->user()->canAccessAdmin() ? 'Adminportaal' : 'Klantportaal' }}
+                        </a>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-primary">Uitloggen</button>
+                        </form>
+                    @endguest
                 </div>
 
                 <!-- Mobile menu button -->
@@ -101,10 +114,23 @@
                 <a href="{{ route('contact') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
                     Contact
                 </a>
-                <div class="pt-4 pb-3 border-t border-gray-200">
-                    <a href="{{ route('contact') }}" class="block w-full text-center btn btn-primary">
-                        Offerte Aanvragen
-                    </a>
+                <div class="pt-4 pb-3 border-t border-gray-200 space-y-2">
+                    @guest
+                        <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                            Inloggen
+                        </a>
+                        <a href="{{ route('contact') }}" class="block w-full text-center btn btn-primary">
+                            Offerte Aanvragen
+                        </a>
+                    @else
+                        <a href="{{ auth()->user()->canAccessAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                            {{ auth()->user()->canAccessAdmin() ? 'Adminportaal' : 'Klantportaal' }}
+                        </a>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="block w-full text-center btn btn-primary">Uitloggen</button>
+                        </form>
+                    @endguest
                 </div>
             </div>
         </div>

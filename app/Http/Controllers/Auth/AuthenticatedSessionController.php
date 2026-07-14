@@ -41,7 +41,11 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+        if (! Auth::attempt([
+            'email' => $request->input('email'),
+            'password' => $request->input('password'),
+            'is_active' => true,
+        ], $request->boolean('remember'))) {
             $this->incrementLoginAttempts($request);
             
             throw ValidationException::withMessages([
