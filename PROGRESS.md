@@ -12,8 +12,8 @@
 
 ## Huidige taak
 
-**Wat**: Admin ticketsysteem verder uitwerken zodat medewerkers tickets kunnen openen, beantwoorden, toewijzen en sluiten; reacties zijn zichtbaar in het klantenportaal.
-**Status**: bezig — routes, controller en admin detail-view geïmplementeerd; klant detail-view laat alleen publieke reacties zien; CI-build ontbreekt.
+**Wat**: Klantenportaal krijgt een zijbalknavigatie naast het bestaande topmenu; admin en klant kunnen via de ticketdetailpagina communiceren.
+**Status**: bezig — admin detail/reply-flow en klant-zijbalk geïmplementeerd; CI-build ontbreekt.
 **Volgende stap**: push deze commit en leg de CI-pass/fail-uitkomst vast.
 
 ## Omgevingsstatus
