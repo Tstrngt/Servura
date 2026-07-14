@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
+use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -71,6 +72,7 @@ Route::middleware('auth')->group(function () {
     // Admin routes
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
+        Route::get('/tickets', [AdminTicketController::class, 'index'])->name('tickets.index');
         
         // Customers
         Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');

@@ -3,8 +3,9 @@
 @section('title', 'Admin Dashboard - Servura')
 
 @section('content')
+@include('admin.partials.sidebar')
 <!-- Admin Navigation -->
-<nav class="bg-white shadow-sm border-b border-gray-200">
+<nav class="hidden bg-white shadow-sm border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
@@ -63,7 +64,7 @@
 </nav>
 
 <!-- Admin Dashboard Content -->
-<div class="bg-gray-50 min-h-screen">
+<div class="bg-gray-50 min-h-screen lg:pl-64">
     <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="px-4 py-6 sm:px-0">
@@ -321,7 +322,7 @@
                             <h3 class="text-lg leading-6 font-medium text-gray-900">
                                 Recente Tickets
                             </h3>
-                            <a href="#" class="text-sm text-primary-600 hover:text-primary-500">
+                            <a href="{{ route('admin.tickets.index') }}" class="text-sm text-primary-600 hover:text-primary-500">
                                 Bekijk alles
                             </a>
                         </div>

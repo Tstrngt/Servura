@@ -3,8 +3,9 @@
 @section('title', 'Klant {{ $customer->name }} - Servura Admin')
 
 @section('content')
+@include('admin.partials.sidebar')
 <!-- Admin Navigation -->
-<nav class="bg-white shadow-sm border-b border-gray-200">
+<nav class="hidden bg-white shadow-sm border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
@@ -63,7 +64,7 @@
 </nav>
 
 <!-- Customer Details Content -->
-<div class="bg-gray-50 min-h-screen">
+<div class="bg-gray-50 min-h-screen lg:pl-64">
     <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="px-4 py-6 sm:px-0">
