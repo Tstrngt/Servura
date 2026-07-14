@@ -49,6 +49,12 @@ window.notificationBell = window.notificationBell || function () {
                 this.notifications = [];
                 this.count = 0;
             });
+        },
+        formatDate(value) {
+            if (!value) return '';
+            const date = new Date(value);
+            if (isNaN(date.getTime())) return '';
+            return date.toLocaleString('nl-NL', { dateStyle: 'short', timeStyle: 'short' });
         }
     }
 }
@@ -62,7 +68,7 @@ window.notificationBell = window.notificationBell || function () {
         <span x-show="count > 0" x-text="count" x-cloak class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white ring-2 ring-white"></span>
     </button>
 
-    <div x-show="open" x-transition @click.outside="open = false" x-cloak class="absolute {{ $dropdownClass }} z-50 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
+    <div x-show="open" x-transition @click.outside="open = false" x-cloak class="absolute {{ $dropdownClass }} z-50 max-h-96 overflow-y-auto overflow-x-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
             <h3 class="text-sm font-semibold text-gray-900">Meldingen</h3>
             <button x-show="count > 0" @click="readAll()" type="button" class="text-xs text-primary-600 hover:text-primary-500">Alles gelezen</button>
@@ -78,7 +84,7 @@ window.notificationBell = window.notificationBell || function () {
             <a href="#" @click.prevent="read(notification.id, notification.link)" class="block px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors">
                 <div class="text-sm font-medium text-gray-900" x-text="notification.title"></div>
                 <div class="mt-1 text-sm text-gray-500 line-clamp-2" x-text="notification.message"></div>
-                <div class="mt-1 text-xs text-gray-400" x-text="new Date(notification.created_at).toLocaleString('nl-NL', { dateStyle: 'short', timeStyle: 'short' })"></div>
+                <div class="mt-1 text-xs text-gray-400" x-text="formatDate(notification.created_at)"></div>
             </a>
         </template>
     </div>
