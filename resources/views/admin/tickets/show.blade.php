@@ -89,7 +89,7 @@
                         <div class="px-4 py-5 sm:p-6">
                             <h3 class="text-lg font-medium text-gray-900 mb-4">Omschrijving</h3>
                             <div class="prose max-w-none text-gray-700">
-                                <p>{{ nl2br(e($ticket->description)) }}</p>
+                                <p>{!! nl2br(e($ticket->description)) !!}</p>
                             </div>
 
                             @if($ticket->attachments->count() > 0)
@@ -211,7 +211,7 @@
                                                 </div>
                                             </div>
                                             <div class="prose max-w-none text-gray-700">
-                                                <p>{{ $reply->formatted_message }}</p>
+                                                <p>{!! $reply->formatted_message !!}</p>
                                             </div>
                                         </div>
                                     @endforeach

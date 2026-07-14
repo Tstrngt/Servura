@@ -102,7 +102,7 @@
                     </div>
                     
                     <div class="prose max-w-none">
-                        <p>{{ nl2br(e($ticket->description)) }}</p>
+                        <p>{!! nl2br(e($ticket->description)) !!}</p>
                     </div>
 
                     @if($ticket->attachments->count() > 0)
@@ -178,7 +178,7 @@
                                         </div>
                                     </div>
                                     <div class="prose max-w-none">
-                                        <p>{{ $reply->formatted_message }}</p>
+                                        <p>{!! $reply->formatted_message !!}</p>
                                     </div>
                                 </div>
                             @endforeach
