@@ -106,7 +106,10 @@ class TicketController extends Controller
             abort(403);
         }
 
-        $ticket->load(['replies.user', 'attachments.uploadedBy']);
+        $ticket->load([
+            'replies' => fn ($query) => $query->public()->with('user'),
+            'attachments.uploadedBy',
+        ]);
 
         return view('customer.tickets.show', compact('ticket'));
     }

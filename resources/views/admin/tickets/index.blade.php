@@ -53,6 +53,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Prioriteit</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Laatste activiteit</th>
+                                    <th class="relative px-6 py-3"><span class="sr-only">Acties</span></th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 bg-white">
@@ -63,9 +64,20 @@
                                             <p class="text-sm text-gray-500">{{ $ticket->title }}</p>
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-700">{{ $ticket->user->name }}</td>
-                                        <td class="px-6 py-4 text-sm text-gray-700">{{ $ticket->statusLabel['text'] }}</td>
-                                        <td class="px-6 py-4 text-sm text-gray-700">{{ $ticket->priorityLabel['text'] }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->statusLabel['color'] }}-100 text-{{ $ticket->statusLabel['color'] }}-800">
+                                                {{ $ticket->statusLabel['text'] }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->priorityLabel['color'] }}-100 text-{{ $ticket->priorityLabel['color'] }}-800">
+                                                {{ $ticket->priorityLabel['text'] }}
+                                            </span>
+                                        </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">{{ ($ticket->last_reply_at ?? $ticket->created_at)->diffForHumans() }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <a href="{{ route('admin.tickets.show', $ticket) }}" class="text-primary-600 hover:text-primary-900">Bekijk</a>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

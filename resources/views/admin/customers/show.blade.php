@@ -313,12 +313,14 @@
                             @foreach($customer->tickets as $ticket)
                                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-md">
                                     <div class="flex-1">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $ticket->ticket_number }}
-                                        </div>
-                                        <div class="text-sm text-gray-500">
-                                            {{ $ticket->title }}
-                                        </div>
+                                        <a href="{{ route('admin.tickets.show', $ticket) }}" class="block hover:text-primary-600">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                {{ $ticket->ticket_number }}
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                {{ $ticket->title }}
+                                            </div>
+                                        </a>
                                         <div class="text-xs text-gray-400">
                                             {{ $ticket->created_at->format('d-m-Y H:i') }}
                                         </div>

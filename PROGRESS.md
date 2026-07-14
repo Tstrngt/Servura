@@ -12,8 +12,8 @@
 
 ## Huidige taak
 
-**Wat**: Dashboardacties: statistiekkaarten en bestaande overzichtslinks laten navigeren.
-**Status**: bezig — kaarten, ticketstatussen, ticketprioriteiten en recente klanten zijn gekoppeld; CI-build ontbreekt.
+**Wat**: Admin ticketsysteem verder uitwerken zodat medewerkers tickets kunnen openen, beantwoorden, toewijzen en sluiten; reacties zijn zichtbaar in het klantenportaal.
+**Status**: bezig — routes, controller en admin detail-view geïmplementeerd; klant detail-view laat alleen publieke reacties zien; CI-build ontbreekt.
 **Volgende stap**: push deze commit en leg de CI-pass/fail-uitkomst vast.
 
 ## Omgevingsstatus
@@ -27,7 +27,7 @@
 
 - Geen CI-workflow aanwezig; daardoor is geen enkele fase CI-geverifieerd.
 - Frontendbuild moet nog door CI worden uitgevoerd met `axios@1.18.1`.
-- Dashboardacties moeten nog via CI worden geverifieerd.
+- Admin ticket detail- en reply-flow moet nog via CI worden geverifieerd.
 - Bevestig welke CI-provider en branchbescherming gebruikt moeten worden.
 - Admin `Diensten` en `Content` hebben nog geen route/controller en staan niet in de zijbalk.
 
@@ -42,5 +42,5 @@
 ## Laatste update
 
 **Datum**: 2026-07-14
-**Taak**: Dashboardacties gekoppeld aan bestaande klanten- en ticketfilters.
+**Taak**: Admin ticket detail/reply-flow (toewijzen, status, prioriteit, sluiten/heropenen, bijlagen) en klantzijde beperkt tot publieke reacties.
 **Volgende**: CI-build uitvoeren en uitkomst vastleggen.
