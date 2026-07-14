@@ -80,10 +80,10 @@
             </div>
         @endif
 
-        <div class="px-4 py-6 sm:px-0">
+        <div class="px-4 py-6 sm:px-0 space-y-6">
+            <!-- Row: Description + Ticket details -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Main column -->
-                <div class="lg:col-span-2 space-y-6">
+                <div class="lg:col-span-2">
                     <!-- Description and attachments -->
                     <div class="bg-white shadow rounded-lg">
                         <div class="px-4 py-5 sm:p-6">
@@ -128,7 +128,51 @@
                             @endif
                         </div>
                     </div>
+                </div>
 
+                <div class="lg:col-span-1">
+                    <!-- Ticket details -->
+                    <div class="bg-white shadow rounded-lg">
+                        <div class="px-4 py-5 sm:p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Ticket details</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Status</label>
+                                    <div class="mt-1">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->statusLabel['color'] }}-100 text-{{ $ticket->statusLabel['color'] }}-800">
+                                            {{ $ticket->statusLabel['text'] }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Prioriteit</label>
+                                    <div class="mt-1">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->priorityLabel['color'] }}-100 text-{{ $ticket->priorityLabel['color'] }}-800">
+                                            {{ $ticket->priorityLabel['text'] }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Categorie</label>
+                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->categoryLabel }}</div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Toegewezen aan</label>
+                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->assignedTo ? $ticket->assignedTo->name : 'Nog niet toegewezen' }}</div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Laatste activiteit</label>
+                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->last_reply_at ? $ticket->last_reply_at->format('d-m-Y H:i') : $ticket->created_at->format('d-m-Y H:i') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row: Replies + management -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                <div class="lg:col-span-2 space-y-6">
                     <!-- Replies -->
                     <div class="bg-white shadow rounded-lg">
                         <div class="px-4 py-5 sm:p-6">
@@ -182,116 +226,77 @@
 
                     <!-- Reply form -->
                     <div class="bg-white shadow rounded-lg">
-                            <div class="px-4 py-5 sm:p-6">
-                                <h3 class="text-lg font-medium text-gray-900 mb-4">Reageren</h3>
+                        <div class="px-4 py-5 sm:p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Reageren</h3>
 
-                                <form action="{{ route('admin.tickets.reply', $ticket) }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
+                            <form action="{{ route('admin.tickets.reply', $ticket) }}" method="POST" enctype="multipart/form-data">
+                                @csrf
 
-                                    <div class="form-group mb-4">
-                                        <label for="message" class="form-label">Bericht</label>
-                                        <textarea id="message" name="message" rows="4" class="form-textarea" placeholder="Typ uw reactie..." required>{{ old('message') }}</textarea>
-                                        @error('message')
+                                <div class="form-group mb-4">
+                                    <label for="message" class="form-label">Bericht</label>
+                                    <textarea id="message" name="message" rows="4" class="form-textarea" placeholder="Typ uw reactie..." required>{{ old('message') }}</textarea>
+                                    @error('message')
+                                        <span class="form-error">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label for="status_after_reply" class="form-label">Status na reactie</label>
+                                        <select id="status_after_reply" name="status_after_reply" class="form-input">
+                                            <option value="">Huidige status behouden</option>
+                                            <option value="open" {{ old('status_after_reply') == 'open' ? 'selected' : '' }}>Open</option>
+                                            <option value="in_progress" {{ old('status_after_reply') == 'in_progress' ? 'selected' : '' }}>In behandeling</option>
+                                            <option value="waiting_for_customer" {{ old('status_after_reply') == 'waiting_for_customer' ? 'selected' : '' }}>Wacht op klant</option>
+                                            <option value="resolved" {{ old('status_after_reply') == 'resolved' ? 'selected' : '' }}>Opgelost</option>
+                                        </select>
+                                        @error('status_after_reply')
                                             <span class="form-error">{{ $message }}</span>
                                         @enderror
                                     </div>
-
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                        <div>
-                                            <label for="status_after_reply" class="form-label">Status na reactie</label>
-                                            <select id="status_after_reply" name="status_after_reply" class="form-input">
-                                                <option value="">Huidige status behouden</option>
-                                                <option value="open" {{ old('status_after_reply') == 'open' ? 'selected' : '' }}>Open</option>
-                                                <option value="in_progress" {{ old('status_after_reply') == 'in_progress' ? 'selected' : '' }}>In behandeling</option>
-                                                <option value="waiting_for_customer" {{ old('status_after_reply') == 'waiting_for_customer' ? 'selected' : '' }}>Wacht op klant</option>
-                                                <option value="resolved" {{ old('status_after_reply') == 'resolved' ? 'selected' : '' }}>Opgelost</option>
-                                            </select>
-                                            @error('status_after_reply')
-                                                <span class="form-error">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                        <div class="flex items-end">
-                                            <label class="inline-flex items-center">
-                                                <input type="checkbox" name="is_internal" value="1" {{ old('is_internal') ? 'checked' : '' }} class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
-                                                <span class="ml-2 text-sm text-gray-700">Interne notitie (niet zichtbaar voor klant)</span>
-                                            </label>
-                                        </div>
+                                    <div class="flex items-end">
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" name="is_internal" value="1" {{ old('is_internal') ? 'checked' : '' }} class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
+                                            <span class="ml-2 text-sm text-gray-700">Interne notitie (niet zichtbaar voor klant)</span>
+                                        </label>
                                     </div>
+                                </div>
 
-                                    <div class="form-group mb-4">
-                                        <label class="form-label">Bijlagen</label>
-                                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
-                                            <div class="space-y-1 text-center">
-                                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                                </svg>
-                                                <div class="flex text-sm text-gray-600 justify-center">
-                                                    <label for="attachments" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
-                                                        <span>Upload bestanden</span>
-                                                        <input id="attachments" name="attachments[]" type="file" class="sr-only" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.zip">
-                                                    </label>
-                                                    <p class="pl-1">of sleep en zet neer</p>
-                                                </div>
-                                                <p class="text-xs text-gray-500">
-                                                    PNG, JPG, GIF, PDF, DOC, DOCX, TXT, ZIP tot 10MB per bestand
-                                                </p>
+                                <div class="form-group mb-4">
+                                    <label class="form-label">Bijlagen</label>
+                                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
+                                        <div class="space-y-1 text-center">
+                                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                            <div class="flex text-sm text-gray-600 justify-center">
+                                                <label for="attachments" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
+                                                    <span>Upload bestanden</span>
+                                                    <input id="attachments" name="attachments[]" type="file" class="sr-only" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.zip">
+                                                </label>
+                                                <p class="pl-1">of sleep en zet neer</p>
                                             </div>
+                                            <p class="text-xs text-gray-500">
+                                                PNG, JPG, GIF, PDF, DOC, DOCX, TXT, ZIP tot 10MB per bestand
+                                            </p>
                                         </div>
-                                        @error('attachments.*')
-                                            <span class="form-error">{{ $message }}</span>
-                                        @enderror
                                     </div>
+                                    @error('attachments.*')
+                                        <span class="form-error">{{ $message }}</span>
+                                    @enderror
+                                </div>
 
-                                    <div class="flex justify-end">
-                                        <button type="submit" class="btn btn-primary">
-                                            Reactie Versturen
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
+                                <div class="flex justify-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        Reactie Versturen
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
 
-                <!-- Sidebar column -->
-                <div class="space-y-6">
-                    <!-- Status card -->
-                    <div class="bg-white shadow rounded-lg">
-                        <div class="px-4 py-5 sm:p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Ticket details</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Status</label>
-                                    <div class="mt-1">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->statusLabel['color'] }}-100 text-{{ $ticket->statusLabel['color'] }}-800">
-                                            {{ $ticket->statusLabel['text'] }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Prioriteit</label>
-                                    <div class="mt-1">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->priorityLabel['color'] }}-100 text-{{ $ticket->priorityLabel['color'] }}-800">
-                                            {{ $ticket->priorityLabel['text'] }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Categorie</label>
-                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->categoryLabel }}</div>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Toegewezen aan</label>
-                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->assignedTo ? $ticket->assignedTo->name : 'Nog niet toegewezen' }}</div>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Laatste activiteit</label>
-                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->last_reply_at ? $ticket->last_reply_at->format('d-m-Y H:i') : $ticket->created_at->format('d-m-Y H:i') }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                <div class="lg:col-span-1 space-y-6">
                     <!-- Assignment form -->
                     <div class="bg-white shadow rounded-lg">
                         <div class="px-4 py-5 sm:p-6">
