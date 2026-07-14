@@ -12,9 +12,9 @@
 
 ## Huidige taak
 
-**Wat**: Frontendbuild herstellen: ontbrekende `axios`-dependency.
-**Status**: bezig — `axios@1.18.1` is met `npm view axios version` op de server geverifieerd en in `package.json` vastgelegd; CI-build ontbreekt.
-**Volgende stap**: push deze commit, voer de CI-build uit en leg de pass/fail-uitkomst vast.
+**Wat**: Dashboardacties: statistiekkaarten en bestaande overzichtslinks laten navigeren.
+**Status**: bezig — alleen dashboardacties vallen binnen deze stap.
+**Volgende stap**: koppel kaarten aan bestaande klanten- en ticketfilters; daarna CI-build uitvoeren.
 
 ## Omgevingsstatus
 
@@ -27,6 +27,7 @@
 
 - Geen CI-workflow aanwezig; daardoor is geen enkele fase CI-geverifieerd.
 - Frontendbuild moet nog door CI worden uitgevoerd met `axios@1.18.1`.
+- Dashboardacties moeten nog via CI worden geverifieerd.
 - Bevestig welke CI-provider en branchbescherming gebruikt moeten worden.
 - Admin `Diensten` en `Content` hebben nog geen route/controller en staan niet in de zijbalk.
 
@@ -41,5 +42,5 @@
 ## Laatste update
 
 **Datum**: 2026-07-14
-**Taak**: `axios@1.18.1` toegevoegd na npm-verificatie op de server.
-**Volgende**: CI-build uitvoeren en uitkomst vastleggen.
+**Taak**: Dashboardacties geselecteerd als afgebakende huidige taak.
+**Volgende**: bestaande klanten- en ticketroutes koppelen aan dashboardacties.
