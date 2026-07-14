@@ -48,6 +48,7 @@ window.notificationBell = window.notificationBell || function () {
             }).then(() => {
                 this.notifications = [];
                 this.count = 0;
+                this.open = false;
             });
         },
         formatDate(value) {
@@ -65,10 +66,10 @@ window.notificationBell = window.notificationBell || function () {
         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
         </svg>
-        <span x-show="count > 0" x-text="count" x-cloak class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white ring-2 ring-white"></span>
+        <span x-show="count > 0" x-text="count" x-cloak class="hidden absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white ring-2 ring-white" style="display: none;"></span>
     </button>
 
-    <div x-show="open" x-transition @click.outside="open = false" x-cloak class="absolute {{ $dropdownClass }} z-50 max-h-96 overflow-y-auto overflow-x-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+    <div x-show="open" x-transition @click.outside="open = false" x-cloak class="hidden absolute {{ $dropdownClass }} z-50 max-h-96 overflow-y-auto overflow-x-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5" style="display: none;">
         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
             <h3 class="text-sm font-semibold text-gray-900">Meldingen</h3>
             <button x-show="count > 0" @click="readAll()" type="button" class="text-xs text-primary-600 hover:text-primary-500">Alles gelezen</button>
