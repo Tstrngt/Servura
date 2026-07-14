@@ -35,7 +35,11 @@ class NotificationController extends Controller
 
         $notification->markAsRead();
 
-        return response()->json(['ok' => true]);
+        if (request()->wantsJson()) {
+            return response()->json(['ok' => true]);
+        }
+
+        return $notification->link ? redirect()->to($notification->link) : redirect()->back();
     }
 
     /**
@@ -48,6 +52,10 @@ class NotificationController extends Controller
             'read_at' => now(),
         ]);
 
-        return response()->json(['ok' => true]);
+        if (request()->wantsJson()) {
+            return response()->json(['ok' => true]);
+        }
+
+        return redirect()->back();
     }
 }

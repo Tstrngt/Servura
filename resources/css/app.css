@@ -7,6 +7,14 @@
     display: none !important;
 }
 
+details > summary {
+    list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+    display: none;
+}
+
 /* Custom CSS for Servura */
 
 /* Base styles */
