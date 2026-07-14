@@ -69,6 +69,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/tickets/attachments/{attachment}/preview', [App\Http\Controllers\Customer\TicketController::class, 'previewAttachment'])->name('tickets.attachments.preview');
     });
     
+    // Notifications
+    Route::get('/notifications/unread', [App\Http\Controllers\NotificationController::class, 'unread'])->name('notifications.unread');
+    Route::post('/notifications/{notification}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+
     // Admin routes
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');

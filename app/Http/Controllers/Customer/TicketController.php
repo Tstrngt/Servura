@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\Ticket;
 use App\Models\TicketReply;
 use App\Models\TicketAttachment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -92,6 +94,17 @@ class TicketController extends Controller
             }
         }
 
+        // Notify staff about new ticket
+        foreach (User::staff()->get() as $staff) {
+            Notification::notify(
+                $staff,
+                'ticket_created',
+                'Nieuw ticket',
+                Auth::user()->name . ' heeft ticket ' . $ticket->ticket_number . ' aangemaakt.',
+                route('admin.tickets.show', $ticket)
+            );
+        }
+
         return redirect()->route('customer.tickets.show', $ticket)
             ->with('success', 'Uw ticket is succesvol aangemaakt. Wij nemen zo snel mogelijk contact met u op.');
     }
@@ -176,6 +189,17 @@ class TicketController extends Controller
         }
         
         $ticket->updateLastReply();
+
+        // Notify staff about new reply
+        foreach (User::staff()->get() as $staff) {
+            Notification::notify(
+                $staff,
+                'ticket_reply',
+                'Nieuwe reactie',
+                Auth::user()->name . ' heeft gereageerd op ticket ' . $ticket->ticket_number . '.',
+                route('admin.tickets.show', $ticket)
+            );
+        }
 
         return redirect()->back()
             ->with('success', 'Uw reactie is succesvol verzonden.');

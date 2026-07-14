@@ -76,6 +76,7 @@
                             Offerte Aanvragen
                         </a>
                     @else
+                        @include('partials.notifications', ['bellClass' => 'text-gray-500 hover:text-primary-600'])
                         <a href="{{ auth()->user()->canAccessAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}" class="nav-link">
                             {{ auth()->user()->canAccessAdmin() ? 'Adminportaal' : 'Klantportaal' }}
                         </a>

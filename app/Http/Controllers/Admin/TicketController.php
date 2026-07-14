@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\Ticket;
 use App\Models\TicketReply;
 use App\Models\TicketAttachment;
@@ -134,6 +135,14 @@ class TicketController extends Controller
 
         if (!$isInternal) {
             $ticket->updateLastReply();
+
+            Notification::notify(
+                $ticket->user,
+                'ticket_reply',
+                'Nieuwe reactie op uw ticket',
+                Auth::user()->name . ' heeft gereageerd op ticket ' . $ticket->ticket_number . '.',
+                route('customer.tickets.show', $ticket)
+            );
         }
 
         return redirect()->route('admin.tickets.show', $ticket)
@@ -157,6 +166,14 @@ class TicketController extends Controller
 
         $ticket->update($validated);
 
+        Notification::notify(
+            $ticket->user,
+            'ticket_updated',
+            'Ticket bijgewerkt',
+            'Uw ticket ' . $ticket->ticket_number . ' is bijgewerkt.',
+            route('customer.tickets.show', $ticket)
+        );
+
         return redirect()->route('admin.tickets.show', $ticket)
             ->with('success', 'Ticket bijgewerkt.');
     }
@@ -172,9 +189,21 @@ class TicketController extends Controller
             'assigned_to.exists' => 'Geselecteerde medewerker bestaat niet.',
         ]);
 
+        $previousAssignee = $ticket->assigned_to;
+
         $ticket->update([
             'assigned_to' => $validated['assigned_to'] ?: null,
         ]);
+
+        if ($validated['assigned_to'] && (int) $validated['assigned_to'] !== (int) $previousAssignee) {
+            Notification::notify(
+                User::find($validated['assigned_to']),
+                'ticket_assigned',
+                'Ticket toegewezen',
+                'Ticket ' . $ticket->ticket_number . ' is aan u toegewezen.',
+                route('admin.tickets.show', $ticket)
+            );
+        }
 
         $message = $validated['assigned_to']
             ? 'Ticket toegewezen aan ' . User::find($validated['assigned_to'])->name . '.'
@@ -204,6 +233,14 @@ class TicketController extends Controller
             'resolution_notes' => $validated['resolution_notes'] ?? $ticket->resolution_notes,
         ]);
 
+        Notification::notify(
+            $ticket->user,
+            'ticket_closed',
+            'Ticket gesloten',
+            'Uw ticket ' . $ticket->ticket_number . ' is gesloten.',
+            route('customer.tickets.show', $ticket)
+        );
+
         return redirect()->route('admin.tickets.show', $ticket)
             ->with('success', 'Ticket gesloten.');
     }
@@ -214,6 +251,14 @@ class TicketController extends Controller
     public function reopen(Ticket $ticket)
     {
         $ticket->reopen();
+
+        Notification::notify(
+            $ticket->user,
+            'ticket_reopened',
+            'Ticket heropend',
+            'Uw ticket ' . $ticket->ticket_number . ' is heropend.',
+            route('customer.tickets.show', $ticket)
+        );
 
         return redirect()->route('admin.tickets.show', $ticket)
             ->with('success', 'Ticket heropend.');

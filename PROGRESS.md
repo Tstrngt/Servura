@@ -12,8 +12,8 @@
 
 ## Huidige taak
 
-**Wat**: Klantenportaal krijgt een zijbalknavigatie naast het bestaande topmenu; admin en klant kunnen via de ticketdetailpagina communiceren.
-**Status**: bezig — admin ticket detail/reply-flow én layout, en klant-zijbalk geïmplementeerd; CI-build ontbreekt.
+**Wat**: Admin en klanten krijgen meldingen bij ticketgebeurtenissen; regelovergangen in tickettekst worden correct weergegeven; admin en klant kunnen via de ticketdetailpagina communiceren.
+**Status**: bezig — notificatiesysteem, regelovergang-fix en klant-zijbalk geïmplementeerd; migratie moet nog op productie draaien; CI-build ontbreekt.
 **Volgende stap**: push deze commit en leg de CI-pass/fail-uitkomst vast.
 
 ## Omgevingsstatus

@@ -1,6 +1,10 @@
 <aside class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col bg-slate-900 text-slate-200">
-    <div class="flex h-16 items-center px-6 border-b border-slate-700">
+    <div class="flex h-16 items-center justify-between px-6 border-b border-slate-700">
         <a href="{{ route('admin.dashboard') }}" class="text-lg font-bold text-white">Servura Admin</a>
+        @include('partials.notifications', [
+            'bellClass' => 'text-slate-300 hover:text-white',
+            'dropdownClass' => 'right-0 mt-2 w-64',
+        ])
     </div>
     <nav class="flex-1 px-3 py-6 space-y-2">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">

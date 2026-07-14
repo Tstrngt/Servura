@@ -88,6 +88,12 @@ class User extends Authenticatable
         return $this->hasMany(Ticket::class);
     }
 
+    // Notifications relationship
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class)->latest();
+    }
+
     // Get active tickets
     public function activeTickets()
     {
