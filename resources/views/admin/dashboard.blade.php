@@ -279,8 +279,8 @@
                             @foreach($ticketStatuses as $status => $count)
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
-                                        <div class="w-3 h-3 rounded-full mr-2" style="background-color: {{ $this->getStatusColor($status) }}"></div>
-                                        <span class="text-sm text-gray-700">{{ $this->getStatusLabel($status) }}</span>
+                                        <div class="w-3 h-3 rounded-full mr-2" style="background-color: {{ getStatusColor($status) }}"></div>
+                                        <span class="text-sm text-gray-700">{{ getStatusLabel($status) }}</span>
                                     </div>
                                     <span class="text-sm font-medium text-gray-900">{{ $count }}</span>
                                 </div>
@@ -299,8 +299,8 @@
                             @foreach($ticketPriorities as $priority => $count)
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
-                                        <div class="w-3 h-3 rounded-full mr-2" style="background-color: {{ $this->getPriorityColor($priority) }}"></div>
-                                        <span class="text-sm text-gray-700">{{ $this->getPriorityLabel($priority) }}</span>
+                                        <div class="w-3 h-3 rounded-full mr-2" style="background-color: {{ getPriorityColor($priority) }}"></div>
+                                        <span class="text-sm text-gray-700">{{ getPriorityLabel($priority) }}</span>
                                     </div>
                                     <span class="text-sm font-medium text-gray-900">{{ $count }}</span>
                                 </div>
