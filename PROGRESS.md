@@ -13,8 +13,8 @@
 ## Huidige taak
 
 **Wat**: Frontendbuild herstellen: ontbrekende `axios`-dependency.
-**Status**: geblokkeerd — `resources/js/bootstrap.js` importeert `axios`, dat niet in `package.json` staat.
-**Volgende stap**: verifieer `axios` met `npm view axios version` op de server, voeg de exacte versie toe en laat CI de build uitvoeren.
+**Status**: bezig — `axios@1.18.1` is met `npm view axios version` op de server geverifieerd en in `package.json` vastgelegd; CI-build ontbreekt.
+**Volgende stap**: push deze commit, voer de CI-build uit en leg de pass/fail-uitkomst vast.
 
 ## Omgevingsstatus
 
@@ -26,7 +26,7 @@
 ## Blokkades en open vragen
 
 - Geen CI-workflow aanwezig; daardoor is geen enkele fase CI-geverifieerd.
-- Axios-versie moet nog via npm op de server worden geverifieerd.
+- Frontendbuild moet nog door CI worden uitgevoerd met `axios@1.18.1`.
 - Bevestig welke CI-provider en branchbescherming gebruikt moeten worden.
 - Admin `Diensten` en `Content` hebben nog geen route/controller en staan niet in de zijbalk.
 
@@ -41,5 +41,5 @@
 ## Laatste update
 
 **Datum**: 2026-07-14
-**Taak**: Frontendbuild geblokkeerd door ontbrekende Axios-dependency.
-**Volgende**: Axios-versie verifiëren met npm op de server.
+**Taak**: `axios@1.18.1` toegevoegd na npm-verificatie op de server.
+**Volgende**: CI-build uitvoeren en uitkomst vastleggen.
