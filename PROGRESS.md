@@ -12,9 +12,9 @@
 
 ## Huidige taak
 
-**Wat**: Adminzijbalk en centraal ticketoverzicht.
-**Status**: bezig — codewijziging is niet via CI geverifieerd.
-**Volgende stap**: voeg een Laravel CI-workflow toe, push de huidige commit en leg de CI-uitkomst vast voordat deze taak `afgerond` wordt.
+**Wat**: Frontendbuild herstellen: ontbrekende `axios`-dependency.
+**Status**: geblokkeerd — `resources/js/bootstrap.js` importeert `axios`, dat niet in `package.json` staat.
+**Volgende stap**: verifieer `axios` met `npm view axios version` op de server, voeg de exacte versie toe en laat CI de build uitvoeren.
 
 ## Omgevingsstatus
 
@@ -26,6 +26,7 @@
 ## Blokkades en open vragen
 
 - Geen CI-workflow aanwezig; daardoor is geen enkele fase CI-geverifieerd.
+- Axios-versie moet nog via npm op de server worden geverifieerd.
 - Bevestig welke CI-provider en branchbescherming gebruikt moeten worden.
 - Admin `Diensten` en `Content` hebben nog geen route/controller en staan niet in de zijbalk.
 
@@ -40,5 +41,5 @@
 ## Laatste update
 
 **Datum**: 2026-07-14
-**Taak**: Status gecorrigeerd; CI-verificatie ontbreekt.
-**Volgende**: CI-workflow toevoegen en uitvoeren.
+**Taak**: Frontendbuild geblokkeerd door ontbrekende Axios-dependency.
+**Volgende**: Axios-versie verifiëren met npm op de server.
