@@ -23,7 +23,7 @@
                         <input name="search" value="{{ request('search') }}" placeholder="Zoek op nummer, titel of klant" class="form-input md:col-span-2">
                         <select name="status" class="form-input">
                             <option value="">Alle statussen</option>
-                            @foreach(['open' => 'Open', 'in_progress' => 'In behandeling', 'waiting_for_customer' => 'Wacht op klant', 'resolved' => 'Opgelost', 'closed' => 'Gesloten'] as $value => $label)
+                            @foreach(['open' => 'Open', 'in_progress' => 'In behandeling', 'waiting_for_customer' => 'Wacht op klant', 'resolved' => 'Opgelost', 'closed' => 'Gesloten', 'overdue' => 'Verlopen'] as $value => $label)
                                 <option value="{{ $value }}" @selected(request('status') === $value)>{{ $label }}</option>
                             @endforeach
                         </select>

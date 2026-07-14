@@ -12,7 +12,8 @@ class TicketController extends Controller
     {
         $tickets = Ticket::query()
             ->with(['user', 'assignedTo'])
-            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')->toString()))
+            ->when($request->input('status') === 'overdue', fn ($query) => $query->overdue())
+            ->when($request->filled('status') && $request->input('status') !== 'overdue', fn ($query) => $query->where('status', $request->string('status')->toString()))
             ->when($request->filled('priority'), fn ($query) => $query->where('priority', $request->string('priority')->toString()))
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->string('search')->toString();

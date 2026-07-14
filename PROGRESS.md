@@ -13,8 +13,8 @@
 ## Huidige taak
 
 **Wat**: Dashboardacties: statistiekkaarten en bestaande overzichtslinks laten navigeren.
-**Status**: bezig — alleen dashboardacties vallen binnen deze stap.
-**Volgende stap**: koppel kaarten aan bestaande klanten- en ticketfilters; daarna CI-build uitvoeren.
+**Status**: bezig — kaarten, ticketstatussen, ticketprioriteiten en recente klanten zijn gekoppeld; CI-build ontbreekt.
+**Volgende stap**: push deze commit en leg de CI-pass/fail-uitkomst vast.
 
 ## Omgevingsstatus
 
@@ -42,5 +42,5 @@
 ## Laatste update
 
 **Datum**: 2026-07-14
-**Taak**: Dashboardacties geselecteerd als afgebakende huidige taak.
-**Volgende**: bestaande klanten- en ticketroutes koppelen aan dashboardacties.
+**Taak**: Dashboardacties gekoppeld aan bestaande klanten- en ticketfilters.
+**Volgende**: CI-build uitvoeren en uitkomst vastleggen.

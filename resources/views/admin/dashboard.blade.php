@@ -92,13 +92,13 @@
         <!-- Stats Grid -->
         <div class="px-4 py-6 sm:px-0">
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="bg-white overflow-hidden shadow rounded-lg">
+                <a href="{{ route('admin.customers.index') }}" class="bg-white overflow-hidden shadow rounded-lg transition-shadow hover:shadow-md">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
                                 <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
                                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 012 0z"></path>
                                     </svg>
                                 </div>
                             </div>
@@ -114,9 +114,9 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="bg-white overflow-hidden shadow rounded-lg">
+                <a href="{{ route('admin.customers.index', ['status' => 'active']) }}" class="bg-white overflow-hidden shadow rounded-lg transition-shadow hover:shadow-md">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -138,9 +138,9 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="bg-white overflow-hidden shadow rounded-lg">
+                <a href="{{ route('admin.tickets.index', ['status' => 'open']) }}" class="bg-white overflow-hidden shadow rounded-lg transition-shadow hover:shadow-md">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -162,9 +162,9 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="bg-white overflow-hidden shadow rounded-lg">
+                <a href="{{ route('admin.tickets.index', ['status' => 'overdue']) }}" class="bg-white overflow-hidden shadow rounded-lg transition-shadow hover:shadow-md">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -186,7 +186,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 
@@ -278,13 +278,13 @@
                         </h3>
                         <div class="space-y-3">
                             @foreach($ticketStatuses as $status => $count)
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <div class="w-3 h-3 rounded-full mr-2" style="background-color: {{ getStatusColor($status) }}"></div>
+                                <a href="{{ route('admin.tickets.index', ['status' => $status]) }}" class="flex items-center justify-between rounded px-1 py-1 hover:bg-gray-50">
+                                    <span class="flex items-center">
+                                        <span class="w-3 h-3 rounded-full mr-2" style="background-color: {{ getStatusColor($status) }}"></span>
                                         <span class="text-sm text-gray-700">{{ getStatusLabel($status) }}</span>
-                                    </div>
+                                    </span>
                                     <span class="text-sm font-medium text-gray-900">{{ $count }}</span>
-                                </div>
+                                </a>
                             @endforeach
                         </div>
                     </div>
@@ -298,13 +298,13 @@
                         </h3>
                         <div class="space-y-3">
                             @foreach($ticketPriorities as $priority => $count)
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <div class="w-3 h-3 rounded-full mr-2" style="background-color: {{ getPriorityColor($priority) }}"></div>
+                                <a href="{{ route('admin.tickets.index', ['priority' => $priority]) }}" class="flex items-center justify-between rounded px-1 py-1 hover:bg-gray-50">
+                                    <span class="flex items-center">
+                                        <span class="w-3 h-3 rounded-full mr-2" style="background-color: {{ getPriorityColor($priority) }}"></span>
                                         <span class="text-sm text-gray-700">{{ getPriorityLabel($priority) }}</span>
-                                    </div>
+                                    </span>
                                     <span class="text-sm font-medium text-gray-900">{{ $count }}</span>
-                                </div>
+                                </a>
                             @endforeach
                         </div>
                     </div>
@@ -364,9 +364,7 @@
                             <h3 class="text-lg leading-6 font-medium text-gray-900">
                                 Ongelezen Berichten
                             </h3>
-                            <a href="#" class="text-sm text-primary-600 hover:text-primary-500">
-                                Bekijk alles
-                            </a>
+                            <span class="text-sm text-gray-400">Overzicht niet beschikbaar</span>
                         </div>
                         @if($unreadMessages->count() > 0)
                             <div class="space-y-3">
@@ -411,14 +409,14 @@
                             <h3 class="text-lg leading-6 font-medium text-gray-900">
                                 Recente Klanten
                             </h3>
-                            <a href="#" class="text-sm text-primary-600 hover:text-primary-500">
+                            <a href="{{ route('admin.customers.index') }}" class="text-sm text-primary-600 hover:text-primary-500">
                                 Bekijk alles
                             </a>
                         </div>
                         @if($recentCustomers->count() > 0)
                             <div class="space-y-3">
                                 @foreach($recentCustomers as $customer)
-                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                                    <a href="{{ route('admin.customers.show', $customer) }}" class="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-8 w-8">
                                                 <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -444,7 +442,7 @@
                                                 {{ $customer->is_active ? 'Actief' : 'Inactief' }}
                                             </span>
                                         </div>
-                                    </div>
+                                    </a>
                                 @endforeach
                             </div>
                         @else
@@ -462,9 +460,7 @@
                             <h3 class="text-lg leading-6 font-medium text-gray-900">
                                 Diensten die Verlopen
                             </h3>
-                            <a href="#" class="text-sm text-primary-600 hover:text-primary-500">
-                                Bekijk alles
-                            </a>
+                            <span class="text-sm text-gray-400">Overzicht niet beschikbaar</span>
                         </div>
                         @if($expiringServices->count() > 0)
                             <div class="space-y-3">
