@@ -3,7 +3,7 @@
         <a href="{{ route('admin.dashboard') }}" class="text-lg font-bold text-white">Servura Admin</a>
         @include('partials.notifications', [
             'bellClass' => 'text-slate-300 hover:text-white',
-            'dropdownClass' => 'right-0 mt-2 w-64',
+            'dropdownClass' => '!fixed left-64 top-16 ml-2 w-80',
         ])
     </div>
     <nav class="flex-1 px-3 py-6 space-y-2">
