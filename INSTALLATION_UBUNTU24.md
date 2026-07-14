@@ -373,11 +373,9 @@ sudo -u servura php artisan db:seed --force
 sudo apt update && sudo apt upgrade -y
 
 # Update applicatie
-cd /var/www/Servura
-sudo -u servura git pull origin main
-sudo -u servura composer install --no-dev --optimize-autoloader
-sudo -u servura npm install && npm run build
-sudo -u servura php artisan migrate --force
+sudo chown -R servura:www-data /var/www/Servura
+sudo -u servura -H git -C /var/www/Servura status --short
+sudo -u servura -H bash -c 'set -e; cd /var/www/Servura; git pull --ff-only origin main; composer install --no-dev --optimize-autoloader --no-interaction; npm install; npm run build; php artisan migrate --force; php artisan optimize:clear; php artisan config:cache; php artisan route:cache; php artisan view:cache'
 ```
 
 ### Backups

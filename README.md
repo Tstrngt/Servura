@@ -177,27 +177,17 @@ Gebruik deze stappen na een nieuwe push naar `main`. De instructies zijn voor de
    ls -lh /var/backups/mysql/ | tail
    ```
 
-2. **Open een shell als de applicatiegebruiker en controleer lokale wijzigingen:**
+2. **Herstel de projectrechten en controleer lokale wijzigingen:**
    ```bash
-   sudo -u servura -H bash
-   cd /var/www/Servura
-   git status --short
+   sudo chown -R servura:www-data /var/www/Servura
+   sudo -u servura -H git -C /var/www/Servura status --short
    ```
 
    Verwacht geen uitvoer van `git status --short`. Stop bij lokale wijzigingen en bewaar of verwijder die eerst; anders kan Git de update niet veilig toepassen.
 
 3. **Haal de laatste versie op en bouw de applicatie opnieuw:**
    ```bash
-   git pull --ff-only origin main
-   composer install --no-dev --optimize-autoloader --no-interaction
-   npm install
-   npm run build
-   php artisan migrate --force
-   php artisan optimize:clear
-   php artisan config:cache
-   php artisan route:cache
-   php artisan view:cache
-   exit
+   sudo -u servura -H bash -c 'set -e; cd /var/www/Servura; git pull --ff-only origin main; composer install --no-dev --optimize-autoloader --no-interaction; npm install; npm run build; php artisan migrate --force; php artisan optimize:clear; php artisan config:cache; php artisan route:cache; php artisan view:cache'
    ```
 
 4. **Herstel rechten en herlaad PHP-FPM:**
