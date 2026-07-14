@@ -1,5 +1,6 @@
 /node_modules
 /public/hot
+/public/build
 /public/storage
 /storage/*.key
 /vendor
@@ -27,6 +28,7 @@ Thumbs.db
 /storage/framework/views/*
 /storage/framework/views/*.php
 /storage/logs/*
+/bootstrap/cache/*
 
 # Environment and config
 .env.local

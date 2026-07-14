@@ -190,7 +190,12 @@ Gebruik deze stappen na een nieuwe push naar `main`. De instructies zijn voor de
    sudo -u servura -H bash -c 'set -e; cd /var/www/Servura; git pull --ff-only origin main; composer install --no-dev --optimize-autoloader --no-interaction; npm install; npm run build; php artisan migrate --force; php artisan optimize:clear; php artisan config:cache; php artisan route:cache; php artisan view:cache'
    ```
 
-4. **Herstel rechten en herlaad PHP-FPM:**
+4. **Installeer het bijgewerkte back-upscript:**
+   ```bash
+   sudo install -o root -g root -m 700 /var/www/Servura/backup-mysql.sh /usr/local/bin/backup-mysql.sh
+   ```
+
+5. **Herstel rechten en herlaad PHP-FPM:**
    ```bash
    sudo chown -R servura:www-data /var/www/Servura/storage /var/www/Servura/bootstrap/cache
    sudo find /var/www/Servura/storage /var/www/Servura/bootstrap/cache -type d -exec chmod 775 {} \;
@@ -200,7 +205,7 @@ Gebruik deze stappen na een nieuwe push naar `main`. De instructies zijn voor de
 
    Vervang `php8.3-fpm` als de server een andere geïnstalleerde PHP-versie gebruikt. Controleer dit met `systemctl list-units --type=service --all 'php*-fpm.service'`.
 
-5. **Controleer de update:**
+6. **Controleer de update:**
    ```bash
    curl -I https://uw-domein.nl
    sudo tail -n 100 /var/www/Servura/storage/logs/laravel.log
@@ -210,7 +215,7 @@ Gebruik deze stappen na een nieuwe push naar `main`. De instructies zijn voor de
 
 1. Laat de back-up en foutmelding intact.
 2. Ga terug naar de vorige release met `git log --oneline -5`, gevolgd door `git reset --hard <vorige-commit>`. Doe dit alleen nadat stap 2 bevestigt dat er geen lokale wijzigingen zijn.
-3. Voer de dependency-, build-, cache- en servicestappen uit stap 3 en 4 opnieuw uit, maar sla `git pull` over. Een database-rollback alleen uitvoeren als de bijbehorende migratie expliciet veilig terug te draaien is.
+3. Voer de dependency-, build-, cache- en servicestappen uit stap 3 tot en met 5 opnieuw uit, maar sla `git pull` over. Een database-rollback alleen uitvoeren als de bijbehorende migratie expliciet veilig terug te draaien is.
 
 ## Beheer
 
