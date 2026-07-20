@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
+use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -99,5 +100,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/customers/{customer}/reset-password', [AdminCustomerController::class, 'resetPassword'])->name('customers.reset-password');
         Route::get('/customers/{customer}/services', [AdminCustomerController::class, 'services'])->name('customers.services');
         Route::get('/customers/{customer}/tickets', [AdminCustomerController::class, 'tickets'])->name('customers.tickets');
+
+        // Services (bind by id, not slug)
+        Route::get('/services', [AdminServiceController::class, 'index'])->name('services.index');
+        Route::get('/services/create', [AdminServiceController::class, 'create'])->name('services.create');
+        Route::post('/services', [AdminServiceController::class, 'store'])->name('services.store');
+        Route::get('/services/{service:id}/edit', [AdminServiceController::class, 'edit'])->name('services.edit');
+        Route::put('/services/{service:id}', [AdminServiceController::class, 'update'])->name('services.update');
+        Route::delete('/services/{service:id}', [AdminServiceController::class, 'destroy'])->name('services.destroy');
     });
 });

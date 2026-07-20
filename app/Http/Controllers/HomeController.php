@@ -17,9 +17,9 @@ class HomeController extends Controller
             ->get();
 
         $popularServices = Service::active()
-            ->popular()
+            ->homepage()
             ->ordered()
-            ->take(3)
+            ->take(6)
             ->get();
 
         return view('home', compact('featuredPortfolio', 'popularServices'));

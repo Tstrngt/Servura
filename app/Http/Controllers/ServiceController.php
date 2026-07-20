@@ -10,6 +10,7 @@ class ServiceController extends Controller
     public function index()
     {
         $services = Service::active()
+            ->servicesPage()
             ->ordered()
             ->get();
 

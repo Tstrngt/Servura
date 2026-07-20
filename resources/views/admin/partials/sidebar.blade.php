@@ -16,6 +16,9 @@
         <a href="{{ route('admin.customers.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.customers.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Klanten
         </a>
+        <a href="{{ route('admin.services.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.services.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
+            Diensten
+        </a>
     </nav>
     <div class="border-t border-slate-700 p-4">
         <p class="truncate text-sm font-medium text-white">{{ Auth::user()->name }}</p>
@@ -32,5 +35,6 @@
         <a href="{{ route('admin.dashboard') }}">Dashboard</a>
         <a href="{{ route('admin.tickets.index') }}">Tickets</a>
         <a href="{{ route('admin.customers.index') }}">Klanten</a>
+        <a href="{{ route('admin.services.index') }}">Diensten</a>
     </div>
 </div>
