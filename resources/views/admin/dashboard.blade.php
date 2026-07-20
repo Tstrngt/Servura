@@ -267,51 +267,6 @@
             </div>
         </div>
 
-        <!-- Charts and Tables Row -->
-        <div class="px-4 py-6 sm:px-0">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Ticket Status Chart -->
-                <div class="bg-white shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                            Ticket Statussen
-                        </h3>
-                        <div class="space-y-3">
-                            @foreach($ticketStatuses as $status => $count)
-                                <a href="{{ route('admin.tickets.index', ['status' => $status]) }}" class="flex items-center justify-between rounded px-1 py-1 hover:bg-gray-50">
-                                    <span class="flex items-center">
-                                        <span class="w-3 h-3 rounded-full mr-2" style="background-color: {{ getStatusColor($status) }}"></span>
-                                        <span class="text-sm text-gray-700">{{ getStatusLabel($status) }}</span>
-                                    </span>
-                                    <span class="text-sm font-medium text-gray-900">{{ $count }}</span>
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Ticket Priority Chart -->
-                <div class="bg-white shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                            Ticket Prioriteiten
-                        </h3>
-                        <div class="space-y-3">
-                            @foreach($ticketPriorities as $priority => $count)
-                                <a href="{{ route('admin.tickets.index', ['priority' => $priority]) }}" class="flex items-center justify-between rounded px-1 py-1 hover:bg-gray-50">
-                                    <span class="flex items-center">
-                                        <span class="w-3 h-3 rounded-full mr-2" style="background-color: {{ getPriorityColor($priority) }}"></span>
-                                        <span class="text-sm text-gray-700">{{ getPriorityLabel($priority) }}</span>
-                                    </span>
-                                    <span class="text-sm font-medium text-gray-900">{{ $count }}</span>
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Recent Activity Tables -->
         <div class="px-4 py-6 sm:px-0">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -497,47 +452,4 @@
     </div>
 </div>
 
-@php
-function getStatusColor($status) {
-    return match($status) {
-        'open' => '#3B82F6',
-        'in_progress' => '#EAB308',
-        'waiting_for_customer' => '#F97316',
-        'resolved' => '#10B981',
-        'closed' => '#6B7280',
-        default => '#6B7280'
-    };
-}
-
-function getStatusLabel($status) {
-    return match($status) {
-        'open' => 'Open',
-        'in_progress' => 'In behandeling',
-        'waiting_for_customer' => 'Wacht op klant',
-        'resolved' => 'Opgelost',
-        'closed' => 'Gesloten',
-        default => ucfirst($status)
-    };
-}
-
-function getPriorityColor($priority) {
-    return match($priority) {
-        'low' => '#6B7280',
-        'medium' => '#3B82F6',
-        'high' => '#F97316',
-        'urgent' => '#EF4444',
-        default => '#6B7280'
-    };
-}
-
-function getPriorityLabel($priority) {
-    return match($priority) {
-        'low' => 'Laag',
-        'medium' => 'Medium',
-        'high' => 'Hoog',
-        'urgent' => 'Urgent',
-        default => ucfirst($priority)
-    };
-}
-@endphp
 @endsection

@@ -142,4 +142,24 @@ class User extends Authenticatable
     {
         return $query->whereIn('role', ['admin', 'employee']);
     }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function quotes()
+    {
+        return $this->hasMany(Quote::class);
+    }
+
+    public function billableItems()
+    {
+        return $this->hasMany(BillableItem::class);
+    }
 }

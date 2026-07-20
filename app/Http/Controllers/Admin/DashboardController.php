@@ -55,23 +55,6 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Get ticket status distribution
-        $ticketStatuses = [
-            'open' => Ticket::open()->count(),
-            'in_progress' => Ticket::inProgress()->count(),
-            'waiting_for_customer' => Ticket::waitingForCustomer()->count(),
-            'resolved' => Ticket::resolved()->count(),
-            'closed' => Ticket::closed()->count(),
-        ];
-
-        // Get ticket priority distribution
-        $ticketPriorities = [
-            'low' => Ticket::priority('low')->count(),
-            'medium' => Ticket::priority('medium')->count(),
-            'high' => Ticket::priority('high')->count(),
-            'urgent' => Ticket::priority('urgent')->count(),
-        ];
-
         // Get recent customers
         $recentCustomers = User::customers()
             ->latest()
@@ -88,8 +71,6 @@ class DashboardController extends Controller
             'stats',
             'recentTickets',
             'unreadMessages',
-            'ticketStatuses',
-            'ticketPriorities',
             'recentCustomers',
             'expiringServices'
         ));

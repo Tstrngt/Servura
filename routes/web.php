@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
+use App\Http\Controllers\Admin\FinancialController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -108,5 +109,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/services/{service:id}/edit', [AdminServiceController::class, 'edit'])->name('services.edit');
         Route::put('/services/{service:id}', [AdminServiceController::class, 'update'])->name('services.update');
         Route::delete('/services/{service:id}', [AdminServiceController::class, 'destroy'])->name('services.destroy');
+
+        // Financial
+        Route::prefix('financial')->name('financial.')->group(function () {
+            Route::get('/invoices', [FinancialController::class, 'invoices'])->name('invoices');
+            Route::get('/transactions', [FinancialController::class, 'transactions'])->name('transactions');
+            Route::get('/billable-items', [FinancialController::class, 'billableItems'])->name('billable-items');
+            Route::get('/quotes', [FinancialController::class, 'quotes'])->name('quotes');
+            Route::get('/logs', [FinancialController::class, 'logs'])->name('logs');
+        });
     });
 });

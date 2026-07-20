@@ -19,6 +19,31 @@
         <a href="{{ route('admin.services.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.services.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Diensten
         </a>
+        <div x-data="{ open: {{ request()->routeIs('admin.financial.*') ? 'true' : 'false' }} }">
+            <button @click="open = !open" class="w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.financial.*') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
+                <span>Financieel</span>
+                <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div x-show="open" x-transition class="ml-4 mt-1 space-y-1">
+                <a href="{{ route('admin.financial.invoices') }}" class="block rounded-lg px-3 py-2 text-sm {{ request()->routeIs('admin.financial.invoices') ? 'text-primary-400 font-medium' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+                    Facturen
+                </a>
+                <a href="{{ route('admin.financial.transactions') }}" class="block rounded-lg px-3 py-2 text-sm {{ request()->routeIs('admin.financial.transactions') ? 'text-primary-400 font-medium' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+                    Transacties
+                </a>
+                <a href="{{ route('admin.financial.billable-items') }}" class="block rounded-lg px-3 py-2 text-sm {{ request()->routeIs('admin.financial.billable-items') ? 'text-primary-400 font-medium' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+                    Te factureren
+                </a>
+                <a href="{{ route('admin.financial.quotes') }}" class="block rounded-lg px-3 py-2 text-sm {{ request()->routeIs('admin.financial.quotes') ? 'text-primary-400 font-medium' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+                    Offertes
+                </a>
+                <a href="{{ route('admin.financial.logs') }}" class="block rounded-lg px-3 py-2 text-sm {{ request()->routeIs('admin.financial.logs') ? 'text-primary-400 font-medium' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+                    Logboek
+                </a>
+            </div>
+        </div>
     </nav>
     <div class="border-t border-slate-700 p-4">
         <p class="truncate text-sm font-medium text-white">{{ Auth::user()->name }}</p>
@@ -36,5 +61,6 @@
         <a href="{{ route('admin.tickets.index') }}">Tickets</a>
         <a href="{{ route('admin.customers.index') }}">Klanten</a>
         <a href="{{ route('admin.services.index') }}">Diensten</a>
+        <a href="{{ route('admin.financial.invoices') }}">Financieel</a>
     </div>
 </div>
