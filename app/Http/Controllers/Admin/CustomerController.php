@@ -326,8 +326,7 @@ class CustomerController extends Controller
         $request->validate([
             'service_id' => 'required|exists:services,id',
             'price' => 'nullable|numeric|min:0',
-            'price_type' => 'required|in:eenmalig,maandelijks,jaarlijks',
-            'start_date' => 'required|date',
+            'price_type' => 'nullable|in:eenmalig,maandelijks,jaarlijks',
         ]);
 
         $service = Service::findOrFail($request->service_id);
@@ -336,9 +335,9 @@ class CustomerController extends Controller
             'user_id' => $customer->id,
             'service_id' => $service->id,
             'status' => 'active',
-            'price' => $request->price ?? $service->price ?? 0,
-            'price_type' => $request->price_type,
-            'start_date' => $request->start_date,
+            'price' => $request->filled('price') ? $request->price : ($service->price ?? 0),
+            'price_type' => $request->filled('price_type') ? $request->price_type : ($service->price_type ?? 'eenmalig'),
+            'start_date' => now(),
         ]);
 
         return redirect()

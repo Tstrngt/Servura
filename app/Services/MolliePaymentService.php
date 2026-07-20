@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CustomerService;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Models\TransactionLog;
@@ -74,6 +75,13 @@ class MolliePaymentService
                 'transaction_date' => now(),
                 'reference' => $paymentId,
             ]);
+
+            // Set start_date on linked customer services (start = payment date)
+            $serviceIds = $invoice->lines()->whereNotNull('customer_service_id')->pluck('customer_service_id');
+            if ($serviceIds->isNotEmpty()) {
+                CustomerService::whereIn('id', $serviceIds)
+                    ->update(['start_date' => now()]);
+            }
 
             TransactionLog::create([
                 'user_id' => $invoice->user_id,
