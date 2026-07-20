@@ -26,7 +26,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('admin.financial.invoices.store') }}" x-data="invoiceForm">
+            <form method="POST" action="{{ route('admin.financial.invoices.store') }}" id="invoiceForm">
                 @csrf
 
                 <div class="bg-white shadow rounded-lg p-6 mb-6">
@@ -52,42 +52,23 @@
                 <div class="bg-white shadow rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Factuurregels</h3>
 
-                    <template x-for="(line, index) in lines" :key="index">
-                        <div class="grid grid-cols-12 gap-3 mb-3 items-end">
-                            <div class="col-span-6">
-                                <label x-show="index === 0" class="block text-sm font-medium text-gray-700 mb-1">Omschrijving</label>
-                                <input type="text" :name="'lines['+index+'][description]'" x-model="line.description" class="form-input w-full" required>
-                            </div>
-                            <div class="col-span-2">
-                                <label x-show="index === 0" class="block text-sm font-medium text-gray-700 mb-1">Aantal</label>
-                                <input type="number" :name="'lines['+index+'][quantity]'" x-model.number="line.quantity" min="1" class="form-input w-full" required>
-                            </div>
-                            <div class="col-span-3">
-                                <label x-show="index === 0" class="block text-sm font-medium text-gray-700 mb-1">Stuksprijs</label>
-                                <input type="number" :name="'lines['+index+'][unit_price]'" x-model.number="line.unit_price" step="0.01" min="0" class="form-input w-full" required>
-                            </div>
-                            <div class="col-span-1">
-                                <button type="button" x-on:click="removeLine(index)" x-show="lines.length > 1" class="text-red-500 hover:text-red-700 p-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </div>
-                        </div>
-                    </template>
+                    <div class="mb-3 grid grid-cols-12 gap-3">
+                        <div class="col-span-6"><span class="block text-sm font-medium text-gray-700">Omschrijving</span></div>
+                        <div class="col-span-2"><span class="block text-sm font-medium text-gray-700">Aantal</span></div>
+                        <div class="col-span-3"><span class="block text-sm font-medium text-gray-700">Stuksprijs</span></div>
+                        <div class="col-span-1"></div>
+                    </div>
 
-                    <button type="button" x-on:click="addLine()" class="mt-2 text-sm text-primary-600 hover:text-primary-500 font-medium">
+                    <div id="invoice-lines"></div>
+
+                    <button type="button" id="add-line-btn" class="mt-2 text-sm text-primary-600 hover:text-primary-500 font-medium">
                         + Regel toevoegen
                     </button>
 
                     <div class="mt-6 border-t pt-4 text-right">
-                        <div class="text-sm text-gray-600">
-                            Subtotaal: <span class="font-medium" x-text="'€' + subtotal().toFixed(2).replace('.', ',')"></span>
-                        </div>
-                        <div class="text-sm text-gray-600">
-                            BTW (21%): <span class="font-medium" x-text="'€' + vat().toFixed(2).replace('.', ',')"></span>
-                        </div>
-                        <div class="text-lg font-bold text-gray-900 mt-1">
-                            Totaal: <span x-text="'€' + total().toFixed(2).replace('.', ',')"></span>
-                        </div>
+                        <div class="text-sm text-gray-600">Subtotaal: <span class="font-medium" id="calc-subtotal">€0,00</span></div>
+                        <div class="text-sm text-gray-600">BTW (21%): <span class="font-medium" id="calc-vat">€0,00</span></div>
+                        <div class="text-lg font-bold text-gray-900 mt-1">Totaal: <span id="calc-total">€0,00</span></div>
                     </div>
                 </div>
 
@@ -98,4 +79,80 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var lineCount = 0;
+    var container = document.getElementById('invoice-lines');
+    var addBtn = document.getElementById('add-line-btn');
+
+    function createLine() {
+        var i = lineCount++;
+        var row = document.createElement('div');
+        row.className = 'grid grid-cols-12 gap-3 mb-3 items-end';
+        row.id = 'line-' + i;
+        row.innerHTML =
+            '<div class="col-span-6">' +
+                '<input type="text" name="lines[' + i + '][description]" class="form-input w-full" placeholder="Omschrijving" required>' +
+            '</div>' +
+            '<div class="col-span-2">' +
+                '<input type="number" name="lines[' + i + '][quantity]" class="form-input w-full line-qty" value="1" min="1" required>' +
+            '</div>' +
+            '<div class="col-span-3">' +
+                '<input type="number" name="lines[' + i + '][unit_price]" class="form-input w-full line-price" value="0" step="0.01" min="0" required>' +
+            '</div>' +
+            '<div class="col-span-1">' +
+                '<button type="button" class="remove-line text-red-500 hover:text-red-700 p-2" data-line="' + i + '">' +
+                    '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>' +
+                '</button>' +
+            '</div>';
+        container.appendChild(row);
+        recalc();
+    }
+
+    function recalc() {
+        var subtotal = 0;
+        var rows = container.querySelectorAll('[id^="line-"]');
+        rows.forEach(function(row) {
+            var qty = parseFloat(row.querySelector('.line-qty').value) || 0;
+            var price = parseFloat(row.querySelector('.line-price').value) || 0;
+            subtotal += qty * price;
+        });
+        var vat = subtotal * 0.21;
+        var total = subtotal + vat;
+        document.getElementById('calc-subtotal').textContent = formatEuro(subtotal);
+        document.getElementById('calc-vat').textContent = formatEuro(vat);
+        document.getElementById('calc-total').textContent = formatEuro(total);
+    }
+
+    function formatEuro(val) {
+        return '\u20AC' + val.toFixed(2).replace('.', ',');
+    }
+
+    addBtn.addEventListener('click', function() {
+        createLine();
+    });
+
+    container.addEventListener('click', function(e) {
+        var btn = e.target.closest('.remove-line');
+        if (btn) {
+            var lineId = btn.getAttribute('data-line');
+            var row = document.getElementById('line-' + lineId);
+            if (row && container.children.length > 1) {
+                row.remove();
+                recalc();
+            }
+        }
+    });
+
+    container.addEventListener('input', function(e) {
+        if (e.target.classList.contains('line-qty') || e.target.classList.contains('line-price')) {
+            recalc();
+        }
+    });
+
+    // Start with one line
+    createLine();
+});
+</script>
 @endsection
