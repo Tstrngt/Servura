@@ -2,6 +2,7 @@
     "name": "servura",
     "version": "1.0.0",
     "description": "Servura webapp frontend assets",
+    "type": "module",
     "private": true,
     "scripts": {
         "dev": "vite",

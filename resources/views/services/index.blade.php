@@ -5,165 +5,206 @@
 @section('meta-keywords', 'diensten, webdesign, hosting, onderhoud, mkb, website ontwikkeling')
 
 @section('content')
+@php
+$featuredServices = $services->sortBy('sort_order')->values()->take(3);
+$first = $featuredServices[0] ?? null;
+$second = $featuredServices[1] ?? null;
+$third = $featuredServices[2] ?? null;
+
+$steps = [
+    ['title' => 'Kennismaking', 'text' => 'Iedere samenwerking begint met een vrijblijvend kennismakingsgesprek. Tijdens dit gesprek bespreken we uw bedrijf, doelgroep, wensen en doelstellingen. Op basis daarvan geven we advies over de beste oplossing voor uw online aanwezigheid.', 'color' => 'primary'],
+    ['title' => 'Voorstel', 'text' => 'Na het kennismakingsgesprek ontvangt u een helder en overzichtelijk voorstel. Hierin beschrijven we de werkzaamheden, planning, investering en eventuele aanvullende mogelijkheden, zodat u precies weet waar u aan toe bent.', 'color' => 'accent'],
+    ['title' => 'Ontwikkeling', 'text' => 'Na akkoord starten we met het ontwerpen en ontwikkelen van uw website. Tijdens dit proces houden we u op de hoogte van de voortgang en is er ruimte voor feedback, zodat het eindresultaat volledig aansluit bij uw verwachtingen.', 'color' => 'secondary'],
+    ['title' => 'Lancering', 'text' => 'Wanneer de website volledig is getest en goedgekeurd, verzorgen wij de livegang. Ook na de lancering blijven wij beschikbaar voor hosting, onderhoud, beveiligingsupdates en ondersteuning, zodat uw website veilig, snel en altijd optimaal blijft presteren.', 'color' => 'emerald'],
+];
+@endphp
+
 <!-- Hero Section -->
-<section class="bg-white py-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                Onze Diensten
-            </h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Alles wat uw bedrijf nodig heeft voor een professionele online aanwezigheid. 
-                Van een nieuwe website tot betrouwbare hosting en ongoing support.
-            </p>
+<section class="relative py-24 lg:py-32 overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 text-white">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-accent-900/20 via-transparent to-transparent"></div>
+
+    <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        <h1 class="font-display text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight animate-slide-up">
+            Diensten die <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-200 via-accent-200 to-white">uw groei</span> versnellen
+        </h1>
+        <p class="text-xl md:text-2xl text-primary-100 max-w-3xl mx-auto mb-10 animate-slide-up" style="animation-delay: 0.1s">
+            Drie heldere pakketten, van start-up tot uitgebreide webshop. Kies wat bij uw ambities past.
+        </p>
+        <div class="animate-slide-up" style="animation-delay: 0.2s">
+            <a href="#pakketten" class="btn bg-white text-primary-700 hover:bg-primary-50 font-bold text-lg px-8 py-4 shadow-xl transition-transform hover:scale-105">
+                Bekijk de pakketten
+            </a>
         </div>
     </div>
 </section>
 
-<!-- Services Grid -->
-@if($services->count() > 0)
-<section class="py-16 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach($services as $service)
-                <div class="service-card {{ $service->is_popular ? 'featured' : '' }} animate-on-scroll">
-                    @if($service->is_popular)
-                        <div class="bg-primary-600 text-white text-center py-2 text-sm font-semibold">
-                            Meest Populair
-                        </div>
-                    @endif
-                    
-                    @if($service->image_url)
-                        <img src="{{ $service->image_url }}" alt="{{ $service->title }}" class="w-full h-48 object-cover">
-                    @else
-                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
-                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                            </svg>
-                        </div>
-                    @endif
-                    
-                    <div class="card-body">
-                        <h3 class="text-xl font-semibold mb-2">{{ $service->title }}</h3>
-                        <p class="text-gray-600 mb-4">{{ $service->short_description }}</p>
-                        
-                        @if($service->features && count($service->features) > 0)
-                            <ul class="space-y-2 mb-6">
-                                @foreach(array_slice($service->features, 0, 3) as $feature)
-                                    <li class="flex items-center text-sm text-gray-600">
-                                        <svg class="w-4 h-4 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                        </svg>
-                                        {{ $feature }}
-                                    </li>
-                                @endforeach
-                                @if(count($service->features) > 3)
-                                    <li class="text-sm text-gray-500">
-                                        En nog {{ count($service->features) - 3 }} meer...
-                                    </li>
-                                @endif
-                            </ul>
-                        @endif
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-2xl font-bold text-primary-600">{{ $service->formatted_price }}</span>
-                        </div>
-                        
-                        <a href="{{ route('services.show', $service) }}" class="btn btn-primary w-full">
-                            Meer Informatie
-                        </a>
-                    </div>
+@if($first)
+<!-- Featured Service -->
+<section id="basis" class="relative py-20 lg:py-28 bg-gradient-to-b from-slate-50 via-white to-slate-50 overflow-hidden">
+    <div class="absolute top-0 right-0 w-[35rem] h-[35rem] bg-primary-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+    <div class="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-accent-200/30 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16 animate-on-scroll">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-accent-100 text-accent-700 text-sm font-semibold tracking-wide uppercase mb-4">Basis pakket</span>
+            <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4">{{ $first->title }}</h2>
+            <p class="text-xl text-slate-600 max-w-2xl mx-auto">{{ $first->short_description }}</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="animate-on-scroll">
+                <div class="prose prose-lg text-slate-600 mb-8">{!! $first->description !!}</div>
+
+                <div class="flex items-baseline gap-4 mb-8">
+                    <span class="text-5xl font-bold text-slate-900">{{ $first->formatted_price }}</span>
+                    <span class="text-slate-500">eenmalig</span>
                 </div>
-            @endforeach
+
+                <a href="{{ route('services.show', $first) }}" class="btn btn-primary text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all">
+                    Bekijk details
+                </a>
+            </div>
+
+            <div class="relative h-[460px] hidden lg:block animate-on-scroll">
+                <div class="absolute top-0 left-8 w-56 h-36 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center text-center font-semibold shadow-2xl animate-float">
+                    Homepage ontwerp
+                </div>
+                <div class="absolute top-24 right-0 w-56 h-36 rounded-2xl bg-gradient-to-br from-accent-500 to-accent-700 text-white flex items-center justify-center text-center font-semibold shadow-2xl animate-float" style="animation-delay: 1s">
+                    Mobiel vriendelijk
+                </div>
+                <div class="absolute bottom-24 left-0 w-56 h-36 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white flex items-center justify-center text-center font-semibold shadow-2xl animate-float" style="animation-delay: 2s">
+                    Contactformulier
+                </div>
+                <div class="absolute bottom-0 right-12 w-56 h-36 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center text-center font-semibold shadow-2xl animate-float" style="animation-delay: 3s">
+                    Eigen input
+                </div>
+            </div>
         </div>
     </div>
 </section>
-@else
-<section class="py-16 bg-gray-50">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div class="bg-white p-8 rounded-lg shadow-sm">
-            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-            </svg>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">Geen diensten beschikbaar</h3>
-            <p class="text-gray-600 mb-4">
- Er zijn momenteel geen diensten beschikbaar. Neem contact met ons op voor een maatwerk oplossing.
-            </p>
-            <a href="{{ route('contact') }}" class="btn btn-primary">
-                Neem Contact Op
-            </a>
+@endif
+
+@if($second || $third)
+<!-- Comparison Section -->
+<section id="pakketten" class="py-16 lg:py-24 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-12 animate-on-scroll">
+            <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-3 block">Doorontwikkeling</span>
+            <h2 class="font-heading text-3xl md:text-4xl font-bold text-slate-900 mb-4">Doorontwikkel uw pakket</h2>
+            <p class="text-xl text-slate-600 max-w-2xl mx-auto">Elke volgende optie bevat alles van de vorige, plus extra mogelijkheden.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            @if($second)
+            <div class="group bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden hover:shadow-xl transition-all duration-300 animate-on-scroll">
+                <div class="h-2 bg-gradient-to-r from-secondary-500 to-accent-500"></div>
+                <div class="p-8 lg:p-10">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-heading text-2xl font-bold text-slate-900">{{ $second->title }}</h3>
+                        <span class="px-3 py-1 rounded-full bg-secondary-100 text-secondary-700 text-sm font-semibold">Stap 2</span>
+                    </div>
+                    <p class="text-slate-600 mb-6">{{ $second->short_description }}</p>
+
+                    @if($second->features && count($second->features) > 0)
+                        <ul class="space-y-3 mb-8">
+                            @foreach(array_slice($second->features, 0, 6) as $feature)
+                                <li class="flex items-start text-sm text-slate-700">
+                                    <svg class="w-5 h-5 text-accent-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                    {{ $feature }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+
+                    <div class="text-3xl font-bold text-slate-900 mb-6">{{ $second->formatted_price }}</div>
+                    <a href="{{ route('services.show', $second) }}" class="btn btn-primary w-full">
+                        Bekijk {{ $second->title }}
+                    </a>
+                </div>
+            </div>
+            @endif
+
+            @if($third)
+            <div class="group bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden hover:shadow-xl transition-all duration-300 animate-on-scroll">
+                <div class="h-2 bg-gradient-to-r from-amber-500 to-rose-500"></div>
+                <div class="p-8 lg:p-10">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-heading text-2xl font-bold text-slate-900">{{ $third->title }}</h3>
+                        <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-semibold">Stap 3</span>
+                    </div>
+                    <p class="text-slate-600 mb-6">{{ $third->short_description }}</p>
+
+                    @if($third->features && count($third->features) > 0)
+                        <ul class="space-y-3 mb-8">
+                            @foreach(array_slice($third->features, 0, 6) as $feature)
+                                <li class="flex items-start text-sm text-slate-700">
+                                    <svg class="w-5 h-5 text-amber-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                    {{ $feature }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+
+                    <div class="text-3xl font-bold text-slate-900 mb-6">{{ $third->formatted_price }}</div>
+                    <a href="{{ route('services.show', $third) }}" class="btn btn-primary w-full">
+                        Bekijk {{ $third->title }}
+                    </a>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </section>
 @endif
 
 <!-- Process Section -->
-<section class="py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Ons Proces
-            </h2>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                Van eerste contact tot lancering, wij begeleiden u bij elke stap.
-            </p>
+<section class="py-16 lg:py-24 bg-white">
+    <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12 animate-on-scroll">
+            <span class="text-primary-600 font-semibold tracking-wide uppercase text-sm mb-3 block">Werkwijze</span>
+            <h2 class="font-heading text-3xl md:text-4xl font-bold text-slate-900 mb-4">Ons Proces</h2>
+            <p class="text-xl text-slate-600 max-w-2xl mx-auto">Van eerste contact tot lancering, wij begeleiden u bij elke stap.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div class="text-center">
-                <div class="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">
-                    1
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            @foreach($steps as $index => $step)
+                @php
+                    $colorClasses = [
+                        'primary' => 'bg-primary-500',
+                        'accent' => 'bg-accent-500',
+                        'secondary' => 'bg-secondary-500',
+                        'emerald' => 'bg-emerald-500',
+                    ][$step['color']];
+                @endphp
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:shadow-lg transition-all duration-300 animate-on-scroll">
+                    <div class="w-12 h-12 {{ $colorClasses }} text-white rounded-full flex items-center justify-center mb-4 font-bold text-lg shadow-md">
+                        {{ $index + 1 }}
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-slate-900 mb-2">{{ $step['title'] }}</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">{{ $step['text'] }}</p>
                 </div>
-                <h3 class="text-lg font-semibold mb-2">Kennismaking</h3>
-                <p class="text-gray-600 text-sm">
-                    Gratis adviesgesprek om uw wensen en doelen te bespreken.
-                </p>
-            </div>
-
-            <div class="text-center">
-                <div class="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">
-                    2
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Voorstel</h3>
-                <p class="text-gray-600 text-sm">
-                    Maatwerk voorstel met duidelijke prijs en planning.
-                </p>
-            </div>
-
-            <div class="text-center">
-                <div class="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">
-                    3
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Ontwikkeling</h3>
-                <p class="text-gray-600 text-sm">
-                    Professionele ontwikkeling met regelmatige updates.
-                </p>
-            </div>
-
-            <div class="text-center">
-                <div class="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">
-                    4
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Lancering</h3>
-                <p class="text-gray-600 text-sm">
-                    Lancering en ongoing support voor optimaal resultaat.
-                </p>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
 
 <!-- CTA Section -->
-<section class="py-16 bg-primary-600 text-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+<section class="py-16 bg-gradient-to-br from-primary-700 via-accent-600 to-primary-900 text-white relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent"></div>
+
+    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+        <h2 class="font-display text-3xl md:text-4xl font-bold mb-4">
             Welke dienst past bij uw bedrijf?
         </h2>
-        <p class="text-xl text-primary-100 mb-8">
+        <p class="text-xl text-white/90 mb-8">
             Plan een gratis adviesgesprek en ontdek de beste oplossing voor uw bedrijf.
         </p>
-        <a href="{{ route('contact') }}" class="btn bg-white text-primary-600 hover:bg-primary-50 text-lg px-8 py-4">
-            Plan Adviesgesprek
+        <a href="{{ route('contact') }}" class="btn bg-white text-primary-700 hover:bg-slate-100 text-lg px-8 py-4 shadow-xl font-bold transition-transform hover:scale-105">
+            Plan een gratis adviesgesprek
         </a>
     </div>
 </section>

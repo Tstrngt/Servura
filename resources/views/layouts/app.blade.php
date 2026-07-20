@@ -36,6 +36,18 @@
     <meta name="twitter:image" content="@yield('twitter:image', asset('images/og-image.jpg'))">
 </head>
 <body class="bg-gray-50" x-data="{ mobileMenu: false }">
+    <!-- Page transition loader -->
+    <div id="page-loader" class="fixed inset-0 z-[60] flex items-center justify-center bg-white/95 backdrop-blur-sm transition-opacity duration-500">
+        <div class="flex flex-col items-center">
+            <span class="logo-text text-4xl font-extrabold logo-mark mb-4 animate-pulse-soft">Servura</span>
+            <svg class="animate-spin h-6 w-6 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="mt-3 text-sm font-medium text-gray-500">Laden...</span>
+        </div>
+    </div>
+
     <!-- Navigation -->
     @unless(request()->routeIs('admin.*'))
     <nav class="bg-white shadow-sm sticky top-0 z-50">
@@ -43,8 +55,9 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex-shrink-0">
-                    <a href="{{ route('home') }}" class="flex items-center">
-                        <span class="text-2xl font-bold text-primary-600">Servura</span>
+                    <a href="{{ route('home') }}" class="flex items-center group" aria-label="Servura home">
+                        <span class="logo-text text-2xl font-extrabold logo-mark group-hover:opacity-80 transition-opacity">Servura</span>
+                        <span class="ml-1 text-2xl font-logo font-bold text-primary-600 animate-pulse-soft">.</span>
                     </a>
                 </div>
 
@@ -182,9 +195,9 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- Company Info -->
                 <div class="col-span-1 md:col-span-2">
-                    <h3 class="text-lg font-semibold mb-4">Servura</h3>
+                    <h3 class="logo-text text-2xl font-bold logo-mark mb-4">Servura<span class="text-primary-400">.</span></h3>
                     <p class="text-gray-300 mb-4">
-                        Professionele websites en hosting voor het MKB. Wij helpen ondernemers met een sterke online aanwezigheid.
+                        Servura biedt de oplossing voor mkb-ondernemers van het opbouwen van een online omgeving en het hosten. Tot hulp bij aanpassingen.
                     </p>
                     <div class="flex space-x-4">
                         <!-- Social media links can be added here -->
@@ -207,7 +220,7 @@
                     <h4 class="text-lg font-semibold mb-4">Contact</h4>
                     <ul class="space-y-2 text-gray-300">
                         <li>Neem contact met ons op via het contactformulier</li>
-                        <li>We reageren binnen 24 uur</li>
+                        <li>We reageren binnen 48 uur</li>
                         <li>Gratis adviesgesprek</li>
                     </ul>
                 </div>
@@ -219,6 +232,29 @@
         </div>
     </footer>
     @endunless
+
+    <!-- Page transition script -->
+    <script>
+        (function() {
+            const loader = document.getElementById('page-loader');
+            if (!loader) return;
+
+            function hideLoader() {
+                setTimeout(() => {
+                    loader.classList.add('opacity-0', 'pointer-events-none');
+                }, 200);
+            }
+
+            window.addEventListener('pageshow', function(e) {
+                if (e.persisted) hideLoader();
+            });
+            window.addEventListener('beforeunload', function() {
+                loader.classList.remove('opacity-0', 'pointer-events-none');
+            });
+
+            hideLoader();
+        })();
+    </script>
 
     <!-- Scripts -->
     @vite(['resources/js/app.js'])
