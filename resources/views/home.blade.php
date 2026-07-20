@@ -6,7 +6,7 @@
 
 @section('content')
 @php
-$baseService = \App\Models\Service::active()->ordered()->first();
+$baseService = \App\Models\Service::active()->homepage()->ordered()->first();
 @endphp
 
 <!-- Hero Section -->
