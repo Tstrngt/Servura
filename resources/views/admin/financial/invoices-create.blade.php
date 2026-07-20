@@ -26,7 +26,14 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('admin.financial.invoices.store') }}" x-data="invoiceForm()">
+            <form method="POST" action="{{ route('admin.financial.invoices.store') }}" x-data="{
+                lines: [{ description: '', quantity: 1, unit_price: 0 }],
+                addLine() { this.lines.push({ description: '', quantity: 1, unit_price: 0 }); },
+                removeLine(index) { this.lines.splice(index, 1); },
+                subtotal() { return this.lines.reduce((sum, l) => sum + (l.quantity * l.unit_price), 0); },
+                vat() { return this.subtotal() * 0.21; },
+                total() { return this.subtotal() + this.vat(); }
+            }">
                 @csrf
 
                 <div class="bg-white shadow rounded-lg p-6 mb-6">
@@ -98,27 +105,4 @@
         </div>
     </div>
 </div>
-
-<script>
-function invoiceForm() {
-    return {
-        lines: [{ description: '', quantity: 1, unit_price: 0 }],
-        addLine() {
-            this.lines.push({ description: '', quantity: 1, unit_price: 0 });
-        },
-        removeLine(index) {
-            this.lines.splice(index, 1);
-        },
-        subtotal() {
-            return this.lines.reduce((sum, l) => sum + (l.quantity * l.unit_price), 0);
-        },
-        vat() {
-            return this.subtotal() * 0.21;
-        },
-        total() {
-            return this.subtotal() + this.vat();
-        }
-    }
-}
-</script>
 @endsection
