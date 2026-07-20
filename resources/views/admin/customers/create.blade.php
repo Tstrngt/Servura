@@ -162,6 +162,70 @@
                             </div>
                         </div>
 
+                        <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Adresgegevens</h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="form-group md:col-span-2">
+                                <label for="street" class="form-label">Straat</label>
+                                <input type="text" id="street" name="street" class="form-input" value="{{ old('street') }}" placeholder="Straatnaam">
+                                @error('street')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="house_number" class="form-label">Huisnummer</label>
+                                <input type="text" id="house_number" name="house_number" class="form-input" value="{{ old('house_number') }}" placeholder="1A">
+                                @error('house_number')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="form-group">
+                                <label for="postal_code" class="form-label">Postcode</label>
+                                <input type="text" id="postal_code" name="postal_code" class="form-input" value="{{ old('postal_code') }}" placeholder="1234 AB">
+                                @error('postal_code')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="city" class="form-label">Plaats</label>
+                                <input type="text" id="city" name="city" class="form-input" value="{{ old('city') }}" placeholder="Amsterdam">
+                                @error('city')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="country" class="form-label">Land</label>
+                                <input type="text" id="country" name="country" class="form-input" value="{{ old('country', 'Nederland') }}" placeholder="Nederland">
+                                @error('country')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Zakelijke gegevens</h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="form-group">
+                                <label for="kvk_number" class="form-label">KVK-nummer</label>
+                                <input type="text" id="kvk_number" name="kvk_number" class="form-input" value="{{ old('kvk_number') }}" placeholder="12345678">
+                                @error('kvk_number')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="vat_number" class="form-label">BTW-nummer</label>
+                                <input type="text" id="vat_number" name="vat_number" class="form-input" value="{{ old('vat_number') }}" placeholder="NL123456789B01">
+                                @error('vat_number')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Wachtwoord</h3>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div class="form-group">
                                 <label for="password" class="form-label">Wachtwoord *</label>

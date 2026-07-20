@@ -150,6 +150,30 @@
                                     </div>
                                 </div>
                                 <div>
+                                    <label class="block text-sm font-medium text-gray-700">Adres</label>
+                                    <div class="mt-1 text-sm text-gray-900">
+                                        @if($customer->street || $customer->city)
+                                            {{ $customer->street }} {{ $customer->house_number }}<br>
+                                            {{ $customer->postal_code }} {{ $customer->city }}<br>
+                                            {{ $customer->country }}
+                                        @else
+                                            -
+                                        @endif
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">KVK-nummer</label>
+                                    <div class="mt-1 text-sm text-gray-900">
+                                        {{ $customer->kvk_number ?: '-' }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">BTW-nummer</label>
+                                    <div class="mt-1 text-sm text-gray-900">
+                                        {{ $customer->vat_number ?: '-' }}
+                                    </div>
+                                </div>
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700">Aangemaakt op</label>
                                     <div class="mt-1 text-sm text-gray-900">
                                         {{ $customer->created_at->format('d-m-Y H:i') }}
