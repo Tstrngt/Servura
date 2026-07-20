@@ -82,7 +82,7 @@
 
         <div class="px-4 py-6 sm:px-0 space-y-6">
             <!-- Row: Description + Ticket details -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                 <div class="lg:col-span-2">
                     <!-- Description and attachments -->
                     <div class="bg-white shadow rounded-lg">
@@ -168,10 +168,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Row: Replies + management -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                 <div class="lg:col-span-2 space-y-6">
                     <!-- Replies -->
                     <div class="bg-white shadow rounded-lg">
