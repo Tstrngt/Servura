@@ -125,5 +125,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+Alpine.data('invoiceForm', () => ({
+    lines: [{ description: '', quantity: 1, unit_price: 0 }],
+    addLine() {
+        this.lines.push({ description: '', quantity: 1, unit_price: 0 });
+    },
+    removeLine(index) {
+        this.lines.splice(index, 1);
+    },
+    subtotal() {
+        return this.lines.reduce((sum, l) => sum + (l.quantity * l.unit_price), 0);
+    },
+    vat() {
+        return this.subtotal() * 0.21;
+    },
+    total() {
+        return this.subtotal() + this.vat();
+    }
+}));
+
 // Initialize Alpine.js
 Alpine.start();
