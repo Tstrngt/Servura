@@ -109,6 +109,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/customers/{customer}/toggle-status', [AdminCustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
         Route::post('/customers/{customer}/reset-password', [AdminCustomerController::class, 'resetPassword'])->name('customers.reset-password');
         Route::get('/customers/{customer}/services', [AdminCustomerController::class, 'services'])->name('customers.services');
+        Route::post('/customers/{customer}/services', [AdminCustomerController::class, 'storeService'])->name('customers.services.store');
+        Route::post('/customers/{customer}/services/{service}/cancel', [AdminCustomerController::class, 'cancelService'])->name('customers.services.cancel');
         Route::get('/customers/{customer}/tickets', [AdminCustomerController::class, 'tickets'])->name('customers.tickets');
 
         // Services (bind by id, not slug)

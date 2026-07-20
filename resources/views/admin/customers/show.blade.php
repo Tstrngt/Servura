@@ -227,140 +227,220 @@
             </div>
         </div>
 
-        <!-- Tabs -->
-        <div class="px-4 py-6 sm:px-0">
-            <div class="bg-white shadow rounded-lg">
-                <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
-                        <a href="#" class="tab-active border-primary-500 text-primary-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                            Diensten
-                        </a>
-                        <a href="{{ route('admin.customers.tickets', $customer) }}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                            Tickets ({{ $stats['total_tickets'] }})
-                        </a>
-                    </nav>
-                </div>
-
-                <!-- Services Tab -->
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-medium text-gray-900">Diensten</h3>
-                        <a href="#" class="text-sm text-primary-600 hover:text-primary-500">
-                            Dienst Toewijzen
-                        </a>
-                    </div>
-
-                    @if($customer->customerServices->count() > 0)
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Dienst
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Status
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Prijs
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Startdatum
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Einddatum
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($customer->customerServices as $service)
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    {{ $service->service->title }}
-                                                </div>
-                                                <div class="text-sm text-gray-500">
-                                                    {{ $service->service->short_description }}
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $service->statusLabel['color'] }}-100 text-{{ $service->statusLabel['color'] }}-800">
-                                                    {{ $service->statusLabel['text'] }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $service->formatted_price }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $service->start_date->format('d-m-Y') }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $service->end_date ? $service->end_date->format('d-m-Y') : 'Onbeperkt' }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-8">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                            </svg>
-                            <h3 class="mt-2 text-sm font-medium text-gray-900">Geen diensten</h3>
-                            <p class="mt-1 text-sm text-gray-500">
-                                Deze klant heeft nog geen diensten toegewezen.
-                            </p>
-                            <div class="mt-6">
-                                <a href="#" class="btn btn-primary">
-                                    Eerste Dienst Toewijzen
-                                </a>
-                            </div>
-                        </div>
-                    @endif
-                </div>
+        <!-- Tabs Navigation -->
+        <div class="px-4 sm:px-0 mb-6">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                    <a href="{{ route('admin.customers.show', $customer) }}" class="{{ !request('tab') || request('tab') === 'overview' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Overzicht
+                    </a>
+                    <a href="{{ route('admin.customers.show', [$customer, 'tab' => 'services']) }}" class="{{ request('tab') === 'services' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Diensten ({{ $stats['total_services'] }})
+                    </a>
+                    <a href="{{ route('admin.customers.show', [$customer, 'tab' => 'invoices']) }}" class="{{ request('tab') === 'invoices' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Facturen ({{ $stats['total_invoices'] ?? 0 }})
+                    </a>
+                    <a href="{{ route('admin.customers.show', [$customer, 'tab' => 'tickets']) }}" class="{{ request('tab') === 'tickets' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Tickets ({{ $stats['total_tickets'] }})
+                    </a>
+                </nav>
             </div>
         </div>
 
-        <!-- Recent Tickets -->
-        @if($customer->tickets->count() > 0)
-            <div class="px-4 py-6 sm:px-0">
-                <div class="bg-white shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-medium text-gray-900">Recente Tickets</h3>
-                            <a href="{{ route('admin.customers.tickets', $customer) }}" class="text-sm text-primary-600 hover:text-primary-500">
-                                Bekijk alle tickets
-                            </a>
-                        </div>
+        <!-- Tab Content -->
+        <div class="px-4 py-6 sm:px-0">
+            @if(!request('tab') || request('tab') === 'overview')
+                <!-- Overview Tab -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Recente Activiteit</h3>
+                    @if($customer->tickets->count() > 0)
                         <div class="space-y-3">
                             @foreach($customer->tickets as $ticket)
                                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded-md">
                                     <div class="flex-1">
                                         <a href="{{ route('admin.tickets.show', $ticket) }}" class="block hover:text-primary-600">
-                                            <div class="text-sm font-medium text-gray-900">
-                                                {{ $ticket->ticket_number }}
-                                            </div>
-                                            <div class="text-sm text-gray-500">
-                                                {{ $ticket->title }}
-                                            </div>
+                                            <div class="text-sm font-medium text-gray-900">{{ $ticket->ticket_number }}</div>
+                                            <div class="text-sm text-gray-500">{{ $ticket->title }}</div>
                                         </a>
-                                        <div class="text-xs text-gray-400">
-                                            {{ $ticket->created_at->format('d-m-Y H:i') }}
-                                        </div>
+                                        <div class="text-xs text-gray-400">{{ $ticket->created_at->format('d-m-Y H:i') }}</div>
                                     </div>
-                                    <div class="ml-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->statusLabel['color'] }}-100 text-{{ $ticket->statusLabel['color'] }}-800">
+                                        {{ $ticket->statusLabel['text'] }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-sm text-gray-500">Geen recente activiteit.</p>
+                    @endif
+                </div>
+
+            @elseif(request('tab') === 'services')
+                <!-- Services Tab -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Diensten</h3>
+                            <button type="button" id="show-assign-form" class="btn btn-primary text-sm">Dienst Toewijzen</button>
+                        </div>
+
+                        <!-- Assign Service Form -->
+                        <div id="assign-form" class="hidden mb-6 p-4 bg-gray-50 rounded-lg border">
+                            <h4 class="text-sm font-medium text-gray-900 mb-3">Nieuwe dienst toewijzen</h4>
+                            <form method="POST" action="{{ route('admin.customers.services.store', $customer) }}">
+                                @csrf
+                                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">Dienst</label>
+                                        <select name="service_id" class="form-input w-full text-sm" required>
+                                            <option value="">Kies...</option>
+                                            @foreach($availableServices as $svc)
+                                                <option value="{{ $svc->id }}">{{ $svc->title }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">Prijs</label>
+                                        <input type="number" name="price" step="0.01" min="0" class="form-input w-full text-sm" placeholder="0.00">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">Type</label>
+                                        <select name="price_type" class="form-input w-full text-sm">
+                                            <option value="eenmalig">Eenmalig</option>
+                                            <option value="maandelijks">Maandelijks</option>
+                                            <option value="jaarlijks">Jaarlijks</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">Startdatum</label>
+                                        <input type="date" name="start_date" class="form-input w-full text-sm" value="{{ date('Y-m-d') }}" required>
+                                    </div>
+                                    <div>
+                                        <button type="submit" class="btn btn-primary text-sm w-full">Toewijzen</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        @if($customer->customerServices->count() > 0)
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dienst</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prijs</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Startdatum</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Einddatum</th>
+                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acties</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        @foreach($customer->customerServices as $cs)
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="text-sm font-medium text-gray-900">{{ $cs->service->title }}</div>
+                                                    <div class="text-sm text-gray-500">{{ $cs->service->short_description }}</div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $cs->statusLabel['color'] }}-100 text-{{ $cs->statusLabel['color'] }}-800">
+                                                        {{ $cs->statusLabel['text'] }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $cs->formatted_price }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $cs->start_date->format('d-m-Y') }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $cs->end_date ? $cs->end_date->format('d-m-Y') : 'Onbeperkt' }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                                    @if($cs->status === 'active')
+                                                        <form method="POST" action="{{ route('admin.customers.services.cancel', [$customer, $cs]) }}" class="inline">
+                                                            @csrf
+                                                            <button type="submit" class="text-sm text-red-600 hover:text-red-500">Annuleren</button>
+                                                        </form>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="text-center py-8">
+                                <h3 class="text-sm font-medium text-gray-900">Geen diensten</h3>
+                                <p class="mt-1 text-sm text-gray-500">Klik op "Dienst Toewijzen" om een dienst toe te voegen.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+            @elseif(request('tab') === 'invoices')
+                <!-- Invoices Tab -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Facturen</h3>
+                        @if(isset($invoices) && $invoices->count() > 0)
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Factuurnummer</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
+                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Bedrag</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        @foreach($invoices as $invoice)
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                    <a href="{{ route('admin.financial.invoices.show', $invoice) }}" class="text-primary-600 hover:text-primary-500 font-medium">{{ $invoice->invoice_number }}</a>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $invoice->invoice_date->format('d-m-Y') }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">€{{ number_format($invoice->total, 2, ',', '.') }}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $invoice->statusLabel['color'] }}-100 text-{{ $invoice->statusLabel['color'] }}-800">
+                                                        {{ $invoice->statusLabel['text'] }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 text-center py-8">Geen facturen voor deze klant.</p>
+                        @endif
+                    </div>
+                </div>
+
+            @elseif(request('tab') === 'tickets')
+                <!-- Tickets Tab -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Tickets</h3>
+                        @if($customer->tickets->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($customer->tickets as $ticket)
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                                        <div class="flex-1">
+                                            <a href="{{ route('admin.tickets.show', $ticket) }}" class="block hover:text-primary-600">
+                                                <div class="text-sm font-medium text-gray-900">{{ $ticket->ticket_number }}</div>
+                                                <div class="text-sm text-gray-500">{{ $ticket->title }}</div>
+                                            </a>
+                                            <div class="text-xs text-gray-400">{{ $ticket->created_at->format('d-m-Y H:i') }}</div>
+                                        </div>
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->statusLabel['color'] }}-100 text-{{ $ticket->statusLabel['color'] }}-800">
                                             {{ $ticket->statusLabel['text'] }}
                                         </span>
                                     </div>
-                                </div>
-                            @endforeach
-                        </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 text-center py-8">Geen tickets voor deze klant.</p>
+                        @endif
                     </div>
                 </div>
-            </div>
-        @endif
+            @endif
+        </div>
     </div>
 </div>
 
@@ -405,9 +485,17 @@
 function openPasswordModal() {
     document.getElementById('passwordModal').classList.remove('hidden');
 }
-
 function closePasswordModal() {
     document.getElementById('passwordModal').classList.add('hidden');
 }
+document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('show-assign-form');
+    var form = document.getElementById('assign-form');
+    if (btn && form) {
+        btn.addEventListener('click', function() {
+            form.classList.toggle('hidden');
+        });
+    }
+});
 </script>
 @endsection

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\CustomerService;
+use App\Models\Invoice;
+use App\Models\Service;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -125,6 +127,7 @@ class CustomerController extends Controller
             'active_services' => $customer->activeServices()->count(),
             'total_tickets' => $customer->tickets()->count(),
             'open_tickets' => $customer->openTickets()->count(),
+            'total_invoices' => Invoice::where('user_id', $customer->id)->count(),
             'monthly_cost' => $customer->activeServices()
                 ->where('price_type', 'maandelijks')
                 ->sum('price'),
@@ -133,7 +136,13 @@ class CustomerController extends Controller
                 ->sum('price'),
         ];
 
-        return view('admin.customers.show', compact('customer', 'stats'));
+        // Data for services tab
+        $availableServices = Service::where('is_active', true)->orderBy('title')->get();
+
+        // Data for invoices tab
+        $invoices = Invoice::where('user_id', $customer->id)->latest('invoice_date')->get();
+
+        return view('admin.customers.show', compact('customer', 'stats', 'availableServices', 'invoices'));
     }
 
     /**
@@ -303,5 +312,53 @@ class CustomerController extends Controller
             ->paginate(15);
 
         return view('admin.customers.tickets', compact('customer', 'tickets'));
+    }
+
+    /**
+     * Assign a service to a customer (auto-generates invoice via observer).
+     */
+    public function storeService(Request $request, User $customer)
+    {
+        if (!$customer->isCustomer()) {
+            abort(404);
+        }
+
+        $request->validate([
+            'service_id' => 'required|exists:services,id',
+            'price' => 'nullable|numeric|min:0',
+            'price_type' => 'required|in:eenmalig,maandelijks,jaarlijks',
+            'start_date' => 'required|date',
+        ]);
+
+        $service = Service::findOrFail($request->service_id);
+
+        CustomerService::create([
+            'user_id' => $customer->id,
+            'service_id' => $service->id,
+            'status' => 'active',
+            'price' => $request->price ?? $service->price ?? 0,
+            'price_type' => $request->price_type,
+            'start_date' => $request->start_date,
+        ]);
+
+        return redirect()
+            ->route('admin.customers.show', [$customer, 'tab' => 'services'])
+            ->with('success', "Dienst \"{$service->title}\" is toegewezen en factuur is automatisch aangemaakt.");
+    }
+
+    /**
+     * Cancel a customer service.
+     */
+    public function cancelService(User $customer, CustomerService $service)
+    {
+        if (!$customer->isCustomer() || $service->user_id !== $customer->id) {
+            abort(404);
+        }
+
+        $service->update(['status' => 'cancelled']);
+
+        return redirect()
+            ->route('admin.customers.show', [$customer, 'tab' => 'services'])
+            ->with('success', 'Dienst is geannuleerd.');
     }
 }

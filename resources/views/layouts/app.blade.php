@@ -36,7 +36,8 @@
     <meta name="twitter:image" content="@yield('twitter:image', asset('images/og-image.jpg'))">
 </head>
 <body class="bg-gray-50" x-data="{ mobileMenu: false }">
-    <!-- Page transition loader -->
+    <!-- Page transition loader (only on public/customer pages) -->
+    @unless(request()->routeIs('admin.*'))
     <div id="page-loader" class="fixed inset-0 z-[60] flex items-center justify-center bg-white/95 backdrop-blur-sm transition-opacity duration-500">
         <div class="flex flex-col items-center">
             <span class="logo-text text-4xl font-extrabold logo-mark mb-4 animate-pulse-soft">Servura</span>
@@ -47,6 +48,7 @@
             <span class="mt-3 text-sm font-medium text-gray-500">Laden...</span>
         </div>
     </div>
+    @endunless
 
     <!-- Navigation -->
     @unless(request()->routeIs('admin.*'))
