@@ -13,6 +13,7 @@
                     <h1 class="text-2xl font-bold text-gray-900">Financieel</h1>
                     <p class="mt-1 text-sm text-gray-600">Beheer facturen, transacties en offertes.</p>
                 </div>
+                <a href="{{ route('admin.financial.invoices.create') }}" class="btn btn-primary">Nieuwe Factuur</a>
             </div>
         </div>
 
@@ -62,7 +63,9 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($invoices as $invoice)
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $invoice->invoice_number }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="{{ route('admin.financial.invoices.show', $invoice) }}" class="text-primary-600 hover:text-primary-500">{{ $invoice->invoice_number }}</a>
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-gray-900">{{ $invoice->user->name }}</div>
                                             <div class="text-sm text-gray-500">{{ $invoice->user->company }}</div>

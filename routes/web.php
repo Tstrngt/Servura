@@ -13,6 +13,9 @@ use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\FinancialController;
+use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
+use App\Http\Controllers\Customer\InvoiceController as CustomerInvoiceController;
+use App\Http\Controllers\MollieWebhookController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -69,6 +72,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/tickets/{ticket}/sluiten', [App\Http\Controllers\Customer\TicketController::class, 'close'])->name('tickets.close');
         Route::get('/tickets/attachments/{attachment}/download', [App\Http\Controllers\Customer\TicketController::class, 'downloadAttachment'])->name('tickets.attachments.download');
         Route::get('/tickets/attachments/{attachment}/preview', [App\Http\Controllers\Customer\TicketController::class, 'previewAttachment'])->name('tickets.attachments.preview');
+
+        // Invoices
+        Route::get('/facturen', [CustomerInvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('/facturen/{invoice}', [CustomerInvoiceController::class, 'show'])->name('invoices.show');
+        Route::post('/facturen/{invoice}/betalen', [CustomerInvoiceController::class, 'pay'])->name('invoices.pay');
+        Route::get('/facturen/{invoice}/betaling-retour', [CustomerInvoiceController::class, 'paymentReturn'])->name('invoices.payment.return');
     });
     
     // Notifications
@@ -113,6 +122,11 @@ Route::middleware('auth')->group(function () {
         // Financial
         Route::prefix('financial')->name('financial.')->group(function () {
             Route::get('/invoices', [FinancialController::class, 'invoices'])->name('invoices');
+            Route::get('/invoices/create', [AdminInvoiceController::class, 'create'])->name('invoices.create');
+            Route::post('/invoices', [AdminInvoiceController::class, 'store'])->name('invoices.store');
+            Route::get('/invoices/{invoice}', [AdminInvoiceController::class, 'show'])->name('invoices.show');
+            Route::post('/invoices/{invoice}/mark-sent', [AdminInvoiceController::class, 'markSent'])->name('invoices.mark-sent');
+            Route::post('/invoices/{invoice}/mark-paid', [AdminInvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
             Route::get('/transactions', [FinancialController::class, 'transactions'])->name('transactions');
             Route::get('/billable-items', [FinancialController::class, 'billableItems'])->name('billable-items');
             Route::get('/quotes', [FinancialController::class, 'quotes'])->name('quotes');
@@ -120,3 +134,6 @@ Route::middleware('auth')->group(function () {
         });
     });
 });
+
+// Mollie webhook (no auth, POST only)
+Route::post('/mollie/webhook', MollieWebhookController::class)->name('mollie.webhook');
