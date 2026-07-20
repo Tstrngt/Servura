@@ -253,6 +253,23 @@
                 </div>
 
                 <div class="lg:col-span-1 space-y-6">
+                    <!-- Customer card -->
+                    <div class="bg-white shadow rounded-lg">
+                        <div class="px-4 py-5 sm:p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Klant</h3>
+                            <div class="flex items-center">
+                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <span class="text-sm font-medium text-blue-700">{{ substr($ticket->user->name, 0, 2) }}</span>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ $ticket->user->name }}</div>
+                                    <div class="text-sm text-gray-500">{{ $ticket->user->email }}</div>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.customers.show', $ticket->user) }}" class="mt-3 inline-block text-primary-600 hover:text-primary-500 text-sm">Klantprofiel bekijken</a>
+                        </div>
+                    </div>
+
                     <!-- Ticket details -->
                     <div class="bg-white shadow rounded-lg">
                         <div class="px-4 py-5 sm:p-6">
@@ -352,22 +369,6 @@
                         </div>
                     </div>
 
-                    <!-- Customer card -->
-                    <div class="bg-white shadow rounded-lg">
-                        <div class="px-4 py-5 sm:p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Klant</h3>
-                            <div class="flex items-center mb-4">
-                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                    <span class="text-sm font-medium text-blue-700">{{ substr($ticket->user->name, 0, 2) }}</span>
-                                </div>
-                                <div class="ml-3">
-                                    <div class="text-sm font-medium text-gray-900">{{ $ticket->user->name }}</div>
-                                    <div class="text-sm text-gray-500">{{ $ticket->user->email }}</div>
-                                </div>
-                            </div>
-                            <a href="{{ route('admin.customers.show', $ticket->user) }}" class="text-primary-600 hover:text-primary-500 text-sm">Klantprofiel bekijken</a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
