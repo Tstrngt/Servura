@@ -281,45 +281,7 @@
                     <div class="px-4 py-5 sm:p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-medium text-gray-900">Diensten</h3>
-                            <button type="button" id="show-assign-form" class="btn btn-primary text-sm">Dienst Toewijzen</button>
-                        </div>
-
-                        <!-- Assign Service Form -->
-                        <div id="assign-form" class="hidden mb-6 p-4 bg-gray-50 rounded-lg border">
-                            <h4 class="text-sm font-medium text-gray-900 mb-3">Nieuwe dienst toewijzen</h4>
-                            <p class="text-xs text-gray-500 mb-3">Prijs en type worden automatisch overgenomen van de dienst. Overschrijf indien nodig.</p>
-                            <form method="POST" action="{{ route('admin.customers.services.store', $customer) }}">
-                                @csrf
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-                                    <div>
-                                        <label class="block text-xs font-medium text-gray-700 mb-1">Dienst</label>
-                                        <select name="service_id" class="form-input w-full text-sm" required>
-                                            <option value="">Kies...</option>
-                                            @foreach($availableServices as $svc)
-                                                <option value="{{ $svc->id }}" data-price="{{ $svc->price }}" data-type="{{ $svc->price_type }}">
-                                                    {{ $svc->title }} (€{{ number_format($svc->price, 2, ',', '.') }} / {{ $svc->price_type }})
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-gray-700 mb-1">Prijs (optioneel overschrijven)</label>
-                                        <input type="number" name="price" id="assign-price" step="0.01" min="0" class="form-input w-full text-sm" placeholder="Van dienst">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-gray-700 mb-1">Type (optioneel overschrijven)</label>
-                                        <select name="price_type" id="assign-type" class="form-input w-full text-sm">
-                                            <option value="">Van dienst</option>
-                                            <option value="eenmalig">Eenmalig</option>
-                                            <option value="maandelijks">Maandelijks</option>
-                                            <option value="jaarlijks">Jaarlijks</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <button type="submit" class="btn btn-primary text-sm w-full">Toewijzen</button>
-                                    </div>
-                                </div>
-                            </form>
+                            <a href="{{ route('admin.financial.quotes.create') }}" class="btn btn-primary text-sm">Offerte Aanmaken</a>
                         </div>
 
                         @if($customer->customerServices->count() > 0)
@@ -488,27 +450,5 @@ function openPasswordModal() {
 function closePasswordModal() {
     document.getElementById('passwordModal').classList.add('hidden');
 }
-document.addEventListener('DOMContentLoaded', function() {
-    var btn = document.getElementById('show-assign-form');
-    var form = document.getElementById('assign-form');
-    if (btn && form) {
-        btn.addEventListener('click', function() {
-            form.classList.toggle('hidden');
-        });
-    }
-    // Auto-fill price/type from selected service
-    var serviceSelect = form ? form.querySelector('select[name="service_id"]') : null;
-    if (serviceSelect) {
-        serviceSelect.addEventListener('change', function() {
-            var opt = this.options[this.selectedIndex];
-            var priceInput = document.getElementById('assign-price');
-            var typeSelect = document.getElementById('assign-type');
-            if (opt.value) {
-                priceInput.placeholder = opt.getAttribute('data-price');
-                typeSelect.querySelector('option[value=""]').textContent = opt.getAttribute('data-type') + ' (van dienst)';
-            }
-        });
-    }
-});
 </script>
 @endsection

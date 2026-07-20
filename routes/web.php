@@ -14,7 +14,9 @@ use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
+use App\Http\Controllers\Admin\QuoteController as AdminQuoteController;
 use App\Http\Controllers\Customer\InvoiceController as CustomerInvoiceController;
+use App\Http\Controllers\Customer\QuoteController as CustomerQuoteController;
 use App\Http\Controllers\MollieWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -78,6 +80,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/facturen/{invoice}', [CustomerInvoiceController::class, 'show'])->name('invoices.show');
         Route::post('/facturen/{invoice}/betalen', [CustomerInvoiceController::class, 'pay'])->name('invoices.pay');
         Route::get('/facturen/{invoice}/betaling-retour', [CustomerInvoiceController::class, 'paymentReturn'])->name('invoices.payment.return');
+
+        // Quotes
+        Route::get('/offertes', [CustomerQuoteController::class, 'index'])->name('quotes.index');
+        Route::get('/offertes/{quote}', [CustomerQuoteController::class, 'show'])->name('quotes.show');
+        Route::post('/offertes/{quote}/akkoord', [CustomerQuoteController::class, 'accept'])->name('quotes.accept');
+        Route::post('/offertes/{quote}/afwijzen', [CustomerQuoteController::class, 'reject'])->name('quotes.reject');
     });
     
     // Notifications
@@ -132,6 +140,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/transactions', [FinancialController::class, 'transactions'])->name('transactions');
             Route::get('/billable-items', [FinancialController::class, 'billableItems'])->name('billable-items');
             Route::get('/quotes', [FinancialController::class, 'quotes'])->name('quotes');
+            Route::get('/quotes/create', [AdminQuoteController::class, 'create'])->name('quotes.create');
+            Route::post('/quotes', [AdminQuoteController::class, 'store'])->name('quotes.store');
+            Route::get('/quotes/{quote}', [AdminQuoteController::class, 'show'])->name('quotes.show');
+            Route::post('/quotes/{quote}/mark-sent', [AdminQuoteController::class, 'markSent'])->name('quotes.mark-sent');
             Route::get('/logs', [FinancialController::class, 'logs'])->name('logs');
         });
     });

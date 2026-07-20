@@ -13,6 +13,7 @@
                     <h1 class="text-2xl font-bold text-gray-900">Financieel</h1>
                     <p class="mt-1 text-sm text-gray-600">Beheer facturen, transacties en offertes.</p>
                 </div>
+                <a href="{{ route('admin.financial.quotes.create') }}" class="btn btn-primary">Nieuwe Offerte</a>
             </div>
         </div>
 

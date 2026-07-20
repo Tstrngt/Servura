@@ -15,6 +15,7 @@ class QuoteLine extends Model
         'quantity',
         'unit_price',
         'total',
+        'service_id',
         'sort_order',
     ];
 
@@ -26,5 +27,10 @@ class QuoteLine extends Model
     public function quote()
     {
         return $this->belongsTo(Quote::class);
+    }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
     }
 }

@@ -94,6 +94,10 @@ class CustomerService extends Model
                 'text' => 'Inactief',
                 'color' => 'gray'
             ],
+            'suspended' => [
+                'text' => 'In afwachting',
+                'color' => 'yellow'
+            ],
             'cancelled' => [
                 'text' => 'Geannuleerd',
                 'color' => 'red'
