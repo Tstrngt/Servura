@@ -83,7 +83,7 @@
         <div class="px-4 py-6 sm:px-0 space-y-6">
             <!-- Row: Description + Ticket details -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                <div class="lg:col-span-2">
+                <div class="lg:col-span-2 space-y-6">
                     <!-- Description and attachments -->
                     <div class="bg-white shadow rounded-lg">
                         <div class="px-4 py-5 sm:p-6">
@@ -128,48 +128,7 @@
                             @endif
                         </div>
                     </div>
-                </div>
 
-                <div class="lg:col-span-1">
-                    <!-- Ticket details -->
-                    <div class="bg-white shadow rounded-lg">
-                        <div class="px-4 py-5 sm:p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Ticket details</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Status</label>
-                                    <div class="mt-1">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->statusLabel['color'] }}-100 text-{{ $ticket->statusLabel['color'] }}-800">
-                                            {{ $ticket->statusLabel['text'] }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Prioriteit</label>
-                                    <div class="mt-1">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->priorityLabel['color'] }}-100 text-{{ $ticket->priorityLabel['color'] }}-800">
-                                            {{ $ticket->priorityLabel['text'] }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Categorie</label>
-                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->categoryLabel }}</div>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Toegewezen aan</label>
-                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->assignedTo ? $ticket->assignedTo->name : 'Nog niet toegewezen' }}</div>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Laatste activiteit</label>
-                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->last_reply_at ? $ticket->last_reply_at->format('d-m-Y H:i') : $ticket->created_at->format('d-m-Y H:i') }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-2 space-y-6">
                     <!-- Replies -->
                     <div class="bg-white shadow rounded-lg">
                         <div class="px-4 py-5 sm:p-6">
@@ -294,6 +253,43 @@
                 </div>
 
                 <div class="lg:col-span-1 space-y-6">
+                    <!-- Ticket details -->
+                    <div class="bg-white shadow rounded-lg">
+                        <div class="px-4 py-5 sm:p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Ticket details</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Status</label>
+                                    <div class="mt-1">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->statusLabel['color'] }}-100 text-{{ $ticket->statusLabel['color'] }}-800">
+                                            {{ $ticket->statusLabel['text'] }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Prioriteit</label>
+                                    <div class="mt-1">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->priorityLabel['color'] }}-100 text-{{ $ticket->priorityLabel['color'] }}-800">
+                                            {{ $ticket->priorityLabel['text'] }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Categorie</label>
+                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->categoryLabel }}</div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Toegewezen aan</label>
+                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->assignedTo ? $ticket->assignedTo->name : 'Nog niet toegewezen' }}</div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Laatste activiteit</label>
+                                    <div class="mt-1 text-sm text-gray-900">{{ $ticket->last_reply_at ? $ticket->last_reply_at->format('d-m-Y H:i') : $ticket->created_at->format('d-m-Y H:i') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Assignment form -->
                     <div class="bg-white shadow rounded-lg">
                         <div class="px-4 py-5 sm:p-6">
