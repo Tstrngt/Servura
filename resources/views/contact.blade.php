@@ -6,17 +6,18 @@
 
 @section('content')
 <!-- Hero Section -->
-<section class="bg-white py-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                Neem Contact Op
-            </h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Heeft u vragen of wilt u een vrijblijvend adviesgesprek? 
-                Neem contact met ons op en wij helpen u graag verder.
-            </p>
-        </div>
+<section class="relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 py-24 lg:py-28 text-white">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-accent-500/25 via-transparent to-transparent"></div>
+    <div class="absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-primary-400/20 blur-3xl"></div>
+    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span class="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.16em] text-accent-200 mb-6">Contact</span>
+        <h1 class="font-display text-4xl md:text-6xl lg:text-7xl font-bold mb-6 drop-shadow-lg">
+            Neem Contact Op
+        </h1>
+        <p class="text-xl md:text-2xl text-primary-100 max-w-3xl mx-auto leading-relaxed">
+            Heeft u vragen of wilt u een vrijblijvend adviesgesprek? 
+            Neem contact met ons op en wij helpen u graag verder.
+        </p>
     </div>
 </section>
 
@@ -197,30 +198,30 @@
                 <p class="text-lg text-gray-600 mb-10">Liever direct contact? We zijn bereikbaar op onderstaande kanalen.</p>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
-                    <div class="flex flex-col items-center">
-                        <div class="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center mb-4 text-primary-600">
+                    <div class="group flex flex-col items-center">
+                        <a href="tel:0612345678" aria-label="Bel Servura" class="contact-icon-phone w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center mb-4 text-primary-600 transition-colors duration-200 group-hover:bg-primary-600 group-hover:text-white">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                             </svg>
-                        </div>
+                        </a>
                         <h3 class="font-semibold text-gray-900 mb-1">Telefoon</h3>
                         <a href="tel:0612345678" class="text-primary-600 hover:text-primary-700 font-medium">06 123 456 78</a>
                         <p class="text-sm text-gray-500 mt-1">Maandag t/m vrijdag, 9:00 - 17:00</p>
                     </div>
 
-                    <div class="flex flex-col items-center">
-                        <div class="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center mb-4 text-primary-600">
+                    <div class="group flex flex-col items-center">
+                        <a href="mailto:info@servura.nl" aria-label="E-mail Servura" class="contact-icon-email w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center mb-4 text-primary-600 transition-colors duration-200 group-hover:bg-primary-600 group-hover:text-white">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v10a2 2 0 002 2z"></path>
                             </svg>
-                        </div>
+                        </a>
                         <h3 class="font-semibold text-gray-900 mb-1">E-mail</h3>
                         <a href="mailto:info@servura.nl" class="text-primary-600 hover:text-primary-700 font-medium">info@servura.nl</a>
                         <p class="text-sm text-gray-500 mt-1">Binnen 48 uur reactie</p>
                     </div>
 
-                    <div class="flex flex-col items-center">
-                        <div class="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center mb-4 text-primary-600">
+                    <div class="group flex flex-col items-center">
+                        <div class="contact-icon-clock w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center mb-4 text-primary-600 transition-colors duration-200 group-hover:bg-primary-600 group-hover:text-white">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
@@ -270,15 +271,17 @@
 </section>
 
 <!-- CTA Section -->
-<section class="py-16 bg-primary-600 text-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+<section class="relative overflow-hidden py-14 lg:py-16 bg-gradient-to-r from-primary-800 via-teal-700 to-emerald-700 text-white">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-300/25 via-transparent to-transparent"></div>
+    <div class="absolute -right-16 -top-24 h-56 w-56 rounded-full bg-white/10 blur-2xl"></div>
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="font-heading text-2xl md:text-3xl font-bold mb-3">
             Liever direct bellen?
         </h2>
-        <p class="text-xl text-primary-100 mb-8">
+        <p class="text-lg text-cyan-50 mb-6">
             Soms is een persoonlijk gesprek de snelste weg naar een oplossing.
         </p>
-        <a href="tel:0612345678" class="btn bg-white text-primary-600 hover:bg-primary-50 text-lg px-8 py-4">
+        <a href="tel:0612345678" class="btn bg-white text-teal-700 hover:bg-cyan-50 px-7 py-3 shadow-lg shadow-primary-950/20 transition-transform hover:scale-105">
             Bel Nu: 06 123 456 78
         </a>
     </div>

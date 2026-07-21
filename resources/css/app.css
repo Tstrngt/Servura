@@ -209,3 +209,40 @@ h1, h2, h3, h4, h5, h6 {
 .footer {
     @apply bg-secondary-900 text-white;
 }
+
+@keyframes process-arrow {
+    0%, 100% { transform: translateX(0); opacity: 0.45; }
+    50% { transform: translateX(8px); opacity: 1; }
+}
+
+.process-arrow {
+    animation: process-arrow 1.5s ease-in-out infinite;
+}
+
+@keyframes contact-phone-ring {
+    0%, 100% { transform: rotate(0); }
+    15%, 45% { transform: rotate(-14deg); }
+    30%, 60% { transform: rotate(14deg); }
+}
+
+@keyframes contact-email-send {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    50% { transform: translateX(4px) rotate(-8deg); }
+}
+
+@keyframes contact-clock-tick {
+    0%, 100% { transform: rotate(0); }
+    50% { transform: rotate(18deg); }
+}
+
+.group:hover .contact-icon-phone svg {
+    animation: contact-phone-ring 0.55s ease-in-out;
+}
+
+.group:hover .contact-icon-email svg {
+    animation: contact-email-send 0.55s ease-in-out;
+}
+
+.group:hover .contact-icon-clock svg {
+    animation: contact-clock-tick 0.55s ease-in-out;
+}
