@@ -6,7 +6,7 @@
 
 @section('content')
 <!-- Hero Section -->
-<section class="relative min-h-[60vh] flex items-center justify-center py-20 lg:py-28 overflow-hidden">
+<section class="relative h-[calc(100svh-4rem)] min-h-[36rem] flex items-center justify-center overflow-hidden">
     <!-- Background image: Rotterdam, Zuid-Holland -->
     <img
         src="https://images.unsplash.com/photo-1526505917130-857817501277?fm=jpg&q=80&w=1920&auto=format&fit=crop"
@@ -15,7 +15,7 @@
     >
     <div class="absolute inset-0 bg-gradient-to-br from-primary-900/85 via-primary-800/75 to-primary-900/80"></div>
 
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+    <div class="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 drop-shadow-lg">
             Over Servura
         </h1>

@@ -26,11 +26,13 @@
         <!-- Form + photo -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch mb-24">
             <!-- Contact Form -->
-            <div class="bg-white rounded-2xl shadow-lg p-8 lg:p-10 animate-on-scroll">
-                <h2 class="text-3xl font-bold text-gray-900 mb-2">
+            <div class="relative overflow-hidden rounded-3xl bg-white p-8 lg:p-10 shadow-2xl shadow-primary-900/10 ring-1 ring-slate-200 animate-on-scroll">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-400 to-emerald-400"></div>
+                <span class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-primary-700 mb-4">Direct contact</span>
+                <h2 class="font-heading text-3xl font-bold text-slate-900 mb-2">
                     Stuur ons een bericht
                 </h2>
-                <p class="text-gray-500 mb-6">Vul het formulier in en we nemen binnen 48 uur contact op.</p>
+                <p class="text-slate-500 mb-8">Vul het formulier in en we nemen binnen 48 uur contact op.</p>
                 
                 @if(session('success'))
                     <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6 rounded-r-lg">
@@ -154,13 +156,13 @@
                         >
                     </div>
 
-                    <div class="flex items-center justify-between pt-2">
-                        <p class="text-sm text-gray-500">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
+                        <p class="text-sm text-slate-500">
                             Velden met * zijn verplicht
                         </p>
                         <button 
                             type="submit" 
-                            class="btn btn-primary"
+                            class="btn btn-primary px-7 py-3.5 shadow-lg shadow-primary-500/25 disabled:cursor-not-allowed disabled:opacity-60"
                             :disabled="submitting"
                             x-text="submitting ? 'Verzenden...' : 'Verstuur Bericht'"
                         ></button>
@@ -245,48 +247,21 @@
                     ];
                 @endphp
 
-                <div class="space-y-5" x-data="{ open: null }">
-                    @foreach($faqs as $index => $faq)
-                        <div 
-                            class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300"
-                            :class="open === {{ $index }} ? 'ring-2 ring-primary-500 shadow-md' : 'hover:shadow-md'"
-                        >
-                            <button 
-                                @click="open = open === {{ $index }} ? null : {{ $index }}"
-                                class="w-full text-left px-6 py-5 flex justify-between items-center gap-4 focus:outline-none focus:bg-gray-50 transition-colors"
-                                :aria-expanded="open === {{ $index }}"
-                            >
+                <div class="space-y-5">
+                    @foreach($faqs as $faq)
+                        <details class="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md open:ring-2 open:ring-primary-500 open:shadow-md">
+                            <summary class="w-full cursor-pointer text-left px-6 py-5 flex justify-between items-center gap-4 focus:outline-none focus:bg-gray-50 transition-colors">
                                 <span class="font-semibold text-lg text-gray-900 leading-snug">{{ $faq['q'] }}</span>
-                                <span 
-                                    class="w-8 h-8 rounded-full bg-gray-100 text-primary-600 flex items-center justify-center flex-shrink-0 transition-all duration-300"
-                                    :class="open === {{ $index }} ? 'bg-primary-100 rotate-180' : ''"
-                                >
-                                    <svg 
-                                        class="w-5 h-5"
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        viewBox="0 0 24 24"
-                                    >
+                                <span class="w-8 h-8 rounded-full bg-gray-100 text-primary-600 flex items-center justify-center flex-shrink-0 transition-all duration-300 group-open:bg-primary-100 group-open:rotate-180">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </span>
-                            </button>
-                            <div 
-                                x-show="open === {{ $index }}"
-                                x-transition:enter="transition-all ease-out duration-300"
-                                x-transition:enter-start="opacity-0 max-h-0"
-                                x-transition:enter-end="opacity-100 max-h-[40rem]"
-                                x-transition:leave="transition-all ease-in duration-200"
-                                x-transition:leave-start="opacity-100 max-h-[40rem]"
-                                x-transition:leave-end="opacity-0 max-h-0"
-                                class="overflow-hidden"
-                                x-cloak
-                            >
-                                <div class="px-6 pb-6 pt-3 text-gray-600 leading-relaxed border-t border-gray-100">
-                                    {{ $faq['a'] }}
-                                </div>
+                            </summary>
+                            <div class="px-6 pb-6 pt-3 text-gray-600 leading-relaxed border-t border-gray-100">
+                                {{ $faq['a'] }}
                             </div>
-                        </div>
+                        </details>
                     @endforeach
                 </div>
             </div>

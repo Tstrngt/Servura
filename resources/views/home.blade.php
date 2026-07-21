@@ -10,7 +10,7 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
 @endphp
 
 <!-- Hero Section -->
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden text-white">
+<section class="relative h-[calc(100svh-4rem)] flex items-center justify-center overflow-hidden text-white">
     <!-- Background video -->
     <video
         autoplay
@@ -184,7 +184,7 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
 </section>
 
 <!-- Portfolio Cinematic -->
-<section id="portfolio-cinematic" class="relative h-[500vh] bg-slate-950 text-white">
+<section id="portfolio-cinematic" class="relative h-[500vh] -mb-px bg-slate-950 text-white">
     <!-- Background ambience -->
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-primary-900/30 via-slate-950 to-slate-950"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80rem] h-[80rem] bg-accent-900/10 rounded-full blur-3xl"></div>
