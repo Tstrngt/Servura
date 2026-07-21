@@ -101,87 +101,47 @@
             <div class="bg-white shadow rounded-lg">
                 <div class="px-4 py-5 sm:p-6">
                     @if($services->count() > 0)
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Dienst
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Status
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Prijs
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Startdatum
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Einddatum
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Notities
-                                        </th>
-                                        <th class="relative px-6 py-3">
-                                            <span class="sr-only">Acties</span>
-                                        </th>
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dienst</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prijs</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Periode</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acties</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($services as $service)
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3">
+                                            <div class="text-sm font-medium text-gray-900">{{ $service->service->title }}</div>
+                                            <div class="text-xs text-gray-500">{{ $service->service->short_description }}</div>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-{{ $service->statusLabel['color'] }}-100 text-{{ $service->statusLabel['color'] }}-800">
+                                                {{ $service->statusLabel['text'] }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{ $service->formatted_price }}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                                            {{ $service->start_date->format('d-m-Y') }} — {{ $service->end_date ? $service->end_date->format('d-m-Y') : '∞' }}
+                                            @if($service->end_date && $service->isExpiringSoon())
+                                                <div class="text-xs text-yellow-600">Verloopt binnen {{ $service->end_date->diffInDays(now()) }} dagen</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
+                                            @if($service->status === 'active')
+                                                <form method="POST" action="{{ route('admin.customers.services.cancel', [$customer, $service]) }}" class="inline" onsubmit="return confirm('Weet je zeker dat je deze dienst wilt annuleren?')">
+                                                    @csrf
+                                                    <button type="submit" class="text-red-600 hover:text-red-900">Annuleren</button>
+                                                </form>
+                                            @endif
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($services as $service)
-                                        <tr class="hover:bg-gray-50">
-                                            <td class="px-6 py-4">
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    {{ $service->service->title }}
-                                                </div>
-                                                <div class="text-sm text-gray-500">
-                                                    {{ $service->service->short_description }}
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $service->statusLabel['color'] }}-100 text-{{ $service->statusLabel['color'] }}-800">
-                                                    {{ $service->statusLabel['text'] }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $service->formatted_price }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $service->start_date->format('d-m-Y') }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $service->end_date ? $service->end_date->format('d-m-Y') : 'Onbeperkt' }}
-                                                @if($service->end_date && $service->isExpiringSoon())
-                                                    <div class="text-xs text-yellow-600">
-                                                        Verloopt binnen {{ $service->end_date->diffInDays(now()) }} dagen
-                                                    </div>
-                                                @endif
-                                            </td>
-                                            <td class="px-6 py-4 text-sm text-gray-900">
-                                                <div class="max-w-xs truncate" title="{{ $service->notes }}">
-                                                    {{ $service->notes ?: '-' }}
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <div class="flex justify-end space-x-2">
-                                                    <a href="#" class="text-primary-600 hover:text-primary-900">
-                                                        Bewerken
-                                                    </a>
-                                                    <form method="POST" action="#" class="inline" onsubmit="return confirm('Weet u zeker dat u deze dienst wilt verwijderen?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="text-red-600 hover:text-red-900">
-                                                            Verwijderen
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                @endforeach
+                            </tbody>
+                        </table>
                         <div class="mt-4">
                             {{ $services->links() }}
                         </div>

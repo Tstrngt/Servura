@@ -285,46 +285,43 @@
                         </div>
 
                         @if($customer->customerServices->count() > 0)
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dienst</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prijs</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Periode</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acties</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($customer->customerServices as $cs)
                                         <tr>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dienst</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prijs</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Startdatum</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Einddatum</th>
-                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acties</th>
+                                            <td class="px-4 py-3">
+                                                <div class="text-sm font-medium text-gray-900">{{ $cs->service->title }}</div>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-{{ $cs->statusLabel['color'] }}-100 text-{{ $cs->statusLabel['color'] }}-800">
+                                                    {{ $cs->statusLabel['text'] }}
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{ $cs->formatted_price }}</td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                                                {{ $cs->start_date->format('d-m-Y') }} — {{ $cs->end_date ? $cs->end_date->format('d-m-Y') : '∞' }}
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-right">
+                                                @if($cs->status === 'active')
+                                                    <form method="POST" action="{{ route('admin.customers.services.cancel', [$customer, $cs]) }}" class="inline" onsubmit="return confirm('Weet je zeker dat je deze dienst wilt annuleren?')">
+                                                        @csrf
+                                                        <button type="submit" class="text-sm text-red-600 hover:text-red-500">Annuleren</button>
+                                                    </form>
+                                                @endif
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        @foreach($customer->customerServices as $cs)
-                                            <tr>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="text-sm font-medium text-gray-900">{{ $cs->service->title }}</div>
-                                                    <div class="text-sm text-gray-500">{{ $cs->service->short_description }}</div>
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $cs->statusLabel['color'] }}-100 text-{{ $cs->statusLabel['color'] }}-800">
-                                                        {{ $cs->statusLabel['text'] }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $cs->formatted_price }}</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $cs->start_date->format('d-m-Y') }}</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $cs->end_date ? $cs->end_date->format('d-m-Y') : 'Onbeperkt' }}</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-right">
-                                                    @if($cs->status === 'active')
-                                                        <form method="POST" action="{{ route('admin.customers.services.cancel', [$customer, $cs]) }}" class="inline">
-                                                            @csrf
-                                                            <button type="submit" class="text-sm text-red-600 hover:text-red-500">Annuleren</button>
-                                                        </form>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         @else
                             <div class="text-center py-8">
                                 <h3 class="text-sm font-medium text-gray-900">Geen diensten</h3>
