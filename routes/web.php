@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Admin\QuoteController as AdminQuoteController;
+use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\Customer\InvoiceController as CustomerInvoiceController;
 use App\Http\Controllers\Customer\QuoteController as CustomerQuoteController;
 use App\Http\Controllers\MollieWebhookController;
@@ -139,6 +140,9 @@ Route::middleware('auth')->group(function () {
             Route::post('/invoices/{invoice}/mark-sent', [AdminInvoiceController::class, 'markSent'])->name('invoices.mark-sent');
             Route::post('/invoices/{invoice}/mark-paid', [AdminInvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
             Route::get('/transactions', [FinancialController::class, 'transactions'])->name('transactions');
+            Route::get('/transactions/{transaction}/edit', [AdminTransactionController::class, 'edit'])->name('transactions.edit');
+            Route::put('/transactions/{transaction}', [AdminTransactionController::class, 'update'])->name('transactions.update');
+            Route::delete('/transactions/{transaction}', [AdminTransactionController::class, 'destroy'])->name('transactions.destroy');
             Route::get('/billable-items', [FinancialController::class, 'billableItems'])->name('billable-items');
             Route::get('/quotes', [FinancialController::class, 'quotes'])->name('quotes');
             Route::get('/quotes/create', [AdminQuoteController::class, 'create'])->name('quotes.create');
