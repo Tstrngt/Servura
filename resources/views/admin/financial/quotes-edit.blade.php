@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load existing lines
     @foreach($quote->lines as $line)
-    createLine(@json($line->description), {{ $line->quantity }}, {{ $line->unit_price }}, {{ $line->discount }}, {!! $line->service_id ? $line->service_id : 'null' !!}, @json($line->service?->price_type));
+    createLine(@json($line->description), {{ $line->quantity }}, {{ $line->unit_price }}, {{ $line->discount ?? 0 }}, {!! $line->service_id ? $line->service_id : 'null' !!}, @json($line->service?->price_type));
     @endforeach
 });
 </script>
