@@ -22,7 +22,7 @@ class QuoteService
             'quote_number' => Quote::generateNumber(),
             'user_id' => $customer->id,
             'quote_date' => now(),
-            'valid_until' => now()->addDays($data['valid_days'] ?? 30),
+            'valid_until' => now()->addDays((int) ($data['valid_days'] ?? 30)),
             'vat_percentage' => 21.00,
             'status' => 'concept',
             'proposal' => $data['proposal'] ?? null,
@@ -51,7 +51,7 @@ class QuoteService
     public function update(Quote $quote, array $data, array $lines, ?int $performedBy = null): Quote
     {
         $quote->update([
-            'valid_until' => isset($data['valid_days']) ? now()->addDays($data['valid_days']) : $quote->valid_until,
+            'valid_until' => isset($data['valid_days']) ? now()->addDays((int) $data['valid_days']) : $quote->valid_until,
             'proposal' => $data['proposal'] ?? $quote->proposal,
             'notes' => $data['notes'] ?? $quote->notes,
             'client_notes' => $data['client_notes'] ?? $quote->client_notes,
