@@ -20,10 +20,12 @@ class Invoice extends Model
         'vat_percentage',
         'status',
         'notes',
+        'internal_notes',
         'sent_at',
         'paid_at',
         'mollie_payment_id',
         'payment_url',
+        'quote_id',
     ];
 
     protected $casts = [
@@ -39,10 +41,12 @@ class Invoice extends Model
 
     public const STATUSES = [
         'concept' => 'Concept',
-        'verzonden' => 'Verzonden',
+        'openstaand' => 'Openstaand',
+        'te_laat' => 'Te laat betaald',
         'betaald' => 'Betaald',
-        'vervallen' => 'Vervallen',
+        'geannuleerd' => 'Geannuleerd',
         'gecrediteerd' => 'Gecrediteerd',
+        'in_behandeling' => 'Betaling in behandeling',
     ];
 
     public function user()
@@ -65,14 +69,21 @@ class Invoice extends Model
         return $this->hasMany(BillableItem::class);
     }
 
+    public function quote()
+    {
+        return $this->belongsTo(Quote::class);
+    }
+
     public function getStatusLabelAttribute(): array
     {
         $colors = [
             'concept' => 'gray',
-            'verzonden' => 'blue',
+            'openstaand' => 'blue',
+            'te_laat' => 'red',
             'betaald' => 'green',
-            'vervallen' => 'red',
+            'geannuleerd' => 'gray',
             'gecrediteerd' => 'purple',
+            'in_behandeling' => 'yellow',
         ];
 
         return [
@@ -88,7 +99,7 @@ class Invoice extends Model
 
     public function scopeOverdue($query)
     {
-        return $query->where('status', 'verzonden')
+        return $query->where('status', 'openstaand')
                      ->where('due_date', '<', now());
     }
 

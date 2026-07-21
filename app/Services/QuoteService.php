@@ -16,44 +16,22 @@ class QuoteService
     /**
      * Create a quote for a customer with product lines and/or custom lines.
      */
-    public function create(User $customer, array $lines, ?string $notes = null, ?int $validDays = 30, ?int $performedBy = null): Quote
+    public function create(User $customer, array $data, array $lines, ?int $performedBy = null): Quote
     {
         $quote = Quote::create([
             'quote_number' => Quote::generateNumber(),
             'user_id' => $customer->id,
             'quote_date' => now(),
-            'valid_until' => now()->addDays($validDays),
+            'valid_until' => now()->addDays($data['valid_days'] ?? 30),
             'vat_percentage' => 21.00,
             'status' => 'concept',
-            'notes' => $notes,
+            'proposal' => $data['proposal'] ?? null,
+            'notes' => $data['notes'] ?? null,
+            'client_notes' => $data['client_notes'] ?? null,
+            'internal_notes' => $data['internal_notes'] ?? null,
         ]);
 
-        foreach ($lines as $i => $line) {
-            $total = ($line['quantity'] ?? 1) * $line['unit_price'];
-            QuoteLine::create([
-                'quote_id' => $quote->id,
-                'description' => $line['description'],
-                'quantity' => $line['quantity'] ?? 1,
-                'unit_price' => $line['unit_price'],
-                'total' => $total,
-                'service_id' => $line['service_id'] ?? null,
-                'sort_order' => $i,
-            ]);
-        }
-
-        $quote->recalculate();
-
-        // Create suspended customer services for product lines
-        foreach ($quote->lines()->whereNotNull('service_id')->get() as $line) {
-            CustomerService::create([
-                'user_id' => $customer->id,
-                'service_id' => $line->service_id,
-                'status' => 'suspended',
-                'price' => $line->unit_price,
-                'price_type' => Service::find($line->service_id)->price_type ?? 'eenmalig',
-                'start_date' => now(),
-            ]);
-        }
+        $this->saveLines($quote, $lines);
 
         TransactionLog::create([
             'user_id' => $customer->id,
@@ -65,6 +43,77 @@ class QuoteService
         ]);
 
         return $quote;
+    }
+
+    /**
+     * Update an existing quote.
+     */
+    public function update(Quote $quote, array $data, array $lines, ?int $performedBy = null): Quote
+    {
+        $quote->update([
+            'valid_until' => isset($data['valid_days']) ? now()->addDays($data['valid_days']) : $quote->valid_until,
+            'proposal' => $data['proposal'] ?? $quote->proposal,
+            'notes' => $data['notes'] ?? $quote->notes,
+            'client_notes' => $data['client_notes'] ?? $quote->client_notes,
+            'internal_notes' => $data['internal_notes'] ?? $quote->internal_notes,
+        ]);
+
+        // Delete old lines and re-create
+        $quote->lines()->delete();
+        $this->saveLines($quote, $lines);
+
+        TransactionLog::create([
+            'user_id' => $quote->user_id,
+            'loggable_type' => Quote::class,
+            'loggable_id' => $quote->id,
+            'action' => 'bijgewerkt',
+            'description' => "Offerte {$quote->quote_number} bijgewerkt",
+            'performed_by' => $performedBy,
+        ]);
+
+        return $quote;
+    }
+
+    private function saveLines(Quote $quote, array $lines): void
+    {
+        foreach ($lines as $i => $line) {
+            $qty = $line['quantity'] ?? 1;
+            $price = $line['unit_price'];
+            $discount = $line['discount'] ?? 0;
+            $total = ($qty * $price) - $discount;
+
+            QuoteLine::create([
+                'quote_id' => $quote->id,
+                'description' => $line['description'],
+                'quantity' => $qty,
+                'unit_price' => $price,
+                'discount' => $discount,
+                'total' => max(0, $total),
+                'service_id' => $line['service_id'] ?? null,
+                'sort_order' => $i,
+            ]);
+        }
+
+        $quote->recalculate();
+
+        // Sync suspended customer services for product lines
+        $existingServiceIds = CustomerService::where('user_id', $quote->user_id)
+            ->where('status', 'suspended')
+            ->pluck('service_id')
+            ->toArray();
+
+        foreach ($quote->lines()->whereNotNull('service_id')->get() as $line) {
+            if (!in_array($line->service_id, $existingServiceIds)) {
+                CustomerService::create([
+                    'user_id' => $quote->user_id,
+                    'service_id' => $line->service_id,
+                    'status' => 'suspended',
+                    'price' => $line->unit_price,
+                    'price_type' => Service::find($line->service_id)->price_type ?? 'eenmalig',
+                    'start_date' => now(),
+                ]);
+            }
+        }
     }
 
     /**
@@ -99,8 +148,10 @@ class QuoteService
             'invoice_date' => now(),
             'due_date' => now()->addDays(14),
             'vat_percentage' => $quote->vat_percentage,
-            'status' => 'verzonden',
-            'notes' => $quote->notes,
+            'status' => 'openstaand',
+            'notes' => $quote->client_notes,
+            'internal_notes' => $quote->internal_notes,
+            'quote_id' => $quote->id,
         ]);
 
         // Copy lines and link customer_service_id where applicable
@@ -150,7 +201,7 @@ class QuoteService
      */
     public function reject(Quote $quote): void
     {
-        $quote->update(['status' => 'afgewezen']);
+        $quote->update(['status' => 'geweigerd']);
 
         // Remove suspended services linked to this quote
         foreach ($quote->lines()->whereNotNull('service_id')->get() as $line) {
@@ -164,8 +215,8 @@ class QuoteService
             'user_id' => $quote->user_id,
             'loggable_type' => Quote::class,
             'loggable_id' => $quote->id,
-            'action' => 'afgewezen',
-            'description' => "Offerte {$quote->quote_number} afgewezen door klant",
+            'action' => 'geweigerd',
+            'description' => "Offerte {$quote->quote_number} geweigerd door klant",
         ]);
     }
 }

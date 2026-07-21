@@ -45,11 +45,43 @@
                         @endforeach
                     </select>
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kwartaal</label>
+                    <select name="quarter" class="form-input">
+                        <option value="">Alle</option>
+                        <option value="1" {{ request('quarter') == '1' ? 'selected' : '' }}>Q1 (jan-mrt)</option>
+                        <option value="2" {{ request('quarter') == '2' ? 'selected' : '' }}>Q2 (apr-jun)</option>
+                        <option value="3" {{ request('quarter') == '3' ? 'selected' : '' }}>Q3 (jul-sep)</option>
+                        <option value="4" {{ request('quarter') == '4' ? 'selected' : '' }}>Q4 (okt-dec)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Jaar</label>
+                    <input type="number" name="year" value="{{ request('year', date('Y')) }}" class="form-input w-24" min="2020" max="2030">
+                </div>
                 <button type="submit" class="btn btn-outline">Filteren</button>
-                @if(request()->hasAny(['search', 'type', 'status']))
+                @if(request()->hasAny(['search', 'type', 'status', 'quarter']))
                     <a href="{{ route('admin.financial.transactions') }}" class="text-sm text-gray-500 hover:text-gray-700">Reset</a>
                 @endif
             </form>
+        </div>
+
+        <!-- BTW / Omzet Summary -->
+        <div class="px-4 sm:px-0 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white shadow rounded-lg p-4">
+                    <div class="text-sm text-gray-500">Totaal ontvangen (incl. BTW)</div>
+                    <div class="text-2xl font-bold text-gray-900">€{{ number_format($summary['total_revenue'], 2, ',', '.') }}</div>
+                </div>
+                <div class="bg-white shadow rounded-lg p-4">
+                    <div class="text-sm text-gray-500">Omzet (excl. BTW)</div>
+                    <div class="text-2xl font-bold text-green-600">€{{ number_format($summary['net_revenue'], 2, ',', '.') }}</div>
+                </div>
+                <div class="bg-white shadow rounded-lg p-4">
+                    <div class="text-sm text-gray-500">BTW (21%)</div>
+                    <div class="text-2xl font-bold text-blue-600">€{{ number_format($summary['total_vat'], 2, ',', '.') }}</div>
+                </div>
+            </div>
         </div>
 
         <!-- Table -->

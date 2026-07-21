@@ -76,7 +76,15 @@
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">{{ ($ticket->last_reply_at ?? $ticket->created_at)->diffForHumans() }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{{ route('admin.tickets.show', $ticket) }}" class="text-primary-600 hover:text-primary-900">Bekijk</a>
+                                            <div class="flex items-center justify-end space-x-3">
+                                                <a href="{{ route('admin.tickets.show', $ticket) }}" class="text-primary-600 hover:text-primary-900">Bekijk</a>
+                                                <form method="POST" action="{{ route('admin.tickets.destroy', $ticket) }}" class="inline" onsubmit="return confirm('Weet je zeker dat je dit ticket wilt verwijderen?')">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="text-red-400 hover:text-red-600">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach

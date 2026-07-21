@@ -279,6 +279,24 @@ class TicketController extends Controller
     }
 
     /**
+     * Delete the specified ticket.
+     */
+    public function destroy(Ticket $ticket)
+    {
+        $ticketNumber = $ticket->ticket_number;
+
+        // Delete attachments from storage
+        foreach ($ticket->attachments as $attachment) {
+            Storage::disk('public')->delete($attachment->file_path);
+        }
+
+        $ticket->delete();
+
+        return redirect()->route('admin.tickets.index')
+            ->with('success', "Ticket {$ticketNumber} is verwijderd.");
+    }
+
+    /**
      * Preview attachment (for images).
      */
     public function previewAttachment(TicketAttachment $attachment)

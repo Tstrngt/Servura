@@ -20,6 +20,9 @@ class Quote extends Model
         'vat_percentage',
         'status',
         'notes',
+        'proposal',
+        'client_notes',
+        'internal_notes',
         'sent_at',
         'accepted_at',
         'converted_invoice_id',
@@ -38,10 +41,11 @@ class Quote extends Model
 
     public const STATUSES = [
         'concept' => 'Concept',
-        'verzonden' => 'Verzonden',
+        'verzonden' => 'Verstuurd',
+        'in_afwachting' => 'In afwachting',
         'geaccepteerd' => 'Geaccepteerd',
-        'afgewezen' => 'Afgewezen',
-        'verlopen' => 'Verlopen',
+        'geweigerd' => 'Geweigerd',
+        'verlopen' => 'Vervallen',
     ];
 
     public function user()
@@ -64,9 +68,10 @@ class Quote extends Model
         $colors = [
             'concept' => 'gray',
             'verzonden' => 'blue',
+            'in_afwachting' => 'yellow',
             'geaccepteerd' => 'green',
-            'afgewezen' => 'red',
-            'verlopen' => 'yellow',
+            'geweigerd' => 'red',
+            'verlopen' => 'orange',
         ];
 
         return [

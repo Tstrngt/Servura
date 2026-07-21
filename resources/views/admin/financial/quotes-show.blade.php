@@ -20,15 +20,32 @@
                     </p>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-{{ $quote->statusLabel['color'] }}-100 text-{{ $quote->statusLabel['color'] }}-800">
-                        {{ $quote->statusLabel['text'] }}
-                    </span>
+                    <a href="{{ route('admin.financial.quotes.edit', $quote) }}" class="btn btn-outline text-sm">Bewerken</a>
+                    <form method="POST" action="{{ route('admin.financial.quotes.destroy', $quote) }}" onsubmit="return confirm('Weet je zeker dat je deze offerte wilt verwijderen?')">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn btn-outline text-red-600 border-red-300 hover:bg-red-50 text-sm">Verwijderen</button>
+                    </form>
                     <a href="{{ route('admin.financial.quotes') }}" class="text-sm text-gray-500 hover:text-gray-700">Terug</a>
                 </div>
             </div>
 
+            <!-- Status & Info -->
             <div class="bg-white shadow rounded-lg p-6 mb-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-{{ $quote->statusLabel['color'] }}-100 text-{{ $quote->statusLabel['color'] }}-800">
+                        {{ $quote->statusLabel['text'] }}
+                    </span>
+                    <form method="POST" action="{{ route('admin.financial.quotes.status', $quote) }}" class="flex items-center space-x-2">
+                        @csrf
+                        <select name="status" class="form-input text-sm">
+                            @foreach(\App\Models\Quote::STATUSES as $key => $label)
+                                <option value="{{ $key }}" {{ $quote->status === $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="btn btn-outline text-sm">Wijzig</button>
+                    </form>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                     <div>
                         <span class="text-gray-500">Offertedatum</span>
                         <div class="font-medium">{{ $quote->quote_date->format('d-m-Y') }}</div>
@@ -45,15 +62,22 @@
                         <span class="text-gray-500">Geaccepteerd op</span>
                         <div class="font-medium">{{ $quote->accepted_at ? $quote->accepted_at->format('d-m-Y H:i') : '-' }}</div>
                     </div>
-                </div>
-                @if($quote->notes)
-                    <div class="mt-4 pt-4 border-t">
-                        <span class="text-sm text-gray-500">Opmerkingen:</span>
-                        <p class="text-sm text-gray-700 mt-1">{{ $quote->notes }}</p>
+                    <div>
+                        <span class="text-gray-500">Laatst gewijzigd</span>
+                        <div class="font-medium">{{ $quote->updated_at->format('d-m-Y H:i') }}</div>
                     </div>
-                @endif
+                </div>
             </div>
 
+            <!-- Proposal -->
+            @if($quote->proposal)
+                <div class="bg-white shadow rounded-lg p-6 mb-6">
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">Voorstel</h3>
+                    <div class="prose prose-sm max-w-none text-gray-700">{!! nl2br(e($quote->proposal)) !!}</div>
+                </div>
+            @endif
+
+            <!-- Lines Table -->
             <div class="bg-white shadow rounded-lg overflow-hidden mb-6">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -61,6 +85,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Omschrijving</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aantal</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Stuksprijs</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Korting</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Totaal</th>
                         </tr>
                     </thead>
@@ -75,42 +100,56 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-900 text-right">{{ $line->quantity }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-900 text-right">€{{ number_format($line->unit_price, 2, ',', '.') }}</td>
+                                <td class="px-6 py-4 text-sm text-right">
+                                    @if($line->discount > 0)
+                                        <span class="text-red-600">-€{{ number_format($line->discount, 2, ',', '.') }}</span>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 text-sm text-gray-900 text-right font-medium">€{{ number_format($line->total, 2, ',', '.') }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                     <tfoot class="bg-gray-50">
                         <tr>
-                            <td colspan="3" class="px-6 py-3 text-sm text-gray-500 text-right">Subtotaal</td>
+                            <td colspan="4" class="px-6 py-3 text-sm text-gray-500 text-right">Subtotaal</td>
                             <td class="px-6 py-3 text-sm font-medium text-gray-900 text-right">€{{ number_format($quote->subtotal, 2, ',', '.') }}</td>
                         </tr>
                         <tr>
-                            <td colspan="3" class="px-6 py-3 text-sm text-gray-500 text-right">BTW ({{ number_format($quote->vat_percentage, 0) }}%)</td>
+                            <td colspan="4" class="px-6 py-3 text-sm text-gray-500 text-right">BTW ({{ number_format($quote->vat_percentage, 0) }}%)</td>
                             <td class="px-6 py-3 text-sm font-medium text-gray-900 text-right">€{{ number_format($quote->vat_amount, 2, ',', '.') }}</td>
                         </tr>
                         <tr>
-                            <td colspan="3" class="px-6 py-3 text-sm font-bold text-gray-900 text-right">Totaal</td>
+                            <td colspan="4" class="px-6 py-3 text-sm font-bold text-gray-900 text-right">Totaal</td>
                             <td class="px-6 py-3 text-lg font-bold text-gray-900 text-right">€{{ number_format($quote->total, 2, ',', '.') }}</td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
 
-            @if($quote->status === 'concept')
-                <div class="flex justify-end space-x-3">
-                    <form method="POST" action="{{ route('admin.financial.quotes.mark-sent', $quote) }}">
-                        @csrf
-                        <button type="submit" class="btn btn-primary">Markeer als Verzonden</button>
-                    </form>
-                </div>
-            @endif
+            <!-- Notes -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                @if($quote->client_notes)
+                    <div class="bg-white shadow rounded-lg p-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-2">Klantnotitie <span class="text-xs text-gray-400">(zichtbaar voor klant)</span></h3>
+                        <p class="text-sm text-gray-700">{!! nl2br(e($quote->client_notes)) !!}</p>
+                    </div>
+                @endif
+                @if($quote->internal_notes)
+                    <div class="bg-yellow-50 shadow rounded-lg p-6 border border-yellow-200">
+                        <h3 class="text-sm font-medium text-yellow-700 mb-2">Interne notitie <span class="text-xs">(niet zichtbaar voor klant)</span></h3>
+                        <p class="text-sm text-yellow-800">{!! nl2br(e($quote->internal_notes)) !!}</p>
+                    </div>
+                @endif
+            </div>
 
             @if($quote->converted_invoice_id)
-                <div class="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                <div class="p-4 bg-green-50 rounded-lg border border-green-200 mb-6">
                     <p class="text-sm text-green-700">
                         Omgezet naar factuur:
                         <a href="{{ route('admin.financial.invoices.show', $quote->converted_invoice_id) }}" class="font-medium underline">
-                            Bekijk factuur
+                            {{ $quote->convertedInvoice?->invoice_number ?? 'Bekijk factuur' }}
                         </a>
                     </p>
                 </div>

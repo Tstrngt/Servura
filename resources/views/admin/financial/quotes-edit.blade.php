@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Offerte Aanmaken - Servura Admin')
+@section('title', "Offerte {$quote->quote_number} Bewerken - Servura Admin")
 
 @section('content')
 @include('admin.partials.sidebar')
@@ -10,10 +10,10 @@
         <div class="px-4 py-6 sm:px-0">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Offerte Aanmaken</h1>
-                    <p class="mt-1 text-sm text-gray-600">Maak een offerte aan met producten en/of vrije regels.</p>
+                    <h1 class="text-2xl font-bold text-gray-900">{{ $quote->quote_number }} Bewerken</h1>
+                    <p class="mt-1 text-sm text-gray-600">Klant: {{ $quote->user->name }}</p>
                 </div>
-                <a href="{{ route('admin.financial.quotes') }}" class="text-sm text-gray-500 hover:text-gray-700">Terug</a>
+                <a href="{{ route('admin.financial.quotes.show', $quote) }}" class="text-sm text-gray-500 hover:text-gray-700">Annuleren</a>
             </div>
 
             @if($errors->any())
@@ -26,44 +26,32 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('admin.financial.quotes.store') }}" id="quoteForm">
-                @csrf
+            <form method="POST" action="{{ route('admin.financial.quotes.update', $quote) }}" id="quoteForm">
+                @csrf @method('PUT')
 
                 <div class="bg-white shadow rounded-lg p-6 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Klant</label>
-                            <select name="user_id" class="form-input w-full" required>
-                                <option value="">Selecteer klant...</option>
-                                @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}">
-                                        {{ $customer->name }} {{ $customer->company ? "({$customer->company})" : '' }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Geldig (dagen)</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Geldig (dagen vanaf nu)</label>
                             <input type="number" name="valid_days" value="30" min="1" max="365" class="form-input w-full">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Voorstel</label>
-                            <textarea name="proposal" class="form-input w-full" rows="3" placeholder="Beschrijving van het voorstel..."></textarea>
+                            <textarea name="proposal" class="form-input w-full" rows="3">{{ old('proposal', $quote->proposal) }}</textarea>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Klantnotitie <span class="text-xs text-gray-400">(zichtbaar voor klant)</span></label>
-                            <textarea name="client_notes" class="form-input w-full" rows="2" placeholder="Wordt getoond aan de klant..."></textarea>
+                            <textarea name="client_notes" class="form-input w-full" rows="2">{{ old('client_notes', $quote->client_notes) }}</textarea>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Interne notitie <span class="text-xs text-gray-400">(alleen team)</span></label>
-                            <textarea name="internal_notes" class="form-input w-full" rows="2" placeholder="Niet zichtbaar voor klant..."></textarea>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Interne notitie <span class="text-xs text-gray-400">(alleen voor team)</span></label>
+                            <textarea name="internal_notes" class="form-input w-full" rows="2">{{ old('internal_notes', $quote->internal_notes) }}</textarea>
                         </div>
                     </div>
                 </div>
 
                 <div class="bg-white shadow rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-medium text-gray-900 mb-2">Offerteregels</h3>
-                    <p class="text-sm text-gray-500 mb-4">Voeg producten (diensten) toe of typ vrije regels. Producten worden als dienst gekoppeld aan de klant.</p>
 
                     <div class="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                         <label class="block text-xs font-medium text-blue-700 mb-1">Product toevoegen uit catalogus</label>
@@ -103,7 +91,7 @@
                 </div>
 
                 <div class="flex justify-end">
-                    <button type="submit" class="btn btn-primary">Offerte Aanmaken</button>
+                    <button type="submit" class="btn btn-primary">Offerte Opslaan</button>
                 </div>
             </form>
         </div>
@@ -115,18 +103,16 @@ document.addEventListener('DOMContentLoaded', function() {
     var lineCount = 0;
     var container = document.getElementById('quote-lines');
 
-    function createLine(description, quantity, unitPrice, serviceId, priceType) {
+    function createLine(description, quantity, unitPrice, discount, serviceId, priceType) {
         var i = lineCount++;
         var row = document.createElement('div');
         row.className = 'grid grid-cols-12 gap-3 mb-3 items-center';
         row.id = 'line-' + i;
-
         var serviceInput = serviceId ? '<input type="hidden" name="lines[' + i + '][service_id]" value="' + serviceId + '">' : '';
         var badge = serviceId ? '<span class="inline-block ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">Product</span>' : '';
-
         row.innerHTML =
             '<div class="col-span-4">' +
-                '<input type="text" name="lines[' + i + '][description]" class="form-input w-full text-sm" value="' + (description || '') + '" placeholder="Omschrijving" required>' +
+                '<input type="text" name="lines[' + i + '][description]" class="form-input w-full text-sm" value="' + (description || '').replace(/"/g, '&quot;') + '" required>' +
                 badge + serviceInput +
             '</div>' +
             '<div class="col-span-1">' +
@@ -136,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 '<input type="number" name="lines[' + i + '][unit_price]" class="form-input w-full text-sm line-price" value="' + (unitPrice || 0) + '" step="0.01" min="0" required>' +
             '</div>' +
             '<div class="col-span-2">' +
-                '<input type="number" name="lines[' + i + '][discount]" class="form-input w-full text-sm line-discount" value="0" step="0.01" min="0" placeholder="0,00">' +
+                '<input type="number" name="lines[' + i + '][discount]" class="form-input w-full text-sm line-discount" value="' + (discount || 0) + '" step="0.01" min="0">' +
             '</div>' +
             '<div class="col-span-2 text-sm font-medium line-total">€0,00</div>' +
             '<div class="col-span-1">' +
@@ -165,33 +151,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function formatEuro(val) { return '\u20AC' + val.toFixed(2).replace('.', ','); }
 
-    // Add product from catalog
     document.getElementById('add-product-btn').addEventListener('click', function() {
         var sel = document.getElementById('product-select');
         var opt = sel.options[sel.selectedIndex];
         if (!opt.value) return;
-        createLine(opt.getAttribute('data-title'), 1, opt.getAttribute('data-price'), opt.value, opt.getAttribute('data-type'));
+        createLine(opt.getAttribute('data-title'), 1, opt.getAttribute('data-price'), 0, opt.value, opt.getAttribute('data-type'));
         sel.selectedIndex = 0;
     });
 
-    // Add free line
     document.getElementById('add-line-btn').addEventListener('click', function() {
-        createLine('', 1, 0, null, '-');
+        createLine('', 1, 0, 0, null, null);
     });
 
-    // Remove line
     container.addEventListener('click', function(e) {
         var btn = e.target.closest('.remove-line');
-        if (btn) {
-            document.getElementById('line-' + btn.getAttribute('data-line')).remove();
-            recalc();
-        }
+        if (btn) { document.getElementById('line-' + btn.getAttribute('data-line')).remove(); recalc(); }
     });
 
-    // Recalc on input
     container.addEventListener('input', function(e) {
         if (e.target.classList.contains('line-qty') || e.target.classList.contains('line-price') || e.target.classList.contains('line-discount')) recalc();
     });
+
+    // Load existing lines
+    @foreach($quote->lines as $line)
+    createLine(@json($line->description), {{ $line->quantity }}, {{ $line->unit_price }}, {{ $line->discount }}, {!! $line->service_id ? $line->service_id : 'null' !!}, @json($line->service?->price_type));
+    @endforeach
 });
 </script>
 @endsection

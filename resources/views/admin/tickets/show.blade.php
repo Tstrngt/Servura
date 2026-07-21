@@ -40,6 +40,10 @@
                                     <button type="submit" class="btn btn-primary">Heropenen</button>
                                 </form>
                             @endif
+                            <form action="{{ route('admin.tickets.destroy', $ticket) }}" method="POST" class="inline" onsubmit="return confirm('Weet je zeker dat je dit ticket wilt verwijderen? Dit kan niet ongedaan gemaakt worden.')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-outline text-red-600 border-red-300 hover:bg-red-50">Verwijderen</button>
+                            </form>
                         </div>
                     </div>
                 </div>

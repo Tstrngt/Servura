@@ -60,9 +60,31 @@ class FinancialController extends Controller
             $query->where('status', $request->status);
         }
 
+        // Quarter filter
+        if ($request->filled('quarter')) {
+            $year = $request->input('year', date('Y'));
+            $quarter = (int) $request->quarter;
+            $startMonth = ($quarter - 1) * 3 + 1;
+            $startDate = "{$year}-" . str_pad($startMonth, 2, '0', STR_PAD_LEFT) . "-01";
+            $endDate = date('Y-m-t', strtotime("+2 months", strtotime($startDate)));
+            $query->whereBetween('transaction_date', [$startDate, $endDate]);
+        }
+
+        // Clone query for summary before pagination
+        $summaryQuery = clone $query;
+        $totalRevenue = (clone $summaryQuery)->where('type', 'inkomst')->where('status', 'voltooid')->sum('amount');
+        $vatPercentage = 21;
+        $netRevenue = round($totalRevenue / (1 + ($vatPercentage / 100)), 2);
+        $totalVat = round($totalRevenue - $netRevenue, 2);
+        $summary = [
+            'total_revenue' => $totalRevenue,
+            'net_revenue' => $netRevenue,
+            'total_vat' => $totalVat,
+        ];
+
         $transactions = $query->latest('transaction_date')->paginate(15);
 
-        return view('admin.financial.transactions', compact('transactions'));
+        return view('admin.financial.transactions', compact('transactions', 'summary'));
     }
 
     public function billableItems(Request $request)
@@ -102,9 +124,11 @@ class FinancialController extends Controller
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        } else {
+            $query->where('status', '!=', 'verlopen');
         }
 
-        $quotes = $query->latest('quote_date')->paginate(15);
+        $quotes = $query->latest('updated_at')->paginate(15);
 
         return view('admin.financial.quotes', compact('quotes'));
     }

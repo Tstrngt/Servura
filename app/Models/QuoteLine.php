@@ -14,6 +14,7 @@ class QuoteLine extends Model
         'description',
         'quantity',
         'unit_price',
+        'discount',
         'total',
         'service_id',
         'sort_order',
@@ -21,6 +22,7 @@ class QuoteLine extends Model
 
     protected $casts = [
         'unit_price' => 'decimal:2',
+        'discount' => 'decimal:2',
         'total' => 'decimal:2',
     ];
 

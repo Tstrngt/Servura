@@ -6,9 +6,6 @@
         <a href="{{ route('admin.financial.transactions') }}" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {{ request()->routeIs('admin.financial.transactions') ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
             Transacties
         </a>
-        <a href="{{ route('admin.financial.billable-items') }}" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {{ request()->routeIs('admin.financial.billable-items') ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
-            Te factureren
-        </a>
         <a href="{{ route('admin.financial.quotes') }}" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {{ request()->routeIs('admin.financial.quotes') ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
             Offertes
         </a>

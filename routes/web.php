@@ -105,6 +105,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/tickets/{ticket}/assign', [AdminTicketController::class, 'assign'])->name('tickets.assign');
         Route::post('/tickets/{ticket}/close', [AdminTicketController::class, 'close'])->name('tickets.close');
         Route::post('/tickets/{ticket}/reopen', [AdminTicketController::class, 'reopen'])->name('tickets.reopen');
+        Route::delete('/tickets/{ticket}', [AdminTicketController::class, 'destroy'])->name('tickets.destroy');
 
         // Customers
         Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
@@ -143,7 +144,16 @@ Route::middleware('auth')->group(function () {
             Route::get('/quotes/create', [AdminQuoteController::class, 'create'])->name('quotes.create');
             Route::post('/quotes', [AdminQuoteController::class, 'store'])->name('quotes.store');
             Route::get('/quotes/{quote}', [AdminQuoteController::class, 'show'])->name('quotes.show');
-            Route::post('/quotes/{quote}/mark-sent', [AdminQuoteController::class, 'markSent'])->name('quotes.mark-sent');
+            Route::get('/quotes/{quote}/edit', [AdminQuoteController::class, 'edit'])->name('quotes.edit');
+            Route::put('/quotes/{quote}', [AdminQuoteController::class, 'update'])->name('quotes.update');
+            Route::delete('/quotes/{quote}', [AdminQuoteController::class, 'destroy'])->name('quotes.destroy');
+            Route::post('/quotes/{quote}/status', [AdminQuoteController::class, 'updateStatus'])->name('quotes.status');
+            Route::get('/invoices/{invoice}/edit', [AdminInvoiceController::class, 'edit'])->name('invoices.edit');
+            Route::put('/invoices/{invoice}', [AdminInvoiceController::class, 'update'])->name('invoices.update');
+            Route::delete('/invoices/{invoice}', [AdminInvoiceController::class, 'destroy'])->name('invoices.destroy');
+            Route::post('/invoices/{invoice}/status', [AdminInvoiceController::class, 'updateStatus'])->name('invoices.status');
+            Route::post('/invoices/{invoice}/notes', [AdminInvoiceController::class, 'storeNote'])->name('invoices.notes.store');
+            Route::post('/invoices/{invoice}/payments', [AdminInvoiceController::class, 'storePayment'])->name('invoices.payments.store');
             Route::get('/logs', [FinancialController::class, 'logs'])->name('logs');
         });
     });
