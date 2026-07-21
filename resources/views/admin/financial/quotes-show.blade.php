@@ -85,7 +85,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Omschrijving</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aantal</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Stuksprijs</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Korting</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Korting (%)</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Totaal</th>
                         </tr>
                     </thead>
@@ -102,7 +102,7 @@
                                 <td class="px-6 py-4 text-sm text-gray-900 text-right">€{{ number_format($line->unit_price, 2, ',', '.') }}</td>
                                 <td class="px-6 py-4 text-sm text-right">
                                     @if($line->discount > 0)
-                                        <span class="text-red-600">-€{{ number_format($line->discount, 2, ',', '.') }}</span>
+                                        <span class="text-red-600">{{ number_format($line->discount, 1) }}%</span>
                                     @else
                                         <span class="text-gray-400">-</span>
                                     @endif

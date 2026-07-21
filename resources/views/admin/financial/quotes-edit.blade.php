@@ -72,7 +72,7 @@
                         <div class="col-span-4"><span class="block text-sm font-medium text-gray-700">Omschrijving</span></div>
                         <div class="col-span-1"><span class="block text-sm font-medium text-gray-700">Aantal</span></div>
                         <div class="col-span-2"><span class="block text-sm font-medium text-gray-700">Stuksprijs</span></div>
-                        <div class="col-span-2"><span class="block text-sm font-medium text-gray-700">Korting</span></div>
+                        <div class="col-span-2"><span class="block text-sm font-medium text-gray-700">Korting (%)</span></div>
                         <div class="col-span-2"><span class="block text-sm font-medium text-gray-700">Totaal</span></div>
                         <div class="col-span-1"></div>
                     </div>
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 '<input type="number" name="lines[' + i + '][unit_price]" class="form-input w-full text-sm line-price" value="' + (unitPrice || 0) + '" step="0.01" min="0" required>' +
             '</div>' +
             '<div class="col-span-2">' +
-                '<input type="number" name="lines[' + i + '][discount]" class="form-input w-full text-sm line-discount" value="' + (discount || 0) + '" step="0.01" min="0">' +
+                '<input type="number" name="lines[' + i + '][discount]" class="form-input w-full text-sm line-discount" value="' + (discount || 0) + '" step="0.01" min="0" max="100">' +
             '</div>' +
             '<div class="col-span-2 text-sm font-medium line-total">€0,00</div>' +
             '<div class="col-span-1">' +
@@ -140,7 +140,9 @@ document.addEventListener('DOMContentLoaded', function() {
             var qty = parseFloat(row.querySelector('.line-qty').value) || 0;
             var price = parseFloat(row.querySelector('.line-price').value) || 0;
             var discount = parseFloat(row.querySelector('.line-discount').value) || 0;
-            var total = Math.max(0, (qty * price) - discount);
+            var lineTotal = qty * price;
+            var total = discount > 0 ? lineTotal * (1 - (discount / 100)) : lineTotal;
+            total = Math.max(0, total);
             subtotal += total;
             row.querySelector('.line-total').textContent = formatEuro(total);
         });

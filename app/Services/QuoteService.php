@@ -79,8 +79,9 @@ class QuoteService
         foreach ($lines as $i => $line) {
             $qty = $line['quantity'] ?? 1;
             $price = $line['unit_price'];
-            $discount = $line['discount'] ?? 0;
-            $total = ($qty * $price) - $discount;
+            $discount = (float) ($line['discount'] ?? 0);
+            $lineTotal = $qty * $price;
+            $total = $discount > 0 ? $lineTotal * (1 - ($discount / 100)) : $lineTotal;
 
             QuoteLine::create([
                 'quote_id' => $quote->id,
