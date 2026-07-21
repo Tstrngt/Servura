@@ -170,7 +170,7 @@ $steps = [
             <p class="text-xl text-slate-600 max-w-2xl mx-auto">Van eerste contact tot lancering, wij begeleiden u bij elke stap.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-14 gap-y-8 mt-20 lg:mt-24">
             @foreach($steps as $index => $step)
                 @php
                     $colorClasses = [
@@ -179,13 +179,29 @@ $steps = [
                         'secondary' => 'bg-secondary-500',
                         'emerald' => 'bg-emerald-500',
                     ][$step['color']];
+                    $arrowClasses = [
+                        'primary' => 'text-primary-400',
+                        'accent' => 'text-accent-400',
+                        'secondary' => 'text-secondary-400',
+                        'emerald' => 'text-emerald-400',
+                    ][$step['color']];
                 @endphp
-                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:shadow-lg transition-all duration-300 animate-on-scroll">
+                <div class="relative bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 {{ $index % 2 === 0 ? 'lg:-translate-y-10' : 'lg:translate-y-10' }}">
                     <div class="w-12 h-12 {{ $colorClasses }} text-white rounded-full flex items-center justify-center mb-4 font-bold text-lg shadow-md">
                         {{ $index + 1 }}
                     </div>
                     <h3 class="font-heading text-xl font-bold text-slate-900 mb-2">{{ $step['title'] }}</h3>
                     <p class="text-slate-600 text-sm leading-relaxed">{{ $step['text'] }}</p>
+
+                    @if($index < count($steps) - 1)
+                        <div class="hidden lg:flex absolute -right-10 w-8 items-center justify-center {{ $arrowClasses }} z-10" style="top: 1.25rem; bottom: auto; transform: rotate({{ $index % 2 === 0 ? '45' : '-45' }}deg);">
+                            <span class="process-arrow inline-flex">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14m-5-5 5 5-5 5"></path>
+                                </svg>
+                            </span>
+                        </div>
+                    @endif
                 </div>
             @endforeach
         </div>

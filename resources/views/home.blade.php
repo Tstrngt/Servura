@@ -43,7 +43,7 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
             <a href="{{ route('contact') }}" class="btn bg-white text-primary-700 hover:bg-primary-50 hover:scale-105 font-bold text-lg px-8 py-4 shadow-xl transition-transform">
                 Gratis Adviesgesprek
             </a>
-            <a href="#diensten" class="btn bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-primary-700 hover:border-white font-semibold text-lg px-8 py-4 shadow-xl transition-transform">
+            <a href="{{ route('services.index') }}" class="btn bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-primary-700 hover:border-white font-semibold text-lg px-8 py-4 shadow-xl transition-transform">
                 Bekijk Diensten
             </a>
         </div>

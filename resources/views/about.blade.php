@@ -32,7 +32,7 @@
 </section>
 
 <!-- About Content -->
-<section class="py-16 bg-gray-50">
+<section class="py-16 bg-gradient-to-b from-slate-100 via-slate-50 to-primary-50/60">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -64,7 +64,7 @@
                 </div>
             </div>
             
-            <div class="bg-white p-8 rounded-lg shadow-sm">
+            <div class="bg-slate-50/90 p-8 rounded-2xl shadow-lg shadow-primary-900/5 ring-1 ring-slate-200">
                 <h3 class="text-2xl font-semibold mb-6">Onze Waarden</h3>
                 <div class="space-y-4">
                     <div class="flex items-start">
@@ -129,7 +129,7 @@
 </section>
 
 <!-- Team Section -->
-<section class="py-16 bg-white">
+<section class="py-16 bg-slate-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -144,7 +144,7 @@
             @php
                 $team = [
                     ['name' => 'Tim van Gorkom', 'role' => 'Founder & Lead Developer', 'bio' => 'Richting, architectuur en de technische visie van Servura.', 'initial' => 'T', 'color' => 'from-primary-500 to-primary-700'],
-                    ['name' => 'Dirk van Gelderen', 'role' => 'Front-end & Back-end Developer', 'bio' => 'Bouwt solide applicaties en zorgt voor snelle, nette interfaces.', 'initial' => 'D', 'color' => 'from-secondary-600 to-secondary-800'],
+                    ['name' => 'Dirk van Gelderen', 'role' => 'Front-end & Back-end Developer', 'bio' => 'Bouwt solide applicaties en zorgt voor snelle, nette interfaces.', 'initial' => 'D', 'color' => 'from-secondary-600 to-secondary-800', 'image' => 'images/dirk-van-gelderen.jpg'],
                     ['name' => 'Isis van Dijk', 'role' => 'UX/UI Specialist & Design Expert', 'bio' => 'Ontwerpt intuïtieve ervaringen die bezoekers converteren.', 'initial' => 'I', 'color' => 'from-emerald-400 to-emerald-600'],
                 ];
             @endphp
@@ -152,8 +152,12 @@
             <div class="group text-center animate-on-scroll">
                 <div class="relative w-32 h-32 mx-auto mb-6">
                     <div class="absolute inset-0 rounded-full bg-gradient-to-br {{ $member['color'] }} opacity-20 blur-xl group-hover:opacity-40 transition-opacity duration-300"></div>
-                    <div class="relative w-full h-32 rounded-full bg-gradient-to-br {{ $member['color'] }} text-white text-4xl font-bold flex items-center justify-center shadow-lg group-hover:scale-105 group-hover:rotate-3 transition-transform duration-300">
-                        {{ $member['initial'] }}
+                    <div class="relative w-full h-32 rounded-full bg-gradient-to-br {{ $member['color'] }} text-white text-4xl font-bold flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+                        @if(isset($member['image']) && file_exists(public_path($member['image'])))
+                            <img src="{{ asset($member['image']) }}" alt="{{ $member['name'] }}" class="w-full h-full object-cover" style="object-position: 50% 0%; transform: scale(1.25); transform-origin: top center;">
+                        @else
+                            {{ $member['initial'] }}
+                        @endif
                     </div>
                 </div>
                 <h3 class="text-xl font-semibold mb-1">{{ $member['name'] }}</h3>
@@ -166,7 +170,7 @@
 </section>
 
 <!-- Portfolio Section -->
-<section class="py-16 lg:py-24 bg-gray-50">
+<section class="py-16 lg:py-24 bg-gradient-to-b from-slate-100 to-primary-50/70">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -193,21 +197,6 @@
                 </div>
             @endforeach
         </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="py-16 bg-primary-600 text-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">
-            Klaar om samen te werken?
-        </h2>
-        <p class="text-xl text-primary-100 mb-8">
-            Neem contact met ons op en ontdek hoe wij uw bedrijf online kunnen laten groeien.
-        </p>
-        <a href="{{ route('contact') }}" class="btn bg-white text-primary-600 hover:bg-primary-50 text-lg px-8 py-4">
-            Neem Contact Op
-        </a>
     </div>
 </section>
 @endsection
