@@ -38,3 +38,7 @@ Thumbs.db
 # Deployment
 /deploy.log
 /backup/
+
+# Agent skill installer duplicates (canonical copies live in .claude/skills/)
+/.agents/
+/.codex/
