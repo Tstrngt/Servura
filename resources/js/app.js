@@ -134,29 +134,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const darkSections = Array.from(document.querySelectorAll('[data-navbar-theme="dark"]'));
     if (darkSections.length === 0) return;
 
-    const navHeight = nav.offsetHeight || 64;
-    let activeDark = new Set();
+    let ticking = false;
 
-    const setTheme = () => {
-        nav.classList.toggle('is-dark', activeDark.size > 0);
-    };
-
-    const themeObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                activeDark.add(entry.target);
-            } else {
-                activeDark.delete(entry.target);
-            }
+    function updateTheme() {
+        ticking = false;
+        // Point just below the navbar's own bottom edge — whichever section
+        // currently covers that point decides the theme.
+        const probeY = nav.getBoundingClientRect().bottom + 1;
+        const isDark = darkSections.some((section) => {
+            const rect = section.getBoundingClientRect();
+            return rect.top <= probeY && rect.bottom >= probeY;
         });
-        setTheme();
-    }, {
-        // Only watch a thin band right where the navbar sits.
-        rootMargin: `-${navHeight}px 0px -${window.innerHeight - navHeight - 1}px 0px`,
-        threshold: 0,
-    });
+        nav.classList.toggle('is-dark', isDark);
+    }
 
-    darkSections.forEach((section) => themeObserver.observe(section));
+    function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(updateTheme);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    updateTheme();
 });
 
 Alpine.data('invoiceForm', () => ({

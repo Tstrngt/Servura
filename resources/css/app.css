@@ -129,7 +129,6 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Glass navbar: translucent + blurred, theme follows the section behind it */
 .site-navbar {
-    position: relative;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.32) 100%);
     backdrop-filter: blur(22px) saturate(180%);
     -webkit-backdrop-filter: blur(22px) saturate(180%);
