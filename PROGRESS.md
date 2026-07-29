@@ -13,8 +13,8 @@
 
 ## Huidige taak
 
-**Wat**: Verbeter de homepage hero (`resources/views/partials/hero-home.blade.php`): floating badges rondom de monitor meer uitgesproken en beter in het design laten passen.
-**Status**: bezig — badges verder naar de hoeken van de right-column geplaatst, scroll-offset verder vergroot naar 160px voor een sterkere orbit.
+**Wat**: Fix de publieke navbar (`resources/views/layouts/app.blade.php`): logo links, navigatie gecentreerd, CTA rechts; login-link wordt een icoon-knop voor het klantenportaal.
+**Status**: bezig — desktop navbar gebruikt nu een 3-koloms grid, login/portaal knoppen hebben een user-icoon.
 **Volgende stap**: build verifiëren, committen en pushen.
 
 **Open details:**

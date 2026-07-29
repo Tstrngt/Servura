@@ -54,9 +54,9 @@
     @unless(request()->routeIs('admin.*'))
     <nav class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
+            <div class="grid grid-cols-3 items-center h-16">
                 <!-- Logo -->
-                <div class="flex-shrink-0">
+                <div class="justify-self-start">
                     <a href="{{ route('home') }}" class="flex items-center group" aria-label="Servura home">
                         <span class="logo-text text-2xl font-extrabold logo-mark group-hover:opacity-80 transition-opacity">Servura</span>
                         <span class="ml-1 text-2xl font-logo font-bold text-primary-600 animate-pulse-soft">.</span>
@@ -64,27 +64,28 @@
                 </div>
 
                 <!-- Desktop Navigation -->
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'nav-link active' : 'nav-link' }}">
-                            Home
-                        </a>
-                        <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'nav-link active' : 'nav-link' }}">
-                            Over Ons
-                        </a>
-                        <a href="{{ route('services.index') }}" class="{{ request()->routeIs('services.*') ? 'nav-link active' : 'nav-link' }}">
-                            Diensten
-                        </a>
-                        <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'nav-link active' : 'nav-link' }}">
-                            Contact
-                        </a>
-                    </div>
+                <div class="hidden md:flex justify-self-center items-center space-x-1">
+                    <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'nav-link active' : 'nav-link' }}">
+                        Home
+                    </a>
+                    <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'nav-link active' : 'nav-link' }}">
+                        Over Ons
+                    </a>
+                    <a href="{{ route('services.index') }}" class="{{ request()->routeIs('services.*') ? 'nav-link active' : 'nav-link' }}">
+                        Diensten
+                    </a>
+                    <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'nav-link active' : 'nav-link' }}">
+                        Contact
+                    </a>
                 </div>
 
-                <!-- CTA Button -->
-                <div class="hidden md:flex items-center gap-3">
+                <!-- CTA + Login -->
+                <div class="hidden md:flex items-center gap-3 justify-self-end">
                     @guest
-                        <a href="{{ route('login') }}" class="nav-link">
+                        <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
                             Inloggen
                         </a>
                         <a href="{{ route('contact') }}" class="btn btn-primary">
@@ -92,7 +93,10 @@
                         </a>
                     @else
                         @include('partials.notifications', ['bellClass' => 'text-gray-500 hover:text-primary-600'])
-                        <a href="{{ auth()->user()->canAccessAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}" class="nav-link">
+                        <a href="{{ auth()->user()->canAccessAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
                             {{ auth()->user()->canAccessAdmin() ? 'Adminportaal' : 'Klantportaal' }}
                         </a>
                         <form action="{{ route('logout') }}" method="POST">
@@ -103,7 +107,7 @@
                 </div>
 
                 <!-- Mobile menu button -->
-                <div class="md:hidden">
+                <div class="md:hidden justify-self-end">
                     <button @click="mobileMenu = !mobileMenu" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500">
                         <svg class="h-6 w-6" :class="mobileMenu ? 'hidden' : 'block'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
