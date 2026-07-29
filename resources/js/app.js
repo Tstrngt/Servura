@@ -156,7 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
-    updateTheme();
+
+    // Run once layout has actually settled (fonts/images can still shift things
+    // right at DOMContentLoaded), and again once everything has fully loaded.
+    requestAnimationFrame(() => requestAnimationFrame(updateTheme));
+    window.addEventListener('load', updateTheme);
 });
 
 Alpine.data('invoiceForm', () => ({
