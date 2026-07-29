@@ -154,13 +154,12 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(updateTheme);
     }
 
+    // The initial theme (scrollY 0) is already rendered server-side in Blade
+    // (see layouts/app.blade.php) to avoid any race at load. From here on,
+    // JS only needs to react to actual scrolling — it should never overwrite
+    // that initial state on its own.
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
-
-    // Run once layout has actually settled (fonts/images can still shift things
-    // right at DOMContentLoaded), and again once everything has fully loaded.
-    requestAnimationFrame(() => requestAnimationFrame(updateTheme));
-    window.addEventListener('load', updateTheme);
 });
 
 Alpine.data('invoiceForm', () => ({
