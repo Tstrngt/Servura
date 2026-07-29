@@ -14,10 +14,12 @@
 ## Huidige taak
 
 **Wat**: Verbeter de publieke "Over ons"-pagina (`resources/views/about.blade.php`): helderder hero, consistente fonts met homepage, volgorde Wie wij zijn / Team / Werkwijze / Portfolio / CTA, persoonlijke portfolio-links per teamlid, CTA gelijk aan homepage.
-**Status**: af — Vite-build lokaal geslaagd.
+**Status**: af — Vite-build lokaal geslaagd; hero-fonts en sectiebreedtes aangepast na feedback.
 **Volgende stap**: commit + push naar `main`, daarna op de server `git pull` en `npm run build`.
 
-**Open detail:** de portfolio-links voor Tim, Dirk en Isis zijn placeholders (`#...`). Vul echte URLs in in `resources/views/about.blade.php`.
+**Open details:**
+- Portfolio-links voor Tim, Dirk en Isis zijn placeholders (`#...`).
+- Telefoonnummer in CTA is `‹TELEFOON›` (TODO).
 
 ## Omgevingsstatus
 

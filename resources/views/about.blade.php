@@ -49,9 +49,10 @@
 
     <div class="relative max-w-7xl mx-auto px-6 py-24 lg:py-32">
         <div class="max-w-2xl animate-slide-up">
-            <span class="text-accent-300 font-semibold tracking-wide uppercase text-sm mb-4 block">Over Servura</span>
-            <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-[1.05]">
-                Uw partner voor een sterke online aanwezigheid
+            <span class="inline-block rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-semibold uppercase tracking-wide text-accent-200 mb-4">Over Servura</span>
+            <h1 class="font-display text-5xl font-bold leading-[1.1] sm:text-6xl lg:text-7xl mb-6">
+                Uw partner voor een<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-200 via-accent-200 to-white">sterke online aanwezigheid</span>
             </h1>
             <p class="text-lg md:text-xl text-white/90 mb-8 leading-relaxed">
                 Wij helpen ondernemers en organisaties met professionele websites, betrouwbare hosting en persoonlijke ondersteuning — van het eerste gesprek tot het doorlopende onderhoud.
@@ -71,8 +72,8 @@
 <!-- Wie wij zijn -->
 <section class="py-24 lg:py-28 bg-white">
     <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-            <div class="lg:col-span-5 animate-on-scroll">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+            <div class="animate-on-scroll">
                 <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Wie wij zijn</span>
                 <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">
                     Websites die werken, zonder de technische last
@@ -85,7 +86,7 @@
                 </p>
             </div>
 
-            <div class="lg:col-span-7 animate-on-scroll">
+            <div class="animate-on-scroll">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-10">
                     @php
                         $values = [
@@ -116,10 +117,10 @@
 <!-- Ons team -->
 <section class="py-24 lg:py-28 bg-slate-50">
     <div class="max-w-7xl mx-auto px-6">
-        <div class="max-w-2xl mb-14 animate-on-scroll">
+        <div class="mb-14 animate-on-scroll">
             <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Ons team</span>
             <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 leading-[1.05] tracking-tight">De mensen achter Servura</h2>
-            <p class="text-lg text-slate-600 leading-relaxed">
+            <p class="max-w-2xl text-lg text-slate-600 leading-relaxed">
                 Een klein team van professionals met passie voor webdevelopment, design en klantenservice.
             </p>
         </div>
@@ -149,8 +150,8 @@
 <!-- Werkwijze -->
 <section class="py-24 lg:py-28 bg-white">
     <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start animate-on-scroll">
-            <div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+            <div class="animate-on-scroll">
                 <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Werkwijze</span>
                 <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">
                     Persoonlijk, van begin tot eind
@@ -208,10 +209,10 @@
 <!-- Portfolio (persoonlijk) -->
 <section class="py-24 lg:py-28 bg-slate-50">
     <div class="max-w-7xl mx-auto px-6">
-        <div class="max-w-2xl mb-14 animate-on-scroll">
+        <div class="mb-14 animate-on-scroll">
             <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Portfolio</span>
             <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 leading-[1.05] tracking-tight">Het werk van ons team</h2>
-            <p class="text-lg text-slate-600 leading-relaxed">
+            <p class="max-w-2xl text-lg text-slate-600 leading-relaxed">
                 Ontdek het persoonlijke portfolio van elk teamlid. Hier delen we onze individuele expertise, projecten en specialisaties.
             </p>
         </div>
