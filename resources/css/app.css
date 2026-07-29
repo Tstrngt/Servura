@@ -187,6 +187,29 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(226, 232, 240, 0.9);
 }
 
+/* Navbar CTA/logout button: forced to the exact same height as .icon-btn
+   (h-10 = 2.5rem) so both sit visually aligned in the navbar. */
+.nav-cta {
+    height: 2.5rem;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    font-size: 0.875rem;
+    line-height: 1;
+}
+
+.site-navbar.is-dark .nav-cta {
+    background-color: #ffffff;
+    color: #0369a1;
+    box-shadow: none;
+}
+
+.site-navbar.is-dark .nav-cta:hover {
+    background-color: #e0f2fe;
+    color: #075985;
+}
+
 .site-navbar.is-dark .icon-btn:hover {
     border-color: rgba(255, 255, 255, 0.4);
     background-color: rgba(255, 255, 255, 0.16);
