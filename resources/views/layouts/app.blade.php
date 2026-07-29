@@ -52,14 +52,14 @@
 
     <!-- Navigation -->
     @unless(request()->routeIs('admin.*'))
-    <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <nav class="site-navbar sticky top-0 z-50" data-navbar>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-3 items-center h-16">
                 <!-- Logo -->
                 <div class="justify-self-start">
                     <a href="{{ route('home') }}" class="flex items-center group" aria-label="Servura home">
                         <span class="logo-text text-2xl font-extrabold logo-mark group-hover:opacity-80 transition-opacity">Servura</span>
-                        <span class="ml-1 text-2xl font-logo font-bold text-primary-600 animate-pulse-soft">.</span>
+                        <span class="logo-dot ml-1 text-2xl font-logo font-bold text-primary-600 animate-pulse-soft">.</span>
                     </a>
                 </div>
 
@@ -82,7 +82,7 @@
                 <!-- CTA + Login -->
                 <div class="hidden md:flex items-center gap-3 justify-self-end">
                     @guest
-                        <a href="{{ route('login') }}" title="Inloggen" aria-label="Inloggen" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                        <a href="{{ route('login') }}" title="Inloggen" aria-label="Inloggen" class="icon-btn inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
@@ -92,7 +92,7 @@
                         </a>
                     @else
                         @include('partials.notifications', ['bellClass' => 'text-gray-500 hover:text-primary-600'])
-                        <a href="{{ auth()->user()->canAccessAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}" title="{{ auth()->user()->canAccessAdmin() ? 'Adminportaal' : 'Klantportaal' }}" aria-label="{{ auth()->user()->canAccessAdmin() ? 'Adminportaal' : 'Klantportaal' }}" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                        <a href="{{ auth()->user()->canAccessAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}" title="{{ auth()->user()->canAccessAdmin() ? 'Adminportaal' : 'Klantportaal' }}" aria-label="{{ auth()->user()->canAccessAdmin() ? 'Adminportaal' : 'Klantportaal' }}" class="icon-btn inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>

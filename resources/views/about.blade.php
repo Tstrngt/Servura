@@ -39,7 +39,7 @@
 @endphp
 
 <!-- Hero Section -->
-<section class="relative overflow-hidden bg-slate-950 text-white">
+<section class="relative overflow-hidden bg-slate-950 text-white" data-navbar-theme="dark">
     <img
         src="https://images.unsplash.com/photo-1526505917130-857817501277?fm=jpg&q=80&w=1920&auto=format&fit=crop"
         alt="Skyline van Rotterdam in Zuid-Holland"
@@ -266,7 +266,7 @@
 </section>
 
 <!-- CTA Section (gelijk aan homepage) -->
-<section class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900">
+<section class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900" data-navbar-theme="dark">
     <div class="absolute -top-24 -right-16 h-96 w-96 rounded-full bg-accent-400/20 blur-3xl"></div>
     <div class="absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-primary-400/20 blur-3xl"></div>
     <div class="absolute inset-0 opacity-[0.15] cta-grid" aria-hidden="true"></div>

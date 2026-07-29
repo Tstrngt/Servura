@@ -6,7 +6,7 @@
 
 @section('content')
 <!-- Hero Section -->
-<section class="relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 py-24 lg:py-28 text-white">
+<section class="relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 py-24 lg:py-28 text-white" data-navbar-theme="dark">
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-accent-500/25 via-transparent to-transparent"></div>
     <div class="absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-primary-400/20 blur-3xl"></div>
     <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -271,7 +271,7 @@
 </section>
 
 <!-- CTA Section -->
-<section class="relative overflow-hidden py-14 lg:py-16 bg-gradient-to-r from-primary-800 via-teal-700 to-emerald-700 text-white">
+<section class="relative overflow-hidden py-14 lg:py-16 bg-gradient-to-r from-primary-800 via-teal-700 to-emerald-700 text-white" data-navbar-theme="dark">
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-300/25 via-transparent to-transparent"></div>
     <div class="absolute -right-16 -top-24 h-56 w-56 rounded-full bg-white/10 blur-2xl"></div>
     <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

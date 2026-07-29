@@ -1,5 +1,5 @@
 <!-- Hero Section: two-column, scroll-driven "website wordt gebouwd" in a monitor -->
-<section id="hero-build" class="relative h-[240vh] bg-slate-950 text-white">
+<section id="hero-build" class="relative h-[240vh] bg-slate-950 text-white" data-navbar-theme="dark">
     <div class="sticky top-16 h-[calc(100vh-4rem)] overflow-hidden flex items-center" data-hero-build data-hero-parallax>
         <!-- Ambient light -->
         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-800/40 via-slate-950 to-slate-950"></div>

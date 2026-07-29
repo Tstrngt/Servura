@@ -166,7 +166,7 @@
 @endif
 
 <!-- CTA Section -->
-<section class="py-16 bg-primary-600 text-white">
+<section class="py-16 bg-primary-600 text-white" data-navbar-theme="dark">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl md:text-4xl font-bold mb-4">
             Klaar om te beginnen?

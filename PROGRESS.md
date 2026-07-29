@@ -13,9 +13,9 @@
 
 ## Huidige taak
 
-**Wat**: Fix de publieke navbar (`resources/views/layouts/app.blade.php`): logo links, navigatie gecentreerd, CTA rechts; login-link wordt een icoon-knop voor het klantenportaal.
-**Status**: af — desktop navbar gebruikt een 3-koloms grid; login/klantportaal-knop is nu een pure ronde icoon-knop (geen tekst meer), met aria-label/title voor toegankelijkheid.
-**Volgende stap**: build verifiëren, committen en pushen.
+**Wat**: Navbar krijgt een glass-effect (semi-transparant + blur) waarbij de kleur van het "Servura"-logo en de nav-links meeveren met de sectie die er onder zit (donker op donkere hero's, licht elders).
+**Status**: af — `.site-navbar` in `resources/css/app.css` gebruikt `backdrop-filter: blur` + translucent achtergrond; `resources/js/app.js` heeft een IntersectionObserver die kijkt welke `[data-navbar-theme="dark"]`-sectie zich achter de sticky navbar bevindt en `.is-dark` toggelt. Alle donkere hero/CTA-secties op home, about, contact, services/index en services/show hebben dit attribuut gekregen.
+**Volgende stap**: `npm run build` + visueel verifiëren op alle pagina's, committen en pushen.
 
 **Open details:**
 - Portfolio-links voor Tim, Dirk en Isis zijn placeholders (`#...`).

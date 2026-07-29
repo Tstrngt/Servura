@@ -221,7 +221,7 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
 </section>
 
 <!-- Portfolio Cinematic -->
-<section id="portfolio-cinematic" class="relative h-[500vh] -mb-px bg-slate-950 text-white">
+<section id="portfolio-cinematic" class="relative h-[500vh] -mb-px bg-slate-950 text-white" data-navbar-theme="dark">
     <!-- Background ambience -->
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-primary-900/30 via-slate-950 to-slate-950"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80rem] h-[80rem] bg-accent-900/10 rounded-full blur-3xl"></div>
@@ -424,7 +424,7 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
 </script>
 
 <!-- Closing CTA -->
-<section class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900">
+<section class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900" data-navbar-theme="dark">
     <!-- Ambient depth -->
     <div class="absolute -top-24 -right-16 h-96 w-96 rounded-full bg-accent-400/20 blur-3xl"></div>
     <div class="absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-primary-400/20 blur-3xl"></div>

@@ -1,4 +1,4 @@
-<section class="relative min-h-[calc(100svh-4rem)] overflow-hidden bg-slate-950 text-white">
+<section class="relative min-h-[calc(100svh-4rem)] overflow-hidden bg-slate-950 text-white" data-navbar-theme="dark">
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-700/45 via-slate-950 to-slate-950"></div>
     <div class="absolute -left-32 top-1/3 h-80 w-80 rounded-full bg-accent-500/10 blur-3xl"></div>
 

@@ -125,6 +125,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Glass navbar: switch between light/dark theme depending on the section
+// currently sitting behind it, so the "Servura" logo and links stay readable.
+document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.querySelector('[data-navbar]');
+    if (!nav) return;
+
+    const darkSections = Array.from(document.querySelectorAll('[data-navbar-theme="dark"]'));
+    if (darkSections.length === 0) return;
+
+    const navHeight = nav.offsetHeight || 64;
+    let activeDark = new Set();
+
+    const setTheme = () => {
+        nav.classList.toggle('is-dark', activeDark.size > 0);
+    };
+
+    const themeObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                activeDark.add(entry.target);
+            } else {
+                activeDark.delete(entry.target);
+            }
+        });
+        setTheme();
+    }, {
+        // Only watch a thin band right where the navbar sits.
+        rootMargin: `-${navHeight}px 0px -${window.innerHeight - navHeight - 1}px 0px`,
+        threshold: 0,
+    });
+
+    darkSections.forEach((section) => themeObserver.observe(section));
+});
+
 Alpine.data('invoiceForm', () => ({
     lines: [{ description: '', quantity: 1, unit_price: 0 }],
     addLine() {
