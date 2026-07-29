@@ -127,60 +127,6 @@ h1, h2, h3, h4, h5, h6 {
     @apply text-primary-600 border-b-2 border-primary-600;
 }
 
-/* Navbar: fully transparent, no background/blur whatsoever. !important is
-   used deliberately here so no other rule anywhere in the cascade can ever
-   re-introduce a background on this element by accident. */
-nav.site-navbar,
-nav[data-navbar] {
-    background-color: transparent !important;
-    background-image: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border-bottom: 1px solid transparent !important;
-    box-shadow: none !important;
-}
-
-.site-navbar .logo-text,
-.site-navbar .logo-dot,
-.site-navbar .nav-link {
-    transition: color 0.4s ease, opacity 0.4s ease;
-}
-
-.site-navbar.is-dark .nav-link {
-    color: rgba(226, 232, 240, 0.85);
-}
-
-.site-navbar.is-dark .nav-link:hover {
-    color: #ffffff;
-}
-
-.site-navbar.is-dark .nav-link.active {
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.6);
-}
-
-.site-navbar.is-dark .logo-mark {
-    background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.site-navbar.is-dark .logo-dot {
-    color: #7dd3fc;
-}
-
-.site-navbar.is-dark .icon-btn {
-    border-color: rgba(255, 255, 255, 0.25);
-    background-color: rgba(255, 255, 255, 0.08);
-    color: rgba(226, 232, 240, 0.9);
-}
-
-.site-navbar.is-dark .icon-btn:hover {
-    border-color: rgba(255, 255, 255, 0.4);
-    background-color: rgba(255, 255, 255, 0.16);
-    color: #ffffff;
-}
 
 /* Hero section */
 .hero-gradient {
