@@ -646,6 +646,13 @@ h1, h2, h3, h4, h5, h6 {
 .hero-badge {
     position: absolute;
     z-index: 20;
+    --badge-x: 0px;
+    --badge-y: 0px;
+    transform: translate3d(var(--badge-x), var(--badge-y), 0);
+    will-change: transform;
+}
+.hero-badge-inner {
+    display: inline-flex;
     align-items: center;
     gap: 0.65rem;
     white-space: nowrap;
@@ -663,9 +670,9 @@ h1, h2, h3, h4, h5, h6 {
         0 0 0 1px rgba(255, 255, 255, 0.05) inset,
         0 0 50px -8px rgba(56, 189, 248, 0.22);
 }
-.hero-badge-tl { top: -3.5rem; left: -5.5rem; }
-.hero-badge-tr { top: 1.5rem; right: -6rem; }
-.hero-badge-br { bottom: 0.5rem; right: -5rem; }
+.hero-badge-tl { top: 8%; left: -1.5rem; }
+.hero-badge-tr { top: 3%; right: -1.5rem; }
+.hero-badge-br { bottom: 6%; right: -1rem; }
 
 /* Computer monitor frame */
 .hero-monitor { position: relative; width: 100%; max-width: 760px; margin: 0 auto; }

@@ -55,7 +55,7 @@
             </div>
 
             <!-- Right: computer monitor with the building animation -->
-            <div class="w-full justify-self-center lg:justify-self-end">
+            <div class="relative w-full justify-self-center lg:justify-self-end">
                 <div class="hero-monitor">
                     <div class="hero-monitor-screen">
                         <div class="hero-build" data-hero-build-stage>
@@ -113,21 +113,27 @@
                     <div class="hero-monitor-neck"></div>
                     <div class="hero-monitor-base"></div>
                     <div class="hero-monitor-reflection" aria-hidden="true"></div>
+                </div>
 
-                    <!-- Floating UI accents (ambient craft) -->
-                    <div class="hero-badge hero-badge-tl animate-float hidden lg:inline-flex" aria-hidden="true">
+                <!-- Floating UI accents (ambient craft) -->
+                <div class="hero-badge hero-badge-tl hidden lg:inline-flex" data-hero-badge="tl" aria-hidden="true">
+                    <div class="hero-badge-inner animate-float">
                         <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-accent-500/20 text-accent-300 ring-1 ring-accent-300/30">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                         </span>
                         SSL &amp; dagelijkse back-ups
                     </div>
-                    <div class="hero-badge hero-badge-tr animate-float hidden lg:inline-flex" style="animation-delay: 0.7s" aria-hidden="true">
+                </div>
+                <div class="hero-badge hero-badge-tr hidden lg:inline-flex" data-hero-badge="tr" aria-hidden="true">
+                    <div class="hero-badge-inner animate-float" style="animation-delay: 0.7s">
                         <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-500/20 text-primary-300 ring-1 ring-primary-300/30">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                         </span>
                         Supersnel geladen
                     </div>
-                    <div class="hero-badge hero-badge-br animate-float hidden lg:inline-flex" style="animation-delay: 1.3s" aria-hidden="true">
+                </div>
+                <div class="hero-badge hero-badge-br hidden lg:inline-flex" data-hero-badge="br" aria-hidden="true">
+                    <div class="hero-badge-inner animate-float" style="animation-delay: 1.3s">
                         <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-300/30">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         </span>
@@ -150,6 +156,12 @@
     const idle = section.querySelector('[data-hero-build-idle]');
     const hint = section.querySelector('[data-hero-build-hint]');
     const pieces = Array.from(section.querySelectorAll('[data-build-piece]'));
+    const badges = Array.from(section.querySelectorAll('[data-hero-badge]'));
+    const badgeOffsets = {
+        tl: { x: -70, y: -70 },
+        tr: { x: 70, y: -70 },
+        br: { x: 70, y: 70 },
+    };
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -181,6 +193,13 @@
             const lp = ease(band(p, a, b));
             el.style.opacity = lp;
             el.style.transform = `translate3d(0, ${(1 - lp) * 24}px, 0)`;
+        });
+        badges.forEach((badge) => {
+            const key = badge.getAttribute('data-hero-badge');
+            const off = badgeOffsets[key] || { x: 0, y: 0 };
+            const ep = ease(clamp(p, 0, 1));
+            badge.style.setProperty('--badge-x', `${off.x * ep}px`);
+            badge.style.setProperty('--badge-y', `${off.y * ep}px`);
         });
         const overflow = Math.max(0, site.scrollHeight - viewport.clientHeight);
         site.style.transform = `translate3d(0, ${-overflow * ease(clamp(p, 0, 1))}px, 0)`;
