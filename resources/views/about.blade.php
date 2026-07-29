@@ -39,7 +39,7 @@
 @endphp
 
 <!-- Hero Section -->
-<section class="relative overflow-hidden bg-slate-950 text-white" data-navbar-theme="dark">
+<section class="relative -mt-16 pt-16 overflow-hidden bg-slate-950 text-white" data-navbar-theme="dark">
     <img
         src="https://images.unsplash.com/photo-1526505917130-857817501277?fm=jpg&q=80&w=1920&auto=format&fit=crop"
         alt="Skyline van Rotterdam in Zuid-Holland"

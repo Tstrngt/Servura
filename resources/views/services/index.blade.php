@@ -20,7 +20,7 @@ $steps = [
 @endphp
 
 <!-- Hero Section -->
-<section class="relative py-24 lg:py-32 overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 text-white" data-navbar-theme="dark">
+<section class="relative -mt-16 pt-40 lg:pt-48 pb-24 lg:pb-32 overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 text-white" data-navbar-theme="dark">
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-accent-900/20 via-transparent to-transparent"></div>
 
     <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">

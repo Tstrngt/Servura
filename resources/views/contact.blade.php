@@ -6,7 +6,7 @@
 
 @section('content')
 <!-- Hero Section -->
-<section class="relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 py-24 lg:py-28 text-white" data-navbar-theme="dark">
+<section class="relative -mt-16 overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 pt-40 lg:pt-44 pb-24 lg:pb-28 text-white" data-navbar-theme="dark">
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-accent-500/25 via-transparent to-transparent"></div>
     <div class="absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-primary-400/20 blur-3xl"></div>
     <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
