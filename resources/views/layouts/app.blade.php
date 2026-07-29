@@ -52,7 +52,14 @@
 
     <!-- Navigation -->
     @unless(request()->routeIs('admin.*'))
-    <nav class="site-navbar sticky top-0 z-50" data-navbar>
+    @php
+        // Only these pages open with a dark hero section; render the navbar's
+        // dark glass theme server-side for them so there's no JS timing gap
+        // at the very top of the page (scrollY 0). Everything else (login,
+        // dashboards, services.show, ...) opens light.
+        $navStartsDark = request()->routeIs('home', 'about', 'contact', 'services.index');
+    @endphp
+    <nav class="site-navbar sticky top-0 z-50 {{ $navStartsDark ? 'is-dark' : '' }}" data-navbar>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-3 items-center h-16">
                 <!-- Logo -->
