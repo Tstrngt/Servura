@@ -146,11 +146,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .site-navbar.is-dark {
-    background: linear-gradient(180deg, rgba(8, 13, 30, 0.8) 0%, rgba(2, 6, 23, 0.68) 100%);
-    border-bottom-color: rgba(255, 255, 255, 0.12);
-    box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.08) inset,
-        0 12px 32px -16px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(180deg, rgba(13, 42, 74, 0.72) 0%, rgba(3, 10, 24, 0.58) 100%);
+    border-bottom-color: transparent;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 
 .site-navbar.is-dark .nav-link {
