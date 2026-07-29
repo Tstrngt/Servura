@@ -14,7 +14,7 @@
 ## Huidige taak
 
 **Wat**: Fix de publieke navbar (`resources/views/layouts/app.blade.php`): logo links, navigatie gecentreerd, CTA rechts; login-link wordt een icoon-knop voor het klantenportaal.
-**Status**: bezig — desktop navbar gebruikt nu een 3-koloms grid, login/portaal knoppen hebben een user-icoon.
+**Status**: af — desktop navbar gebruikt een 3-koloms grid; login/klantportaal-knop is nu een pure ronde icoon-knop (geen tekst meer), met aria-label/title voor toegankelijkheid.
 **Volgende stap**: build verifiëren, committen en pushen.
 
 **Open details:**

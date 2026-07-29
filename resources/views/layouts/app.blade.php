@@ -82,22 +82,20 @@
                 <!-- CTA + Login -->
                 <div class="hidden md:flex items-center gap-3 justify-self-end">
                     @guest
-                        <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <a href="{{ route('login') }}" title="Inloggen" aria-label="Inloggen" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
-                            Inloggen
                         </a>
                         <a href="{{ route('contact') }}" class="btn btn-primary">
                             Offerte Aanvragen
                         </a>
                     @else
                         @include('partials.notifications', ['bellClass' => 'text-gray-500 hover:text-primary-600'])
-                        <a href="{{ auth()->user()->canAccessAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <a href="{{ auth()->user()->canAccessAdmin() ? route('admin.dashboard') : route('customer.dashboard') }}" title="{{ auth()->user()->canAccessAdmin() ? 'Adminportaal' : 'Klantportaal' }}" aria-label="{{ auth()->user()->canAccessAdmin() ? 'Adminportaal' : 'Klantportaal' }}" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
-                            {{ auth()->user()->canAccessAdmin() ? 'Adminportaal' : 'Klantportaal' }}
                         </a>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
