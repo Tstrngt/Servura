@@ -49,14 +49,7 @@
 
     <div class="relative max-w-7xl mx-auto px-6 py-24 lg:py-32">
         <div class="max-w-2xl animate-slide-up">
-            <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-sm font-medium text-slate-200">
-                <span class="relative flex h-2 w-2">
-                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-400 opacity-75"></span>
-                    <span class="relative inline-flex h-2 w-2 rounded-full bg-accent-400"></span>
-                </span>
-                Over Servura
-            </span>
-            <h1 class="mt-6 font-heading text-4xl md:text-5xl font-bold leading-[1.05] tracking-tight">
+            <h1 class="font-heading text-4xl md:text-5xl font-bold leading-[1.05] tracking-tight">
                 Uw partner voor een sterke online aanwezigheid.
             </h1>
             <p class="mt-6 max-w-xl text-lg leading-relaxed text-white/90">
@@ -100,7 +93,7 @@
 
             <!-- Central content -->
             <div class="lg:col-span-6 text-center animate-on-scroll">
-                <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Wie wij zijn</span>
+                <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Onze missie</span>
                 <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">
                     Websites die werken, zonder de technische last
                 </h2>
