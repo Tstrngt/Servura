@@ -127,12 +127,34 @@ h1, h2, h3, h4, h5, h6 {
     @apply text-primary-600 border-b-2 border-primary-600;
 }
 
-/* Navbar: no background/blur, ever — only text/logo color adapts to the
-   section currently behind it (toggled via JS on `nav[data-navbar]`). */
+/* Liquid glass navbar: translucent + blurred, theme follows whichever
+   section is currently sitting behind it (toggled via JS on the `is-dark`
+   class). Now that the hero sections slide underneath the sticky navbar
+   (see -mt-16/pt-16 on the hero sections), there's always real content
+   behind it to blur, even at scrollY 0. */
+.site-navbar {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.55) 100%);
+    backdrop-filter: blur(16px) saturate(120%);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.8) inset,
+        0 12px 32px -16px rgba(15, 23, 42, 0.18);
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
 .site-navbar .logo-text,
 .site-navbar .logo-dot,
 .site-navbar .nav-link {
     transition: color 0.4s ease, opacity 0.4s ease;
+}
+
+.site-navbar.is-dark {
+    background: linear-gradient(180deg, rgba(9, 27, 51, 0.8) 0%, rgba(2, 6, 20, 0.7) 100%);
+    backdrop-filter: blur(14px) saturate(110%);
+    -webkit-backdrop-filter: blur(14px) saturate(110%);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 
 .site-navbar.is-dark .nav-link {
