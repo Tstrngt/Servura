@@ -11,7 +11,7 @@
             'name' => 'Tim van Gorkom',
             'role' => 'Founder & Lead Developer',
             'bio' => 'Richting, architectuur en de technische visie van Servura.',
-            'portfolio_summary' => 'Specialist in Laravel-architectuur, API-koppelingen en schaalbare backends voor het MKB.',
+            'portfolio_summary' => 'Specialist in Laravel-architectuur, API-koppelingen en schaalbare backends voor bedrijven.',
             'initial' => 'T',
             'color' => 'from-primary-500 to-primary-700',
             'portfolio_url' => '#tim-portfolio',
@@ -69,72 +69,58 @@
 <!-- Wie wij zijn -->
 <section class="relative overflow-hidden bg-white py-24 lg:py-32">
     <div class="max-w-7xl mx-auto px-6 relative">
-        <!-- Floating UI cards -->
+        <!-- Floating values cards -->
+        @php
+            $values = [
+                ['title' => 'Eerlijkheid', 'text' => 'Transparante prijzen en heldere communicatie, zonder verborgen kosten.', 'icon' => 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
+                ['title' => 'Kwaliteit', 'text' => 'Professionele oplossingen die stabiel, veilig en gebruiksvriendelijk zijn.', 'icon' => 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'],
+                ['title' => 'Service', 'text' => 'Persoonlijke support met korte lijnen en snelle reactietijd.', 'icon' => 'M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3'],
+                ['title' => 'Resultaat', 'text' => 'Focus op uw bedrijfsdoelen en meetbare online groei.', 'icon' => 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z'],
+            ];
+        @endphp
+
         <div class="hidden lg:block">
-            <!-- Browser window card -->
+            <!-- Eerlijkheid -->
             <div class="absolute top-0 left-0 z-10 w-64 rotate-[-6deg] animate-float">
-                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl overflow-hidden">
-                    <div class="h-8 bg-slate-100 flex items-center gap-1.5 px-3">
-                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-                    </div>
-                    <div class="p-4 space-y-3">
-                        <div class="h-24 rounded-lg bg-gradient-to-br from-primary-100 to-primary-50"></div>
-                        <div class="h-3 w-3/4 rounded bg-slate-100"></div>
-                        <div class="h-3 w-1/2 rounded bg-slate-100"></div>
-                        <div class="grid grid-cols-3 gap-2 pt-1">
-                            <div class="h-14 rounded bg-slate-50"></div>
-                            <div class="h-14 rounded bg-slate-50"></div>
-                            <div class="h-14 rounded bg-slate-50"></div>
-                        </div>
-                    </div>
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[0]['icon'] }}" /></svg>
+                    </span>
+                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900">{{ $values[0]['title'] }}</h3>
+                    <p class="mt-2 text-slate-600 leading-relaxed text-sm">{{ $values[0]['text'] }}</p>
                 </div>
             </div>
 
-            <!-- Mobile phone card -->
-            <div class="absolute top-8 right-0 z-10 w-40 rotate-[5deg] animate-float" style="animation-delay: 1s">
-                <div class="rounded-[2rem] bg-slate-900 p-2 shadow-xl">
-                    <div class="h-72 rounded-[1.5rem] bg-white p-3 space-y-3">
-                        <div class="h-32 rounded-xl bg-gradient-to-br from-accent-100 to-accent-50"></div>
-                        <div class="h-3 w-3/4 rounded bg-slate-100"></div>
-                        <div class="h-3 w-1/2 rounded bg-slate-100"></div>
-                        <div class="h-10 rounded-lg bg-primary-100"></div>
-                        <div class="h-24 rounded-lg bg-slate-50"></div>
-                    </div>
+            <!-- Kwaliteit -->
+            <div class="absolute top-8 right-0 z-10 w-64 rotate-[5deg] animate-float" style="animation-delay: 1s">
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-accent-50 text-accent-600 ring-1 ring-accent-100">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[1]['icon'] }}" /></svg>
+                    </span>
+                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900">{{ $values[1]['title'] }}</h3>
+                    <p class="mt-2 text-slate-600 leading-relaxed text-sm">{{ $values[1]['text'] }}</p>
                 </div>
             </div>
 
-            <!-- Stats card -->
-            <div class="absolute bottom-0 left-12 z-10 w-48 rotate-[3deg] animate-float" style="animation-delay: 2s">
-                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-5">
-                    <div class="text-sm text-slate-500 mb-1">Online groei</div>
-                    <div class="text-3xl font-bold text-slate-900">+42%</div>
-                    <div class="h-16 mt-3 rounded-lg bg-gradient-to-t from-primary-100 to-transparent"></div>
+            <!-- Service -->
+            <div class="absolute bottom-0 left-12 z-10 w-64 rotate-[3deg] animate-float" style="animation-delay: 2s">
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[2]['icon'] }}" /></svg>
+                    </span>
+                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900">{{ $values[2]['title'] }}</h3>
+                    <p class="mt-2 text-slate-600 leading-relaxed text-sm">{{ $values[2]['text'] }}</p>
                 </div>
             </div>
 
-            <!-- Checklist card -->
-            <div class="absolute bottom-12 right-12 z-10 w-52 rotate-[-4deg] animate-float" style="animation-delay: 3s">
-                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-5 space-y-3">
-                    <div class="flex items-center gap-3">
-                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4.5 12.75l6 6 9-13.5"/></svg>
-                        </span>
-                        <span class="h-2.5 w-24 rounded bg-slate-100"></span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4.5 12.75l6 6 9-13.5"/></svg>
-                        </span>
-                        <span class="h-2.5 w-28 rounded bg-slate-100"></span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4.5 12.75l6 6 9-13.5"/></svg>
-                        </span>
-                        <span class="h-2.5 w-20 rounded bg-slate-100"></span>
-                    </div>
+            <!-- Resultaat -->
+            <div class="absolute bottom-12 right-12 z-10 w-64 rotate-[-4deg] animate-float" style="animation-delay: 3s">
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[3]['icon'] }}" /></svg>
+                    </span>
+                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900">{{ $values[3]['title'] }}</h3>
+                    <p class="mt-2 text-slate-600 leading-relaxed text-sm">{{ $values[3]['text'] }}</p>
                 </div>
             </div>
         </div>
@@ -146,7 +132,7 @@
                 Websites die werken, zonder de technische last
             </h2>
             <p class="text-lg text-slate-600 leading-relaxed mb-8 max-w-2xl mx-auto">
-                Servura is opgericht met een duidelijke missie: het MKB helpen met een professionele online aanwezigheid zonder de complexiteit en hoge kosten die vaak bij webdevelopment komen kijken. U hoeft er niets technisch van te weten; wij nemen alles uit handen.
+                Servura is opgericht met een duidelijke missie: bedrijven helpen met een professionele online aanwezigheid zonder de complexiteit en hoge kosten die vaak bij webdevelopment komen kijken. U hoeft er niets technisch van te weten; wij nemen alles uit handen.
             </p>
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4">
                 <a href="{{ route('contact') }}" class="btn btn-primary text-base px-7 py-3.5">
