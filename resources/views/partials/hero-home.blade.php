@@ -116,15 +116,21 @@
 
                     <!-- Floating UI accents (ambient craft) -->
                     <div class="hero-badge hero-badge-tl animate-float hidden lg:inline-flex" aria-hidden="true">
-                        <svg class="h-3.5 w-3.5 text-accent-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-accent-500/20 text-accent-300 ring-1 ring-accent-300/30">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        </span>
                         SSL &amp; dagelijkse back-ups
                     </div>
                     <div class="hero-badge hero-badge-tr animate-float hidden lg:inline-flex" style="animation-delay: 0.7s" aria-hidden="true">
-                        <svg class="h-3.5 w-3.5 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-500/20 text-primary-300 ring-1 ring-primary-300/30">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </span>
                         Supersnel geladen
                     </div>
                     <div class="hero-badge hero-badge-br animate-float hidden lg:inline-flex" style="animation-delay: 1.3s" aria-hidden="true">
-                        <svg class="h-3.5 w-3.5 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-300/30">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </span>
                         Binnen 1 werkdag antwoord
                     </div>
                 </div>

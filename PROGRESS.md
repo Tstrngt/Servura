@@ -13,9 +13,9 @@
 
 ## Huidige taak
 
-**Wat**: Verbeter de publieke "Over ons"-pagina (`resources/views/about.blade.php`): helderder hero, consistente fonts met homepage, volgorde Wie wij zijn / Team / Werkwijze / Portfolio / CTA, persoonlijke portfolio-links per teamlid, CTA gelijk aan homepage.
-**Status**: af — Vite-build lokaal geslaagd; hero zonder badge, Wie-wij-zijn hernoemd naar Onze missie, vier waarden als floating cards met icon-kleur hover, MKB vervangen door bedrijven.
-**Volgende stap**: commit + push naar `main`, daarna op de server `git pull` en `npm run build`.
+**Wat**: Verbeter de homepage hero (`resources/views/partials/hero-home.blade.php`): floating badges rondom de monitor meer uitgesproken en beter in het design laten passen.
+**Status**: bezig — badges groter gemaakt, icon-cirkels toegevoegd, verder uit elkaar geplaatst en nadrukkelijkere schaduw/glow.
+**Volgende stap**: build verifiëren, committen en pushen.
 
 **Open details:**
 - Portfolio-links voor Tim, Dirk en Isis zijn placeholders (`#...`).
