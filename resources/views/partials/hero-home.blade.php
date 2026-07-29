@@ -158,9 +158,9 @@
     const pieces = Array.from(section.querySelectorAll('[data-build-piece]'));
     const badges = Array.from(section.querySelectorAll('[data-hero-badge]'));
     const badgeOffsets = {
-        tl: { x: -70, y: -70 },
-        tr: { x: 70, y: -70 },
-        br: { x: 70, y: 70 },
+        tl: { x: -130, y: -130 },
+        tr: { x: 130, y: -130 },
+        br: { x: 130, y: 130 },
     };
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

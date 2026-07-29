@@ -14,7 +14,7 @@
 ## Huidige taak
 
 **Wat**: Verbeter de homepage hero (`resources/views/partials/hero-home.blade.php`): floating badges rondom de monitor meer uitgesproken en beter in het design laten passen.
-**Status**: bezig — badges zijn verplaatst naar de right-column, staan nu netjes rondom het scherm, zweven en verschuiven bij scroll naar buiten (samen met de build-animatie).
+**Status**: bezig — badges starten nu meer op het monitorscherm en schuiven bij scroll flink verder naar buiten (samen met de build-animatie).
 **Volgende stap**: build verifiëren, committen en pushen.
 
 **Open details:**
