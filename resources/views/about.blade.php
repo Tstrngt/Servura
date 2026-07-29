@@ -68,79 +68,81 @@
 
 <!-- Wie wij zijn -->
 <section class="relative overflow-hidden bg-white py-24 lg:py-32">
-    <div class="max-w-[90rem] mx-auto px-6 relative">
-        <!-- Floating values cards -->
-        @php
-            $values = [
-                ['title' => 'Eerlijkheid', 'text' => 'Transparante prijzen en heldere communicatie, zonder verborgen kosten.', 'icon' => 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
-                ['title' => 'Kwaliteit', 'text' => 'Professionele oplossingen die stabiel, veilig en gebruiksvriendelijk zijn.', 'icon' => 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'],
-                ['title' => 'Service', 'text' => 'Persoonlijke support met korte lijnen en snelle reactietijd.', 'icon' => 'M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3'],
-                ['title' => 'Resultaat', 'text' => 'Focus op uw bedrijfsdoelen en meetbare online groei.', 'icon' => 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z'],
-            ];
-        @endphp
-
-        <div class="hidden lg:block">
-            <!-- Eerlijkheid -->
-            <div class="absolute top-0 left-0 z-10 w-64 rotate-[-6deg] animate-float group">
-                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-primary-600 group-hover:ring-primary-500 group-hover:-translate-y-1">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100 transition-colors duration-300 group-hover:bg-white group-hover:text-primary-600">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[0]['icon'] }}" /></svg>
-                    </span>
-                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">{{ $values[0]['title'] }}</h3>
-                    <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-primary-100">{{ $values[0]['text'] }}</p>
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            <!-- Left cards -->
+            <div class="hidden lg:flex lg:col-span-3 flex-col gap-24 items-start">
+                <!-- Eerlijkheid -->
+                <div class="w-full max-w-[15rem] animate-float group" style="animation-delay: 0s">
+                    <div class="rotate-[-3deg]">
+                        <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-primary-600 group-hover:ring-primary-500 group-hover:-translate-y-1">
+                            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100 transition-colors duration-300 group-hover:bg-white group-hover:text-primary-600">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </span>
+                            <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">Eerlijkheid</h3>
+                            <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-primary-100">Transparante prijzen en heldere communicatie, zonder verborgen kosten.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Service -->
+                <div class="w-full max-w-[15rem] self-end animate-float group" style="animation-delay: 2s">
+                    <div class="rotate-[2deg]">
+                        <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-primary-600 group-hover:ring-primary-500 group-hover:-translate-y-1">
+                            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100 transition-colors duration-300 group-hover:bg-white group-hover:text-primary-600">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" /></svg>
+                            </span>
+                            <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">Service</h3>
+                            <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-primary-100">Persoonlijke support met korte lijnen en snelle reactietijd.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Kwaliteit -->
-            <div class="absolute top-8 right-0 z-10 w-64 rotate-[5deg] animate-float group" style="animation-delay: 1s">
-                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-primary-600 group-hover:ring-primary-500 group-hover:-translate-y-1">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-accent-50 text-accent-600 ring-1 ring-accent-100 transition-colors duration-300 group-hover:bg-white group-hover:text-primary-600">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[1]['icon'] }}" /></svg>
-                    </span>
-                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">{{ $values[1]['title'] }}</h3>
-                    <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-primary-100">{{ $values[1]['text'] }}</p>
+            <!-- Central content -->
+            <div class="lg:col-span-6 text-center animate-on-scroll">
+                <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Wie wij zijn</span>
+                <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">
+                    Websites die werken, zonder de technische last
+                </h2>
+                <p class="text-lg text-slate-600 leading-relaxed mb-8 max-w-2xl mx-auto">
+                    Servura is opgericht met een duidelijke missie: bedrijven helpen met een professionele online aanwezigheid zonder de complexiteit en hoge kosten die vaak bij webdevelopment komen kijken. U hoeft er niets technisch van te weten; wij nemen alles uit handen.
+                </p>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4">
+                    <a href="{{ route('contact') }}" class="btn btn-primary text-base px-7 py-3.5">
+                        Plan een vrijblijvend gesprek
+                    </a>
+                    <a href="{{ route('services.index') }}" class="btn btn-outline text-base px-7 py-3.5">
+                        Bekijk onze diensten
+                    </a>
                 </div>
             </div>
 
-            <!-- Service -->
-            <div class="absolute bottom-0 left-12 z-10 w-64 rotate-[3deg] animate-float group" style="animation-delay: 2s">
-                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-primary-600 group-hover:ring-primary-500 group-hover:-translate-y-1">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100 transition-colors duration-300 group-hover:bg-white group-hover:text-primary-600">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[2]['icon'] }}" /></svg>
-                    </span>
-                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">{{ $values[2]['title'] }}</h3>
-                    <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-primary-100">{{ $values[2]['text'] }}</p>
+            <!-- Right cards -->
+            <div class="hidden lg:flex lg:col-span-3 flex-col gap-24 items-end">
+                <!-- Kwaliteit -->
+                <div class="w-full max-w-[15rem] animate-float group" style="animation-delay: 1s">
+                    <div class="rotate-[3deg]">
+                        <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-accent-600 group-hover:ring-accent-500 group-hover:-translate-y-1">
+                            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-accent-50 text-accent-600 ring-1 ring-accent-100 transition-colors duration-300 group-hover:bg-white group-hover:text-accent-600">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                            </span>
+                            <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">Kwaliteit</h3>
+                            <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-accent-100">Professionele oplossingen die stabiel, veilig en gebruiksvriendelijk zijn.</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Resultaat -->
-            <div class="absolute bottom-12 right-12 z-10 w-64 rotate-[-4deg] animate-float group" style="animation-delay: 3s">
-                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-primary-600 group-hover:ring-primary-500 group-hover:-translate-y-1">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 transition-colors duration-300 group-hover:bg-white group-hover:text-primary-600">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[3]['icon'] }}" /></svg>
-                    </span>
-                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">{{ $values[3]['title'] }}</h3>
-                    <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-primary-100">{{ $values[3]['text'] }}</p>
+                <!-- Resultaat -->
+                <div class="w-full max-w-[15rem] self-start animate-float group" style="animation-delay: 3s">
+                    <div class="rotate-[-2deg]">
+                        <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-emerald-600 group-hover:ring-emerald-500 group-hover:-translate-y-1">
+                            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 transition-colors duration-300 group-hover:bg-white group-hover:text-emerald-600">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+                            </span>
+                            <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">Resultaat</h3>
+                            <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-emerald-100">Focus op uw bedrijfsdoelen en meetbare online groei.</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Central content -->
-        <div class="relative z-20 max-w-3xl mx-auto text-center pt-8 lg:py-20 animate-on-scroll">
-            <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Wie wij zijn</span>
-            <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">
-                Websites die werken, zonder de technische last
-            </h2>
-            <p class="text-lg text-slate-600 leading-relaxed mb-8 max-w-2xl mx-auto">
-                Servura is opgericht met een duidelijke missie: bedrijven helpen met een professionele online aanwezigheid zonder de complexiteit en hoge kosten die vaak bij webdevelopment komen kijken. U hoeft er niets technisch van te weten; wij nemen alles uit handen.
-            </p>
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4">
-                <a href="{{ route('contact') }}" class="btn btn-primary text-base px-7 py-3.5">
-                    Plan een vrijblijvend gesprek
-                </a>
-                <a href="{{ route('services.index') }}" class="btn btn-outline text-base px-7 py-3.5">
-                    Bekijk onze diensten
-                </a>
             </div>
         </div>
     </div>

@@ -14,7 +14,7 @@
 ## Huidige taak
 
 **Wat**: Verbeter de publieke "Over ons"-pagina (`resources/views/about.blade.php`): helderder hero, consistente fonts met homepage, volgorde Wie wij zijn / Team / Werkwijze / Portfolio / CTA, persoonlijke portfolio-links per teamlid, CTA gelijk aan homepage.
-**Status**: af — Vite-build lokaal geslaagd; hero gestript tot badge/heading/tekst, Wie-wij-zijn toont de vier waarden als floating cards rondom centrale heading + CTAs, MKB vervangen door bedrijven, cards krijgen kleurverandering bij hover.
+**Status**: af — Vite-build lokaal geslaagd; hero gestript tot badge/heading/tekst, Wie-wij-zijn toont vier waarden in een stabiele 12-koloms layout met float+rotate, hover-kleuren afgestemd op icon-kleur, MKB vervangen door bedrijven.
 **Volgende stap**: commit + push naar `main`, daarna op de server `git pull` en `npm run build`.
 
 **Open details:**
