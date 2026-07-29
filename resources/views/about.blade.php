@@ -68,7 +68,7 @@
 
 <!-- Wie wij zijn -->
 <section class="relative overflow-hidden bg-white py-24 lg:py-32">
-    <div class="max-w-7xl mx-auto px-6 relative">
+    <div class="max-w-[90rem] mx-auto px-6 relative">
         <!-- Floating values cards -->
         @php
             $values = [
@@ -81,46 +81,46 @@
 
         <div class="hidden lg:block">
             <!-- Eerlijkheid -->
-            <div class="absolute top-0 left-0 z-10 w-64 rotate-[-6deg] animate-float">
-                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100">
+            <div class="absolute top-0 left-0 z-10 w-64 rotate-[-6deg] animate-float group">
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-primary-600 group-hover:ring-primary-500 group-hover:-translate-y-1">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100 transition-colors duration-300 group-hover:bg-white group-hover:text-primary-600">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[0]['icon'] }}" /></svg>
                     </span>
-                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900">{{ $values[0]['title'] }}</h3>
-                    <p class="mt-2 text-slate-600 leading-relaxed text-sm">{{ $values[0]['text'] }}</p>
+                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">{{ $values[0]['title'] }}</h3>
+                    <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-primary-100">{{ $values[0]['text'] }}</p>
                 </div>
             </div>
 
             <!-- Kwaliteit -->
-            <div class="absolute top-8 right-0 z-10 w-64 rotate-[5deg] animate-float" style="animation-delay: 1s">
-                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-accent-50 text-accent-600 ring-1 ring-accent-100">
+            <div class="absolute top-8 right-0 z-10 w-64 rotate-[5deg] animate-float group" style="animation-delay: 1s">
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-primary-600 group-hover:ring-primary-500 group-hover:-translate-y-1">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-accent-50 text-accent-600 ring-1 ring-accent-100 transition-colors duration-300 group-hover:bg-white group-hover:text-primary-600">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[1]['icon'] }}" /></svg>
                     </span>
-                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900">{{ $values[1]['title'] }}</h3>
-                    <p class="mt-2 text-slate-600 leading-relaxed text-sm">{{ $values[1]['text'] }}</p>
+                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">{{ $values[1]['title'] }}</h3>
+                    <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-primary-100">{{ $values[1]['text'] }}</p>
                 </div>
             </div>
 
             <!-- Service -->
-            <div class="absolute bottom-0 left-12 z-10 w-64 rotate-[3deg] animate-float" style="animation-delay: 2s">
-                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100">
+            <div class="absolute bottom-0 left-12 z-10 w-64 rotate-[3deg] animate-float group" style="animation-delay: 2s">
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-primary-600 group-hover:ring-primary-500 group-hover:-translate-y-1">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100 transition-colors duration-300 group-hover:bg-white group-hover:text-primary-600">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[2]['icon'] }}" /></svg>
                     </span>
-                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900">{{ $values[2]['title'] }}</h3>
-                    <p class="mt-2 text-slate-600 leading-relaxed text-sm">{{ $values[2]['text'] }}</p>
+                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">{{ $values[2]['title'] }}</h3>
+                    <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-primary-100">{{ $values[2]['text'] }}</p>
                 </div>
             </div>
 
             <!-- Resultaat -->
-            <div class="absolute bottom-12 right-12 z-10 w-64 rotate-[-4deg] animate-float" style="animation-delay: 3s">
-                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
+            <div class="absolute bottom-12 right-12 z-10 w-64 rotate-[-4deg] animate-float group" style="animation-delay: 3s">
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-6 transition-all duration-300 group-hover:bg-primary-600 group-hover:ring-primary-500 group-hover:-translate-y-1">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 transition-colors duration-300 group-hover:bg-white group-hover:text-primary-600">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $values[3]['icon'] }}" /></svg>
                     </span>
-                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900">{{ $values[3]['title'] }}</h3>
-                    <p class="mt-2 text-slate-600 leading-relaxed text-sm">{{ $values[3]['text'] }}</p>
+                    <h3 class="mt-5 font-heading text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-white">{{ $values[3]['title'] }}</h3>
+                    <p class="mt-2 text-slate-600 leading-relaxed text-sm transition-colors duration-300 group-hover:text-primary-100">{{ $values[3]['text'] }}</p>
                 </div>
             </div>
         </div>
