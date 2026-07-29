@@ -670,9 +670,9 @@ h1, h2, h3, h4, h5, h6 {
         0 0 0 1px rgba(255, 255, 255, 0.05) inset,
         0 0 50px -8px rgba(56, 189, 248, 0.22);
 }
-.hero-badge-tl { top: 15%; left: 12%; }
-.hero-badge-tr { top: 10%; right: 12%; }
-.hero-badge-br { bottom: 18%; right: 15%; }
+.hero-badge-tl { top: 10%; left: 4%; }
+.hero-badge-tr { top: 6%; right: 4%; }
+.hero-badge-br { bottom: 12%; right: 8%; }
 
 /* Computer monitor frame */
 .hero-monitor { position: relative; width: 100%; max-width: 760px; margin: 0 auto; }
