@@ -750,7 +750,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .hero-badge-tl { top: 10%; left: 4%; }
 .hero-badge-tr { top: 6%; right: 4%; }
-.hero-badge-br { bottom: 22%; right: -15%; }
+.hero-badge-br { bottom: 30%; right: 10%; }
 
 /* Computer monitor frame */
 .hero-monitor { position: relative; width: 100%; max-width: 760px; margin: 0 auto; }
