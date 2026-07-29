@@ -13,9 +13,9 @@
 
 ## Huidige taak
 
-**Wat**: `Tims-idea` is in `main` gemerged. De financiële module (offertes, facturen, Mollie-betalingen, transacties, billable items, logs) en de hero-redesign staan nu op `main`.
-**Status**: merge geslaagd; onafgebroken wijziging `.claude/launch.json` (lokaal IDE-bestand, niet in Git).
-**Volgende stap**: voeg een CI-workflow toe zodat elke volgende wijziging geautomatiseerd wordt gecontroleerd, of pak een andere expliciete taak op.
+**Wat**: Verbeter de publieke "Over ons"-pagina (`resources/views/about.blade.php`): helderder hero, betere missie/waarden-opbouw, echt portfolio uit de database, consistentie met de rest van de site.
+**Status**: af — Vite-build lokaal geslaagd; wijzigingen klaar om te committen en pushen.
+**Volgende stap**: commit + push naar `main`, daarna op de server `git pull` en `npm run build`.
 
 ## Omgevingsstatus
 
