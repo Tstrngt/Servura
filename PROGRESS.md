@@ -5,19 +5,21 @@
 | Fase | Taak | Status |
 |------|------|--------|
 | 1 | Serverprovisioning en deploy | bezig |
-| 2 | Publieke website | bezig |
-| 3 | Authenticatie en klantenportaal | bezig |
-| 4 | Ticketsysteem | bezig |
-| 5 | Adminportaal, zijbalk en ticketoverzicht | bezig |
+| 2 | Publieke website | grotendeels af — hero redesign op main |
+| 3 | Authenticatie en klantenportaal | grotendeels af — facturen/offertes zichtbaar voor klant |
+| 4 | Ticketsysteem | grotendeels af |
+| 5 | Adminportaal en zijbalk | grotendeels af — financiële module (facturen, offertes, transacties, logs) op main |
+| 6 | CI / testautomatisering | open |
 
 ## Huidige taak
 
-**Wat**: Admin en klanten krijgen meldingen bij ticketgebeurtenissen; regelovergangen in tickettekst worden correct weergegeven; admin en klant kunnen via de ticketdetailpagina communiceren.
-**Status**: bezig — notificatiesysteem, regelovergang-fix en klant-zijbalk geïmplementeerd; migratie moet nog op productie draaien; CI-build ontbreekt.
-**Volgende stap**: push deze commit en leg de CI-pass/fail-uitkomst vast.
+**Wat**: `Tims-idea` is in `main` gemerged. De financiële module (offertes, facturen, Mollie-betalingen, transacties, billable items, logs) en de hero-redesign staan nu op `main`.
+**Status**: merge geslaagd; onafgebroken wijziging `.claude/launch.json` (lokaal IDE-bestand, niet in Git).
+**Volgende stap**: voeg een CI-workflow toe zodat elke volgende wijziging geautomatiseerd wordt gecontroleerd, of pak een andere expliciete taak op.
 
 ## Omgevingsstatus
 
+- Lokale branch: `main`.
 - Productieserver: `servura-main-eu-one`, applicatie in `/var/www/Servura`.
 - PHP-FPM 8.3 draait als `www-data`; Laravel-sessies zijn schrijfbaar onder `storage/framework/sessions`.
 - Applicatieconfiguratie: `/var/www/Servura/.env`; databasecredentials: `/etc/servura/db_credentials`.
@@ -27,20 +29,19 @@
 
 - Geen CI-workflow aanwezig; daardoor is geen enkele fase CI-geverifieerd.
 - Frontendbuild moet nog door CI worden uitgevoerd met `axios@1.18.1`.
-- Admin ticket detail- en reply-flow moet nog via CI worden geverifieerd.
-- Bevestig welke CI-provider en branchbescherming gebruikt moeten worden.
 - Admin `Diensten` en `Content` hebben nog geen route/controller en staan niet in de zijbalk.
+- Bevestig welke CI-provider en branchbescherming gebruikt moeten worden.
 
 ## Hervattingsinstructie
 
 1. Lees dit bestand en `DECISIONS.md`.
 2. Controleer `git status --short` en de actuele CI-uitkomst.
-3. Maak CI de eerstvolgende afgebakende taak.
-4. Werk alleen de taak uit `Huidige taak` af.
-5. Werk dit bestand bij en commit het met de code.
+3. Werk de taak uit `Huidige taak` af.
+4. Commit en push elke voltooide code-stap samen met dit bestand.
+5. Leg blockers vast na twee opeenvolgende CI-failures op hetzelfde punt.
 
 ## Laatste update
 
-**Datum**: 2026-07-14
-**Taak**: Admin ticket detail/reply-flow (toewijzen, status, prioriteit, sluiten/heropenen, bijlagen) en klantzijde beperkt tot publieke reacties.
-**Volgende**: CI-build uitvoeren en uitkomst vastleggen.
+**Datum**: 2026-07-29
+**Taak**: Merge `Tims-idea` → `main`; financiële module en hero redesign nu op main.
+**Volgende**: CI-workflow toevoegen of expliciete vervolgtaak uitvoeren.
