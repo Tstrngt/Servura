@@ -62,65 +62,100 @@
             <p class="mt-6 max-w-xl text-lg leading-relaxed text-white/90">
                 Wij helpen ondernemers en organisaties met professionele websites, betrouwbare hosting en persoonlijke ondersteuning — van het eerste gesprek tot het doorlopende onderhoud.
             </p>
-            <div class="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
-                <a href="{{ route('contact') }}" class="btn btn-primary text-base px-7 py-3.5">
-                    Plan een vrijblijvend gesprek
-                </a>
-                {{-- TODO: vervang ‹TELEFOON› door het echte telefoonnummer vóór livegang --}}
-                <a href="tel:‹TELEFOON›" class="inline-flex items-center gap-2 font-medium text-slate-200 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                    </svg>
-                    Of bel ons: ‹TELEFOON›
-                </a>
-            </div>
-            <div class="mt-9 flex items-center gap-3 text-sm text-slate-300">
-                <div class="flex -space-x-2">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-xs font-bold text-white ring-2 ring-slate-950" aria-hidden="true">T</span>
-                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-secondary-500 to-secondary-700 text-xs font-bold text-white ring-2 ring-slate-950" aria-hidden="true">D</span>
-                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-700 text-xs font-bold text-white ring-2 ring-slate-950" aria-hidden="true">I</span>
-                </div>
-                <span>U spreekt met ons team — geen helpdesk, geen wachtrij.</span>
-            </div>
         </div>
     </div>
 </section>
 
 <!-- Wie wij zijn -->
-<section class="py-24 lg:py-28 bg-white">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="mb-16 animate-on-scroll">
-            <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Wie wij zijn</span>
-            <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight max-w-4xl">
-                Websites die werken, zonder de technische last
-            </h2>
-            <div class="max-w-3xl space-y-4 text-lg text-slate-600 leading-relaxed">
-                <p>Servura is opgericht met een duidelijke missie: het MKB helpen met een professionele online aanwezigheid zonder de complexiteit en hoge kosten die vaak bij webdevelopment komen kijken.</p>
-                <p>U hoeft er niets technisch van te weten; wij nemen alles uit handen. Van ontwerp en ontwikkeling tot hosting, beveiliging en doorlopend onderhoud.</p>
+<section class="relative overflow-hidden bg-white py-24 lg:py-32">
+    <div class="max-w-7xl mx-auto px-6 relative">
+        <!-- Floating UI cards -->
+        <div class="hidden lg:block">
+            <!-- Browser window card -->
+            <div class="absolute top-0 left-0 z-10 w-64 rotate-[-6deg] animate-float">
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl overflow-hidden">
+                    <div class="h-8 bg-slate-100 flex items-center gap-1.5 px-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <div class="h-24 rounded-lg bg-gradient-to-br from-primary-100 to-primary-50"></div>
+                        <div class="h-3 w-3/4 rounded bg-slate-100"></div>
+                        <div class="h-3 w-1/2 rounded bg-slate-100"></div>
+                        <div class="grid grid-cols-3 gap-2 pt-1">
+                            <div class="h-14 rounded bg-slate-50"></div>
+                            <div class="h-14 rounded bg-slate-50"></div>
+                            <div class="h-14 rounded bg-slate-50"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile phone card -->
+            <div class="absolute top-8 right-0 z-10 w-40 rotate-[5deg] animate-float" style="animation-delay: 1s">
+                <div class="rounded-[2rem] bg-slate-900 p-2 shadow-xl">
+                    <div class="h-72 rounded-[1.5rem] bg-white p-3 space-y-3">
+                        <div class="h-32 rounded-xl bg-gradient-to-br from-accent-100 to-accent-50"></div>
+                        <div class="h-3 w-3/4 rounded bg-slate-100"></div>
+                        <div class="h-3 w-1/2 rounded bg-slate-100"></div>
+                        <div class="h-10 rounded-lg bg-primary-100"></div>
+                        <div class="h-24 rounded-lg bg-slate-50"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats card -->
+            <div class="absolute bottom-0 left-12 z-10 w-48 rotate-[3deg] animate-float" style="animation-delay: 2s">
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-5">
+                    <div class="text-sm text-slate-500 mb-1">Online groei</div>
+                    <div class="text-3xl font-bold text-slate-900">+42%</div>
+                    <div class="h-16 mt-3 rounded-lg bg-gradient-to-t from-primary-100 to-transparent"></div>
+                </div>
+            </div>
+
+            <!-- Checklist card -->
+            <div class="absolute bottom-12 right-12 z-10 w-52 rotate-[-4deg] animate-float" style="animation-delay: 3s">
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-xl p-5 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                        </span>
+                        <span class="h-2.5 w-24 rounded bg-slate-100"></span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                        </span>
+                        <span class="h-2.5 w-28 rounded bg-slate-100"></span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                        </span>
+                        <span class="h-2.5 w-20 rounded bg-slate-100"></span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 animate-on-scroll">
-            @php
-                $values = [
-                    ['title' => 'Eerlijkheid', 'text' => 'Transparante prijzen en heldere communicatie, zonder verborgen kosten.', 'icon' => 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
-                    ['title' => 'Kwaliteit', 'text' => 'Professionele oplossingen die stabiel, veilig en gebruiksvriendelijk zijn.', 'icon' => 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'],
-                    ['title' => 'Service', 'text' => 'Persoonlijke support met korte lijnen en snelle reactietijd.', 'icon' => 'M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3'],
-                    ['title' => 'Resultaat', 'text' => 'Focus op uw bedrijfsdoelen en meetbare online groei.', 'icon' => 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z'],
-                ];
-            @endphp
-
-            @foreach($values as $value)
-            <div class="group">
-                <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100 transition-colors duration-300 group-hover:bg-primary-600 group-hover:text-white">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="{{ $value['icon'] }}" />
-                    </svg>
-                </span>
-                <h3 class="mt-5 font-heading text-xl font-bold text-slate-900">{{ $value['title'] }}</h3>
-                <p class="mt-2 text-slate-600 leading-relaxed">{{ $value['text'] }}</p>
+        <!-- Central content -->
+        <div class="relative z-20 max-w-3xl mx-auto text-center pt-8 lg:py-20 animate-on-scroll">
+            <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Wie wij zijn</span>
+            <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">
+                Websites die werken, zonder de technische last
+            </h2>
+            <p class="text-lg text-slate-600 leading-relaxed mb-8 max-w-2xl mx-auto">
+                Servura is opgericht met een duidelijke missie: het MKB helpen met een professionele online aanwezigheid zonder de complexiteit en hoge kosten die vaak bij webdevelopment komen kijken. U hoeft er niets technisch van te weten; wij nemen alles uit handen.
+            </p>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4">
+                <a href="{{ route('contact') }}" class="btn btn-primary text-base px-7 py-3.5">
+                    Plan een vrijblijvend gesprek
+                </a>
+                <a href="{{ route('services.index') }}" class="btn btn-outline text-base px-7 py-3.5">
+                    Bekijk onze diensten
+                </a>
             </div>
-            @endforeach
         </div>
     </div>
 </section>
