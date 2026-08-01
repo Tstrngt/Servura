@@ -40,12 +40,12 @@ $steps = [
         </div>
 
         @php
-            $webdesignServices = $services->where('service_type', 'website_pakket');
+            $webdesignServices = $services->where('service_type', 'website_pakket')->where('slug', '!=', 'test')->take(3);
         @endphp
 
         @if($webdesignServices->count() > 0)
-            <div class="service-scroll flex overflow-x-auto pb-6 pr-6 gap-6 snap-x snap-mandatory scroll-smooth">
-                @foreach($webdesignServices as $service)
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                @foreach($webdesignServices as $index => $service)
                     @php
                         $serviceData = [
                             'title' => $service->title,
@@ -56,31 +56,56 @@ $steps = [
                             'image_url' => $service->image_url,
                             'slug' => $service->slug,
                         ];
+                        $isPopular = $service->is_popular;
+                        $gradients = [
+                            'from-primary-500 to-primary-700',
+                            'from-accent-400 to-primary-500',
+                            'from-secondary-500 to-secondary-700',
+                        ];
                     @endphp
-                    <div class="group snap-start shrink-0 w-[300px] md:w-[360px] bg-white rounded-2xl ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 animate-on-scroll flex flex-col">
+                    <div class="group relative bg-white rounded-3xl ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden transition-all duration-300 animate-on-scroll flex flex-col {{ $isPopular ? 'md:-translate-y-6 md:scale-105 shadow-2xl ring-2 ring-accent-400 z-10' : 'hover:-translate-y-2 hover:shadow-2xl' }}">
+                        @if($isPopular)
+                            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-accent-400 to-primary-500"></div>
+                            <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+                                <span class="inline-block px-4 py-1 rounded-full bg-accent-500 text-white text-xs font-bold uppercase tracking-wide shadow-md">Populair</span>
+                            </div>
+                        @endif
+
                         @if($service->image_url)
                             <div class="h-48 overflow-hidden">
                                 <img src="{{ $service->image_url }}" alt="{{ $service->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             </div>
                         @else
-                            <div class="h-48 bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+                            <div class="h-48 bg-gradient-to-br {{ $gradients[$index % 3] }} flex items-center justify-center">
                                 <span class="text-6xl font-black text-white/25 select-none">{{ mb_strtoupper(mb_substr($service->title, 0, 1)) }}</span>
                             </div>
                         @endif
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="flex items-center justify-between mb-3">
-                                <h3 class="font-heading text-xl font-bold text-slate-900">{{ $service->title }}</h3>
-                                @if($service->is_popular)
-                                    <span class="px-3 py-1 rounded-full bg-accent-100 text-accent-700 text-xs font-semibold uppercase tracking-wide">Populair</span>
-                                @endif
+
+                        <div class="p-8 flex-1 flex flex-col">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-heading text-2xl font-bold text-slate-900">{{ $service->title }}</h3>
                             </div>
-                            <p class="text-slate-600 text-sm mb-6 flex-1">{{ $service->short_description }}</p>
-                            <div class="flex items-baseline gap-2 mb-6">
-                                <span class="text-2xl font-bold text-slate-900">{{ $service->formatted_price }}</span>
+                            <p class="text-slate-600 mb-6">{{ $service->short_description }}</p>
+
+                            @if($service->features && count($service->features) > 0)
+                                <ul class="space-y-3 mb-8">
+                                    @foreach(array_slice($service->features, 0, 4) as $feature)
+                                        <li class="flex items-start text-sm text-slate-700">
+                                            <svg class="w-5 h-5 {{ $isPopular ? 'text-accent-500' : 'text-primary-500' }} mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                            {{ $feature }}
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+
+                            <div class="mt-auto">
+                                <div class="flex items-baseline gap-2 mb-6">
+                                    <span class="text-3xl font-bold text-slate-900">{{ $service->formatted_price }}</span>
+                                </div>
+                                <button type="button" @click="show(@js($serviceData))" class="btn {{ $isPopular ? 'btn-primary' : 'btn-outline' }} w-full" aria-haspopup="dialog" aria-controls="service-modal">
+                                    Bekijk product
+                                </button>
                             </div>
-                            <button type="button" @click="show(@js($serviceData))" class="btn btn-primary w-full" aria-haspopup="dialog" aria-controls="service-modal">
-                                Bekijk product
-                            </button>
                         </div>
                     </div>
                 @endforeach

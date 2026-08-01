@@ -13,8 +13,8 @@
 
 ## Huidige taak
 
-**Wat**: Verfijning van de productrij op `/diensten`: zichtbare scrollbar toevoegen en afsnijding aan het einde van de rij oplossen.
-**Status**: af — `.service-scroll` CSS-klasse toegevoegd in `resources/css/app.css` met styled scrollbar (WebKit + Firefox), scrollbar-hide klassen verwijderd, rechter padding toegevoegd zodat de laatste kaart niet bruusk afgebroken wordt, `npm run build` succesvol.
+**Wat**: Terug naar een statische pricing-UI op `/diensten`: 3 producten in een grid, populair product extra uitgelicht, speelser design.
+**Status**: af — horizontale scrollrij vervangen door `grid-cols-1 md:grid-cols-3`, eerste 3 webdesign-services getoond (test uitgesloten), populaire kaart is op desktop vergroot, omhoog geschoven en krijgt accent-ring, badge en accent-knop; overige kaarten krijgen outline-knoppen en afwisselende gradient-hero's, `npm run build` succesvol.
 **Volgende stap**: visueel verifiëren in de browser en committen/pushen.
 
 **Open details:**
@@ -47,5 +47,5 @@
 ## Laatste update
 
 **Datum**: 2026-08-01
-**Taak**: Zichtbare styled scrollbar toegevoegd aan de horizontale productrij op `/diensten` en rechter padding aangepast zodat de rij netjes eindigt; build gecompileerd.
+**Taak**: Statische pricing-UI op `/diensten`: 3 producten in een grid, populaire kaart uitgelicht met scale/offset/accent-ring, speelse afwisselende gradients; build gecompileerd.
 **Volgende**: Visuele verificatie en commit/push naar `Servura/main`.
