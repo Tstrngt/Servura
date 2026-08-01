@@ -13,9 +13,9 @@
 
 ## Huidige taak
 
-**Wat**: Navbar krijgt een glass-effect (semi-transparant + blur) waarbij de kleur van het "Servura"-logo en de nav-links meeveren met de sectie die er onder zit (donker op donkere hero's, licht elders).
-**Status**: af — `.site-navbar` in `resources/css/app.css` gebruikt `backdrop-filter: blur` + translucent achtergrond; `resources/js/app.js` heeft een IntersectionObserver die kijkt welke `[data-navbar-theme="dark"]`-sectie zich achter de sticky navbar bevindt en `.is-dark` toggelt. Alle donkere hero/CTA-secties op home, about, contact, services/index en services/show hebben dit attribuut gekregen.
-**Volgende stap**: `npm run build` + visueel verifiëren op alle pagina's, committen en pushen.
+**Wat**: Polish van de publieke `/diensten`-pagina (`resources/views/services/index.blade.php`) zodat deze aansluit bij de verfijnde stijl van de homepagina.
+**Status**: af — typografie consistent gebruikt (`font-heading`, `tracking-tight`, `leading-[1.05]`), decoratieve gradient-tekst verwijderd, zwevende gradient-kaarten vervangen door home-achtige capability-cards met iconen, vergelijkingskaarten afgestemd op `rounded-2xl`, proces-sectie vereenvoudigd naar een connected timeline zonder roterende pijlen, CTA's gebruiken de gedeelde `btn-light`-variant, decoratieve elementen hebben `aria-hidden`, `npm run build` succesvol.
+**Volgende stap**: visueel verifiëren in de browser (desktop + mobiel), committen en pushen.
 
 **Open details:**
 - Portfolio-links voor Tim, Dirk en Isis zijn placeholders (`#...`).
@@ -46,6 +46,6 @@
 
 ## Laatste update
 
-**Datum**: 2026-07-29
-**Taak**: Merge `Tims-idea` → `main`; financiële module en hero redesign nu op main.
-**Volgende**: CI-workflow toevoegen of expliciete vervolgtaak uitvoeren.
+**Datum**: 2026-08-01
+**Taak**: Polish van `/diensten`-pagina (`resources/views/services/index.blade.php`): typografie, capability-cards, proces-timeline en CTA's afgestemd op de homepagina-stijl; build gecompileerd.
+**Volgende**: Visuele verificatie en commit/push naar `Servura/main`.
