@@ -820,6 +820,25 @@ h1, h2, h3, h4, h5, h6 {
     .hero-build-site, .hero-build-piece { transition: none !important; }
 }
 
+/* Roadmap (werkwijze) — bouncy pop-in for the step nodes */
+.roadmap-node.animate-on-scroll {
+    transform: translateY(12px) scale(0.5);
+    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.roadmap-node.animate-on-scroll.visible {
+    transform: translateY(0) scale(1);
+}
+
+/* World map — animated flight-path lines drawing in on scroll */
+.map-flightpath {
+    stroke-dasharray: 260;
+    stroke-dashoffset: 260;
+    transition: stroke-dashoffset 1.6s ease;
+}
+.animate-on-scroll.visible .map-flightpath {
+    stroke-dashoffset: 0;
+}
+
 /* Horizontal scroll container used on the services page */
 .service-scroll {
     scrollbar-width: thin;
