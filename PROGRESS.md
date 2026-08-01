@@ -13,8 +13,8 @@
 
 ## Huidige taak
 
-**Wat**: Terug naar een statische pricing-UI op `/diensten`: 3 producten in een grid, populair product extra uitgelicht, speelser design.
-**Status**: af — horizontale scrollrij vervangen door `grid-cols-1 md:grid-cols-3`, eerste 3 webdesign-services getoond (test uitgesloten), populaire kaart is op desktop vergroot, omhoog geschoven en krijgt accent-ring, badge en accent-knop; overige kaarten krijgen outline-knoppen en afwisselende gradient-hero's, `npm run build` succesvol.
+**Wat**: Pricing-UI op `/diensten` aangepast naar klassiek drie-kolommen tier-model met de middelste kaart als aanbevolen optie.
+**Status**: af — kaarten nu opgebouwd als plan-kaarten met titel, korte omschrijving, prijs, feature-lijst en CTA; middelste kaart altijd visueel uitgelicht ('Aanbevolen'-badge, scale, offset, accent-ring, primaire knop); zijkanten krijgen outline-knoppen en eigen kleur-topbalk; `npm run build` succesvol.
 **Volgende stap**: visueel verifiëren in de browser en committen/pushen.
 
 **Open details:**
@@ -47,5 +47,5 @@
 ## Laatste update
 
 **Datum**: 2026-08-01
-**Taak**: Statische pricing-UI op `/diensten`: 3 producten in een grid, populaire kaart uitgelicht met scale/offset/accent-ring, speelse afwisselende gradients; build gecompileerd.
+**Taak**: Pricing-UI op `/diensten` omgevormd naar klassiek drie-kolommen tier-model met middelste kaart als aanbevolen optie; build gecompileerd.
 **Volgende**: Visuele verificatie en commit/push naar `Servura/main`.

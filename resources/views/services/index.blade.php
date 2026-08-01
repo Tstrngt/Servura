@@ -35,8 +35,8 @@ $steps = [
     <div class="max-w-7xl mx-auto px-6">
         <div class="mb-12 animate-on-scroll">
             <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Onze diensten</span>
-            <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">Website pakketten</h2>
-            <p class="text-lg text-slate-600 max-w-2xl">Bekijk onze webdesign pakketten. Klik op een product voor alle details.</p>
+            <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">Onze pakketten</h2>
+            <p class="text-lg text-slate-600 max-w-2xl">Kies het plan dat past bij uw bedrijf. Alle pakketten zijn volledig ontzorgd.</p>
         </div>
 
         @php
@@ -56,56 +56,47 @@ $steps = [
                             'image_url' => $service->image_url,
                             'slug' => $service->slug,
                         ];
-                        $isPopular = $service->is_popular;
+                        $isRecommended = $index === 1;
                         $gradients = [
                             'from-primary-500 to-primary-700',
-                            'from-accent-400 to-primary-500',
+                            'from-accent-500 to-accent-700',
                             'from-secondary-500 to-secondary-700',
                         ];
                     @endphp
-                    <div class="group relative bg-white rounded-3xl ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden transition-all duration-300 animate-on-scroll flex flex-col {{ $isPopular ? 'md:-translate-y-6 md:scale-105 shadow-2xl ring-2 ring-accent-400 z-10' : 'hover:-translate-y-2 hover:shadow-2xl' }}">
-                        @if($isPopular)
-                            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-accent-400 to-primary-500"></div>
+                    <div class="group relative bg-white rounded-3xl ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden transition-all duration-300 animate-on-scroll flex flex-col {{ $isRecommended ? 'md:-translate-y-6 md:scale-105 shadow-2xl ring-2 ring-accent-400 z-10' : 'hover:-translate-y-2 hover:shadow-2xl' }}">
+                        @if($isRecommended)
+                            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-accent-500 to-primary-500"></div>
                             <div class="absolute -top-3 left-1/2 -translate-x-1/2">
-                                <span class="inline-block px-4 py-1 rounded-full bg-accent-500 text-white text-xs font-bold uppercase tracking-wide shadow-md">Populair</span>
-                            </div>
-                        @endif
-
-                        @if($service->image_url)
-                            <div class="h-48 overflow-hidden">
-                                <img src="{{ $service->image_url }}" alt="{{ $service->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <span class="inline-block px-4 py-1 rounded-full bg-accent-500 text-white text-xs font-bold uppercase tracking-wide shadow-md">Aanbevolen</span>
                             </div>
                         @else
-                            <div class="h-48 bg-gradient-to-br {{ $gradients[$index % 3] }} flex items-center justify-center">
-                                <span class="text-6xl font-black text-white/25 select-none">{{ mb_strtoupper(mb_substr($service->title, 0, 1)) }}</span>
-                            </div>
+                            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r {{ $gradients[$index % 3] }}"></div>
                         @endif
 
                         <div class="p-8 flex-1 flex flex-col">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="font-heading text-2xl font-bold text-slate-900">{{ $service->title }}</h3>
+                            <div class="mb-6">
+                                <h3 class="font-heading text-2xl font-bold text-slate-900 mb-2">{{ $service->title }}</h3>
+                                <p class="text-slate-600 text-sm">{{ $service->short_description }}</p>
                             </div>
-                            <p class="text-slate-600 mb-6">{{ $service->short_description }}</p>
+
+                            <div class="flex items-baseline gap-1 mb-6">
+                                <span class="text-4xl font-bold text-slate-900">{{ $service->formatted_price }}</span>
+                            </div>
 
                             @if($service->features && count($service->features) > 0)
-                                <ul class="space-y-3 mb-8">
-                                    @foreach(array_slice($service->features, 0, 4) as $feature)
+                                <ul class="space-y-3 mb-8 flex-1">
+                                    @foreach(array_slice($service->features, 0, 5) as $feature)
                                         <li class="flex items-start text-sm text-slate-700">
-                                            <svg class="w-5 h-5 {{ $isPopular ? 'text-accent-500' : 'text-primary-500' }} mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                            <svg class="w-5 h-5 {{ $isRecommended ? 'text-accent-500' : 'text-primary-500' }} mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                             {{ $feature }}
                                         </li>
                                     @endforeach
                                 </ul>
                             @endif
 
-                            <div class="mt-auto">
-                                <div class="flex items-baseline gap-2 mb-6">
-                                    <span class="text-3xl font-bold text-slate-900">{{ $service->formatted_price }}</span>
-                                </div>
-                                <button type="button" @click="show(@js($serviceData))" class="btn {{ $isPopular ? 'btn-primary' : 'btn-outline' }} w-full" aria-haspopup="dialog" aria-controls="service-modal">
-                                    Bekijk product
-                                </button>
-                            </div>
+                            <button type="button" @click="show(@js($serviceData))" class="btn {{ $isRecommended ? 'btn-primary' : 'btn-outline' }} w-full" aria-haspopup="dialog" aria-controls="service-modal">
+                                Bekijk product
+                            </button>
                         </div>
                     </div>
                 @endforeach
