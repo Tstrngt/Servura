@@ -13,8 +13,8 @@
 
 ## Huidige taak
 
-**Wat**: Gloed-effect op de aanbevolen pricing-kaart mag alleen een gekleurde schaduw róndom de witte box zijn, alsof de box voor de andere kaarten staat.
-**Status**: af — de ring-gloed en de blur-gradient achter de kaart zijn verwijderd; de witte box krijgt nu alleen een sterke gekleurde drop-shadow (`shadow-[...]`) die duidelijk om/onder de kaart valt; `npm run build` succesvol.
+**Wat**: Gloed rondom de volledige aanbevolen pricing-kaart zichtbaar maken als een zachte gekleurde omlijning/aura rond de witte box.
+**Status**: af — drop-shadow vervangen door een zichtbare multi-layer gloed (`0_0_0_8px` en `0_0_0_16px`) in primary/accent-tinten rondom de kaart, gecombineerd met een zachte onder-schaduw; `npm run build` succesvol.
 **Volgende stap**: visueel verifiëren in de browser en committen/pushen.
 
 **Open details:**
@@ -46,6 +46,6 @@
 
 ## Laatste update
 
-**Datum**: 2026-08-01
-**Taak**: Aanbevolen pricing-kaart: alleen een gekleurde drop-shadow róndom de witte box, ring/blur-gradient verwijderd; build gecompileerd.
+**Datum**: 2026-08-02
+**Taak**: Aanbevolen pricing-kaart: zichtbare zachte gekleurde gloed rondom de volledige witte box toegevoegd; build gecompileerd.
 **Volgende**: Visuele verificatie en commit/push naar `Servura/main`.
