@@ -13,8 +13,8 @@
 
 ## Huidige taak
 
-**Wat**: Verfijning van het gloed-effect op de aanbevolen pricing-kaart: schaduw moet duidelijk róndom de box vallen, alsof de box voor de andere kaarten zit.
-**Status**: af — middelste kaart krijgt nu een grotere, meer schaduw-achtige halo (`shadow-[...]` met y-offset en grotere blur), is iets verder omhoog geschoven (`md:-translate-y-8`) en de innerlijke blur-gradient is behouden voor extra diepte; `npm run build` succesvol.
+**Wat**: Gloed-effect op de aanbevolen pricing-kaart mag alleen een gekleurde schaduw róndom de witte box zijn, alsof de box voor de andere kaarten staat.
+**Status**: af — de ring-gloed en de blur-gradient achter de kaart zijn verwijderd; de witte box krijgt nu alleen een sterke gekleurde drop-shadow (`shadow-[...]`) die duidelijk om/onder de kaart valt; `npm run build` succesvol.
 **Volgende stap**: visueel verifiëren in de browser en committen/pushen.
 
 **Open details:**
@@ -47,5 +47,5 @@
 ## Laatste update
 
 **Datum**: 2026-08-01
-**Taak**: Gloed op aanbevolen pricing-kaart veranderd in een grotere, schaduw-achtige halo róndom de box; build gecompileerd.
+**Taak**: Aanbevolen pricing-kaart: alleen een gekleurde drop-shadow róndom de witte box, ring/blur-gradient verwijderd; build gecompileerd.
 **Volgende**: Visuele verificatie en commit/push naar `Servura/main`.
