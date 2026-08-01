@@ -16,130 +16,125 @@ $steps = [
 
 <!-- Hero Section -->
 <section class="relative -mt-16 pt-16 overflow-hidden bg-slate-950 text-white" data-navbar-theme="dark">
-    <img
-        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?fm=jpg&q=80&w=1920&auto=format&fit=crop"
-        alt="Laptop met website op een bureau"
-        class="absolute inset-0 w-full h-full object-cover opacity-10"
-    >
-    <div class="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/90 to-slate-950/60"></div>
-
     <div class="relative max-w-7xl mx-auto px-6 py-24 lg:py-32">
         <div class="max-w-2xl animate-slide-up">
-            <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-sm font-medium text-slate-200 mb-6">
-                <span class="relative flex h-2 w-2">
-                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-400 opacity-75"></span>
-                    <span class="relative inline-flex h-2 w-2 rounded-full bg-accent-400"></span>
-                </span>
-                Duidelijke pakketten, heldere prijzen
-            </span>
             <h1 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight">
                 Websites en hosting die met uw bedrijf meegroeien.
             </h1>
             <p class="mt-6 max-w-xl text-lg leading-relaxed text-white/90">
                 Kies het pakket dat past bij uw ambities. Wij regelen ontwerp, techniek, hosting en onderhoud — zodat u zich kunt richten op ondernemen.
             </p>
-            <div class="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
-                <a href="#pakketten" class="btn btn-light text-base px-7 py-3.5">
-                    Bekijk de pakketten
-                </a>
-                <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 font-medium text-slate-200 hover:text-white transition-colors">
-                    Of vraag direct een offerte aan
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                </a>
-            </div>
         </div>
     </div>
 </section>
 
-<!-- Guarantees -->
-<section class="relative bg-white overflow-hidden">
-    <div class="max-w-7xl mx-auto px-6 py-16">
-        <div class="rounded-2xl bg-white ring-1 ring-slate-200/80 shadow-sm animate-on-scroll">
-            <dl class="grid grid-cols-2 lg:grid-cols-4 divide-y divide-slate-100 lg:divide-y-0 lg:divide-x">
-                <div class="flex items-center gap-3 px-6 py-5">
-                    <svg class="h-5 w-5 flex-shrink-0 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75C4.5 20.496 5.004 21 5.625 21h10.5c.621 0 1.125-.504 1.125-1.125v-6.75c0-.621-.504-1.125-1.125-1.125H6.75z"/></svg>
-                    <div>
-                        <dt class="text-sm font-semibold text-slate-900">SSL-beveiliging</dt>
-                        <dd class="text-sm text-slate-500">Standaard inbegrepen</dd>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 px-6 py-5">
-                    <svg class="h-5 w-5 flex-shrink-0 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125v-11.25m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75"/></svg>
-                    <div>
-                        <dt class="text-sm font-semibold text-slate-900">Dagelijkse back-ups</dt>
-                        <dd class="text-sm text-slate-500">Automatisch geregeld</dd>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 px-6 py-5">
-                    <svg class="h-5 w-5 flex-shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
-                    <div>
-                        <dt class="text-sm font-semibold text-slate-900">99,9% uptime</dt>
-                        <dd class="text-sm text-slate-500">Uw site blijft online</dd>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 px-6 py-5">
-                    <svg class="h-5 w-5 flex-shrink-0 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <div>
-                        <dt class="text-sm font-semibold text-slate-900">Binnen 1 werkdag</dt>
-                        <dd class="text-sm text-slate-500">Antwoord op uw vraag</dd>
-                    </div>
-                </div>
-            </dl>
-        </div>
-    </div>
-</section>
-
-<!-- Packages -->
-<section id="pakketten" class="relative bg-slate-50 overflow-hidden py-24 lg:py-32">
+<!-- Webdesign Producten -->
+<section id="pakketten" class="relative bg-slate-50 py-24 lg:py-32"
+    x-data="{ open: false, service: null, show(s) { this.service = s; this.open = true; document.body.style.overflow = 'hidden'; }, hide() { this.open = false; this.service = null; document.body.style.overflow = 'auto'; } }"
+    @keydown.escape.window="hide">
     <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center mb-16 animate-on-scroll">
-            <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Onze pakketten</span>
-            <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">Kies wat bij u past</h2>
-            <p class="text-lg text-slate-600 max-w-2xl mx-auto">Elk pakket is volledig ontzorgd. Hosting, onderhoud en support zitten standaard inbegrepen.</p>
+        <div class="mb-12 animate-on-scroll">
+            <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Onze diensten</span>
+            <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">Website pakketten</h2>
+            <p class="text-lg text-slate-600 max-w-2xl">Bekijk onze webdesign pakketten. Klik op een product voor alle details.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach($services as $service)
-                <div class="group bg-white rounded-2xl ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 animate-on-scroll flex flex-col">
-                    @if($service->image_url)
-                        <div class="h-48 overflow-hidden">
-                            <img src="{{ $service->image_url }}" alt="{{ $service->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                    @else
-                        <div class="h-48 bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-                            <span class="text-6xl font-black text-white/25 select-none">{{ mb_strtoupper(mb_substr($service->title, 0, 1)) }}</span>
-                        </div>
-                    @endif
-                    <div class="p-8 flex-1 flex flex-col">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-heading text-2xl font-bold text-slate-900">{{ $service->title }}</h3>
-                            @if($service->is_popular)
-                                <span class="px-3 py-1 rounded-full bg-accent-100 text-accent-700 text-xs font-semibold uppercase tracking-wide">Populair</span>
-                            @endif
-                        </div>
-                        <p class="text-slate-600 mb-6">{{ $service->short_description }}</p>
+        @php
+            $webdesignServices = $services->where('service_type', 'website_pakket');
+        @endphp
 
-                        @if($service->features && count($service->features) > 0)
-                            <ul class="space-y-3 mb-8 flex-1">
-                                @foreach(array_slice($service->features, 0, 6) as $feature)
-                                    <li class="flex items-start text-sm text-slate-700">
-                                        <svg class="w-5 h-5 text-accent-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                        {{ $feature }}
-                                    </li>
-                                @endforeach
-                            </ul>
+        @if($webdesignServices->count() > 0)
+            <div class="flex overflow-x-auto pb-6 gap-6 snap-x snap-mandatory scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                @foreach($webdesignServices as $service)
+                    @php
+                        $serviceData = [
+                            'title' => $service->title,
+                            'short_description' => $service->short_description,
+                            'description' => $service->description,
+                            'formatted_price' => $service->formatted_price,
+                            'features' => $service->features ?? [],
+                            'image_url' => $service->image_url,
+                            'slug' => $service->slug,
+                        ];
+                    @endphp
+                    <div class="group snap-start shrink-0 w-[300px] md:w-[360px] bg-white rounded-2xl ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 animate-on-scroll flex flex-col">
+                        @if($service->image_url)
+                            <div class="h-48 overflow-hidden">
+                                <img src="{{ $service->image_url }}" alt="{{ $service->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                        @else
+                            <div class="h-48 bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+                                <span class="text-6xl font-black text-white/25 select-none">{{ mb_strtoupper(mb_substr($service->title, 0, 1)) }}</span>
+                            </div>
                         @endif
-
-                        <div class="flex items-baseline gap-2 mb-6">
-                            <span class="text-3xl font-bold text-slate-900">{{ $service->formatted_price }}</span>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-heading text-xl font-bold text-slate-900">{{ $service->title }}</h3>
+                                @if($service->is_popular)
+                                    <span class="px-3 py-1 rounded-full bg-accent-100 text-accent-700 text-xs font-semibold uppercase tracking-wide">Populair</span>
+                                @endif
+                            </div>
+                            <p class="text-slate-600 text-sm mb-6 flex-1">{{ $service->short_description }}</p>
+                            <div class="flex items-baseline gap-2 mb-6">
+                                <span class="text-2xl font-bold text-slate-900">{{ $service->formatted_price }}</span>
+                            </div>
+                            <button type="button" @click="show(@js($serviceData))" class="btn btn-primary w-full" aria-haspopup="dialog" aria-controls="service-modal">
+                                Bekijk product
+                            </button>
                         </div>
-
-                        <a href="{{ route('services.show', $service) }}" class="btn btn-primary w-full">
-                            Bekijk {{ $service->title }}
-                        </a>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
+        @else
+            <p class="text-slate-600">Geen webdesign pakketten gevonden.</p>
+        @endif
+    </div>
+
+    <!-- Service Modal -->
+    <div id="service-modal" x-show="open" class="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6" style="display: none;" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click.self="hide" role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
+        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" aria-hidden="true"></div>
+        <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl ring-1 ring-slate-200">
+            <div class="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/95 backdrop-blur">
+                <h3 id="service-modal-title" class="font-heading text-2xl font-bold text-slate-900" x-text="service?.title"></h3>
+                <button type="button" @click="hide" class="p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors" aria-label="Sluiten">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <template x-if="service">
+                    <div>
+                        <div x-show="service.image_url" class="mb-6 rounded-xl overflow-hidden">
+                            <img :src="service.image_url" :alt="service.title" class="w-full h-56 object-cover">
+                        </div>
+                        <p class="text-slate-600 mb-6" x-text="service.short_description"></p>
+                        <div class="prose prose-slate max-w-none mb-6" x-html="service.description"></div>
+
+                        <template x-if="service.features && service.features.length > 0">
+                            <div class="mb-6">
+                                <h4 class="font-heading font-semibold text-slate-900 mb-3">Wat zit erin?</h4>
+                                <ul class="space-y-2">
+                                    <template x-for="feature in service.features" :key="feature">
+                                        <li class="flex items-start text-sm text-slate-700">
+                                            <svg class="w-5 h-5 text-accent-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                            <span x-text="feature"></span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-50 rounded-xl">
+                            <div>
+                                <span class="text-sm text-slate-500">Investering</span>
+                                <div class="text-2xl font-bold text-slate-900" x-text="service.formatted_price"></div>
+                            </div>
+                            <a :href="'{{ route('contact') }}?service=' + service.slug" class="btn btn-primary whitespace-nowrap">
+                                Neem contact op
+                            </a>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
 </section>

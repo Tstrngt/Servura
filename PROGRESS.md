@@ -13,9 +13,9 @@
 
 ## Huidige taak
 
-**Wat**: Redesign van de publieke `/diensten`-pagina (`resources/views/services/index.blade.php`) geïnspireerd op de home- en over-ons pagina.
-**Status**: af — volledige herschrijving met dark hero + Unsplash-achtergrond, guarantees-strip overgenomen van home, service-pakketten als uniforme `rounded-2xl` kaarten met afbeelding/placeholder, proces-sectie in de stijl van over-ons (tekst links, genummerde lijst rechts), CTA overgenomen van over-ons met `cta-grid`, `npm run build` succesvol.
-**Volgende stap**: visueel verifiëren in de browser (desktop + mobiel), committen en pushen.
+**Wat**: Iteratie op de publieke `/diensten`-pagina (`resources/views/services/index.blade.php`): hero teruggebracht tot titel + subtekst, productrij horizontaal scrollbaar gemaakt met database-gekoppelde webdesign-pakketten, modaal toegevoegd dat bij 'Bekijk product' alle details toont met contact-CTA.
+**Status**: af — hero is nu basic, garanties-section verwijderd, producten staan in een snap-scroll rij (`service_type = website_pakket`), modaal gebruikt Alpine.js en toont titel, omschrijving, lange beschrijving, features, prijs en 'Neem contact op'-knop, `npm run build` succesvol.
+**Volgende stap**: visueel verifiëren in de browser (desktop + mobiel, test modaal), committen en pushen.
 
 **Open details:**
 - Portfolio-links voor Tim, Dirk en Isis zijn placeholders (`#...`).
@@ -47,5 +47,5 @@
 ## Laatste update
 
 **Datum**: 2026-08-01
-**Taak**: Redesign van `/diensten`-pagina (`resources/views/services/index.blade.php`) geïnspireerd op home en over-ons: dark hero, guarantees, pakketkaarten, proces-sectie en CTA in dezelfde stijl; build gecompileerd.
+**Taak**: Iteratie op `/diensten`-pagina (`resources/views/services/index.blade.php`): basic hero, horizontaal scrollbare webdesign-productrij uit database, modaal met productdetails en contact-CTA; build gecompileerd.
 **Volgende**: Visuele verificatie en commit/push naar `Servura/main`.
