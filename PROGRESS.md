@@ -13,8 +13,8 @@
 
 ## Huidige taak
 
-**Wat**: Pricing-UI op `/diensten` aangepast naar klassiek drie-kolommen tier-model met de middelste kaart als aanbevolen optie.
-**Status**: af — kaarten nu opgebouwd als plan-kaarten met titel, korte omschrijving, prijs, feature-lijst en CTA; middelste kaart altijd visueel uitgelicht ('Aanbevolen'-badge, scale, offset, accent-ring, primaire knop); zijkanten krijgen outline-knoppen en eigen kleur-topbalk; `npm run build` succesvol.
+**Wat**: Visuele verfijning van de pricing-kaarten op `/diensten`: populair middenplan meer laten uitkomen met gloed en afbeelding/placeholder-terugbrengen.
+**Status**: af — middelste kaart krijgt nu een blauw/groen gloed-effect via schaduw en een achterste blur-gradient, daarnaast is de afbeelding/gradient-placeholder bovenaan elke kaart teruggebracht; `npm run build` succesvol.
 **Volgende stap**: visueel verifiëren in de browser en committen/pushen.
 
 **Open details:**
@@ -47,5 +47,5 @@
 ## Laatste update
 
 **Datum**: 2026-08-01
-**Taak**: Pricing-UI op `/diensten` omgevormd naar klassiek drie-kolommen tier-model met middelste kaart als aanbevolen optie; build gecompileerd.
+**Taak**: Pricing-kaarten op `/diensten` verfijnd: blauw/groen gloed-effect op aanbevolen middenkaart en afbeelding/gradient-placeholder teruggebracht; build gecompileerd.
 **Volgende**: Visuele verificatie en commit/push naar `Servura/main`.

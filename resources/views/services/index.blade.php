@@ -63,14 +63,25 @@ $steps = [
                             'from-secondary-500 to-secondary-700',
                         ];
                     @endphp
-                    <div class="group relative bg-white rounded-3xl ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden transition-all duration-300 animate-on-scroll flex flex-col {{ $isRecommended ? 'md:-translate-y-6 md:scale-105 shadow-2xl ring-2 ring-accent-400 z-10' : 'hover:-translate-y-2 hover:shadow-2xl' }}">
+                    <div class="group relative bg-white rounded-3xl ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden transition-all duration-300 animate-on-scroll flex flex-col {{ $isRecommended ? 'md:-translate-y-6 md:scale-105 shadow-2xl ring-2 ring-accent-400 z-10 shadow-[0_0_60px_-12px_rgba(14,165,233,0.35),0_0_40px_-12px_rgba(20,184,166,0.25)]' : 'hover:-translate-y-2 hover:shadow-2xl' }}">
                         @if($isRecommended)
-                            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-accent-500 to-primary-500"></div>
+                            <div class="absolute -inset-4 bg-gradient-to-r from-primary-500/25 to-accent-500/25 rounded-[2rem] blur-3xl -z-10 pointer-events-none"></div>
+                            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-primary-500 to-accent-500"></div>
                             <div class="absolute -top-3 left-1/2 -translate-x-1/2">
                                 <span class="inline-block px-4 py-1 rounded-full bg-accent-500 text-white text-xs font-bold uppercase tracking-wide shadow-md">Aanbevolen</span>
                             </div>
                         @else
                             <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r {{ $gradients[$index % 3] }}"></div>
+                        @endif
+
+                        @if($service->image_url)
+                            <div class="h-48 overflow-hidden">
+                                <img src="{{ $service->image_url }}" alt="{{ $service->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                        @else
+                            <div class="h-48 bg-gradient-to-br {{ $isRecommended ? 'from-primary-500 to-accent-600' : $gradients[$index % 3] }} flex items-center justify-center">
+                                <span class="text-6xl font-black text-white/25 select-none">{{ mb_strtoupper(mb_substr($service->title, 0, 1)) }}</span>
+                            </div>
                         @endif
 
                         <div class="p-8 flex-1 flex flex-col">
