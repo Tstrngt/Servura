@@ -13,8 +13,8 @@
 
 ## Huidige taak
 
-**Wat**: Polish van de publieke `/diensten`-pagina (`resources/views/services/index.blade.php`) zodat deze aansluit bij de verfijnde stijl van de homepagina.
-**Status**: af — typografie consistent gebruikt (`font-heading`, `tracking-tight`, `leading-[1.05]`), decoratieve gradient-tekst verwijderd, zwevende gradient-kaarten vervangen door home-achtige capability-cards met iconen, vergelijkingskaarten afgestemd op `rounded-2xl`, proces-sectie vereenvoudigd naar een connected timeline zonder roterende pijlen, CTA's gebruiken de gedeelde `btn-light`-variant, decoratieve elementen hebben `aria-hidden`, `npm run build` succesvol.
+**Wat**: Redesign van de publieke `/diensten`-pagina (`resources/views/services/index.blade.php`) geïnspireerd op de home- en over-ons pagina.
+**Status**: af — volledige herschrijving met dark hero + Unsplash-achtergrond, guarantees-strip overgenomen van home, service-pakketten als uniforme `rounded-2xl` kaarten met afbeelding/placeholder, proces-sectie in de stijl van over-ons (tekst links, genummerde lijst rechts), CTA overgenomen van over-ons met `cta-grid`, `npm run build` succesvol.
 **Volgende stap**: visueel verifiëren in de browser (desktop + mobiel), committen en pushen.
 
 **Open details:**
@@ -47,5 +47,5 @@
 ## Laatste update
 
 **Datum**: 2026-08-01
-**Taak**: Polish van `/diensten`-pagina (`resources/views/services/index.blade.php`): typografie, capability-cards, proces-timeline en CTA's afgestemd op de homepagina-stijl; build gecompileerd.
+**Taak**: Redesign van `/diensten`-pagina (`resources/views/services/index.blade.php`) geïnspireerd op home en over-ons: dark hero, guarantees, pakketkaarten, proces-sectie en CTA in dezelfde stijl; build gecompileerd.
 **Volgende**: Visuele verificatie en commit/push naar `Servura/main`.
