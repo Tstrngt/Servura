@@ -63,7 +63,7 @@ $steps = [
                             'from-secondary-500 to-secondary-700',
                         ];
                     @endphp
-                    <div class="group relative bg-white rounded-3xl ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden transition-all duration-300 animate-on-scroll flex flex-col {{ $isRecommended ? 'md:-translate-y-6 md:scale-105 shadow-2xl ring-2 ring-accent-400 z-10 shadow-[0_0_60px_-12px_rgba(14,165,233,0.35),0_0_40px_-12px_rgba(20,184,166,0.25)]' : 'hover:-translate-y-2 hover:shadow-2xl' }}">
+                    <div class="group relative bg-white rounded-3xl ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden transition-all duration-300 animate-on-scroll flex flex-col {{ $isRecommended ? 'md:-translate-y-8 md:scale-105 ring-2 ring-accent-400 z-10 shadow-[0_24px_70px_-16px_rgba(14,165,233,0.45),0_16px_40px_-12px_rgba(20,184,166,0.35)]' : 'hover:-translate-y-2 hover:shadow-2xl' }}">
                         @if($isRecommended)
                             <div class="absolute -inset-4 bg-gradient-to-r from-primary-500/25 to-accent-500/25 rounded-[2rem] blur-3xl -z-10 pointer-events-none"></div>
                             <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-primary-500 to-accent-500"></div>

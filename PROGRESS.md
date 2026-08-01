@@ -13,8 +13,8 @@
 
 ## Huidige taak
 
-**Wat**: Visuele verfijning van de pricing-kaarten op `/diensten`: populair middenplan meer laten uitkomen met gloed en afbeelding/placeholder-terugbrengen.
-**Status**: af — middelste kaart krijgt nu een blauw/groen gloed-effect via schaduw en een achterste blur-gradient, daarnaast is de afbeelding/gradient-placeholder bovenaan elke kaart teruggebracht; `npm run build` succesvol.
+**Wat**: Verfijning van het gloed-effect op de aanbevolen pricing-kaart: schaduw moet duidelijk róndom de box vallen, alsof de box voor de andere kaarten zit.
+**Status**: af — middelste kaart krijgt nu een grotere, meer schaduw-achtige halo (`shadow-[...]` met y-offset en grotere blur), is iets verder omhoog geschoven (`md:-translate-y-8`) en de innerlijke blur-gradient is behouden voor extra diepte; `npm run build` succesvol.
 **Volgende stap**: visueel verifiëren in de browser en committen/pushen.
 
 **Open details:**
@@ -47,5 +47,5 @@
 ## Laatste update
 
 **Datum**: 2026-08-01
-**Taak**: Pricing-kaarten op `/diensten` verfijnd: blauw/groen gloed-effect op aanbevolen middenkaart en afbeelding/gradient-placeholder teruggebracht; build gecompileerd.
+**Taak**: Gloed op aanbevolen pricing-kaart veranderd in een grotere, schaduw-achtige halo róndom de box; build gecompileerd.
 **Volgende**: Visuele verificatie en commit/push naar `Servura/main`.
