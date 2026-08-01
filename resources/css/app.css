@@ -819,3 +819,24 @@ h1, h2, h3, h4, h5, h6 {
 @media (prefers-reduced-motion: reduce) {
     .hero-build-site, .hero-build-piece { transition: none !important; }
 }
+
+/* Horizontal scroll container used on the services page */
+.service-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #0ea5e9 #e2e8f0;
+}
+.service-scroll::-webkit-scrollbar {
+    height: 0.5rem;
+}
+.service-scroll::-webkit-scrollbar-track {
+    background: #e2e8f0;
+    border-radius: 9999px;
+    margin: 0 0.25rem;
+}
+.service-scroll::-webkit-scrollbar-thumb {
+    background: #0ea5e9;
+    border-radius: 9999px;
+}
+.service-scroll::-webkit-scrollbar-thumb:hover {
+    background: #0284c7;
+}

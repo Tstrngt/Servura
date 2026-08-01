@@ -44,7 +44,7 @@ $steps = [
         @endphp
 
         @if($webdesignServices->count() > 0)
-            <div class="flex overflow-x-auto pb-6 gap-6 snap-x snap-mandatory scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div class="service-scroll flex overflow-x-auto pb-6 pr-6 gap-6 snap-x snap-mandatory scroll-smooth">
                 @foreach($webdesignServices as $service)
                     @php
                         $serviceData = [

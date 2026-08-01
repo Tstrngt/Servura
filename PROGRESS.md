@@ -13,9 +13,9 @@
 
 ## Huidige taak
 
-**Wat**: Iteratie op de publieke `/diensten`-pagina (`resources/views/services/index.blade.php`): hero teruggebracht tot titel + subtekst, productrij horizontaal scrollbaar gemaakt met database-gekoppelde webdesign-pakketten, modaal toegevoegd dat bij 'Bekijk product' alle details toont met contact-CTA.
-**Status**: af — hero is nu basic, garanties-section verwijderd, producten staan in een snap-scroll rij (`service_type = website_pakket`), modaal gebruikt Alpine.js en toont titel, omschrijving, lange beschrijving, features, prijs en 'Neem contact op'-knop, `npm run build` succesvol.
-**Volgende stap**: visueel verifiëren in de browser (desktop + mobiel, test modaal), committen en pushen.
+**Wat**: Verfijning van de productrij op `/diensten`: zichtbare scrollbar toevoegen en afsnijding aan het einde van de rij oplossen.
+**Status**: af — `.service-scroll` CSS-klasse toegevoegd in `resources/css/app.css` met styled scrollbar (WebKit + Firefox), scrollbar-hide klassen verwijderd, rechter padding toegevoegd zodat de laatste kaart niet bruusk afgebroken wordt, `npm run build` succesvol.
+**Volgende stap**: visueel verifiëren in de browser en committen/pushen.
 
 **Open details:**
 - Portfolio-links voor Tim, Dirk en Isis zijn placeholders (`#...`).
@@ -47,5 +47,5 @@
 ## Laatste update
 
 **Datum**: 2026-08-01
-**Taak**: Iteratie op `/diensten`-pagina (`resources/views/services/index.blade.php`): basic hero, horizontaal scrollbare webdesign-productrij uit database, modaal met productdetails en contact-CTA; build gecompileerd.
+**Taak**: Zichtbare styled scrollbar toegevoegd aan de horizontale productrij op `/diensten` en rechter padding aangepast zodat de rij netjes eindigt; build gecompileerd.
 **Volgende**: Visuele verificatie en commit/push naar `Servura/main`.
