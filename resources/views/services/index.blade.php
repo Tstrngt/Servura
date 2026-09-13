@@ -109,9 +109,9 @@ $steps = [
                                 </ul>
                             @endif
 
-                            <button type="button" @click="show(@js($serviceData))" class="btn {{ $isRecommended ? 'btn-primary' : 'btn-outline' }} w-full" aria-haspopup="dialog" aria-controls="service-modal">
-                                Bekijk product
-                            </button>
+                            <a href="{{ route('quote.builder', ['service' => $service->slug]) }}" class="btn {{ $isRecommended ? 'btn-primary' : 'btn-outline' }} w-full text-center">
+                                Offerte samenstellen
+                            </a>
                         </div>
                     </div>
                 @endforeach
