@@ -296,7 +296,7 @@ $steps = [
                     </div>
                 @endforeach
 
-                <div class="absolute -right-4 -bottom-3 flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 ring-[5px] ring-emerald-300 text-emerald-700 shadow-xl" aria-label="Finish">
+                <div class="absolute -right-12 -bottom-3 flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 ring-[5px] ring-emerald-300 text-emerald-700 shadow-xl" aria-label="Finish">
                     <svg class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM7 4H5a2 2 0 002 2M17 4h2a2 2 0 01-2 2"/>
                     </svg>
