@@ -266,7 +266,6 @@ $steps = [
         <!-- Desktop treasure map roadmap -->
         <div class="hidden lg:block relative px-8 pt-10 pb-20 animate-on-scroll">
             <div class="absolute inset-0 opacity-60 pointer-events-none" style="background-image: radial-gradient(rgba(180,83,9,0.10) 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
-            <span class="absolute top-6 right-8 text-3xl opacity-70 animate-[spin_16s_linear_infinite]">🧭</span>
             <div class="absolute -top-2 -left-2 flex items-center justify-center w-14 h-14 rounded-full bg-amber-100 ring-4 ring-amber-300 text-amber-700 shadow-lg rotate-[-12deg]" aria-label="Start">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M6 18L18 6"/>
