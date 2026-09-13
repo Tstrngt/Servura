@@ -76,16 +76,16 @@
             </div>
 
             <!-- Pagina's + bezoekers -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-14 animate-on-scroll">
-                <div>
-                    <div class="flex items-start gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-14 animate-on-scroll items-stretch">
+                <div class="h-full flex flex-col">
+                    <div class="flex items-start gap-4 mb-4 flex-1">
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">2</span>
                         <div>
                             <h2 class="font-heading text-xl font-bold text-slate-900">Hoeveel pagina's verwacht u?</h2>
                             <p class="text-sm text-slate-500 mt-1">Per extra pagina rekenen veel bureaus € 150 tot € 400.</p>
                         </div>
                     </div>
-                    <select name="pages" class="form-input" required>
+                    <select name="pages" class="form-input mt-auto" required>
                         <option value="">Kies een optie</option>
                         <option value="1-5">1 - 5 pagina's</option>
                         <option value="6-10">6 - 10 pagina's</option>
@@ -95,15 +95,15 @@
                     </select>
                 </div>
 
-                <div>
-                    <div class="flex items-start gap-4 mb-4">
+                <div class="h-full flex flex-col">
+                    <div class="flex items-start gap-4 mb-4 flex-1">
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">3</span>
                         <div>
                             <h2 class="font-heading text-xl font-bold text-slate-900">Verwachte bezoekers per maand</h2>
                             <p class="text-sm text-slate-500 mt-1">Hoge traffic vraagt meer performance en hosting.</p>
                         </div>
                     </div>
-                    <select name="visitors" class="form-input" required>
+                    <select name="visitors" class="form-input mt-auto" required>
                         <option value="">Kies een optie</option>
                         <option value="<1000">Minder dan 1.000</option>
                         <option value="1000-5000">1.000 - 5.000</option>
@@ -114,16 +114,16 @@
             </div>
 
             <!-- Ontwerp + huidige website -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-14 animate-on-scroll">
-                <div>
-                    <div class="flex items-start gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-14 animate-on-scroll items-stretch">
+                <div class="h-full flex flex-col">
+                    <div class="flex items-start gap-4 mb-4 flex-1">
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">4</span>
                         <div>
                             <h2 class="font-heading text-xl font-bold text-slate-900">Ontwerp & huisstijl</h2>
                             <p class="text-sm text-slate-500 mt-1">Een logo of huisstijl traject loopt vaak van € 750 tot € 2.500.</p>
                         </div>
                     </div>
-                    <select name="design" class="form-input" required>
+                    <select name="design" class="form-input mt-auto" required>
                         <option value="">Kies een optie</option>
                         <option value="existing">Ik heb al een huisstijl / logo</option>
                         <option value="new">Ik wil een nieuw logo en huisstijl</option>
@@ -131,15 +131,15 @@
                     </select>
                 </div>
 
-                <div>
-                    <div class="flex items-start gap-4 mb-4">
+                <div class="h-full flex flex-col">
+                    <div class="flex items-start gap-4 mb-4 flex-1">
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">5</span>
                         <div>
                             <h2 class="font-heading text-xl font-bold text-slate-900">Huidige website</h2>
                             <p class="text-sm text-slate-500 mt-1">Zodat wij kunnen zien wat er al is.</p>
                         </div>
                     </div>
-                    <input type="text" name="current_website" class="form-input" placeholder="www.voorbeeld.nl of 'nog geen website'">
+                    <input type="text" name="current_website" class="form-input mt-auto" placeholder="www.voorbeeld.nl of 'nog geen website'">
                 </div>
             </div>
 
@@ -204,16 +204,16 @@
             </div>
 
             <!-- Tijdlijn + budget range -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-14 animate-on-scroll">
-                <div>
-                    <div class="flex items-start gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-14 animate-on-scroll items-stretch">
+                <div class="h-full flex flex-col">
+                    <div class="flex items-start gap-4 mb-4 flex-1">
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">8</span>
                         <div>
                             <h2 class="font-heading text-xl font-bold text-slate-900">Gewenste oplevering</h2>
                             <p class="text-sm text-slate-500 mt-1">Snellere oplevering is vaak mogelijk tegen een kleine meerprijs.</p>
                         </div>
                     </div>
-                    <select name="timeline" class="form-input" required>
+                    <select name="timeline" class="form-input mt-auto" required>
                         <option value="">Kies een optie</option>
                         <option value="asap">Zo snel mogelijk</option>
                         <option value="1-2months">Binnen 1 - 2 maanden</option>
@@ -222,15 +222,15 @@
                     </select>
                 </div>
 
-                <div>
-                    <div class="flex items-start gap-4 mb-4">
+                <div class="h-full flex flex-col">
+                    <div class="flex items-start gap-4 mb-4 flex-1">
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">9</span>
                         <div>
                             <h2 class="font-heading text-xl font-bold text-slate-900">Indicatie budget (optioneel)</h2>
                             <p class="text-sm text-slate-500 mt-1">Helpt ons een passend voorstel te doen.</p>
                         </div>
                     </div>
-                    <select name="budget" class="form-input">
+                    <select name="budget" class="form-input mt-auto">
                         <option value="">Kies een budgetindicatie</option>
                         <option value="<2500">Minder dan € 2.500</option>
                         <option value="2500-5000">€ 2.500 - € 5.000</option>
