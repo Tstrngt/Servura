@@ -109,9 +109,9 @@ $steps = [
                                 </ul>
                             @endif
 
-                            <a href="{{ route('quote.builder', ['service' => $service->slug]) }}" class="btn {{ $isRecommended ? 'btn-primary' : 'btn-outline' }} w-full text-center">
-                                Offerte samenstellen
-                            </a>
+                            <button type="button" @click="show(@js($serviceData))" class="btn {{ $isRecommended ? 'btn-primary' : 'btn-outline' }} w-full" aria-haspopup="dialog" aria-controls="service-modal">
+                                Bekijk product
+                            </button>
                         </div>
                     </div>
                 @endforeach
@@ -221,7 +221,7 @@ $steps = [
                         <a href="{{ route('contact') }}?service=professional-website" class="btn btn-primary whitespace-nowrap px-6 py-3">
                             Neem contact op
                         </a>
-                        <a href="{{ route('contact') }}?service=professional-website&subject=Offerte" class="btn bg-white/10 text-white hover:bg-white/20 ring-1 ring-white/20 whitespace-nowrap px-6 py-3">
+                        <a href="{{ route('quote.builder', ['service' => 'professional-website', 'subject' => 'Offerte']) }}" class="btn bg-white/10 text-white hover:bg-white/20 ring-1 ring-white/20 whitespace-nowrap px-6 py-3">
                             Vraag offerte aan
                         </a>
                     </div>
