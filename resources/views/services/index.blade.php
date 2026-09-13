@@ -121,50 +121,111 @@ $steps = [
         @endif
     </div>
 
-    <!-- Service Modal -->
+    <!-- Service Modal (dummy layout voor goedkeuring) -->
     <div id="service-modal" x-show="open" class="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6" style="display: none;" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click.self="hide" role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
         <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" aria-hidden="true"></div>
-        <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl ring-1 ring-slate-200">
+        <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl shadow-slate-900/25 ring-1 ring-slate-200">
             <div class="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/95 backdrop-blur">
-                <h3 id="service-modal-title" class="font-heading text-2xl font-bold text-slate-900" x-text="service?.title"></h3>
+                <div class="flex items-center gap-3">
+                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 text-white shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904C9.12 15.12 8.25 13.612 8.25 11.25c0-2.846 1.75-5.25 4.5-5.25 2.75 0 4.5 2.404 4.5 5.25 0 2.362-.87 3.87-1.563 4.654M12 21a1.5 1.5 0 01-1.5-1.5 1.5 1.5 0 01-1.5-1.5m3 0a1.5 1.5 0 01-1.5-1.5 1.5 1.5 0 01-1.5-1.5m-3-13.5c0-1.875 1.5-3.375 3.375-3.375.336 0 .66.042.975.12M9.75 12c0-1.875 1.5-3.375 3.375-3.375.336 0 .66.042.975.12"/></svg>
+                    </span>
+                    <h3 id="service-modal-title" class="font-heading text-2xl font-bold text-slate-900">Professional Website</h3>
+                </div>
                 <button type="button" @click="hide" class="p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors" aria-label="Sluiten">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-            <div class="p-6">
-                <template x-if="service">
-                    <div>
-                        <div x-show="service.image_url" class="mb-6 rounded-xl overflow-hidden">
-                            <img :src="service.image_url" :alt="service.title" class="w-full h-56 object-cover">
-                        </div>
-                        <p class="text-slate-600 mb-6" x-text="service.short_description"></p>
-                        <div class="prose prose-slate max-w-none mb-6" x-html="service.description"></div>
 
-                        <template x-if="service.features && service.features.length > 0">
-                            <div class="mb-6">
-                                <h4 class="font-heading font-semibold text-slate-900 mb-3">Wat zit erin?</h4>
-                                <ul class="space-y-2">
-                                    <template x-for="feature in service.features" :key="feature">
-                                        <li class="flex items-start text-sm text-slate-700">
-                                            <svg class="w-5 h-5 text-accent-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                            <span x-text="feature"></span>
-                                        </li>
-                                    </template>
-                                </ul>
-                            </div>
-                        </template>
+            <div class="relative h-56 sm:h-64 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80" alt="Professional Website preview" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                    <span class="inline-flex items-center rounded-full bg-white/20 backdrop-blur px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/30 mb-3">Meest gekozen</span>
+                    <p class="max-w-2xl text-lg text-white/90 leading-relaxed">Een complete website die uw bedrijf professioneel presenteert en klaar is om mee te groeien.</p>
+                </div>
+                <div class="absolute top-4 right-4 rounded-2xl bg-white/95 backdrop-blur px-5 py-3 shadow-xl ring-1 ring-white/20 text-center">
+                    <span class="block text-xs text-slate-500 uppercase tracking-wide">Investering</span>
+                    <span class="block text-2xl font-bold text-slate-900">€ 3.000,00</span>
+                </div>
+            </div>
 
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-50 rounded-xl">
-                            <div>
-                                <span class="text-sm text-slate-500">Investering</span>
-                                <div class="text-2xl font-bold text-slate-900" x-text="service.formatted_price"></div>
-                            </div>
-                            <a :href="'{{ route('contact') }}?service=' + service.slug" class="btn btn-primary whitespace-nowrap">
-                                Neem contact op
-                            </a>
-                        </div>
+            <div class="p-6 sm:p-8">
+                <div class="flex flex-wrap gap-2 mb-8">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1 text-sm font-medium text-primary-700 ring-1 ring-primary-100">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                        Maatwerk design
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-accent-50 px-3 py-1 text-sm font-medium text-accent-700 ring-1 ring-accent-100">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478V12m0 0a2.25 2.25 0 00-2.25-2.25h-3a2.25 2.25 0 00-2.25 2.25v7.5"/></svg>
+                        CMS inbegrepen
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 ring-1 ring-emerald-100">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                        1 jaar onderhoud
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+                    <div class="group rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200 hover:bg-white hover:shadow-lg hover:shadow-primary-500/10 hover:-translate-y-1 transition-all duration-300">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-600 mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.684 2.998 2.998 0 00.89 1.865 6.022 6.022 0 001.72 1.141 3.001 3.001 0 003.17-1.684 6.022 6.022 0 00-1.14-1.72 2.998 2.998 0 00-1.86-.326zm11.06 0a3 3 0 00-5.78 1.684 2.998 2.998 0 00.89 1.865 6.022 6.022 0 001.72 1.141 3.001 3.001 0 003.17-1.684 6.022 6.022 0 00-1.14-1.72 2.998 2.998 0 00-1.86-.326zM12 9.75a6 6 0 00-6 6v.75h12v-.75a6 6 0 00-6-6z"/></svg>
+                        </span>
+                        <h4 class="font-heading font-semibold text-slate-900 mb-1">Uniek ontwerp</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">Een design dat aansluit bij uw merk en doelgroep, zonder standaard templates.</p>
                     </div>
-                </template>
+                    <div class="group rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200 hover:bg-white hover:shadow-lg hover:shadow-primary-500/10 hover:-translate-y-1 transition-all duration-300">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent-100 text-accent-600 mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75v-3"/></svg>
+                        </span>
+                        <h4 class="font-heading font-semibold text-slate-900 mb-1">Responsive</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">Perfect zichtbaar en bruikbaar op mobiel, tablet en desktop.</p>
+                    </div>
+                    <div class="group rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200 hover:bg-white hover:shadow-lg hover:shadow-primary-500/10 hover:-translate-y-1 transition-all duration-300">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-600 mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-2.25l-6 13.5"/></svg>
+                        </span>
+                        <h4 class="font-heading font-semibold text-slate-900 mb-1">CMS & blog</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">Zelf eenvoudig pagina's en nieuwsberichten beheren zonder technische kennis.</p>
+                    </div>
+                    <div class="group rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200 hover:bg-white hover:shadow-lg hover:shadow-primary-500/10 hover:-translate-y-1 transition-all duration-300">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent-100 text-accent-600 mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                        </span>
+                        <h4 class="font-heading font-semibold text-slate-900 mb-1">SEO-optimaal</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">Technisch en inhoudelijk ingericht voor betere vindbaarheid in Google.</p>
+                    </div>
+                    <div class="group rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200 hover:bg-white hover:shadow-lg hover:shadow-primary-500/10 hover:-translate-y-1 transition-all duration-300">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 01-3-3m3 3a3 3 0 106 0m12 0a3 3 0 01-3-3m3 3a3 3 0 10-6 0"/></svg>
+                        </span>
+                        <h4 class="font-heading font-semibold text-slate-900 mb-1">Snelle hosting</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">Inclusief 1 jaar snelle, veilige hosting met SSL-certificaat en backups.</p>
+                    </div>
+                    <div class="group rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200 hover:bg-white hover:shadow-lg hover:shadow-primary-500/10 hover:-translate-y-1 transition-all duration-300">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l-4.548-2.196a3 3 0 00-3.306 0l-4.548 2.196a3 3 0 00-1.19 1.19l-2.196 4.548a3 3 0 000 3.306l2.196 4.548a3 3 0 001.19 1.19l4.548 2.196a3 3 0 003.306 0l4.548-2.196a3 3 0 001.19-1.19l2.196-4.548a3 3 0 000-3.306l-2.196-4.548a3 3 0 00-1.19-1.19l-2.196-4.548"/></svg>
+                        </span>
+                        <h4 class="font-heading font-semibold text-slate-900 mb-1">Support</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">Persoonlijke support, kleine aanpassingen en beveiligingsupdates.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white shadow-xl">
+                    <div>
+                        <span class="text-sm text-slate-300">Investering</span>
+                        <div class="text-3xl font-bold">€ 3.000,00</div>
+                        <p class="text-sm text-slate-400 mt-1">Eenmalig, exclusief maandelijks onderhoud na het eerste jaar.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <a href="{{ route('contact') }}?service=professional-website" class="btn btn-primary whitespace-nowrap px-6 py-3">
+                            Neem contact op
+                        </a>
+                        <a href="{{ route('contact') }}?service=professional-website&subject=Offerte" class="btn bg-white/10 text-white hover:bg-white/20 ring-1 ring-white/20 whitespace-nowrap px-6 py-3">
+                            Vraag offerte aan
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -203,11 +264,11 @@ $steps = [
         @endphp
 
         <!-- Desktop treasure map roadmap -->
-        <div class="hidden lg:block relative px-8 pt-10 pb-20 overflow-hidden animate-on-scroll">
+        <div class="hidden lg:block relative px-8 pt-10 pb-20 animate-on-scroll">
             <div class="absolute inset-0 opacity-60 pointer-events-none" style="background-image: radial-gradient(rgba(180,83,9,0.10) 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
             <span class="absolute top-6 right-8 text-3xl opacity-70 animate-[spin_16s_linear_infinite]">🧭</span>
-            <div class="absolute top-6 left-8 flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 ring-4 ring-amber-300 text-amber-700 shadow-lg rotate-[-12deg]" aria-label="Start">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+            <div class="absolute -top-2 -left-2 flex items-center justify-center w-14 h-14 rounded-full bg-amber-100 ring-4 ring-amber-300 text-amber-700 shadow-lg rotate-[-12deg]" aria-label="Start">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M6 18L18 6"/>
                 </svg>
             </div>
@@ -235,9 +296,9 @@ $steps = [
                     </div>
                 @endforeach
 
-                <div class="absolute flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 ring-4 ring-emerald-300 text-emerald-700 shadow-lg" style="left: 93%; bottom: -2.5rem; transform: translateX(-50%);" aria-label="Finish">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 21v-9a2 2 0 012-2h11l3-3v10l-3-3H6a2 2 0 00-2 2z"/>
+                <div class="absolute -right-4 -bottom-3 flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 ring-[5px] ring-emerald-300 text-emerald-700 shadow-xl" aria-label="Finish">
+                    <svg class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM7 4H5a2 2 0 002 2M17 4h2a2 2 0 01-2 2"/>
                     </svg>
                 </div>
             </div>
@@ -261,8 +322,8 @@ $steps = [
                 @endforeach
                 <div class="flex justify-center pt-2">
                     <div class="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-100 ring-4 ring-emerald-300 text-emerald-700 shadow-lg" aria-label="Finish">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 21v-9a2 2 0 012-2h11l3-3v10l-3-3H6a2 2 0 00-2 2z"/>
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM7 4H5a2 2 0 002 2M17 4h2a2 2 0 01-2 2"/>
                         </svg>
                     </div>
                 </div>
