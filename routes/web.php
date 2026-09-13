@@ -4,6 +4,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboard;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\QuoteBuilderController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -45,6 +46,10 @@ Route::get('/diensten/{service}', [ServiceController::class, 'show'])->name('ser
 // Contact
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+// Offerte samenstellen (niet in hoofdnavigatie)
+Route::get('/offerte-samenstellen', [QuoteBuilderController::class, 'index'])->name('quote.builder');
+Route::post('/offerte-samenstellen', [QuoteBuilderController::class, 'store'])->name('quote.builder.store');
 
 // Authentication routes
 Route::middleware('guest')->group(function () {
