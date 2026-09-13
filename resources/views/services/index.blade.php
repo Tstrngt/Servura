@@ -64,12 +64,6 @@ $steps = [
                         ];
                     @endphp
                     <div class="group relative bg-white rounded-3xl transition-all duration-300 animate-on-scroll flex flex-col {{ $isRecommended ? 'md:-translate-y-8 md:scale-110 z-20 ring-4 ring-accent-400 shadow-[0_0_0_6px_rgba(14,165,233,0.28),0_0_0_16px_rgba(20,184,166,0.20),0_30px_70px_-15px_rgba(14,165,233,0.45)]' : 'ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 hover:-translate-y-2 hover:shadow-2xl' }}">
-                        @if($isRecommended)
-                            <div class="absolute -top-4 left-1/2 -translate-x-1/2 z-30">
-                                <span class="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 text-white text-xs font-bold uppercase tracking-wide shadow-lg">Aanbevolen</span>
-                            </div>
-                        @endif
-
                         <div class="overflow-hidden rounded-t-3xl">
                             @if($isRecommended)
                                 <div class="h-2 bg-gradient-to-r from-primary-500 to-accent-500"></div>
@@ -112,6 +106,9 @@ $steps = [
                             <button type="button" @click="show(@js($serviceData))" class="btn {{ $isRecommended ? 'btn-primary' : 'btn-outline' }} w-full" aria-haspopup="dialog" aria-controls="service-modal">
                                 Bekijk product
                             </button>
+                            @if($isRecommended)
+                                <span class="mt-4 self-center inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 text-white text-xs font-bold uppercase tracking-wide shadow-lg">Aanbevolen</span>
+                            @endif
                         </div>
                     </div>
                 @endforeach
