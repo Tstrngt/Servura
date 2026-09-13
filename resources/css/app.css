@@ -829,13 +829,13 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateY(0) scale(1);
 }
 
-/* World map — animated flight-path lines drawing in on scroll */
+/* World map — animated flight-path lines drawn per selected datacenter */
 .map-flightpath {
     stroke-dasharray: 260;
     stroke-dashoffset: 260;
     transition: stroke-dashoffset 1.6s ease;
 }
-.animate-on-scroll.visible .map-flightpath {
+.map-flightpath.is-drawn {
     stroke-dashoffset: 0;
 }
 

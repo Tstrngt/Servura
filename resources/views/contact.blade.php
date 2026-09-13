@@ -108,6 +108,18 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="current_website" class="form-label">Huidige website of online aanwezigheid</label>
+                        <input 
+                            type="text" 
+                            id="current_website" 
+                            name="current_website" 
+                            class="form-input"
+                            x-model="formData.current_website"
+                            placeholder="www.voorbeeld.nl of 'nog geen website'"
+                        >
+                    </div>
+
+                    <div class="form-group">
                         <label for="subject" class="form-label">Onderwerp *</label>
                         <select 
                             id="subject" 
@@ -125,6 +137,21 @@
                             <option value="Overig">Overige vraag</option>
                         </select>
                         @error('subject')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="looking_for" class="form-label">Waar bent u naar op zoek?</label>
+                        <textarea 
+                            id="looking_for" 
+                            name="looking_for" 
+                            rows="4" 
+                            class="form-textarea"
+                            x-model="formData.looking_for"
+                            placeholder="Bijvoorbeeld: een nieuwe website, meer leads, betere vindbaarheid, hosting, onderhoud..."
+                        ></textarea>
+                        @error('looking_for')
                             <span class="form-error">{{ $message }}</span>
                         @enderror
                     </div>
@@ -297,7 +324,9 @@ function contactForm() {
             email: '',
             company: '',
             phone: '',
+            current_website: '',
             subject: '',
+            looking_for: '',
             message: ''
         },
         
@@ -321,7 +350,9 @@ function contactForm() {
                         email: '',
                         company: '',
                         phone: '',
+                        current_website: '',
                         subject: '',
+                        looking_for: '',
                         message: ''
                     };
                     

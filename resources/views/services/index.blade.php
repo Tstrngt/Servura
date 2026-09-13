@@ -188,7 +188,12 @@ $steps = [
                 ['ring' => 'ring-yellow-400', 'text' => 'text-yellow-800', 'soft' => 'bg-yellow-50', 'border' => 'ring-yellow-200'],
                 ['ring' => 'ring-amber-500', 'text' => 'text-amber-900', 'soft' => 'bg-amber-100', 'border' => 'ring-amber-300'],
             ];
-            $roadmapEmoji = ['🤝', '📝', '💻', '🚀'];
+            $roadmapIcons = [
+                '<svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.548.546 6.5 6.5 0 01-1.557 1.116 18.664 18.664 0 01-3.787.59 18.65 18.65 0 01-3.787-.59 6.5 6.5 0 01-1.557-1.116A9.38 9.38 0 009 19.128M12 14.25a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z"/></svg>',
+                '<svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M9 16h6M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>',
+                '<svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-2.25l-6 13.5"/></svg>',
+                '<svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2.25s-5.25 3.25-5.25 8.25v2.75L4.5 15.5h15l-2.25-2.25v-2.75c0-5-5.25-8.25-5.25-8.25zM12 14.75a2.25 2.25 0 110 4.5 2.25 2.25 0 010-4.5z"/></svg>',
+            ];
             $roadmapPos = [
                 ['left' => '6%', 'anchor' => 'top'],
                 ['left' => '35%', 'anchor' => 'bottom'],
@@ -201,7 +206,11 @@ $steps = [
         <div class="hidden lg:block relative px-8 pt-10 pb-20 overflow-hidden animate-on-scroll">
             <div class="absolute inset-0 opacity-60 pointer-events-none" style="background-image: radial-gradient(rgba(180,83,9,0.10) 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
             <span class="absolute top-6 right-8 text-3xl opacity-70 animate-[spin_16s_linear_infinite]">🧭</span>
-            <span class="absolute top-8 left-10 text-2xl opacity-50 rotate-[-12deg]">✕</span>
+            <div class="absolute top-6 left-8 flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 ring-4 ring-amber-300 text-amber-700 shadow-lg rotate-[-12deg]" aria-label="Start">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M6 18L18 6"/>
+                </svg>
+            </div>
 
             <div class="relative" style="height: 30rem;">
                 <svg class="absolute inset-0 w-full h-full" viewBox="0 0 1000 480" fill="none" preserveAspectRatio="none">
@@ -215,8 +224,8 @@ $steps = [
                         style="left: {{ $pos['left'] }};">
                         <div class="roadmap-node animate-on-scroll relative {{ $pos['anchor'] === 'top' ? 'mb-4' : 'mt-4' }}" style="transition-delay: {{ $index * 0.15 }}s">
                             <span class="absolute inset-0 rounded-full {{ $c['soft'] }} opacity-70 animate-ping"></span>
-                            <span class="relative flex h-16 w-16 items-center justify-center rounded-full bg-white text-2xl shadow-lg ring-4 {{ $c['ring'] }} animate-float" style="animation-delay: {{ $index * 0.4 }}s">
-                                {{ $roadmapEmoji[$index] }}
+                            <span class="relative flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg ring-4 {{ $c['ring'] }} animate-float" style="animation-delay: {{ $index * 0.4 }}s">
+                                {!! $roadmapIcons[$index] !!}
                             </span>
                         </div>
                         <div class="{{ $c['soft'] }} rounded-2xl p-4 ring-1 {{ $c['border'] }} shadow-sm animate-on-scroll" style="transition-delay: {{ $index * 0.15 + 0.1 }}s">
@@ -226,7 +235,11 @@ $steps = [
                     </div>
                 @endforeach
 
-                <span class="absolute text-2xl" style="left: 93%; bottom: -2.5rem; transform: translateX(-50%);">🏁</span>
+                <div class="absolute flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 ring-4 ring-emerald-300 text-emerald-700 shadow-lg" style="left: 93%; bottom: -2.5rem; transform: translateX(-50%);" aria-label="Finish">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 21v-9a2 2 0 012-2h11l3-3v10l-3-3H6a2 2 0 00-2 2z"/>
+                    </svg>
+                </div>
             </div>
         </div>
 
@@ -237,8 +250,8 @@ $steps = [
                 @foreach($steps as $index => $step)
                     @php $c = $roadmapColors[$index % 4]; @endphp
                     <div class="relative flex gap-5 animate-on-scroll" style="transition-delay: {{ $index * 0.1 }}s">
-                        <span class="relative z-10 flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-full bg-white text-2xl shadow-lg ring-4 {{ $c['ring'] }}">
-                            {{ $roadmapEmoji[$index] }}
+                        <span class="relative z-10 flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-lg ring-4 {{ $c['ring'] }}">
+                            {!! $roadmapIcons[$index] !!}
                         </span>
                         <div class="{{ $c['soft'] }} rounded-2xl p-4 ring-1 {{ $c['border'] }} flex-1">
                             <h4 class="font-heading font-bold text-slate-900 mb-1.5">{{ $step['title'] }}</h4>
@@ -247,7 +260,11 @@ $steps = [
                     </div>
                 @endforeach
                 <div class="flex justify-center pt-2">
-                    <span class="text-2xl">🏁</span>
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-100 ring-4 ring-emerald-300 text-emerald-700 shadow-lg" aria-label="Finish">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 21v-9a2 2 0 012-2h11l3-3v10l-3-3H6a2 2 0 00-2 2z"/>
+                        </svg>
+                    </div>
                 </div>
             </div>
         </div>
@@ -431,9 +448,9 @@ $steps = [
                                     <stop offset="100%" stop-color="#22d3ee" stop-opacity="0" />
                                 </linearGradient>
                             </defs>
-                            <path class="map-flightpath" d="M396.6,140.4 Q400,125.4 403.3,144.6" fill="none" stroke="url(#map-path-gradient)" stroke-width="1.5" style="transition-delay: 0.2s" />
-                            <path class="map-flightpath" d="M396.6,140.4 Q394,97.3 415.4,122.3" fill="none" stroke="url(#map-path-gradient)" stroke-width="1.5" style="transition-delay: 0.5s" />
-                            <path class="map-flightpath" d="M396.6,140.4 Q320,70.4 231.5,155.5" fill="none" stroke="url(#map-path-gradient)" stroke-width="1.5" style="transition-delay: 0.8s" />
+                            <path class="map-flightpath" d="M396.6,140.4 Q400,125.4 403.3,144.6" fill="none" stroke="url(#map-path-gradient)" stroke-width="1.5" :class="{ 'is-drawn': active === 1 }" />
+                            <path class="map-flightpath" d="M396.6,140.4 Q394,97.3 415.4,122.3" fill="none" stroke="url(#map-path-gradient)" stroke-width="1.5" :class="{ 'is-drawn': active === 2 }" />
+                            <path class="map-flightpath" d="M396.6,140.4 Q320,70.4 231.5,155.5" fill="none" stroke="url(#map-path-gradient)" stroke-width="1.5" :class="{ 'is-drawn': active === 3 }" />
                         </svg>
                     </div>
                     @foreach($datacenters as $i => $dc)
@@ -441,8 +458,10 @@ $steps = [
                             class="absolute -translate-x-1/2 -translate-y-1/2"
                             style="left: {{ $dc['left'] }}%; top: {{ $dc['top'] }}%;"
                             aria-label="{{ $dc['city'] }}">
-                            <span class="absolute -inset-2 rounded-full bg-purple-500 opacity-30 animate-ping" :class="active === {{ $i }} ? 'opacity-0' : 'opacity-30'" style="animation-delay: {{ $i * 0.4 }}s"></span>
-                            <span class="absolute -inset-2 rounded-full bg-blue-500 animate-ping" :class="active === {{ $i }} ? 'opacity-60' : 'opacity-0'"></span>
+                            @if($i > 0)
+                                <span class="absolute -inset-2 rounded-full bg-purple-500 opacity-20 animate-ping" :class="active === {{ $i }} ? 'opacity-0' : 'opacity-20'" style="animation-delay: {{ $i * 0.4 }}s"></span>
+                                <span class="absolute -inset-2 rounded-full bg-blue-500 animate-ping" :class="active === {{ $i }} ? 'opacity-60' : 'opacity-0'"></span>
+                            @endif
                             <span class="relative block h-3 w-3 rounded-full ring-2 ring-slate-950 shadow-[0_0_8px_rgba(59,130,246,0.8)] transition-transform duration-200"
                                 :class="active === {{ $i }} ? 'bg-blue-500 scale-150' : 'bg-purple-500 hover:scale-125'"></span>
                         </button>
