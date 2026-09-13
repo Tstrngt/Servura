@@ -219,20 +219,6 @@
     </div>
 </section>
 
-<!-- Final CTA -->
-<section class="relative overflow-hidden py-20 lg:py-24 bg-slate-950 text-white" data-navbar-theme="dark">
-    <div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 32px 32px;"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[36rem] h-[36rem] rounded-full bg-primary-600/10 blur-3xl pointer-events-none"></div>
-
-    <div class="relative max-w-4xl mx-auto px-6 text-center">
-        <h2 class="font-heading text-3xl md:text-4xl font-bold mb-4">Bekijk wat wij voor u kunnen betekenen</h2>
-        <p class="text-lg text-white/70 max-w-2xl mx-auto mb-8">Van een nieuwe website tot betrouwbare hosting en onderhoud. Wij regelen het complete traject.</p>
-        <a href="{{ route('services.index') }}" class="btn btn-primary px-8 py-4 text-base shadow-lg shadow-primary-500/25">
-            Ontdek onze diensten
-        </a>
-    </div>
-</section>
-
 <script>
 function contactForm() {
     return {
