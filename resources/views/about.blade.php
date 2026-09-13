@@ -24,7 +24,7 @@
             'initial' => 'D',
             'color' => 'from-secondary-600 to-secondary-800',
             'image' => 'images/dirk-van-gelderen.jpg',
-            'portfolio_url' => '#dirk-portfolio',
+            'portfolio_url' => 'https://itsmysquid.github.io/ProfPortfolio/index.html',
         ],
         [
             'name' => 'Isis van Dijk',
@@ -33,7 +33,7 @@
             'portfolio_summary' => 'Richt zich op gebruikersonderzoek, design systems en visuele hierarchie die resultaat oplevert.',
             'initial' => 'I',
             'color' => 'from-accent-500 to-accent-700',
-            'portfolio_url' => '#isis-portfolio',
+            'portfolio_url' => 'https://isisvandijk.github.io/Portfolio/',
         ],
     ];
 @endphp
