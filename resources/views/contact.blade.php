@@ -13,7 +13,6 @@
 
     <div class="relative max-w-7xl mx-auto px-6 py-24 lg:py-32">
         <div class="max-w-2xl animate-slide-up">
-            <span class="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-accent-300 mb-5">Contact</span>
             <h1 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight mb-6">
                 Klaar om online te groeien?
             </h1>
