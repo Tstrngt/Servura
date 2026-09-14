@@ -24,6 +24,7 @@
             'initial' => 'D',
             'color' => 'from-secondary-600 to-secondary-800',
             'image' => 'images/dirk-van-gelderen.jpg',
+            'portfolio_image' => 'images/dirk-portfolio.png',
             'portfolio_url' => 'https://itsmysquid.github.io/ProfPortfolio/index.html',
         ],
         [
@@ -248,7 +249,11 @@
             @foreach($team as $member)
                 <div class="card group animate-on-scroll flex flex-col overflow-hidden">
                     <div class="relative w-full h-56 bg-gradient-to-br {{ $member['color'] }} flex items-center justify-center overflow-hidden">
-                        <span class="text-7xl font-black text-white/25 select-none group-hover:scale-110 transition-transform duration-300">{{ $member['initial'] }}</span>
+                        @if(!empty($member['portfolio_image']))
+                            <img src="{{ asset($member['portfolio_image']) }}" alt="Portfolio van {{ $member['name'] }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        @else
+                            <span class="text-7xl font-black text-white/25 select-none group-hover:scale-110 transition-transform duration-300">{{ $member['initial'] }}</span>
+                        @endif
                     </div>
                     <div class="card-body flex-1 flex flex-col">
                         <h3 class="text-xl font-semibold text-slate-900 mb-1">{{ $member['name'] }}</h3>
