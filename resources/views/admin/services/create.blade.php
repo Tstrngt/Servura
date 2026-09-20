@@ -76,6 +76,12 @@
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label for="directadmin_package" class="form-label">DirectAdmin-pakket</label>
+                                <input type="text" id="directadmin_package" name="directadmin_package" class="form-input" value="{{ old('directadmin_package') }}" placeholder="Bijvoorbeeld: hosting_starter">
+                                <p class="mt-1 text-xs text-slate-500">Exacte package-naam uit het reselleraccount.</p>
+                                @error('directadmin_package')<span class="form-error">{{ $message }}</span>@enderror
+                            </div>
+                            <div class="form-group">
                                 <label for="image_url" class="form-label">Afbeelding URL</label>
                                 <input type="text" id="image_url" name="image_url" class="form-input" value="{{ old('image_url') }}" placeholder="https://...">
                                 @error('image_url')

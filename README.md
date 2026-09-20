@@ -225,6 +225,21 @@ Gebruik deze stappen na een nieuwe push naar `main`. De instructies zijn voor de
 2. Ga terug naar de vorige release met `git log --oneline -5`, gevolgd door `git reset --hard <vorige-commit>`. Doe dit alleen nadat stap 2 bevestigt dat er geen lokale wijzigingen zijn.
 3. Voer de dependency-, build-, cache- en servicestappen uit stap 3 tot en met 5 opnieuw uit, maar sla `git pull` over. Een database-rollback alleen uitvoeren als de bijbehorende migratie expliciet veilig terug te draaien is.
 
+## DirectAdmin provisioning
+
+Configureer het reselleraccount uitsluitend in `/var/www/Servura/.env`:
+
+```env
+DIRECTADMIN_URL=https://hosting.example.com:2222
+DIRECTADMIN_USERNAME=reseller
+DIRECTADMIN_PASSWORD=sterk-wachtwoord
+DIRECTADMIN_VERIFY_SSL=true
+DIRECTADMIN_TIMEOUT=20
+DIRECTADMIN_SHARED_IP=203.0.113.10
+```
+
+Gebruik voor `DIRECTADMIN_SHARED_IP` een gedeeld IP-adres dat in DirectAdmin aan het reselleraccount beschikbaar is. Voer daarna `php artisan config:clear && php artisan config:cache` uit. Koppel in het dienstenbeheer elk automatisch hostingproduct aan de exacte package-naam uit DirectAdmin. Mislukte acties kunnen gecontroleerd opnieuw worden geprobeerd met `php artisan provisioning:retry` of voor één klantdienst met `php artisan provisioning:retry <id>`.
+
 ## Beheer
 
 - Database backups: `/var/backups/mysql/`

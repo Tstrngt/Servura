@@ -39,6 +39,9 @@
                     <div class="mt-3 rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-800">Er wordt direct een Servura-klantaccount voor u aangemaakt.</div>
                 @endguest
                 <div class="mt-5 grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                    @if($service->fulfillment_type === 'directadmin')
+                        <div class="form-group sm:col-span-2"><label class="form-label" for="domain">Hoofddomein *</label><input class="form-input" id="domain" name="domain" required value="{{ old('domain') }}" placeholder="voorbeeld.nl"><p class="mt-1 text-xs text-slate-500">Voer alleen de domeinnaam in, zonder https:// of www.</p>@error('domain')<span class="form-error">{{ $message }}</span>@enderror</div>
+                    @endif
                     <div class="form-group"><label class="form-label" for="name">Naam *</label><input class="form-input" id="name" name="name" required value="{{ old('name', $user?->name) }}"></div>
                     <div class="form-group"><label class="form-label" for="company">Bedrijfsnaam</label><input class="form-input" id="company" name="company" value="{{ old('company', $user?->company) }}"></div>
                     @guest

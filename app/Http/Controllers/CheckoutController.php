@@ -63,6 +63,10 @@ class CheckoutController extends Controller
             'terms' => 'accepted',
         ];
 
+        if ($service->fulfillment_type === 'directadmin') {
+            $rules['domain'] = ['required', 'string', 'max:253', 'regex:/^(?!-)(?:[a-z0-9-]{1,63}\.)+[a-z]{2,63}$/i'];
+        }
+
         if (!Auth::check()) {
             $rules['email'] = 'required|email|max:255|unique:users,email';
             $rules['password'] = 'required|string|min:8|confirmed';
@@ -97,6 +101,8 @@ class CheckoutController extends Controller
                 'user_id' => $user->id,
                 'service_id' => $service->id,
                 'service_price_id' => $price->id,
+                'domain' => isset($validated['domain']) ? strtolower($validated['domain']) : null,
+                'provisioning_status' => $service->fulfillment_type === 'directadmin' ? 'pending_payment' : 'not_required',
                 'status' => 'suspended',
                 'suspension_reason' => 'pending_payment',
                 'price' => $price->price,

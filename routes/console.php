@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\CustomerService;
 use App\Services\DunningService;
+use App\Services\ProvisioningService;
 use App\Services\RenewalService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -33,3 +35,25 @@ Artisan::command('billing:dunning', function (DunningService $dunning) {
         $result['overdue'], $result['reminders'], $result['suspended'], $result['failed'],
     ]]);
 })->purpose('Verwerk vervallen facturen, herinneringen en suspension');
+
+Artisan::command('provisioning:retry {service?}', function (ProvisioningService $provisioning, ?int $service = null) {
+    $query = CustomerService::with(['user', 'service'])
+        ->where('provisioning_status', 'failed')
+        ->whereHas('service', fn ($query) => $query->where('fulfillment_type', 'directadmin'));
+    if ($service) {
+        $query->whereKey($service);
+    }
+
+    $succeeded = 0;
+    $failed = 0;
+    foreach ($query->get() as $customerService) {
+        try {
+            $provisioning->provision($customerService);
+            $succeeded++;
+        } catch (Throwable $exception) {
+            $failed++;
+            $this->error("Dienst {$customerService->id}: {$exception->getMessage()}");
+        }
+    }
+    $this->info("Provisioning voltooid: {$succeeded} geslaagd, {$failed} mislukt.");
+})->purpose('Probeer mislukte DirectAdmin-provisioning opnieuw');

@@ -12,8 +12,10 @@ use Mollie\Laravel\Facades\Mollie;
 
 class MolliePaymentService
 {
-    public function __construct(private SubscriptionPeriodService $periods)
-    {
+    public function __construct(
+        private SubscriptionPeriodService $periods,
+        private ProvisioningService $provisioning
+    ) {
     }
 
     /**
@@ -110,6 +112,7 @@ class MolliePaymentService
         $customerService = $invoice->customerService
             ?? CustomerService::find($invoice->lines()->whereNotNull('customer_service_id')->value('customer_service_id'));
         if ($customerService) {
+            $wasExternallySuspended = $customerService->provisioning_status === 'suspended';
             if ($invoice->period_start && $invoice->period_end) {
                 $this->periods->applyRenewalPeriod($customerService, $invoice->period_start, $invoice->period_end);
             } elseif (!$customerService->current_period_start) {
@@ -120,6 +123,13 @@ class MolliePaymentService
                     'suspension_reason' => null,
                     'suspended_at' => null,
                 ]);
+            }
+
+            $customerService->refresh()->loadMissing(['user', 'service']);
+            if ($wasExternallySuspended) {
+                $this->provisioning->unsuspend($customerService);
+            } elseif ($customerService->service->fulfillment_type === 'directadmin' && $customerService->provisioning_status !== 'active') {
+                $this->provisioning->provision($customerService);
             }
         }
 

@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Mail;
 
 class DunningService
 {
+    public function __construct(private ProvisioningService $provisioning)
+    {
+    }
+
     public function run(): array
     {
         $result = ['overdue' => 0, 'reminders' => 0, 'suspended' => 0, 'failed' => 0];
@@ -42,8 +46,9 @@ class DunningService
                             $result['reminders']++;
                         }
 
-                        if ($daysOverdue >= $graceDays && $invoice->customerService && $this->recordEvent($invoice, 'suspended', ['days_overdue' => $daysOverdue])) {
+                        if ($daysOverdue >= $graceDays && $invoice->customerService && !$this->hasEvent($invoice, 'suspended')) {
                             $this->suspend($invoice);
+                            $this->recordEvent($invoice, 'suspended', ['days_overdue' => $daysOverdue]);
                             $this->notify($invoice, 'suspended');
                             $result['suspended']++;
                         }
@@ -55,6 +60,11 @@ class DunningService
             });
 
         return $result;
+    }
+
+    private function hasEvent(Invoice $invoice, string $type): bool
+    {
+        return InvoiceDunningEvent::where('invoice_id', $invoice->id)->where('event_type', $type)->exists();
     }
 
     private function recordEvent(Invoice $invoice, string $type, array $metadata): bool
@@ -79,6 +89,7 @@ class DunningService
             'suspension_reason' => 'non_payment',
             'suspended_at' => now(),
         ]);
+        $this->provisioning->suspend($customerService);
 
         TransactionLog::create([
             'user_id' => $invoice->user_id,

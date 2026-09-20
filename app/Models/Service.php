@@ -15,6 +15,7 @@ class Service extends Model
         'slug',
         'service_type',
         'fulfillment_type',
+        'directadmin_package',
         'short_description',
         'description',
         'image_url',

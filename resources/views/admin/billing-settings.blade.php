@@ -34,6 +34,12 @@
                 <p class="mt-4 text-sm leading-relaxed text-slate-300">De geheime API-key wordt om veiligheidsredenen niet in het adminpanel of de database opgeslagen.</p>
                 <div class="mt-5 rounded-xl bg-white/5 p-4 ring-1 ring-white/10"><span class="block text-xs font-medium uppercase tracking-wide text-slate-500">Serverbestand</span><code class="mt-2 block break-all text-sm text-slate-200">/var/www/Servura/.env</code><span class="mt-3 block text-xs font-medium uppercase tracking-wide text-slate-500">Variabele</span><code class="mt-2 block text-sm text-slate-200">MOLLIE_KEY=••••••••</code></div>
                 <p class="mt-4 text-xs leading-relaxed text-slate-400">Voer na een wijziging op de server <code class="text-slate-300">php artisan config:clear</code> en daarna <code class="text-slate-300">php artisan config:cache</code> uit.</p>
+
+                <div class="mt-7 border-t border-white/10 pt-6">
+                    <div class="flex items-center justify-between gap-4"><h2 class="text-lg font-semibold">DirectAdmin</h2><span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $directAdminStatus['configured'] ? 'bg-emerald-400/15 text-emerald-300' : 'bg-red-400/15 text-red-300' }}">{{ $directAdminStatus['configured'] ? 'Geconfigureerd' : 'Niet ingesteld' }}</span></div>
+                    <p class="mt-4 text-sm leading-relaxed text-slate-300">Provisioning gebruikt een reselleraccount. Het wachtwoord blijft uitsluitend in de serveromgeving.</p>
+                    <div class="mt-5 rounded-xl bg-white/5 p-4 ring-1 ring-white/10"><span class="block text-xs font-medium uppercase tracking-wide text-slate-500">URL</span><code class="mt-2 block break-all text-sm text-slate-200">{{ $directAdminStatus['url'] ?: 'DIRECTADMIN_URL niet ingesteld' }}</code><span class="mt-3 block text-xs font-medium uppercase tracking-wide text-slate-500">Reseller</span><code class="mt-2 block text-sm text-slate-200">{{ $directAdminStatus['username'] ?: 'DIRECTADMIN_USERNAME niet ingesteld' }}</code><span class="mt-3 block text-xs font-medium uppercase tracking-wide text-slate-500">Gedeeld IP</span><code class="mt-2 block text-sm text-slate-200">{{ $directAdminStatus['shared_ip'] ?: 'DIRECTADMIN_SHARED_IP niet ingesteld' }}</code></div>
+                </div>
             </aside>
         </div>
     </div>

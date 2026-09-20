@@ -16,6 +16,13 @@ class CustomerService extends Model
         'user_id',
         'service_id',
         'service_price_id',
+        'domain',
+        'external_username',
+        'external_password',
+        'provisioning_status',
+        'provisioning_error',
+        'provisioned_at',
+        'external_suspended_at',
         'status',
         'suspension_reason',
         'suspended_at',
@@ -41,6 +48,9 @@ class CustomerService extends Model
         'next_invoice_date' => 'date',
         'cancelled_at' => 'datetime',
         'suspended_at' => 'datetime',
+        'provisioned_at' => 'datetime',
+        'external_suspended_at' => 'datetime',
+        'external_password' => 'encrypted',
         'end_date' => 'date',
         'price' => 'decimal:2',
         'auto_renew' => 'boolean',
@@ -123,8 +133,12 @@ class CustomerService extends Model
                 'color' => 'gray'
             ],
             'suspended' => [
-                'text' => $this->suspension_reason === 'non_payment' ? 'Geschorst wegens wanbetaling' : 'In afwachting',
-                'color' => $this->suspension_reason === 'non_payment' ? 'red' : 'yellow'
+                'text' => match ($this->suspension_reason) {
+                    'non_payment' => 'Geschorst wegens wanbetaling',
+                    'provisioning_failed' => 'Provisioning mislukt',
+                    default => 'In afwachting',
+                },
+                'color' => in_array($this->suspension_reason, ['non_payment', 'provisioning_failed'], true) ? 'red' : 'yellow'
             ],
             'cancelled' => [
                 'text' => 'Geannuleerd',
