@@ -87,6 +87,11 @@ class Invoice extends Model
         return $this->belongsTo(CustomerService::class);
     }
 
+    public function dunningEvents()
+    {
+        return $this->hasMany(InvoiceDunningEvent::class);
+    }
+
     public function getStatusLabelAttribute(): array
     {
         $colors = [

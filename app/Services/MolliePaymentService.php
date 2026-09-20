@@ -105,7 +105,7 @@ class MolliePaymentService
         return $customer->id;
     }
 
-    private function applyPaidInvoice(Invoice $invoice): void
+    public function finalizePaidInvoice(Invoice $invoice): void
     {
         $customerService = $invoice->customerService
             ?? CustomerService::find($invoice->lines()->whereNotNull('customer_service_id')->value('customer_service_id'));
@@ -115,7 +115,11 @@ class MolliePaymentService
             } elseif (!$customerService->current_period_start) {
                 $this->periods->activateInitialPeriod($customerService);
             } else {
-                $customerService->update(['status' => 'active']);
+                $customerService->update([
+                    'status' => 'active',
+                    'suspension_reason' => null,
+                    'suspended_at' => null,
+                ]);
             }
         }
 
@@ -135,7 +139,7 @@ class MolliePaymentService
 
         if ($payment->isPaid()) {
             if ($invoice->status === 'betaald') {
-                $this->applyPaidInvoice($invoice);
+                $this->finalizePaidInvoice($invoice);
                 return;
             }
 
@@ -157,7 +161,7 @@ class MolliePaymentService
                 'reference' => $paymentId,
             ]);
 
-            $this->applyPaidInvoice($invoice);
+            $this->finalizePaidInvoice($invoice);
 
             TransactionLog::create([
                 'user_id' => $invoice->user_id,

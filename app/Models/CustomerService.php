@@ -17,6 +17,8 @@ class CustomerService extends Model
         'service_id',
         'service_price_id',
         'status',
+        'suspension_reason',
+        'suspended_at',
         'price',
         'price_type',
         'billing_cycle',
@@ -38,6 +40,7 @@ class CustomerService extends Model
         'current_period_end' => 'date',
         'next_invoice_date' => 'date',
         'cancelled_at' => 'datetime',
+        'suspended_at' => 'datetime',
         'end_date' => 'date',
         'price' => 'decimal:2',
         'auto_renew' => 'boolean',
@@ -120,8 +123,8 @@ class CustomerService extends Model
                 'color' => 'gray'
             ],
             'suspended' => [
-                'text' => 'In afwachting',
-                'color' => 'yellow'
+                'text' => $this->suspension_reason === 'non_payment' ? 'Geschorst wegens wanbetaling' : 'In afwachting',
+                'color' => $this->suspension_reason === 'non_payment' ? 'red' : 'yellow'
             ],
             'cancelled' => [
                 'text' => 'Geannuleerd',

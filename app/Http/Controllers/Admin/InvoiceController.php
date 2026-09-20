@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Models\TransactionLog;
 use App\Services\InvoiceService;
+use App\Services\MolliePaymentService;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -114,10 +115,10 @@ class InvoiceController extends Controller
             ->with('success', "Factuur {$invoiceNumber} is verwijderd.");
     }
 
-    public function updateStatus(Request $request, Invoice $invoice)
+    public function updateStatus(Request $request, Invoice $invoice, MolliePaymentService $payments)
     {
         $request->validate([
-            'status' => 'required|in:concept,openstaand,te_laat,betaald,geannuleerd,gecrediteerd,in_behandeling',
+            'status' => 'required|in:concept,verzonden,openstaand,vervallen,te_laat,betaald,geannuleerd,gecrediteerd,in_behandeling',
         ]);
 
         $oldStatus = $invoice->status;
@@ -126,6 +127,9 @@ class InvoiceController extends Controller
             'paid_at' => $request->status === 'betaald' ? ($invoice->paid_at ?? now()) : $invoice->paid_at,
             'sent_at' => $request->status === 'openstaand' ? ($invoice->sent_at ?? now()) : $invoice->sent_at,
         ]);
+        if ($request->status === 'betaald') {
+            $payments->finalizePaidInvoice($invoice);
+        }
 
         TransactionLog::create([
             'user_id' => $invoice->user_id,
@@ -152,7 +156,7 @@ class InvoiceController extends Controller
         return back()->with('success', 'Notitie is toegevoegd.');
     }
 
-    public function storePayment(Request $request, Invoice $invoice)
+    public function storePayment(Request $request, Invoice $invoice, MolliePaymentService $payments)
     {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
@@ -176,6 +180,7 @@ class InvoiceController extends Controller
         $totalPaid = $invoice->transactions()->where('status', 'voltooid')->sum('amount');
         if ($totalPaid >= $invoice->total) {
             $invoice->update(['status' => 'betaald', 'paid_at' => now()]);
+            $payments->finalizePaidInvoice($invoice);
         }
 
         TransactionLog::create([
@@ -209,12 +214,13 @@ class InvoiceController extends Controller
         return back()->with('success', 'Factuur is gemarkeerd als openstaand.');
     }
 
-    public function markPaid(Invoice $invoice)
+    public function markPaid(Invoice $invoice, MolliePaymentService $payments)
     {
         $invoice->update([
             'status' => 'betaald',
             'paid_at' => now(),
         ]);
+        $payments->finalizePaidInvoice($invoice);
 
         TransactionLog::create([
             'user_id' => $invoice->user_id,

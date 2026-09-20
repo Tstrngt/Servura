@@ -29,6 +29,8 @@ class SubscriptionPeriodService
         $end = $this->endFor($customerService->billing_cycle ?? $customerService->price_type, $start);
         $customerService->update([
             'status' => 'active',
+            'suspension_reason' => null,
+            'suspended_at' => null,
             'start_date' => $start,
             'current_period_start' => $start,
             'current_period_end' => $end,
@@ -41,6 +43,8 @@ class SubscriptionPeriodService
     {
         $customerService->update([
             'status' => 'active',
+            'suspension_reason' => null,
+            'suspended_at' => null,
             'current_period_start' => $start,
             'current_period_end' => $end,
             'end_date' => $end,

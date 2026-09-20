@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Services\DunningService;
 use App\Services\RenewalService;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -17,6 +18,10 @@ class Kernel extends ConsoleKernel
         $schedule->call(fn () => app(RenewalService::class)->run())
             ->name('billing:generate-renewals')
             ->dailyAt('02:00')
+            ->withoutOverlapping();
+        $schedule->call(fn () => app(DunningService::class)->run())
+            ->name('billing:process-dunning')
+            ->dailyAt('03:00')
             ->withoutOverlapping();
     }
 

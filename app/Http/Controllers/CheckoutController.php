@@ -98,6 +98,7 @@ class CheckoutController extends Controller
                 'service_id' => $service->id,
                 'service_price_id' => $price->id,
                 'status' => 'suspended',
+                'suspension_reason' => 'pending_payment',
                 'price' => $price->price,
                 'price_type' => $price->billing_cycle,
                 'billing_cycle' => $price->billing_cycle,

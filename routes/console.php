@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\DunningService;
 use App\Services\RenewalService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -25,3 +26,10 @@ Artisan::command('billing:renewals', function (RenewalService $renewals) {
         $result['created'], $result['automatic'], $result['payment_links'], $result['failed'],
     ]]);
 })->purpose('Maak verschuldigde verlengingsfacturen aan en start de betaling');
+
+Artisan::command('billing:dunning', function (DunningService $dunning) {
+    $result = $dunning->run();
+    $this->table(['Vervallen', 'Herinneringen', 'Geschorst', 'Mislukt'], [[
+        $result['overdue'], $result['reminders'], $result['suspended'], $result['failed'],
+    ]]);
+})->purpose('Verwerk vervallen facturen, herinneringen en suspension');
