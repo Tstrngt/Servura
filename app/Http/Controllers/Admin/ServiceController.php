@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BillingSetting;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\ServicePrice;
@@ -59,8 +60,9 @@ class ServiceController extends Controller
     {
         $categories = ServiceCategory::active()->ordered()->get();
         $billingCycles = ServicePrice::CYCLES;
+        $vatRate = BillingSetting::decimal('default_vat_rate', 21.0);
 
-        return view('admin.services.create', compact('categories', 'billingCycles'));
+        return view('admin.services.create', compact('categories', 'billingCycles', 'vatRate'));
     }
 
     public function store(Request $request)
@@ -142,8 +144,9 @@ class ServiceController extends Controller
         $service->load('prices');
         $categories = ServiceCategory::ordered()->get();
         $billingCycles = ServicePrice::CYCLES;
+        $vatRate = BillingSetting::decimal('default_vat_rate', 21.0);
 
-        return view('admin.services.edit', compact('service', 'categories', 'billingCycles'));
+        return view('admin.services.edit', compact('service', 'categories', 'billingCycles', 'vatRate'));
     }
 
     public function update(Request $request, Service $service)

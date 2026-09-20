@@ -35,6 +35,8 @@ class ServicePrice extends Model
 
     public function getPriceIncludingVatAttribute(): string
     {
-        return number_format((float) $this->price * 1.21, 2, ',', '.');
+        $multiplier = 1 + (BillingSetting::decimal('default_vat_rate', 21.0) / 100);
+
+        return number_format((float) $this->price * $multiplier, 2, ',', '.');
     }
 }

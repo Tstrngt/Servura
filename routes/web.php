@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Admin\BillingSettingsController as AdminBillingSettingsController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
@@ -143,6 +144,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/service-categories', [AdminServiceCategoryController::class, 'store'])->name('service-categories.store');
         Route::put('/service-categories/{serviceCategory}', [AdminServiceCategoryController::class, 'update'])->name('service-categories.update');
         Route::delete('/service-categories/{serviceCategory}', [AdminServiceCategoryController::class, 'destroy'])->name('service-categories.destroy');
+        Route::get('/billing-settings', [AdminBillingSettingsController::class, 'edit'])->name('billing-settings.edit');
+        Route::put('/billing-settings', [AdminBillingSettingsController::class, 'update'])->name('billing-settings.update');
 
         // Financial
         Route::prefix('financial')->name('financial.')->group(function () {

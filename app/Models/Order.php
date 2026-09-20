@@ -11,12 +11,14 @@ class Order extends Model
 
     protected $fillable = [
         'order_number', 'user_id', 'service_id', 'service_price_id', 'customer_service_id',
-        'invoice_id', 'billing_cycle', 'fulfillment_type', 'subtotal', 'vat_amount', 'total',
+        'invoice_id', 'billing_cycle', 'fulfillment_type', 'subtotal', 'vat_percentage',
+        'billing_country', 'vat_amount', 'total',
         'status', 'paid_at',
     ];
 
     protected $casts = [
         'subtotal' => 'decimal:2',
+        'vat_percentage' => 'decimal:2',
         'vat_amount' => 'decimal:2',
         'total' => 'decimal:2',
         'paid_at' => 'datetime',

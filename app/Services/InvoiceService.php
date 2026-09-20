@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\BillingSetting;
 use App\Models\Invoice;
 use App\Models\InvoiceLine;
 use App\Models\CustomerService;
@@ -13,14 +14,14 @@ class InvoiceService
     /**
      * Generate an invoice for a customer service assignment.
      */
-    public function createFromCustomerService(CustomerService $customerService, ?int $performedBy = null): Invoice
+    public function createFromCustomerService(CustomerService $customerService, ?int $performedBy = null, ?float $vatRate = null): Invoice
     {
         $invoice = Invoice::create([
             'invoice_number' => Invoice::generateNumber(),
             'user_id' => $customerService->user_id,
             'invoice_date' => now(),
-            'due_date' => now()->addDays(14),
-            'vat_percentage' => 21.00,
+            'due_date' => now()->addDays(BillingSetting::integer('invoice_due_days', 14)),
+            'vat_percentage' => $vatRate ?? BillingSetting::decimal('default_vat_rate', 21.0),
             'status' => 'concept',
         ]);
 
@@ -70,8 +71,8 @@ class InvoiceService
             'invoice_number' => Invoice::generateNumber(),
             'user_id' => $customer->id,
             'invoice_date' => now(),
-            'due_date' => now()->addDays(14),
-            'vat_percentage' => 21.00,
+            'due_date' => now()->addDays(BillingSetting::integer('invoice_due_days', 14)),
+            'vat_percentage' => BillingSetting::decimal('default_vat_rate', 21.0),
             'status' => 'concept',
             'notes' => $notes,
         ]);

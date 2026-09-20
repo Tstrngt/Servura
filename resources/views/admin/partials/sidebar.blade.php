@@ -25,6 +25,9 @@
         <a href="{{ route('admin.financial.invoices') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.financial.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Financieel
         </a>
+        <a href="{{ route('admin.billing-settings.edit') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.billing-settings.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
+            Facturatie-instellingen
+        </a>
     </nav>
     <div class="border-t border-slate-700 p-4">
         <p class="truncate text-sm font-medium text-white">{{ Auth::user()->name }}</p>
@@ -44,5 +47,6 @@
         <a href="{{ route('admin.services.index') }}">Diensten</a>
         <a href="{{ route('admin.service-categories.index') }}">Categorieën</a>
         <a href="{{ route('admin.financial.invoices') }}">Financieel</a>
+        <a href="{{ route('admin.billing-settings.edit') }}">Instellingen</a>
     </div>
 </div>

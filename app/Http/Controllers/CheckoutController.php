@@ -9,6 +9,7 @@ use App\Models\ServicePrice;
 use App\Models\User;
 use App\Services\InvoiceService;
 use App\Services\MolliePaymentService;
+use App\Services\TaxService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,7 @@ use Illuminate\Validation\Rule;
 
 class CheckoutController extends Controller
 {
-    public function show(Service $service)
+    public function show(Service $service, TaxService $taxService)
     {
         abort_unless($service->is_active, 404);
         abort_if(Auth::check() && Auth::user()->canAccessAdmin(), 403);
@@ -25,14 +26,18 @@ class CheckoutController extends Controller
         $service->load(['category', 'prices' => fn ($query) => $query->where('is_enabled', true)]);
         abort_if($service->prices->isEmpty(), 404);
 
-        return view('checkout', compact('service'));
+        $countries = TaxService::COUNTRIES;
+        $countryRates = $taxService->ratesForCheckout();
+
+        return view('checkout', compact('service', 'countries', 'countryRates'));
     }
 
     public function store(
         Request $request,
         Service $service,
         InvoiceService $invoiceService,
-        MolliePaymentService $molliePaymentService
+        MolliePaymentService $molliePaymentService,
+        TaxService $taxService
     ) {
         abort_unless($service->is_active, 404);
         abort_if(Auth::check() && Auth::user()->canAccessAdmin(), 403);
@@ -51,7 +56,7 @@ class CheckoutController extends Controller
             'house_number' => 'required|string|max:30',
             'postal_code' => 'required|string|max:20',
             'city' => 'required|string|max:100',
-            'country' => 'required|string|max:100',
+            'country' => ['required', 'string', 'size:2', Rule::in(array_keys(TaxService::COUNTRIES))],
             'kvk_number' => 'nullable|string|max:30',
             'vat_number' => 'nullable|string|max:30',
             'terms' => 'accepted',
@@ -67,8 +72,9 @@ class CheckoutController extends Controller
             ->where('service_id', $service->id)
             ->where('is_enabled', true)
             ->firstOrFail();
+        $tax = $taxService->calculate((float) $price->price, $validated['country']);
 
-        [$order, $user] = DB::transaction(function () use ($validated, $service, $price, $invoiceService) {
+        [$order, $user] = DB::transaction(function () use ($validated, $service, $price, $tax, $invoiceService) {
             $user = Auth::user();
             $userData = collect($validated)->only([
                 'name', 'company', 'phone', 'street', 'house_number', 'postal_code', 'city',
@@ -96,9 +102,9 @@ class CheckoutController extends Controller
                 'notes' => 'Aangemaakt via online bestelling; wacht op betaling.',
             ]);
 
-            $invoice = $invoiceService->createFromCustomerService($customerService, $user->id);
+            $invoice = $invoiceService->createFromCustomerService($customerService, $user->id, $tax['rate']);
             $subtotal = (float) $price->price;
-            $vatAmount = round($subtotal * 0.21, 2);
+            $vatAmount = $tax['amount'];
             $order = Order::create([
                 'order_number' => Order::generateNumber(),
                 'user_id' => $user->id,
@@ -109,8 +115,10 @@ class CheckoutController extends Controller
                 'billing_cycle' => $price->billing_cycle,
                 'fulfillment_type' => $service->fulfillment_type,
                 'subtotal' => $subtotal,
+                'vat_percentage' => $tax['rate'],
+                'billing_country' => $validated['country'],
                 'vat_amount' => $vatAmount,
-                'total' => $subtotal + $vatAmount,
+                'total' => $tax['total'],
                 'status' => 'pending_payment',
             ]);
 

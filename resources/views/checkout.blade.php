@@ -6,9 +6,10 @@
 @php
     $initialPrice = $service->prices->first();
     $user = auth()->user();
+    $initialCountry = old('country', array_key_exists((string) $user?->country, $countries) ? $user->country : 'NL');
 @endphp
 <div class="min-h-screen bg-slate-50 py-12 lg:py-16">
-    <form action="{{ route('checkout.store', $service) }}" method="POST" x-data="{ selected: @js((string) old('service_price_id', $initialPrice->id)), prices: @js($service->prices->mapWithKeys(fn ($price) => [(string) $price->id => (float) $price->price])), submitting: false }" @submit="submitting = true" class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:px-8">
+    <form action="{{ route('checkout.store', $service) }}" method="POST" x-data="{ selected: @js((string) old('service_price_id', $initialPrice->id)), country: @js($initialCountry), prices: @js($service->prices->mapWithKeys(fn ($price) => [(string) $price->id => (float) $price->price])), rates: @js($countryRates), submitting: false, rate() { return Number(this.rates[this.country] ?? 0) } }" @submit="submitting = true" class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:px-8">
         @csrf
         <div class="space-y-6">
             <div>
@@ -25,7 +26,7 @@
                             <input type="radio" name="service_price_id" value="{{ $price->id }}" x-model="selected" class="sr-only">
                             <span class="block text-sm font-semibold text-slate-900">{{ $price->label }}</span>
                             <span class="mt-2 block text-xl font-bold text-slate-900">€ {{ number_format($price->price, 2, ',', '.') }}</span>
-                            <span class="mt-1 block text-xs text-slate-500">€ {{ $price->price_including_vat }} inclusief BTW</span>
+                            <span class="mt-1 block text-xs text-slate-500"><span x-text="'€ ' + Number({{ (float) $price->price }} * (1 + rate() / 100)).toLocaleString('nl-NL', {minimumFractionDigits: 2})"></span> inclusief BTW</span>
                         </label>
                     @endforeach
                 </div>
@@ -52,7 +53,7 @@
                     <div class="form-group"><label class="form-label" for="house_number">Huisnummer *</label><input class="form-input" id="house_number" name="house_number" required value="{{ old('house_number', $user?->house_number) }}"></div>
                     <div class="form-group"><label class="form-label" for="postal_code">Postcode *</label><input class="form-input" id="postal_code" name="postal_code" required value="{{ old('postal_code', $user?->postal_code) }}"></div>
                     <div class="form-group"><label class="form-label" for="city">Plaats *</label><input class="form-input" id="city" name="city" required value="{{ old('city', $user?->city) }}"></div>
-                    <div class="form-group"><label class="form-label" for="country">Land *</label><input class="form-input" id="country" name="country" required value="{{ old('country', $user?->country ?? 'Nederland') }}"></div>
+                    <div class="form-group"><label class="form-label" for="country">Land *</label><select class="form-input" id="country" name="country" x-model="country" required>@foreach($countries as $code => $name)<option value="{{ $code }}">{{ $name }}</option>@endforeach</select></div>
                     <div class="form-group"><label class="form-label" for="kvk_number">KvK-nummer</label><input class="form-input" id="kvk_number" name="kvk_number" value="{{ old('kvk_number', $user?->kvk_number) }}"></div>
                     <div class="form-group sm:col-span-2"><label class="form-label" for="vat_number">BTW-nummer</label><input class="form-input" id="vat_number" name="vat_number" value="{{ old('vat_number', $user?->vat_number) }}"></div>
                 </div>
@@ -66,8 +67,8 @@
                 <p class="mt-2 text-sm leading-relaxed text-slate-300">{{ $service->short_description }}</p>
                 <dl class="mt-6 space-y-3 border-y border-white/10 py-5 text-sm">
                     <div class="flex justify-between gap-4"><dt class="text-slate-400">Exclusief BTW</dt><dd x-text="'€ ' + Number(prices[selected] || 0).toLocaleString('nl-NL', {minimumFractionDigits: 2})"></dd></div>
-                    <div class="flex justify-between gap-4"><dt class="text-slate-400">BTW (21%)</dt><dd x-text="'€ ' + Number((prices[selected] || 0) * .21).toLocaleString('nl-NL', {minimumFractionDigits: 2})"></dd></div>
-                    <div class="flex items-end justify-between gap-4 pt-2"><dt class="font-semibold">Totaal</dt><dd class="text-2xl font-bold" x-text="'€ ' + Number((prices[selected] || 0) * 1.21).toLocaleString('nl-NL', {minimumFractionDigits: 2})"></dd></div>
+                    <div class="flex justify-between gap-4"><dt class="text-slate-400">BTW (<span x-text="rate().toLocaleString('nl-NL')"></span>%)</dt><dd x-text="'€ ' + Number((prices[selected] || 0) * (rate() / 100)).toLocaleString('nl-NL', {minimumFractionDigits: 2})"></dd></div>
+                    <div class="flex items-end justify-between gap-4 pt-2"><dt class="font-semibold">Totaal</dt><dd class="text-2xl font-bold" x-text="'€ ' + Number((prices[selected] || 0) * (1 + rate() / 100)).toLocaleString('nl-NL', {minimumFractionDigits: 2})"></dd></div>
                 </dl>
                 <label class="mt-5 flex items-start gap-3 text-sm text-slate-300"><input type="checkbox" name="terms" value="1" required class="mt-1 rounded border-slate-500 bg-slate-800 text-primary-500"><span>Ik ga akkoord met de algemene voorwaarden en de betalingsverplichting.</span></label>
                 @error('terms')<span class="mt-2 block text-sm text-red-300">{{ $message }}</span>@enderror

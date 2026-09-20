@@ -106,7 +106,7 @@
                             <section x-cloak x-show="activeTab === 'pricing'" data-tab="pricing">
                                 <div class="mb-4 border-b pb-2">
                                     <h3 class="text-md font-semibold text-gray-900">Prijsvariaties</h3>
-                                    <p class="mt-1 text-xs text-slate-500">Bedragen zijn exclusief 21% BTW; het bedrag inclusief BTW wordt direct berekend.</p>
+                                    <p class="mt-1 text-xs text-slate-500">Bedragen zijn exclusief {{ number_format($vatRate, 2, ',', '.') }}% BTW; het bedrag inclusief BTW wordt direct berekend.</p>
                                 </div>
                                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     @foreach($billingCycles as $cycle => $label)
@@ -122,7 +122,7 @@
                                                 {{ $label }}
                                             </label>
                                             <input type="number" name="prices[{{ $cycle }}][amount]" x-model="amount" step="0.01" min="0" class="form-input" placeholder="0,00">
-                                            <p class="mt-2 text-xs text-slate-500">Incl. BTW: <strong class="text-slate-700" x-text="amount ? '€ ' + (Number(amount) * 1.21).toLocaleString('nl-NL', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—'"></strong></p>
+                                            <p class="mt-2 text-xs text-slate-500">Incl. BTW: <strong class="text-slate-700" x-text="amount ? '€ ' + (Number(amount) * {{ 1 + ($vatRate / 100) }}).toLocaleString('nl-NL', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—'"></strong></p>
                                         </div>
                                     @endforeach
                                 </div>
