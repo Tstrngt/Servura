@@ -21,6 +21,8 @@
             </div>
         </div>
 
+        @include('admin.partials.services-nav')
+
         @if(session('success'))
             <div class="px-4 sm:px-0 mb-4">
                 <div class="rounded-md bg-green-50 p-4">
@@ -104,7 +106,7 @@
                                         </td>
                                         <td class="px-4 py-4 text-sm text-gray-900">
                                             <div class="truncate font-medium">{{ $service->category?->name ?? $service->service_type_label }}</div>
-                                            <div class="mt-0.5 text-xs text-slate-500">{{ $service->fulfillment_type === 'directadmin' ? 'DirectAdmin' : 'Handmatig' }}</div>
+                                            <div class="mt-0.5 truncate text-xs text-slate-500">{{ $service->fulfillment_type === 'directadmin' ? ($service->serverConnection?->name ?? 'Geen server gekoppeld') : 'Handmatig' }}</div>
                                         </td>
                                         <td class="px-4 py-4 text-sm text-gray-900">
                                             <div class="font-medium">{{ $service->formatted_price }}</div>

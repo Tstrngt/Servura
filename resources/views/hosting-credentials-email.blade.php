@@ -7,7 +7,7 @@
 <tr><td style="padding:32px">
 <h1 style="margin:0 0 16px;font-size:24px">Uw hostingaccount is gereed</h1>
 <p style="margin:0 0 20px;line-height:1.6;color:#475569">Beste {{ $customerService->user->name }}, het hostingaccount voor <strong>{{ $customerService->domain }}</strong> is automatisch aangemaakt.</p>
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:24px;background:#f8fafc;border-radius:12px"><tr><td style="padding:18px;line-height:1.9"><strong>Domein:</strong> {{ $customerService->domain }}<br><strong>Gebruikersnaam:</strong> {{ $customerService->external_username }}<br><strong>Tijdelijk wachtwoord:</strong> {{ $customerService->external_password }}<br><strong>DirectAdmin:</strong> {{ rtrim(config('directadmin.url'), '/') }}</td></tr></table>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:24px;background:#f8fafc;border-radius:12px"><tr><td style="padding:18px;line-height:1.9"><strong>Domein:</strong> {{ $customerService->domain }}<br><strong>Gebruikersnaam:</strong> {{ $customerService->external_username }}<br><strong>Tijdelijk wachtwoord:</strong> {{ $customerService->external_password }}<br><strong>DirectAdmin:</strong> {{ rtrim($customerService->service->serverConnection->url, '/') }}</td></tr></table>
 <p style="margin:0;line-height:1.6;color:#475569">Log in en wijzig het tijdelijke wachtwoord zo snel mogelijk. Bewaar deze gegevens op een veilige plek.</p>
 </td></tr></table>
 </td></tr></table>

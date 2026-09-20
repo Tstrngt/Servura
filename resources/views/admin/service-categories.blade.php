@@ -12,6 +12,8 @@
             <p class="mt-1 text-sm text-slate-600">Groepeer producten voor beheer, catalogus en checkout.</p>
         </div>
 
+        @include('admin.partials.services-nav')
+
         <div class="grid grid-cols-1 gap-6 xl:grid-cols-[380px_minmax(0,1fr)]">
             <form action="{{ route('admin.service-categories.store') }}" method="POST" class="h-fit rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
                 @csrf

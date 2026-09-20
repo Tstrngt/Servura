@@ -37,8 +37,8 @@
 
                 <div class="mt-7 border-t border-white/10 pt-6">
                     <div class="flex items-center justify-between gap-4"><h2 class="text-lg font-semibold">DirectAdmin</h2><span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $directAdminStatus['configured'] ? 'bg-emerald-400/15 text-emerald-300' : 'bg-red-400/15 text-red-300' }}">{{ $directAdminStatus['configured'] ? 'Geconfigureerd' : 'Niet ingesteld' }}</span></div>
-                    <p class="mt-4 text-sm leading-relaxed text-slate-300">Provisioning gebruikt een reselleraccount. Het wachtwoord blijft uitsluitend in de serveromgeving.</p>
-                    <div class="mt-5 rounded-xl bg-white/5 p-4 ring-1 ring-white/10"><span class="block text-xs font-medium uppercase tracking-wide text-slate-500">URL</span><code class="mt-2 block break-all text-sm text-slate-200">{{ $directAdminStatus['url'] ?: 'DIRECTADMIN_URL niet ingesteld' }}</code><span class="mt-3 block text-xs font-medium uppercase tracking-wide text-slate-500">Reseller</span><code class="mt-2 block text-sm text-slate-200">{{ $directAdminStatus['username'] ?: 'DIRECTADMIN_USERNAME niet ingesteld' }}</code><span class="mt-3 block text-xs font-medium uppercase tracking-wide text-slate-500">Gedeeld IP</span><code class="mt-2 block text-sm text-slate-200">{{ $directAdminStatus['shared_ip'] ?: 'DIRECTADMIN_SHARED_IP niet ingesteld' }}</code></div>
+                    <p class="mt-4 text-sm leading-relaxed text-slate-300">{{ $directAdminStatus['active'] }} actieve koppeling(en), {{ $directAdminStatus['total'] }} totaal. Credentials worden versleuteld opgeslagen.</p>
+                    <a href="{{ route('admin.server-connections.index') }}" class="mt-5 inline-flex w-full items-center justify-center rounded-lg bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/15 hover:bg-white/15">Serverkoppelingen beheren</a>
                 </div>
             </aside>
         </div>

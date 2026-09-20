@@ -48,7 +48,13 @@ Artisan::command('provisioning:retry {service?}', function (ProvisioningService 
     $failed = 0;
     foreach ($query->get() as $customerService) {
         try {
-            $provisioning->provision($customerService);
+            if (!$customerService->provisioned_at) {
+                $provisioning->provision($customerService);
+            } elseif ($customerService->status === 'suspended' && $customerService->suspension_reason === 'non_payment') {
+                $provisioning->suspend($customerService);
+            } else {
+                $provisioning->unsuspend($customerService);
+            }
             $succeeded++;
         } catch (Throwable $exception) {
             $failed++;

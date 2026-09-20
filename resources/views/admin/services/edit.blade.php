@@ -22,6 +22,8 @@
             </div>
         </div>
 
+        @include('admin.partials.services-nav')
+
         <!-- Form -->
         <div>
             <div class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
@@ -77,10 +79,18 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="directadmin_package" class="form-label">DirectAdmin-pakket</label>
-                                <input type="text" id="directadmin_package" name="directadmin_package" class="form-input" value="{{ old('directadmin_package', $service->directadmin_package) }}" placeholder="Bijvoorbeeld: hosting_starter">
-                                <p class="mt-1 text-xs text-slate-500">Exacte package-naam uit het reselleraccount.</p>
-                                @error('directadmin_package')<span class="form-error">{{ $message }}</span>@enderror
+                                <label for="server_connection_id" class="form-label">Serverkoppeling</label>
+                                <select id="server_connection_id" name="server_connection_id" class="form-input">
+                                    <option value="">Geen serverkoppeling</option>
+                                    @foreach($serverConnections as $connection)<option value="{{ $connection->id }}" {{ old('server_connection_id', $service->server_connection_id) == $connection->id ? 'selected' : '' }}>{{ $connection->name }} · {{ $connection->provider_label }}{{ !$connection->is_active ? ' (inactief)' : '' }}</option>@endforeach
+                                </select>
+                                @error('server_connection_id')<span class="form-error">{{ $message }}</span>@enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="provider_package" class="form-label">Providerpakket</label>
+                                <input type="text" id="provider_package" name="provider_package" class="form-input" value="{{ old('provider_package', $service->provider_package ?? $service->directadmin_package) }}" placeholder="Bijvoorbeeld: hosting_starter">
+                                <p class="mt-1 text-xs text-slate-500">Exacte pakketnaam bij de gekozen provider.</p>
+                                @error('provider_package')<span class="form-error">{{ $message }}</span>@enderror
                             </div>
                             <div class="form-group">
                                 <label for="image_url" class="form-label">Afbeelding URL</label>

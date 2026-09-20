@@ -16,11 +16,8 @@
         <a href="{{ route('admin.customers.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.customers.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Klanten
         </a>
-        <a href="{{ route('admin.services.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.services.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
+        <a href="{{ route('admin.services.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.services.*', 'admin.service-categories.*', 'admin.server-connections.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Diensten
-        </a>
-        <a href="{{ route('admin.service-categories.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.service-categories.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
-            Productcategorieën
         </a>
         <a href="{{ route('admin.financial.invoices') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.financial.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Financieel
@@ -45,7 +42,6 @@
         <a href="{{ route('admin.tickets.index') }}">Tickets</a>
         <a href="{{ route('admin.customers.index') }}">Klanten</a>
         <a href="{{ route('admin.services.index') }}">Diensten</a>
-        <a href="{{ route('admin.service-categories.index') }}">Categorieën</a>
         <a href="{{ route('admin.financial.invoices') }}">Financieel</a>
         <a href="{{ route('admin.billing-settings.edit') }}">Instellingen</a>
     </div>

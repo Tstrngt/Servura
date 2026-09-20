@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BillingSetting;
-use App\Services\DirectAdminClient;
+use App\Models\ServerConnection;
 use Illuminate\Http\Request;
 
 class BillingSettingsController extends Controller
 {
-    public function edit(DirectAdminClient $directAdmin)
+    public function edit()
     {
         $settings = [
             'default_vat_rate' => BillingSetting::decimal('default_vat_rate', 21.0),
@@ -25,11 +25,12 @@ class BillingSettingsController extends Controller
             'mode' => !$mollieConfigured ? 'unknown' : (str_starts_with($mollieKey, 'live_') ? 'live' : 'test'),
         ];
 
+        $directAdminConnections = ServerConnection::where('provider', 'directadmin')->count();
+        $activeDirectAdminConnections = ServerConnection::active()->where('provider', 'directadmin')->count();
         $directAdminStatus = [
-            'configured' => $directAdmin->isConfigured(),
-            'url' => config('directadmin.url'),
-            'username' => config('directadmin.username'),
-            'shared_ip' => config('directadmin.shared_ip'),
+            'configured' => $activeDirectAdminConnections > 0,
+            'total' => $directAdminConnections,
+            'active' => $activeDirectAdminConnections,
         ];
 
         return view('admin.billing-settings', compact('settings', 'mollie', 'directAdminStatus'));

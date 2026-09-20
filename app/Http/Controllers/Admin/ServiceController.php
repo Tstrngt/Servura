@@ -7,6 +7,7 @@ use App\Models\BillingSetting;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\ServicePrice;
+use App\Models\ServerConnection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -21,7 +22,7 @@ class ServiceController extends Controller
 
     public function index(Request $request)
     {
-        $query = Service::with(['category', 'prices']);
+        $query = Service::with(['category', 'prices', 'serverConnection']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -61,8 +62,9 @@ class ServiceController extends Controller
         $categories = ServiceCategory::active()->ordered()->get();
         $billingCycles = ServicePrice::CYCLES;
         $vatRate = BillingSetting::decimal('default_vat_rate', 21.0);
+        $serverConnections = ServerConnection::active()->orderBy('name')->get();
 
-        return view('admin.services.create', compact('categories', 'billingCycles', 'vatRate'));
+        return view('admin.services.create', compact('categories', 'billingCycles', 'vatRate', 'serverConnections'));
     }
 
     public function store(Request $request)
@@ -72,7 +74,8 @@ class ServiceController extends Controller
             'service_category_id' => 'nullable|exists:service_categories,id',
             'service_type' => 'required|in:website_pakket,hosting,custom',
             'fulfillment_type' => 'required|in:manual,directadmin',
-            'directadmin_package' => 'nullable|required_if:fulfillment_type,directadmin|string|max:100',
+            'server_connection_id' => 'nullable|required_if:fulfillment_type,directadmin|exists:server_connections,id',
+            'provider_package' => 'nullable|required_if:fulfillment_type,directadmin|string|max:100',
             'short_description' => 'required|string|max:500',
             'description' => 'required|string',
             'image_url' => 'nullable|string|max:500',
@@ -110,6 +113,13 @@ class ServiceController extends Controller
         $validated['show_on_homepage'] = $request->boolean('show_on_homepage');
         $validated['show_on_services_page'] = $request->boolean('show_on_services_page');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        if ($validated['fulfillment_type'] === 'manual') {
+            $validated['server_connection_id'] = null;
+            $validated['provider_package'] = null;
+            $validated['directadmin_package'] = null;
+        } else {
+            $validated['directadmin_package'] = $validated['provider_package'];
+        }
 
         // Parse features from textarea (one per line)
         if (!empty($validated['features'])) {
@@ -146,8 +156,9 @@ class ServiceController extends Controller
         $categories = ServiceCategory::ordered()->get();
         $billingCycles = ServicePrice::CYCLES;
         $vatRate = BillingSetting::decimal('default_vat_rate', 21.0);
+        $serverConnections = ServerConnection::orderBy('name')->get();
 
-        return view('admin.services.edit', compact('service', 'categories', 'billingCycles', 'vatRate'));
+        return view('admin.services.edit', compact('service', 'categories', 'billingCycles', 'vatRate', 'serverConnections'));
     }
 
     public function update(Request $request, Service $service)
@@ -157,7 +168,8 @@ class ServiceController extends Controller
             'service_category_id' => 'nullable|exists:service_categories,id',
             'service_type' => 'required|in:website_pakket,hosting,custom',
             'fulfillment_type' => 'required|in:manual,directadmin',
-            'directadmin_package' => 'nullable|required_if:fulfillment_type,directadmin|string|max:100',
+            'server_connection_id' => 'nullable|required_if:fulfillment_type,directadmin|exists:server_connections,id',
+            'provider_package' => 'nullable|required_if:fulfillment_type,directadmin|string|max:100',
             'short_description' => 'required|string|max:500',
             'description' => 'required|string',
             'image_url' => 'nullable|string|max:500',
@@ -195,6 +207,13 @@ class ServiceController extends Controller
         $validated['show_on_homepage'] = $request->boolean('show_on_homepage');
         $validated['show_on_services_page'] = $request->boolean('show_on_services_page');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        if ($validated['fulfillment_type'] === 'manual') {
+            $validated['server_connection_id'] = null;
+            $validated['provider_package'] = null;
+            $validated['directadmin_package'] = null;
+        } else {
+            $validated['directadmin_package'] = $validated['provider_package'];
+        }
 
         // Parse features from textarea (one per line)
         if (!empty($validated['features'])) {

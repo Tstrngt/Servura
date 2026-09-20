@@ -15,6 +15,8 @@ class Service extends Model
         'slug',
         'service_type',
         'fulfillment_type',
+        'server_connection_id',
+        'provider_package',
         'directadmin_package',
         'short_description',
         'description',
@@ -93,6 +95,11 @@ class Service extends Model
     public function category()
     {
         return $this->belongsTo(ServiceCategory::class, 'service_category_id');
+    }
+
+    public function serverConnection()
+    {
+        return $this->belongsTo(ServerConnection::class);
     }
 
     public function prices()

@@ -2,17 +2,40 @@
 
 namespace App\Services;
 
+use App\Models\ServerConnection;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
 class DirectAdminClient
 {
+    private ?ServerConnection $connection = null;
+
+    public function using(?ServerConnection $connection): self
+    {
+        $client = clone $this;
+        $client->connection = $connection;
+
+        return $client;
+    }
+
     public function isConfigured(): bool
     {
-        return filled(config('directadmin.url'))
-            && filled(config('directadmin.username'))
-            && filled(config('directadmin.password'))
-            && filled(config('directadmin.shared_ip'));
+        return filled($this->value('url'))
+            && filled($this->value('username'))
+            && filled($this->value('password'))
+            && filled($this->value('shared_ip'));
+    }
+
+    public function testConnection(): array
+    {
+        if (!$this->isConfigured()) {
+            throw new \RuntimeException('De serverkoppeling is niet volledig ingevuld.');
+        }
+
+        $response = $this->http()->get(rtrim($this->value('url'), '/') . '/CMD_API_LOGIN_TEST', ['json' => 'yes']);
+        $response->throw();
+
+        return $this->parseResponse($response->json(), $response->body());
     }
 
     public function createUser(array $data): array
@@ -26,7 +49,7 @@ class DirectAdminClient
             'passwd2' => $data['password'],
             'domain' => $data['domain'],
             'package' => $data['package'],
-            'ip' => config('directadmin.shared_ip'),
+            'ip' => $this->value('shared_ip'),
             'notify' => 'no',
         ]);
     }
@@ -56,13 +79,18 @@ class DirectAdminClient
         }
 
         $response = $this->http()->asForm()->post(
-            rtrim(config('directadmin.url'), '/') . '/' . $endpoint,
+            rtrim($this->value('url'), '/') . '/' . $endpoint,
             $data + ['json' => 'yes']
         );
         $response->throw();
-        $result = $response->json();
-        if (!is_array($result)) {
-            parse_str($response->body(), $result);
+        return $this->parseResponse($response->json(), $response->body());
+    }
+
+    private function parseResponse(mixed $json, string $body): array
+    {
+        $result = is_array($json) ? $json : [];
+        if (!$result) {
+            parse_str($body, $result);
         }
         if ((int) ($result['error'] ?? 1) !== 0) {
             throw new \RuntimeException(trim(($result['text'] ?? 'DirectAdmin-fout') . ' ' . ($result['details'] ?? '')));
@@ -71,12 +99,17 @@ class DirectAdminClient
         return $result;
     }
 
+    private function value(string $key): mixed
+    {
+        return $this->connection?->{$key} ?? config("directadmin.{$key}");
+    }
+
     private function http(): PendingRequest
     {
-        $request = Http::withBasicAuth(config('directadmin.username'), config('directadmin.password'))
+        $request = Http::withBasicAuth($this->value('username'), $this->value('password'))
             ->acceptJson()
-            ->timeout(config('directadmin.timeout', 20));
+            ->timeout((int) ($this->value('timeout') ?: 20));
 
-        return config('directadmin.verify_ssl', true) ? $request : $request->withoutVerifying();
+        return $this->value('verify_ssl') ? $request : $request->withoutVerifying();
     }
 }

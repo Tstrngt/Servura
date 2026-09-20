@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\ServiceCategoryController as AdminServiceCategoryController;
+use App\Http\Controllers\Admin\ServerConnectionController as AdminServerConnectionController;
 use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Admin\QuoteController as AdminQuoteController;
@@ -144,6 +145,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/service-categories', [AdminServiceCategoryController::class, 'store'])->name('service-categories.store');
         Route::put('/service-categories/{serviceCategory}', [AdminServiceCategoryController::class, 'update'])->name('service-categories.update');
         Route::delete('/service-categories/{serviceCategory}', [AdminServiceCategoryController::class, 'destroy'])->name('service-categories.destroy');
+        Route::get('/server-connections', [AdminServerConnectionController::class, 'index'])->name('server-connections.index');
+        Route::post('/server-connections', [AdminServerConnectionController::class, 'store'])->name('server-connections.store');
+        Route::put('/server-connections/{serverConnection}', [AdminServerConnectionController::class, 'update'])->name('server-connections.update');
+        Route::post('/server-connections/{serverConnection}/test', [AdminServerConnectionController::class, 'test'])->name('server-connections.test');
+        Route::delete('/server-connections/{serverConnection}', [AdminServerConnectionController::class, 'destroy'])->name('server-connections.destroy');
         Route::get('/billing-settings', [AdminBillingSettingsController::class, 'edit'])->name('billing-settings.edit');
         Route::put('/billing-settings', [AdminBillingSettingsController::class, 'update'])->name('billing-settings.update');
 

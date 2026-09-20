@@ -227,18 +227,11 @@ Gebruik deze stappen na een nieuwe push naar `main`. De instructies zijn voor de
 
 ## DirectAdmin provisioning
 
-Configureer het reselleraccount uitsluitend in `/var/www/Servura/.env`:
+Maak serverkoppelingen aan via **Admin → Diensten → Serverkoppelingen**. URL, resellernaam, wachtwoord, gedeeld IP, SSL-validatie en timeout worden per verbinding beheerd; wachtwoorden en providerspecifieke instellingen worden met de Laravel `APP_KEY` versleuteld opgeslagen. Gebruik de knop **Test verbinding** voordat producten aan een server worden gekoppeld.
 
-```env
-DIRECTADMIN_URL=https://hosting.example.com:2222
-DIRECTADMIN_USERNAME=reseller
-DIRECTADMIN_PASSWORD=sterk-wachtwoord
-DIRECTADMIN_VERIFY_SSL=true
-DIRECTADMIN_TIMEOUT=20
-DIRECTADMIN_SHARED_IP=203.0.113.10
-```
+Koppel daarna in het dienstenbeheer elk automatisch hostingproduct aan een actieve serverkoppeling en de exacte package-naam uit DirectAdmin. Mislukte acties kunnen gecontroleerd opnieuw worden geprobeerd met `php artisan provisioning:retry` of voor één klantdienst met `php artisan provisioning:retry <id>`.
 
-Gebruik voor `DIRECTADMIN_SHARED_IP` een gedeeld IP-adres dat in DirectAdmin aan het reselleraccount beschikbaar is. Voer daarna `php artisan config:clear && php artisan config:cache` uit. Koppel in het dienstenbeheer elk automatisch hostingproduct aan de exacte package-naam uit DirectAdmin. Mislukte acties kunnen gecontroleerd opnieuw worden geprobeerd met `php artisan provisioning:retry` of voor één klantdienst met `php artisan provisioning:retry <id>`.
+De `DIRECTADMIN_*` variabelen in `.env.example` blijven beschikbaar als technische fallback, maar nieuwe producten moeten een serverkoppeling uit het adminpanel gebruiken.
 
 ## Beheer
 

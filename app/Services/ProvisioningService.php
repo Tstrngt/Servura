@@ -16,15 +16,20 @@ class ProvisioningService
 
     public function provision(CustomerService $customerService): void
     {
-        $customerService->loadMissing(['user', 'service']);
+        $customerService->loadMissing(['user', 'service.serverConnection']);
         if ($customerService->service->fulfillment_type !== 'directadmin') {
             return;
         }
         if ($customerService->provisioning_status === 'active') {
             return;
         }
-        if (!$customerService->domain || !$customerService->service->directadmin_package) {
-            $this->fail($customerService, 'Domein of DirectAdmin-pakket ontbreekt.');
+        if (!$customerService->domain || !$customerService->service->serverConnection || !$customerService->service->provider_package) {
+            $this->fail($customerService, 'Domein, serverkoppeling of providerpakket ontbreekt.');
+            return;
+        }
+
+        if ($customerService->service->serverConnection->provider !== 'directadmin') {
+            $this->fail($customerService, 'De gekozen serverprovider wordt nog niet ondersteund.');
             return;
         }
 
@@ -38,12 +43,13 @@ class ProvisioningService
         ]);
 
         try {
-            $this->directAdmin->createUser([
+            $client = $this->directAdmin->using($customerService->service->serverConnection);
+            $client->createUser([
                 'username' => $username,
                 'password' => $password,
                 'email' => $customerService->user->email,
                 'domain' => $customerService->domain,
-                'package' => $customerService->service->directadmin_package,
+                'package' => $customerService->service->provider_package,
             ]);
             $customerService->update([
                 'provisioning_status' => 'active',
@@ -51,7 +57,7 @@ class ProvisioningService
                 'external_suspended_at' => null,
             ]);
             $this->log($customerService, 'directadmin_aangemaakt', 'DirectAdmin-account automatisch aangemaakt.');
-            $this->sendCredentials($customerService->fresh(['user', 'service']));
+            $this->sendCredentials($customerService->fresh(['user', 'service.serverConnection']));
         } catch (\Throwable $exception) {
             $this->fail($customerService, $exception->getMessage());
             throw $exception;
@@ -60,7 +66,8 @@ class ProvisioningService
 
     public function suspend(CustomerService $customerService): void
     {
-        if ($customerService->service->fulfillment_type !== 'directadmin' || !$customerService->external_username) {
+        $customerService->loadMissing('service.serverConnection');
+        if ($customerService->service->fulfillment_type !== 'directadmin' || !$customerService->external_username || !$customerService->service->serverConnection) {
             return;
         }
         if ($customerService->provisioning_status === 'suspended') {
@@ -68,7 +75,7 @@ class ProvisioningService
         }
 
         try {
-            $this->directAdmin->suspendUser($customerService->external_username);
+            $this->directAdmin->using($customerService->service->serverConnection)->suspendUser($customerService->external_username);
             $customerService->update([
                 'provisioning_status' => 'suspended',
                 'external_suspended_at' => now(),
@@ -83,15 +90,16 @@ class ProvisioningService
 
     public function unsuspend(CustomerService $customerService): void
     {
-        if ($customerService->service->fulfillment_type !== 'directadmin' || !$customerService->external_username) {
+        $customerService->loadMissing('service.serverConnection');
+        if ($customerService->service->fulfillment_type !== 'directadmin' || !$customerService->external_username || !$customerService->service->serverConnection) {
             return;
         }
-        if ($customerService->provisioning_status !== 'suspended') {
+        if (!in_array($customerService->provisioning_status, ['suspended', 'failed'], true)) {
             return;
         }
 
         try {
-            $this->directAdmin->unsuspendUser($customerService->external_username);
+            $this->directAdmin->using($customerService->service->serverConnection)->unsuspendUser($customerService->external_username);
             $customerService->update([
                 'provisioning_status' => 'active',
                 'external_suspended_at' => null,
