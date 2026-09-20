@@ -211,6 +211,14 @@ Gebruik deze stappen na een nieuwe push naar `main`. De instructies zijn voor de
    sudo tail -n 100 /var/www/Servura/storage/logs/laravel.log
    ```
 
+7. **Activeer de Laravel-scheduler voor renewals, herinneringen en suspension:**
+   ```bash
+   echo '* * * * * servura cd /var/www/Servura && /usr/bin/php artisan schedule:run >> /var/log/servura/scheduler.log 2>&1' | sudo tee /etc/cron.d/servura-scheduler
+   sudo chmod 644 /etc/cron.d/servura-scheduler
+   sudo systemctl reload cron
+   sudo -u servura -H php /var/www/Servura/artisan schedule:list
+   ```
+
 ### Bij een mislukte update
 
 1. Laat de back-up en foutmelding intact.

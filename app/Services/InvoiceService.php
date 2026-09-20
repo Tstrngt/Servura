@@ -22,6 +22,7 @@ class InvoiceService
             'invoice_date' => now(),
             'due_date' => now()->addDays(BillingSetting::integer('invoice_due_days', 14)),
             'vat_percentage' => $vatRate ?? BillingSetting::decimal('default_vat_rate', 21.0),
+            'customer_service_id' => $customerService->id,
             'status' => 'concept',
         ]);
 

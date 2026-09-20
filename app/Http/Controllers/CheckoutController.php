@@ -59,6 +59,7 @@ class CheckoutController extends Controller
             'country' => ['required', 'string', 'size:2', Rule::in(array_keys(TaxService::COUNTRIES))],
             'kvk_number' => 'nullable|string|max:30',
             'vat_number' => 'nullable|string|max:30',
+            'payment_method' => 'required|in:auto_debit,payment_link',
             'terms' => 'accepted',
         ];
 
@@ -95,10 +96,14 @@ class CheckoutController extends Controller
             $customerService = CustomerService::create([
                 'user_id' => $user->id,
                 'service_id' => $service->id,
+                'service_price_id' => $price->id,
                 'status' => 'suspended',
                 'price' => $price->price,
                 'price_type' => $price->billing_cycle,
+                'billing_cycle' => $price->billing_cycle,
                 'start_date' => now(),
+                'auto_renew' => $price->billing_cycle !== 'one_time',
+                'payment_method' => $validated['payment_method'],
                 'notes' => 'Aangemaakt via online bestelling; wacht op betaling.',
             ]);
 
@@ -131,7 +136,10 @@ class CheckoutController extends Controller
         }
 
         try {
-            return redirect($molliePaymentService->createPayment($order->invoice));
+            return redirect($molliePaymentService->createPayment(
+                $order->invoice,
+                $validated['payment_method'] === 'auto_debit' && $price->billing_cycle !== 'one_time'
+            ));
         } catch (\Throwable $exception) {
             report($exception);
 

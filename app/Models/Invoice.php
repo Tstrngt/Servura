@@ -26,6 +26,10 @@ class Invoice extends Model
         'mollie_payment_id',
         'payment_url',
         'quote_id',
+        'renewal_key',
+        'customer_service_id',
+        'period_start',
+        'period_end',
     ];
 
     protected $casts = [
@@ -37,6 +41,8 @@ class Invoice extends Model
         'vat_percentage' => 'decimal:2',
         'sent_at' => 'datetime',
         'paid_at' => 'datetime',
+        'period_start' => 'date',
+        'period_end' => 'date',
     ];
 
     public const STATUSES = [
@@ -74,6 +80,11 @@ class Invoice extends Model
     public function quote()
     {
         return $this->belongsTo(Quote::class);
+    }
+
+    public function customerService()
+    {
+        return $this->belongsTo(CustomerService::class);
     }
 
     public function getStatusLabelAttribute(): array

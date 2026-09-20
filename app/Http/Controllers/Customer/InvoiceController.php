@@ -19,7 +19,7 @@ class InvoiceController extends Controller
     public function index()
     {
         $invoices = Invoice::where('user_id', Auth::id())
-            ->whereIn('status', ['verzonden', 'betaald', 'vervallen'])
+            ->whereIn('status', ['verzonden', 'in_behandeling', 'betaald', 'vervallen'])
             ->latest('invoice_date')
             ->paginate(15);
 

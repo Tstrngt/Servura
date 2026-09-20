@@ -24,6 +24,7 @@ class User extends Authenticatable
         'country',
         'kvk_number',
         'vat_number',
+        'mollie_customer_id',
         'role',
         'is_active',
         'last_login_at',

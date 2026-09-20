@@ -7,16 +7,21 @@ use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Transaction;
 use App\Models\TransactionLog;
+use App\Models\User;
 use Mollie\Laravel\Facades\Mollie;
 
 class MolliePaymentService
 {
+    public function __construct(private SubscriptionPeriodService $periods)
+    {
+    }
+
     /**
      * Create a Mollie payment for an invoice.
      */
-    public function createPayment(Invoice $invoice): string
+    public function createPayment(Invoice $invoice, bool $establishMandate = false): string
     {
-        $payment = Mollie::api()->payments->create([
+        $payload = [
             'amount' => [
                 'currency' => 'EUR',
                 'value' => number_format($invoice->total, 2, '.', ''),
@@ -28,7 +33,14 @@ class MolliePaymentService
                 'invoice_id' => $invoice->id,
                 'invoice_number' => $invoice->invoice_number,
             ],
-        ]);
+        ];
+
+        if ($establishMandate) {
+            $payload['customerId'] = $this->ensureCustomer($invoice->user);
+            $payload['sequenceType'] = 'first';
+        }
+
+        $payment = Mollie::api()->payments->create($payload);
 
         $invoice->update([
             'mollie_payment_id' => $payment->id,
@@ -49,6 +61,69 @@ class MolliePaymentService
         return $payment->getCheckoutUrl();
     }
 
+    public function createRecurringPayment(Invoice $invoice): void
+    {
+        if (!$invoice->user->mollie_customer_id) {
+            throw new \RuntimeException('Geen Mollie-klant beschikbaar voor automatische incasso.');
+        }
+
+        $payment = Mollie::api()->payments->create([
+            'amount' => [
+                'currency' => 'EUR',
+                'value' => number_format($invoice->total, 2, '.', ''),
+            ],
+            'customerId' => $invoice->user->mollie_customer_id,
+            'sequenceType' => 'recurring',
+            'description' => "Verlenging {$invoice->invoice_number}",
+            'webhookUrl' => route('mollie.webhook'),
+            'metadata' => [
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+            ],
+        ]);
+
+        $invoice->update([
+            'mollie_payment_id' => $payment->id,
+            'payment_url' => null,
+            'status' => 'in_behandeling',
+        ]);
+    }
+
+    private function ensureCustomer(User $user): string
+    {
+        if ($user->mollie_customer_id) {
+            return $user->mollie_customer_id;
+        }
+
+        $customer = Mollie::api()->customers->create([
+            'name' => $user->name,
+            'email' => $user->email,
+            'metadata' => ['user_id' => $user->id],
+        ]);
+        $user->update(['mollie_customer_id' => $customer->id]);
+
+        return $customer->id;
+    }
+
+    private function applyPaidInvoice(Invoice $invoice): void
+    {
+        $customerService = $invoice->customerService
+            ?? CustomerService::find($invoice->lines()->whereNotNull('customer_service_id')->value('customer_service_id'));
+        if ($customerService) {
+            if ($invoice->period_start && $invoice->period_end) {
+                $this->periods->applyRenewalPeriod($customerService, $invoice->period_start, $invoice->period_end);
+            } elseif (!$customerService->current_period_start) {
+                $this->periods->activateInitialPeriod($customerService);
+            } else {
+                $customerService->update(['status' => 'active']);
+            }
+        }
+
+        Order::where('invoice_id', $invoice->id)
+            ->where('status', 'pending_payment')
+            ->update(['status' => 'paid', 'paid_at' => now()]);
+    }
+
     /**
      * Handle Mollie webhook callback.
      */
@@ -60,7 +135,7 @@ class MolliePaymentService
 
         if ($payment->isPaid()) {
             if ($invoice->status === 'betaald') {
-                Order::where('invoice_id', $invoice->id)->update(['status' => 'paid']);
+                $this->applyPaidInvoice($invoice);
                 return;
             }
 
@@ -82,17 +157,7 @@ class MolliePaymentService
                 'reference' => $paymentId,
             ]);
 
-            // Activate suspended customer services (start = payment date)
-            $serviceIds = $invoice->lines()->whereNotNull('customer_service_id')->pluck('customer_service_id');
-            if ($serviceIds->isNotEmpty()) {
-                CustomerService::whereIn('id', $serviceIds)
-                    ->where('status', 'suspended')
-                    ->update(['status' => 'active', 'start_date' => now()]);
-            }
-
-            Order::where('invoice_id', $invoice->id)
-                ->where('status', 'pending_payment')
-                ->update(['status' => 'paid', 'paid_at' => now()]);
+            $this->applyPaidInvoice($invoice);
 
             TransactionLog::create([
                 'user_id' => $invoice->user_id,

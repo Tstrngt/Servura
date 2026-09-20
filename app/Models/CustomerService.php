@@ -15,18 +15,33 @@ class CustomerService extends Model
     protected $fillable = [
         'user_id',
         'service_id',
+        'service_price_id',
         'status',
         'price',
         'price_type',
+        'billing_cycle',
         'start_date',
+        'current_period_start',
+        'current_period_end',
+        'next_invoice_date',
+        'auto_renew',
+        'payment_method',
+        'cancel_at_period_end',
+        'cancelled_at',
         'end_date',
         'notes',
     ];
 
     protected $casts = [
         'start_date' => 'date',
+        'current_period_start' => 'date',
+        'current_period_end' => 'date',
+        'next_invoice_date' => 'date',
+        'cancelled_at' => 'datetime',
         'end_date' => 'date',
         'price' => 'decimal:2',
+        'auto_renew' => 'boolean',
+        'cancel_at_period_end' => 'boolean',
     ];
 
     // Relationships
@@ -38,6 +53,16 @@ class CustomerService extends Model
     public function service()
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function servicePrice()
+    {
+        return $this->belongsTo(ServicePrice::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
     }
 
     // Status checking methods
