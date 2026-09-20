@@ -26,10 +26,19 @@
         <div>
             <div class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
                 <div class="p-5 sm:p-6 lg:p-8">
-                    <form action="{{ route('admin.services.update', $service) }}" method="POST">
+                    <form action="{{ route('admin.services.update', $service) }}" method="POST" x-data="{ activeTab: 'general' }" @invalid.capture="activeTab = $event.target.closest('[data-tab]')?.dataset.tab || activeTab">
                         @csrf
                         @method('PUT')
 
+                        <div class="mb-8 border-b border-slate-200">
+                            <nav class="-mb-px flex gap-7 overflow-x-auto" aria-label="Dienstinstellingen">
+                                <button type="button" @click="activeTab = 'general'" :class="activeTab === 'general' ? 'border-primary-500 text-primary-700' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800'" class="whitespace-nowrap border-b-2 px-1 pb-3 text-sm font-semibold transition-colors">Algemeen</button>
+                                <button type="button" @click="activeTab = 'pricing'" :class="activeTab === 'pricing' ? 'border-primary-500 text-primary-700' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800'" class="whitespace-nowrap border-b-2 px-1 pb-3 text-sm font-semibold transition-colors">Prijs</button>
+                                <button type="button" @click="activeTab = 'features'" :class="activeTab === 'features' ? 'border-primary-500 text-primary-700' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800'" class="whitespace-nowrap border-b-2 px-1 pb-3 text-sm font-semibold transition-colors">Kenmerken</button>
+                            </nav>
+                        </div>
+
+                        <div x-cloak x-show="activeTab === 'general'" data-tab="general">
                         <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Algemeen</h3>
 
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 mb-6">
@@ -91,9 +100,10 @@
                                 <span class="form-error">{{ $message }}</span>
                             @enderror
                         </div>
+                        </div>
 
-                        <div class="grid grid-cols-1 gap-8 xl:grid-cols-2">
-                            <section>
+                        <div class="grid grid-cols-1 gap-8">
+                            <section x-cloak x-show="activeTab === 'pricing'" data-tab="pricing">
                                 <div class="mb-4 border-b pb-2">
                                     <h3 class="text-md font-semibold text-gray-900">Prijsvariaties</h3>
                                     <p class="mt-1 text-xs text-slate-500">Bedragen zijn exclusief 21% BTW; het bedrag inclusief BTW wordt direct berekend.</p>
@@ -118,7 +128,7 @@
                                 </div>
                             </section>
 
-                            <section>
+                            <section x-cloak x-show="activeTab === 'features'" data-tab="features">
                                 <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Kenmerken</h3>
 
                         <div class="form-group mb-6">
@@ -132,7 +142,7 @@
                             </section>
                         </div>
 
-                        <div x-data="popupEditor(@js(['badges' => old('popup_badges', $service->popup_badges ?? []), 'details' => old('popup_details', $service->popup_details ?? [])]))" class="mb-8 rounded-2xl border border-slate-200 bg-slate-50/70 p-5 sm:p-6">
+                        <div x-cloak x-show="activeTab === 'features'" data-tab="features" x-data="popupEditor(@js(['badges' => old('popup_badges', $service->popup_badges ?? []), 'details' => old('popup_details', $service->popup_details ?? [])]))" class="mb-8 rounded-2xl border border-slate-200 bg-slate-50/70 p-5 sm:p-6">
                             <div class="mb-6 flex items-start justify-between gap-4 border-b border-slate-200 pb-5">
                                 <div>
                                     <h3 class="text-lg font-semibold text-slate-900">Pakket-popup</h3>
@@ -193,6 +203,7 @@
                             </div>
                         </div>
 
+                        <div x-cloak x-show="activeTab === 'general'" data-tab="general">
                         <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Zichtbaarheid & Instellingen</h3>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -223,6 +234,7 @@
                                 <input type="checkbox" name="is_popular" value="1" {{ old('is_popular', $service->is_popular) ? 'checked' : '' }} class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
                                 <span class="ml-2 text-sm text-gray-700">Markeren als populair</span>
                             </label>
+                        </div>
                         </div>
 
                         @if($service->customerServices()->count() > 0)
