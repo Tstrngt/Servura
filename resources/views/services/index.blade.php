@@ -165,8 +165,8 @@ $steps = [
                 <div x-show="service?.popup_badges?.length" class="flex flex-wrap gap-2 mb-8">
                     <template x-for="(badge, index) in service?.popup_badges || []" :key="index">
                         <span class="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1 text-sm font-medium text-primary-700 ring-1 ring-primary-100">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
-                            <span x-text="badge"></span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" x-html="window.serviceIconSvg(badge.icon || ['sparkles', 'code', 'shield'][index] || 'sparkles')"></svg>
+                            <span x-text="badge.text || badge"></span>
                         </span>
                     </template>
                 </div>
@@ -175,7 +175,7 @@ $steps = [
                     <template x-for="(detail, index) in service?.popup_details || []" :key="index">
                         <div class="group rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200 hover:bg-white hover:shadow-lg hover:shadow-primary-500/10 hover:-translate-y-1 transition-all duration-300">
                             <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-600 mb-4">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" x-html="window.serviceIconSvg(detail.icon || ['sparkles', 'device', 'code', 'search', 'server', 'support'][index] || 'sparkles')"></svg>
                             </span>
                             <h4 class="font-heading font-semibold text-slate-900 mb-1" x-text="detail.title"></h4>
                             <p class="text-sm text-slate-600 leading-relaxed" x-text="detail.description"></p>

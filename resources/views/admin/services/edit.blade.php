@@ -111,32 +111,65 @@
                             @enderror
                         </div>
 
-                        <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Pakket-popup</h3>
+                        <div x-data="popupEditor(@js(['badges' => old('popup_badges', $service->popup_badges ?? []), 'details' => old('popup_details', $service->popup_details ?? [])]))" class="mb-8 rounded-2xl border border-slate-200 bg-slate-50/70 p-5 sm:p-6">
+                            <div class="mb-6 flex items-start justify-between gap-4 border-b border-slate-200 pb-5">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-slate-900">Pakket-popup</h3>
+                                    <p class="mt-1 text-sm text-slate-500">Stel de inhoud en iconen samen zoals bezoekers ze zien.</p>
+                                </div>
+                                <span class="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 ring-1 ring-primary-100">Visuele editor</span>
+                            </div>
 
-                        <div class="form-group mb-6">
-                            <label for="popup_label" class="form-label">Label boven de omschrijving</label>
-                            <input type="text" id="popup_label" name="popup_label" class="form-input" value="{{ old('popup_label', $service->popup_label) }}" placeholder="Bijvoorbeeld: Meest gekozen">
-                            @error('popup_label')<span class="form-error">{{ $message }}</span>@enderror
-                        </div>
+                            <div class="form-group mb-7">
+                                <label for="popup_label" class="form-label">Label boven de omschrijving</label>
+                                <input type="text" id="popup_label" name="popup_label" class="form-input" value="{{ old('popup_label', $service->popup_label) }}" placeholder="Bijvoorbeeld: Meest gekozen">
+                                @error('popup_label')<span class="form-error">{{ $message }}</span>@enderror
+                            </div>
 
-                        <div class="form-group mb-6">
-                            <label for="popup_badges" class="form-label">Badges (één per regel)</label>
-                            <textarea id="popup_badges" name="popup_badges" rows="4" class="form-textarea" placeholder="Maatwerk design&#10;CMS inbegrepen&#10;1 jaar onderhoud">{{ old('popup_badges', is_array($service->popup_badges) ? implode("\n", $service->popup_badges) : '') }}</textarea>
-                            <p class="mt-1 text-sm text-gray-500">Korte kenmerken die boven de detailblokken verschijnen.</p>
-                            @error('popup_badges')<span class="form-error">{{ $message }}</span>@enderror
-                        </div>
+                            <div class="mb-8">
+                                <div class="mb-3 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+                                    <div><h4 class="text-sm font-semibold text-slate-900">Badges</h4><p class="text-xs text-slate-500">Korte voordelen boven de detailblokken.</p></div>
+                                    <button type="button" @click="addBadge" class="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-slate-200 transition-colors hover:bg-primary-50 active:scale-[.98]">+ Badge toevoegen</button>
+                                </div>
+                                <div x-show="badges.length === 0" class="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-500">Nog geen badges toegevoegd.</div>
+                                <div class="space-y-3">
+                                    <template x-for="(badge, index) in badges" :key="index">
+                                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-[48px_minmax(0,1fr)_150px_40px] sm:items-center rounded-xl bg-white p-3 shadow-sm ring-1 ring-slate-200">
+                                            <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-50 text-primary-600"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" x-html="iconSvg(badge.icon)"></svg></span>
+                                            <input type="text" :name="`popup_badges[${index}][text]`" x-model="badge.text" class="form-input" placeholder="Bijvoorbeeld: Maatwerk design" required>
+                                            <select :name="`popup_badges[${index}][icon]`" x-model="badge.icon" class="form-input" aria-label="Icoon badge"><template x-for="icon in icons" :key="icon[0]"><option :value="icon[0]" x-text="icon[1]"></option></template></select>
+                                            <button type="button" @click="removeBadge(index)" class="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 active:scale-[.96]" aria-label="Badge verwijderen">×</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
 
-                        <div class="form-group mb-6">
-                            <label for="popup_details" class="form-label">Detailblokken (één per regel)</label>
-                            <textarea id="popup_details" name="popup_details" rows="7" class="form-textarea" placeholder="Uniek ontwerp | Een design dat aansluit bij uw merk en doelgroep.&#10;Responsive | Perfect zichtbaar op mobiel, tablet en desktop.">{{ old('popup_details', is_array($service->popup_details) ? collect($service->popup_details)->map(fn ($detail) => ($detail['title'] ?? '') . ' | ' . ($detail['description'] ?? ''))->implode("\n") : '') }}</textarea>
-                            <p class="mt-1 text-sm text-gray-500">Gebruik per regel: titel | omschrijving.</p>
-                            @error('popup_details')<span class="form-error">{{ $message }}</span>@enderror
-                        </div>
+                            <div class="mb-7">
+                                <div class="mb-3 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+                                    <div><h4 class="text-sm font-semibold text-slate-900">Detailblokken</h4><p class="text-xs text-slate-500">Uitgebreide voordelen met een eigen icoon.</p></div>
+                                    <button type="button" @click="addDetail" class="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-slate-200 transition-colors hover:bg-primary-50 active:scale-[.98]">+ Blok toevoegen</button>
+                                </div>
+                                <div x-show="details.length === 0" class="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center text-sm text-slate-500">Voeg een detailblok toe om een pakketvoordeel uit te lichten.</div>
+                                <div class="space-y-4">
+                                    <template x-for="(detail, index) in details" :key="index">
+                                        <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-[48px_minmax(0,1fr)_150px_40px] sm:items-center">
+                                                <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-accent-50 text-accent-600"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" x-html="iconSvg(detail.icon)"></svg></span>
+                                                <input type="text" :name="`popup_details[${index}][title]`" x-model="detail.title" class="form-input" placeholder="Titel van het voordeel" required>
+                                                <select :name="`popup_details[${index}][icon]`" x-model="detail.icon" class="form-input" aria-label="Icoon detailblok"><template x-for="icon in icons" :key="icon[0]"><option :value="icon[0]" x-text="icon[1]"></option></template></select>
+                                                <button type="button" @click="removeDetail(index)" class="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 active:scale-[.96]" aria-label="Detailblok verwijderen">×</button>
+                                            </div>
+                                            <textarea :name="`popup_details[${index}][description]`" x-model="detail.description" rows="2" class="form-textarea mt-3" placeholder="Beschrijf kort wat de klant hiervan merkt." required></textarea>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
 
-                        <div class="form-group mb-6">
-                            <label for="popup_price_note" class="form-label">Toelichting bij de prijs</label>
-                            <textarea id="popup_price_note" name="popup_price_note" rows="2" class="form-textarea" placeholder="Bijvoorbeeld: Eenmalig, exclusief onderhoud.">{{ old('popup_price_note', $service->popup_price_note) }}</textarea>
-                            @error('popup_price_note')<span class="form-error">{{ $message }}</span>@enderror
+                            <div class="form-group">
+                                <label for="popup_price_note" class="form-label">Toelichting bij de prijs</label>
+                                <textarea id="popup_price_note" name="popup_price_note" rows="2" class="form-textarea" placeholder="Bijvoorbeeld: Eenmalig, exclusief onderhoud.">{{ old('popup_price_note', $service->popup_price_note) }}</textarea>
+                                @error('popup_price_note')<span class="form-error">{{ $message }}</span>@enderror
+                            </div>
                         </div>
 
                         <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Zichtbaarheid & Instellingen</h3>
