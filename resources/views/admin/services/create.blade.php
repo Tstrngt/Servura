@@ -6,9 +6,9 @@
 @include('admin.partials.sidebar')
 
 <div class="bg-gray-50 min-h-screen lg:pl-64">
-    <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto w-full max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="px-4 py-6 sm:px-0">
+        <div class="py-4">
             <div class="flex items-center">
                 <a href="{{ route('admin.services.index') }}" class="text-primary-600 hover:text-primary-500 mr-4">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,9 +23,9 @@
         </div>
 
         <!-- Form -->
-        <div class="px-4 sm:px-0">
-            <div class="bg-white shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
+        <div>
+            <div class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                <div class="p-5 sm:p-6 lg:p-8">
                     <form action="{{ route('admin.services.store') }}" method="POST">
                         @csrf
 
@@ -69,13 +69,15 @@
 
                         <div class="form-group mb-6">
                             <label for="description" class="form-label">Volledige omschrijving *</label>
-                            <textarea id="description" name="description" rows="6" class="form-textarea" required placeholder="Gedetailleerde beschrijving van de dienst...">{{ old('description') }}</textarea>
+                            <textarea id="description" name="description" rows="4" class="form-textarea" required placeholder="Gedetailleerde beschrijving van de dienst...">{{ old('description') }}</textarea>
                             @error('description')
                                 <span class="form-error">{{ $message }}</span>
                             @enderror
                         </div>
 
-                        <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Prijs</h3>
+                        <div class="grid grid-cols-1 gap-8 xl:grid-cols-2">
+                            <section>
+                                <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Prijs</h3>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div class="form-group">
@@ -97,17 +99,21 @@
                                     <span class="form-error">{{ $message }}</span>
                                 @enderror
                             </div>
-                        </div>
+                                </div>
+                            </section>
 
-                        <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Kenmerken</h3>
+                            <section>
+                                <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Kenmerken</h3>
 
                         <div class="form-group mb-6">
                             <label for="features" class="form-label">Features (één per regel)</label>
-                            <textarea id="features" name="features" rows="5" class="form-textarea" placeholder="Onbeperkt bandbreedte&#10;24/7 support&#10;Dagelijkse backups">{{ old('features') }}</textarea>
+                            <textarea id="features" name="features" rows="4" class="form-textarea" placeholder="Onbeperkt bandbreedte&#10;24/7 support&#10;Dagelijkse backups">{{ old('features') }}</textarea>
                             <p class="mt-1 text-sm text-gray-500">Voer elke feature op een nieuwe regel in.</p>
                             @error('features')
                                 <span class="form-error">{{ $message }}</span>
                             @enderror
+                        </div>
+                            </section>
                         </div>
 
                         <div x-data="popupEditor(@js(['badges' => old('popup_badges', []), 'details' => old('popup_details', [])]))" class="mb-8 rounded-2xl border border-slate-200 bg-slate-50/70 p-5 sm:p-6">
@@ -131,7 +137,7 @@
                                     <button type="button" @click="addBadge" class="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-slate-200 transition-colors hover:bg-primary-50 active:scale-[.98]">+ Badge toevoegen</button>
                                 </div>
                                 <div x-show="badges.length === 0" class="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-500">Nog geen badges toegevoegd.</div>
-                                <div class="space-y-3">
+                                <div class="grid grid-cols-1 gap-3 2xl:grid-cols-2">
                                     <template x-for="(badge, index) in badges" :key="index">
                                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-[48px_minmax(0,1fr)_150px_40px] sm:items-center rounded-xl bg-white p-3 shadow-sm ring-1 ring-slate-200">
                                             <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-primary-50 text-primary-600"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" x-html="iconSvg(badge.icon)"></svg></span>
@@ -149,7 +155,7 @@
                                     <button type="button" @click="addDetail" class="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-slate-200 transition-colors hover:bg-primary-50 active:scale-[.98]">+ Blok toevoegen</button>
                                 </div>
                                 <div x-show="details.length === 0" class="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center text-sm text-slate-500">Voeg een detailblok toe om een pakketvoordeel uit te lichten.</div>
-                                <div class="space-y-4">
+                                <div class="grid grid-cols-1 gap-4 2xl:grid-cols-2">
                                     <template x-for="(detail, index) in details" :key="index">
                                         <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
                                             <div class="grid grid-cols-1 gap-3 sm:grid-cols-[48px_minmax(0,1fr)_150px_40px] sm:items-center">
@@ -184,23 +190,20 @@
                             </div>
                         </div>
 
-                        <div class="space-y-4 mb-6">
-                            <label class="inline-flex items-center">
+                        <div class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                            <label class="flex items-center rounded-xl bg-slate-50 px-4 py-3 ring-1 ring-slate-200">
                                 <input type="checkbox" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }} class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
                                 <span class="ml-2 text-sm text-gray-700">Actief (dienst is beschikbaar)</span>
                             </label>
-                            <br>
-                            <label class="inline-flex items-center">
+                            <label class="flex items-center rounded-xl bg-slate-50 px-4 py-3 ring-1 ring-slate-200">
                                 <input type="checkbox" name="show_on_homepage" value="1" {{ old('show_on_homepage') ? 'checked' : '' }} class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
                                 <span class="ml-2 text-sm text-gray-700">Tonen op homepage</span>
                             </label>
-                            <br>
-                            <label class="inline-flex items-center">
+                            <label class="flex items-center rounded-xl bg-slate-50 px-4 py-3 ring-1 ring-slate-200">
                                 <input type="checkbox" name="show_on_services_page" value="1" {{ old('show_on_services_page', true) ? 'checked' : '' }} class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
                                 <span class="ml-2 text-sm text-gray-700">Tonen op diensten pagina</span>
                             </label>
-                            <br>
-                            <label class="inline-flex items-center">
+                            <label class="flex items-center rounded-xl bg-slate-50 px-4 py-3 ring-1 ring-slate-200">
                                 <input type="checkbox" name="is_popular" value="1" {{ old('is_popular') ? 'checked' : '' }} class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
                                 <span class="ml-2 text-sm text-gray-700">Markeren als populair</span>
                             </label>
