@@ -31,7 +31,7 @@
 
                         <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Algemeen</h3>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 mb-6">
                             <div class="form-group">
                                 <label for="title" class="form-label">Titel *</label>
                                 <input type="text" id="title" name="title" class="form-input" required value="{{ old('title') }}" placeholder="Naam van de dienst">
@@ -49,6 +49,22 @@
                                 @error('service_type')
                                     <span class="form-error">{{ $message }}</span>
                                 @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="service_category_id" class="form-label">Productcategorie</label>
+                                <select id="service_category_id" name="service_category_id" class="form-input">
+                                    <option value="">Geen categorie</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ old('service_category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="fulfillment_type" class="form-label">Levering *</label>
+                                <select id="fulfillment_type" name="fulfillment_type" class="form-input" required>
+                                    <option value="manual" {{ old('fulfillment_type', 'manual') === 'manual' ? 'selected' : '' }}>Handmatig met ticket</option>
+                                    <option value="directadmin" {{ old('fulfillment_type') === 'directadmin' ? 'selected' : '' }}>Automatisch via DirectAdmin</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="image_url" class="form-label">Afbeelding URL</label>
@@ -77,28 +93,23 @@
 
                         <div class="grid grid-cols-1 gap-8 xl:grid-cols-2">
                             <section>
-                                <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Prijs</h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div class="form-group">
-                                <label for="price" class="form-label">Prijs (€)</label>
-                                <input type="number" id="price" name="price" class="form-input" step="0.01" min="0" value="{{ old('price') }}" placeholder="0.00">
-                                @error('price')
-                                    <span class="form-error">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="price_type" class="form-label">Prijstype *</label>
-                                <select id="price_type" name="price_type" class="form-input" required>
-                                    <option value="eenmalig" {{ old('price_type') == 'eenmalig' ? 'selected' : '' }}>Eenmalig</option>
-                                    <option value="maandelijks" {{ old('price_type') == 'maandelijks' ? 'selected' : '' }}>Maandelijks</option>
-                                    <option value="jaarlijks" {{ old('price_type') == 'jaarlijks' ? 'selected' : '' }}>Jaarlijks</option>
-                                    <option value="op-aanvraag" {{ old('price_type') == 'op-aanvraag' ? 'selected' : '' }}>Op aanvraag</option>
-                                </select>
-                                @error('price_type')
-                                    <span class="form-error">{{ $message }}</span>
-                                @enderror
-                            </div>
+                                <div class="mb-4 border-b pb-2">
+                                    <h3 class="text-md font-semibold text-gray-900">Prijsvariaties</h3>
+                                    <p class="mt-1 text-xs text-slate-500">Bedragen zijn exclusief 21% BTW; het bedrag inclusief BTW wordt direct berekend.</p>
+                                </div>
+                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                    @foreach($billingCycles as $cycle => $label)
+                                        @php $amount = old("prices.$cycle.amount"); @endphp
+                                        <div x-data="{ amount: @js($amount) }" class="rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
+                                            <label class="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-800">
+                                                <input type="hidden" name="prices[{{ $cycle }}][enabled]" value="0">
+                                                <input type="checkbox" name="prices[{{ $cycle }}][enabled]" value="1" {{ old("prices.$cycle.enabled") ? 'checked' : '' }} class="rounded border-slate-300 text-primary-600">
+                                                {{ $label }}
+                                            </label>
+                                            <input type="number" name="prices[{{ $cycle }}][amount]" x-model="amount" step="0.01" min="0" class="form-input" placeholder="0,00">
+                                            <p class="mt-2 text-xs text-slate-500">Incl. BTW: <strong class="text-slate-700" x-text="amount ? '€ ' + (Number(amount) * 1.21).toLocaleString('nl-NL', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—'"></strong></p>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </section>
 

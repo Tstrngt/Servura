@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Service;
+use App\Models\ServiceCategory;
+use App\Models\ServicePrice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ServiceController extends Controller
@@ -17,7 +20,7 @@ class ServiceController extends Controller
 
     public function index(Request $request)
     {
-        $query = Service::query();
+        $query = Service::with(['category', 'prices']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -54,19 +57,24 @@ class ServiceController extends Controller
 
     public function create()
     {
-        return view('admin.services.create');
+        $categories = ServiceCategory::active()->ordered()->get();
+        $billingCycles = ServicePrice::CYCLES;
+
+        return view('admin.services.create', compact('categories', 'billingCycles'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'service_category_id' => 'nullable|exists:service_categories,id',
             'service_type' => 'required|in:website_pakket,hosting,custom',
+            'fulfillment_type' => 'required|in:manual,directadmin',
             'short_description' => 'required|string|max:500',
             'description' => 'required|string',
             'image_url' => 'nullable|string|max:500',
             'price' => 'nullable|numeric|min:0',
-            'price_type' => 'required|in:eenmalig,maandelijks,jaarlijks,op-aanvraag',
+            'price_type' => 'nullable|in:eenmalig,maandelijks,jaarlijks,op-aanvraag',
             'features' => 'nullable|string',
             'popup_label' => 'nullable|string|max:100',
             'popup_badges' => 'nullable|array|max:10',
@@ -82,6 +90,9 @@ class ServiceController extends Controller
             'show_on_homepage' => 'boolean',
             'show_on_services_page' => 'boolean',
             'sort_order' => 'nullable|integer|min:0',
+            'prices' => 'nullable|array',
+            'prices.*.enabled' => 'boolean',
+            'prices.*.amount' => 'nullable|numeric|min:0|max:99999999.99',
         ], [
             'title.required' => 'Titel is verplicht',
             'service_type.required' => 'Type is verplicht',
@@ -103,6 +114,10 @@ class ServiceController extends Controller
         } else {
             $validated['features'] = [];
         }
+
+        $prices = $validated['prices'] ?? [];
+        unset($validated['prices']);
+        $this->applyLegacyPrice($validated, $prices);
 
         // Ensure unique slug
         $baseSlug = $validated['slug'];
@@ -112,7 +127,10 @@ class ServiceController extends Controller
             $counter++;
         }
 
-        Service::create($validated);
+        DB::transaction(function () use ($validated, $prices) {
+            $service = Service::create($validated);
+            $this->syncPrices($service, $prices);
+        });
 
         return redirect()
             ->route('admin.services.index')
@@ -121,19 +139,25 @@ class ServiceController extends Controller
 
     public function edit(Service $service)
     {
-        return view('admin.services.edit', compact('service'));
+        $service->load('prices');
+        $categories = ServiceCategory::ordered()->get();
+        $billingCycles = ServicePrice::CYCLES;
+
+        return view('admin.services.edit', compact('service', 'categories', 'billingCycles'));
     }
 
     public function update(Request $request, Service $service)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'service_category_id' => 'nullable|exists:service_categories,id',
             'service_type' => 'required|in:website_pakket,hosting,custom',
+            'fulfillment_type' => 'required|in:manual,directadmin',
             'short_description' => 'required|string|max:500',
             'description' => 'required|string',
             'image_url' => 'nullable|string|max:500',
             'price' => 'nullable|numeric|min:0',
-            'price_type' => 'required|in:eenmalig,maandelijks,jaarlijks,op-aanvraag',
+            'price_type' => 'nullable|in:eenmalig,maandelijks,jaarlijks,op-aanvraag',
             'features' => 'nullable|string',
             'popup_label' => 'nullable|string|max:100',
             'popup_badges' => 'nullable|array|max:10',
@@ -149,6 +173,9 @@ class ServiceController extends Controller
             'show_on_homepage' => 'boolean',
             'show_on_services_page' => 'boolean',
             'sort_order' => 'nullable|integer|min:0',
+            'prices' => 'nullable|array',
+            'prices.*.enabled' => 'boolean',
+            'prices.*.amount' => 'nullable|numeric|min:0|max:99999999.99',
         ], [
             'title.required' => 'Titel is verplicht',
             'service_type.required' => 'Type is verplicht',
@@ -171,6 +198,10 @@ class ServiceController extends Controller
             $validated['features'] = [];
         }
 
+        $prices = $validated['prices'] ?? [];
+        unset($validated['prices']);
+        $this->applyLegacyPrice($validated, $prices);
+
         // Ensure unique slug (exclude current)
         $baseSlug = $validated['slug'];
         $counter = 1;
@@ -179,11 +210,48 @@ class ServiceController extends Controller
             $counter++;
         }
 
-        $service->update($validated);
+        DB::transaction(function () use ($service, $validated, $prices) {
+            $service->update($validated);
+            $this->syncPrices($service, $prices);
+        });
 
         return redirect()
             ->route('admin.services.index')
             ->with('success', 'Dienst is succesvol bijgewerkt.');
+    }
+
+    private function applyLegacyPrice(array &$validated, array $prices): void
+    {
+        foreach (ServicePrice::CYCLES as $cycle => $label) {
+            if (!empty($prices[$cycle]['enabled']) && isset($prices[$cycle]['amount'])) {
+                $validated['price'] = $prices[$cycle]['amount'];
+                $validated['price_type'] = match ($cycle) {
+                    'monthly' => 'maandelijks',
+                    'yearly' => 'jaarlijks',
+                    'one_time' => 'eenmalig',
+                    default => 'eenmalig',
+                };
+                return;
+            }
+        }
+
+        $validated['price'] = null;
+        $validated['price_type'] = 'op-aanvraag';
+    }
+
+    private function syncPrices(Service $service, array $prices): void
+    {
+        foreach (ServicePrice::CYCLES as $cycle => $label) {
+            $data = $prices[$cycle] ?? [];
+            if (!empty($data['enabled']) && isset($data['amount'])) {
+                $service->prices()->updateOrCreate(
+                    ['billing_cycle' => $cycle],
+                    ['price' => $data['amount'], 'is_enabled' => true]
+                );
+            } else {
+                $service->prices()->where('billing_cycle', $cycle)->delete();
+            }
+        }
     }
 
     public function destroy(Service $service)

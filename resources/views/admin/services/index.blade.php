@@ -14,9 +14,10 @@
                     <h1 class="text-2xl font-bold text-gray-900">Diensten</h1>
                     <p class="mt-1 text-sm text-gray-600">Beheer alle diensten en pakketten.</p>
                 </div>
-                <a href="{{ route('admin.services.create') }}" class="btn btn-primary">
-                    Nieuwe Dienst
-                </a>
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('admin.service-categories.index') }}" class="btn btn-outline">Categorieën</a>
+                    <a href="{{ route('admin.services.create') }}" class="btn btn-primary">Nieuwe Dienst</a>
+                </div>
             </div>
         </div>
 
@@ -101,11 +102,15 @@
                                             <div class="truncate text-sm font-semibold text-slate-900">{{ $service->title }}</div>
                                             <div class="mt-0.5 truncate text-sm text-slate-500">{{ $service->short_description }}</div>
                                         </td>
-                                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $service->service_type_label }}
+                                        <td class="px-4 py-4 text-sm text-gray-900">
+                                            <div class="truncate font-medium">{{ $service->category?->name ?? $service->service_type_label }}</div>
+                                            <div class="mt-0.5 text-xs text-slate-500">{{ $service->fulfillment_type === 'directadmin' ? 'DirectAdmin' : 'Handmatig' }}</div>
                                         </td>
-                                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $service->formatted_price }}
+                                        <td class="px-4 py-4 text-sm text-gray-900">
+                                            <div class="font-medium">{{ $service->formatted_price }}</div>
+                                            @if($service->prices->count() > 1)
+                                                <div class="mt-0.5 text-xs text-slate-500">{{ $service->prices->count() }} prijsperioden</div>
+                                            @endif
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap">
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $service->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">

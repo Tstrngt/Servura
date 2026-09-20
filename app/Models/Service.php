@@ -10,9 +10,11 @@ class Service extends Model
     use HasFactory;
 
     protected $fillable = [
+        'service_category_id',
         'title',
         'slug',
         'service_type',
+        'fulfillment_type',
         'short_description',
         'description',
         'image_url',
@@ -85,6 +87,16 @@ class Service extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order')->orderBy('created_at', 'desc');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(ServiceCategory::class, 'service_category_id');
+    }
+
+    public function prices()
+    {
+        return $this->hasMany(ServicePrice::class);
     }
 
     public function customerServices()

@@ -19,6 +19,9 @@
         <a href="{{ route('admin.services.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.services.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Diensten
         </a>
+        <a href="{{ route('admin.service-categories.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.service-categories.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
+            Productcategorieën
+        </a>
         <a href="{{ route('admin.financial.invoices') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.financial.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Financieel
         </a>
@@ -39,6 +42,7 @@
         <a href="{{ route('admin.tickets.index') }}">Tickets</a>
         <a href="{{ route('admin.customers.index') }}">Klanten</a>
         <a href="{{ route('admin.services.index') }}">Diensten</a>
+        <a href="{{ route('admin.service-categories.index') }}">Categorieën</a>
         <a href="{{ route('admin.financial.invoices') }}">Financieel</a>
     </div>
 </div>

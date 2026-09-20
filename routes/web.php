@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
+use App\Http\Controllers\Admin\ServiceCategoryController as AdminServiceCategoryController;
 use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Admin\QuoteController as AdminQuoteController;
@@ -135,6 +136,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/services/{service:id}/edit', [AdminServiceController::class, 'edit'])->name('services.edit');
         Route::put('/services/{service:id}', [AdminServiceController::class, 'update'])->name('services.update');
         Route::delete('/services/{service:id}', [AdminServiceController::class, 'destroy'])->name('services.destroy');
+        Route::get('/service-categories', [AdminServiceCategoryController::class, 'index'])->name('service-categories.index');
+        Route::post('/service-categories', [AdminServiceCategoryController::class, 'store'])->name('service-categories.store');
+        Route::put('/service-categories/{serviceCategory}', [AdminServiceCategoryController::class, 'update'])->name('service-categories.update');
+        Route::delete('/service-categories/{serviceCategory}', [AdminServiceCategoryController::class, 'destroy'])->name('service-categories.destroy');
 
         // Financial
         Route::prefix('financial')->name('financial.')->group(function () {
