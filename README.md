@@ -215,7 +215,7 @@ Gebruik deze stappen na een nieuwe push naar `main`. De instructies zijn voor de
    ```bash
    echo '* * * * * servura cd /var/www/Servura && /usr/bin/php artisan schedule:run >> /var/log/servura/scheduler.log 2>&1' | sudo tee /etc/cron.d/servura-scheduler
    sudo chmod 644 /etc/cron.d/servura-scheduler
-   sudo systemctl reload cron
+   sudo systemctl restart cron
    sudo -u servura -H php /var/www/Servura/artisan schedule:list
    ```
 
