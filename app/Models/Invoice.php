@@ -41,7 +41,9 @@ class Invoice extends Model
 
     public const STATUSES = [
         'concept' => 'Concept',
+        'verzonden' => 'Verzonden',
         'openstaand' => 'Openstaand',
+        'vervallen' => 'Vervallen',
         'te_laat' => 'Te laat betaald',
         'betaald' => 'Betaald',
         'geannuleerd' => 'Geannuleerd',
@@ -78,7 +80,9 @@ class Invoice extends Model
     {
         $colors = [
             'concept' => 'gray',
+            'verzonden' => 'blue',
             'openstaand' => 'blue',
+            'vervallen' => 'red',
             'te_laat' => 'red',
             'betaald' => 'green',
             'geannuleerd' => 'gray',

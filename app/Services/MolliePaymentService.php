@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\CustomerService;
 use App\Models\Invoice;
+use App\Models\Order;
 use App\Models\Transaction;
 use App\Models\TransactionLog;
 use Mollie\Laravel\Facades\Mollie;
@@ -58,6 +59,11 @@ class MolliePaymentService
         $invoice = Invoice::findOrFail($invoiceId);
 
         if ($payment->isPaid()) {
+            if ($invoice->status === 'betaald') {
+                Order::where('invoice_id', $invoice->id)->update(['status' => 'paid']);
+                return;
+            }
+
             $invoice->update([
                 'status' => 'betaald',
                 'paid_at' => now(),
@@ -83,6 +89,10 @@ class MolliePaymentService
                     ->where('status', 'suspended')
                     ->update(['status' => 'active', 'start_date' => now()]);
             }
+
+            Order::where('invoice_id', $invoice->id)
+                ->where('status', 'pending_payment')
+                ->update(['status' => 'paid', 'paid_at' => now()]);
 
             TransactionLog::create([
                 'user_id' => $invoice->user_id,

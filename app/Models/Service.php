@@ -99,6 +99,11 @@ class Service extends Model
         return $this->hasMany(ServicePrice::class);
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function customerServices()
     {
         return $this->hasMany(CustomerService::class);

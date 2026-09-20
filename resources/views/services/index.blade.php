@@ -356,6 +356,7 @@ $steps = [
                         'formatted_price' => $service->formatted_price,
                         'features' => $service->features ?? [],
                         'slug' => $service->slug,
+                        'checkout_url' => $service->prices->isNotEmpty() ? route('checkout.show', $service) : route('contact') . '?service=' . $service->slug,
                     ];
                 @endphp
                 <div class="relative rounded-2xl px-5 py-4 sm:px-6 sm:py-5 bg-white/[0.03] backdrop-blur ring-1 {{ $isPop ? 'ring-emerald-400/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.35)]' : 'ring-white/10' }} animate-on-scroll">
@@ -376,8 +377,8 @@ $steps = [
                             <button type="button" @click="showH(@js($hostingData))" class="btn bg-white/10 text-white hover:bg-white/20 ring-1 ring-white/20 px-4 py-2 text-sm">
                                 Meer info
                             </button>
-                            <a href="{{ route('contact') }}?service={{ $service->slug }}" class="btn px-4 py-2 text-sm {{ $isPop ? 'bg-emerald-500 text-slate-950 hover:bg-emerald-400' : 'bg-white/10 text-white hover:bg-white/20 ring-1 ring-white/20' }}">
-                                Kies dit pakket
+                            <a href="{{ $service->prices->isNotEmpty() ? route('checkout.show', $service) : route('contact') . '?service=' . $service->slug }}" class="btn px-4 py-2 text-sm {{ $isPop ? 'bg-emerald-500 text-slate-950 hover:bg-emerald-400' : 'bg-white/10 text-white hover:bg-white/20 ring-1 ring-white/20' }}">
+                                {{ $service->prices->isNotEmpty() ? 'Bestel direct' : 'Neem contact op' }}
                             </a>
                         </div>
                     </div>
@@ -414,8 +415,8 @@ $steps = [
                                         <span class="text-sm text-slate-500">Investering</span>
                                         <div class="font-mono text-2xl font-bold text-emerald-400" x-text="h.formatted_price"></div>
                                     </div>
-                                    <a :href="'{{ route('contact') }}?service=' + h.slug" class="btn bg-emerald-500 text-slate-950 hover:bg-emerald-400 whitespace-nowrap">
-                                        Kies dit pakket
+                                    <a :href="h.checkout_url" class="btn bg-emerald-500 text-slate-950 hover:bg-emerald-400 whitespace-nowrap">
+                                        Bestel direct
                                     </a>
                                 </div>
                             </div>

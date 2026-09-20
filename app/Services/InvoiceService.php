@@ -28,8 +28,12 @@ class InvoiceService
         $price = $customerService->price ?? $service->price ?? 0;
 
         $priceLabel = match ($customerService->price_type ?? $service->price_type) {
-            'maandelijks' => ' (maandelijks)',
-            'jaarlijks' => ' (jaarlijks)',
+            'monthly', 'maandelijks' => ' (maandelijks)',
+            'quarterly' => ' (per kwartaal)',
+            'semiannual' => ' (ieder halfjaar)',
+            'yearly', 'jaarlijks' => ' (jaarlijks)',
+            'biennial' => ' (per 2 jaar)',
+            'triennial' => ' (per 3 jaar)',
             default => '',
         };
 

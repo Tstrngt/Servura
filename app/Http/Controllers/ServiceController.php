@@ -9,7 +9,8 @@ class ServiceController extends Controller
 {
     public function index()
     {
-        $services = Service::active()
+        $services = Service::with(['prices' => fn ($query) => $query->where('is_enabled', true)])
+            ->active()
             ->servicesPage()
             ->ordered()
             ->get();

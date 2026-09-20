@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboard;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\QuoteBuilderController;
@@ -43,6 +44,8 @@ Route::get('/over-ons', [AboutController::class, 'index'])->name('about');
 // Diensten
 Route::get('/diensten', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/diensten/{service}', [ServiceController::class, 'show'])->name('services.show');
+Route::get('/bestellen/{service}', [CheckoutController::class, 'show'])->name('checkout.show');
+Route::post('/bestellen/{service}', [CheckoutController::class, 'store'])->name('checkout.store');
 
 // Contact
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
