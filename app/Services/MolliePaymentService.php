@@ -112,8 +112,10 @@ class MolliePaymentService
         $customerService = $invoice->customerService
             ?? CustomerService::find($invoice->lines()->whereNotNull('customer_service_id')->value('customer_service_id'));
         if ($customerService) {
-            $wasExternallySuspended = $customerService->provisioning_status === 'suspended';
-            if ($invoice->period_start && $invoice->period_end) {
+            $isRenewal = $invoice->period_start && $invoice->period_end;
+            $wasExternallySuspended = $customerService->provisioning_status === 'suspended'
+                || ($customerService->external_username && $customerService->external_suspended_at);
+            if ($isRenewal) {
                 $this->periods->applyRenewalPeriod($customerService, $invoice->period_start, $invoice->period_end);
             } elseif (!$customerService->current_period_start) {
                 $this->periods->activateInitialPeriod($customerService);
@@ -125,11 +127,25 @@ class MolliePaymentService
                 ]);
             }
 
-            $customerService->refresh()->loadMissing(['user', 'service']);
+            $customerService->refresh()->loadMissing(['user', 'service.serverConnection']);
             if ($wasExternallySuspended) {
                 $this->provisioning->unsuspend($customerService);
-            } elseif ($customerService->service->fulfillment_type === 'directadmin' && $customerService->provisioning_status !== 'active') {
+            } elseif (!$isRenewal
+                && $customerService->service->fulfillment_type === 'directadmin'
+                && in_array($customerService->provisioning_status, ['pending_payment', 'processing', 'failed'], true)
+                && $customerService->domain
+                && $customerService->service->serverConnection) {
                 $this->provisioning->provision($customerService);
+            } elseif ($isRenewal
+                && $customerService->provisioning_status === 'failed'
+                && !$customerService->external_username) {
+                $customerService->update([
+                    'status' => 'active',
+                    'suspension_reason' => null,
+                    'suspended_at' => null,
+                    'provisioning_status' => 'not_required',
+                    'provisioning_error' => null,
+                ]);
             }
         }
 
