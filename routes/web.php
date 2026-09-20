@@ -131,6 +131,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/customers/{customer}/reset-password', [AdminCustomerController::class, 'resetPassword'])->name('customers.reset-password');
         Route::get('/customers/{customer}/services', [AdminCustomerController::class, 'services'])->name('customers.services');
         Route::post('/customers/{customer}/services', [AdminCustomerController::class, 'storeService'])->name('customers.services.store');
+        Route::patch('/customers/{customer}/services/{service}/renewal', [AdminCustomerController::class, 'updateServiceRenewal'])->name('customers.services.renewal.update');
+        Route::post('/customers/{customer}/services/{service}/renewal/process', [AdminCustomerController::class, 'processServiceRenewal'])->name('customers.services.renewal.process');
         Route::post('/customers/{customer}/services/{service}/cancel', [AdminCustomerController::class, 'cancelService'])->name('customers.services.cancel');
         Route::get('/customers/{customer}/tickets', [AdminCustomerController::class, 'tickets'])->name('customers.tickets');
 

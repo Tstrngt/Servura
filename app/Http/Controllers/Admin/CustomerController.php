@@ -7,7 +7,9 @@ use App\Models\User;
 use App\Models\CustomerService;
 use App\Models\Invoice;
 use App\Models\Service;
+use App\Models\ServicePrice;
 use App\Models\Ticket;
+use App\Services\RenewalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -116,6 +118,7 @@ class CustomerController extends Controller
 
         $customer->load([
             'customerServices.service',
+            'customerServices.invoices',
             'tickets' => function ($query) {
                 $query->latest()->limit(10);
             }
@@ -142,7 +145,9 @@ class CustomerController extends Controller
         // Data for invoices tab
         $invoices = Invoice::where('user_id', $customer->id)->latest('invoice_date')->get();
 
-        return view('admin.customers.show', compact('customer', 'stats', 'availableServices', 'invoices'));
+        $billingCycles = ServicePrice::CYCLES;
+
+        return view('admin.customers.show', compact('customer', 'stats', 'availableServices', 'invoices', 'billingCycles'));
     }
 
     /**
@@ -343,6 +348,53 @@ class CustomerController extends Controller
         return redirect()
             ->route('admin.customers.show', [$customer, 'tab' => 'services'])
             ->with('success', "Dienst \"{$service->title}\" is toegewezen en factuur is automatisch aangemaakt.");
+    }
+
+    public function updateServiceRenewal(Request $request, User $customer, CustomerService $service)
+    {
+        if (!$customer->isCustomer() || $service->user_id !== $customer->id) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'billing_cycle' => ['required', Rule::in(array_keys(ServicePrice::CYCLES))],
+            'current_period_start' => 'required|date',
+            'current_period_end' => 'nullable|date|after_or_equal:current_period_start',
+            'next_invoice_date' => 'nullable|date',
+            'payment_method' => 'required|in:auto_debit,payment_link',
+            'auto_renew' => 'boolean',
+        ]);
+        $validated['auto_renew'] = $request->boolean('auto_renew') && $validated['billing_cycle'] !== 'one_time';
+        $validated['price_type'] = $validated['billing_cycle'];
+        $validated['end_date'] = $validated['current_period_end'] ?? null;
+        if (!$validated['auto_renew']) {
+            $validated['next_invoice_date'] = null;
+        }
+        $service->update($validated);
+
+        return redirect()->route('admin.customers.show', [$customer, 'tab' => 'services'])
+            ->with('success', 'Renewalinstellingen zijn bijgewerkt.');
+    }
+
+    public function processServiceRenewal(User $customer, CustomerService $service, RenewalService $renewals)
+    {
+        if (!$customer->isCustomer() || $service->user_id !== $customer->id) {
+            abort(404);
+        }
+
+        try {
+            $invoice = $renewals->processOne($service);
+            if (!$invoice) {
+                return back()->with('error', 'Renewal is niet verschuldigd of is voor deze periode al verwerkt.');
+            }
+
+            return redirect()->route('admin.financial.invoices.show', $invoice)
+                ->with('success', "Renewalfactuur {$invoice->invoice_number} is aangemaakt.");
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return back()->with('error', 'Renewal kon niet worden verwerkt: ' . $exception->getMessage());
+        }
     }
 
     /**

@@ -31,27 +31,12 @@ class RenewalService
             ->chunkById(100, function ($services) use (&$result) {
                 foreach ($services as $customerService) {
                     try {
-                        $invoice = $this->createRenewalInvoice($customerService);
+                        $invoice = $this->processOne($customerService);
                         if (!$invoice) {
                             continue;
                         }
                         $result['created']++;
-
-                        if ($customerService->payment_method === 'auto_debit' && $customerService->user->mollie_customer_id) {
-                            try {
-                                $this->payments->createRecurringPayment($invoice);
-                                $result['automatic']++;
-                            } catch (\Throwable $exception) {
-                                report($exception);
-                                $this->payments->createPayment($invoice);
-                                $result['payment_links']++;
-                            }
-                        } else {
-                            $this->payments->createPayment($invoice);
-                            $result['payment_links']++;
-                        }
-
-                        $this->notifyCustomer($invoice);
+                        $invoice->payment_url ? $result['payment_links']++ : $result['automatic']++;
                     } catch (\Throwable $exception) {
                         report($exception);
                         $result['failed']++;
@@ -60,6 +45,39 @@ class RenewalService
             });
 
         return $result;
+    }
+
+    public function processOne(CustomerService $customerService): ?Invoice
+    {
+        $customerService->loadMissing(['user', 'service']);
+        if ($customerService->status !== 'active'
+            || !$customerService->auto_renew
+            || $customerService->cancel_at_period_end
+            || $customerService->billing_cycle === 'one_time'
+            || !$customerService->next_invoice_date
+            || $customerService->next_invoice_date->isAfter(today())) {
+            return null;
+        }
+
+        $invoice = $this->createRenewalInvoice($customerService);
+        if (!$invoice) {
+            return null;
+        }
+
+        if ($customerService->payment_method === 'auto_debit' && $customerService->user->mollie_customer_id) {
+            try {
+                $this->payments->createRecurringPayment($invoice);
+            } catch (\Throwable $exception) {
+                report($exception);
+                $this->payments->createPayment($invoice);
+            }
+        } else {
+            $this->payments->createPayment($invoice);
+        }
+
+        $this->notifyCustomer($invoice);
+
+        return $invoice->fresh();
     }
 
     private function createRenewalInvoice(CustomerService $customerService): ?Invoice

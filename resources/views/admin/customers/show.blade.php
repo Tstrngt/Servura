@@ -319,6 +319,37 @@
                                                 @endif
                                             </td>
                                         </tr>
+                                        <tr class="bg-slate-50/60">
+                                            <td colspan="5" class="px-4 py-3">
+                                                <details>
+                                                    <summary class="cursor-pointer text-sm font-semibold text-primary-700 hover:text-primary-900">Renewal beheren en testen</summary>
+                                                    <div class="mt-4 rounded-xl bg-white p-4 ring-1 ring-slate-200">
+                                                        <form method="POST" action="{{ route('admin.customers.services.renewal.update', [$customer, $cs]) }}">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                                                                <div><label class="form-label">Betaalperiode</label><select name="billing_cycle" class="form-input">@foreach($billingCycles as $cycle => $label)<option value="{{ $cycle }}" {{ $cs->billing_cycle === $cycle ? 'selected' : '' }}>{{ $label }}</option>@endforeach</select></div>
+                                                                <div><label class="form-label">Periode vanaf</label><input type="date" name="current_period_start" class="form-input" required value="{{ $cs->current_period_start?->format('Y-m-d') ?? $cs->start_date?->format('Y-m-d') }}"></div>
+                                                                <div><label class="form-label">Periode tot</label><input type="date" name="current_period_end" class="form-input" value="{{ $cs->current_period_end?->format('Y-m-d') }}"></div>
+                                                                <div><label class="form-label">Volgende factuurdatum</label><input type="date" name="next_invoice_date" class="form-input" value="{{ $cs->next_invoice_date?->format('Y-m-d') }}"></div>
+                                                                <div><label class="form-label">Betaalmethode</label><select name="payment_method" class="form-input"><option value="payment_link" {{ $cs->payment_method === 'payment_link' ? 'selected' : '' }}>Factuur met betaallink</option><option value="auto_debit" {{ $cs->payment_method === 'auto_debit' ? 'selected' : '' }}>Automatische incasso</option></select></div>
+                                                            </div>
+                                                            <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                                                <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="auto_renew" value="1" {{ $cs->auto_renew ? 'checked' : '' }} class="rounded border-slate-300 text-primary-600"> Automatisch verlengen</label>
+                                                                <button type="submit" class="btn btn-outline">Renewalinstellingen opslaan</button>
+                                                            </div>
+                                                        </form>
+                                                        <div class="mt-4 flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                                                            <p class="text-xs leading-relaxed text-slate-500">Zet de volgende factuurdatum op vandaag of eerder, sla op en verwerk daarna de renewal. De idempotentiecontrole voorkomt een tweede factuur voor dezelfde periode.</p>
+                                                            <form method="POST" action="{{ route('admin.customers.services.renewal.process', [$customer, $cs]) }}" onsubmit="return confirm('Renewal nu verwerken? Dit maakt een echte factuur en start de ingestelde Mollie-betaalmethode.')">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-primary whitespace-nowrap" {{ !$cs->auto_renew || $cs->billing_cycle === 'one_time' ? 'disabled' : '' }}>Renewal nu verwerken</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </details>
+                                            </td>
+                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>
