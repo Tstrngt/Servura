@@ -110,6 +110,34 @@
                             @enderror
                         </div>
 
+                        <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Pakket-popup</h3>
+
+                        <div class="form-group mb-6">
+                            <label for="popup_label" class="form-label">Label boven de omschrijving</label>
+                            <input type="text" id="popup_label" name="popup_label" class="form-input" value="{{ old('popup_label') }}" placeholder="Bijvoorbeeld: Meest gekozen">
+                            @error('popup_label')<span class="form-error">{{ $message }}</span>@enderror
+                        </div>
+
+                        <div class="form-group mb-6">
+                            <label for="popup_badges" class="form-label">Badges (één per regel)</label>
+                            <textarea id="popup_badges" name="popup_badges" rows="4" class="form-textarea" placeholder="Maatwerk design&#10;CMS inbegrepen&#10;1 jaar onderhoud">{{ old('popup_badges') }}</textarea>
+                            <p class="mt-1 text-sm text-gray-500">Korte kenmerken die boven de detailblokken verschijnen.</p>
+                            @error('popup_badges')<span class="form-error">{{ $message }}</span>@enderror
+                        </div>
+
+                        <div class="form-group mb-6">
+                            <label for="popup_details" class="form-label">Detailblokken (één per regel)</label>
+                            <textarea id="popup_details" name="popup_details" rows="7" class="form-textarea" placeholder="Uniek ontwerp | Een design dat aansluit bij uw merk en doelgroep.&#10;Responsive | Perfect zichtbaar op mobiel, tablet en desktop.">{{ old('popup_details') }}</textarea>
+                            <p class="mt-1 text-sm text-gray-500">Gebruik per regel: titel | omschrijving.</p>
+                            @error('popup_details')<span class="form-error">{{ $message }}</span>@enderror
+                        </div>
+
+                        <div class="form-group mb-6">
+                            <label for="popup_price_note" class="form-label">Toelichting bij de prijs</label>
+                            <textarea id="popup_price_note" name="popup_price_note" rows="2" class="form-textarea" placeholder="Bijvoorbeeld: Eenmalig, exclusief onderhoud.">{{ old('popup_price_note') }}</textarea>
+                            @error('popup_price_note')<span class="form-error">{{ $message }}</span>@enderror
+                        </div>
+
                         <h3 class="text-md font-semibold text-gray-900 mb-4 border-b pb-2">Zichtbaarheid & Instellingen</h3>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

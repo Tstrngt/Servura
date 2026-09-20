@@ -19,6 +19,10 @@ class Service extends Model
         'price',
         'price_type',
         'features',
+        'popup_label',
+        'popup_badges',
+        'popup_details',
+        'popup_price_note',
         'is_popular',
         'sort_order',
         'is_active',
@@ -34,6 +38,8 @@ class Service extends Model
 
     protected $casts = [
         'features' => 'array',
+        'popup_badges' => 'array',
+        'popup_details' => 'array',
         'price' => 'decimal:2',
         'is_popular' => 'boolean',
         'is_active' => 'boolean',

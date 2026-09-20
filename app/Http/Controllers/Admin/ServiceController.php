@@ -68,6 +68,10 @@ class ServiceController extends Controller
             'price' => 'nullable|numeric|min:0',
             'price_type' => 'required|in:eenmalig,maandelijks,jaarlijks,op-aanvraag',
             'features' => 'nullable|string',
+            'popup_label' => 'nullable|string|max:100',
+            'popup_badges' => 'nullable|string|max:2000',
+            'popup_details' => 'nullable|string|max:10000',
+            'popup_price_note' => 'nullable|string|max:500',
             'is_popular' => 'boolean',
             'is_active' => 'boolean',
             'show_on_homepage' => 'boolean',
@@ -94,6 +98,9 @@ class ServiceController extends Controller
         } else {
             $validated['features'] = [];
         }
+
+        $validated['popup_badges'] = $this->parseLines($validated['popup_badges'] ?? null);
+        $validated['popup_details'] = $this->parsePopupDetails($validated['popup_details'] ?? null);
 
         // Ensure unique slug
         $baseSlug = $validated['slug'];
@@ -126,6 +133,10 @@ class ServiceController extends Controller
             'price' => 'nullable|numeric|min:0',
             'price_type' => 'required|in:eenmalig,maandelijks,jaarlijks,op-aanvraag',
             'features' => 'nullable|string',
+            'popup_label' => 'nullable|string|max:100',
+            'popup_badges' => 'nullable|string|max:2000',
+            'popup_details' => 'nullable|string|max:10000',
+            'popup_price_note' => 'nullable|string|max:500',
             'is_popular' => 'boolean',
             'is_active' => 'boolean',
             'show_on_homepage' => 'boolean',
@@ -153,6 +164,9 @@ class ServiceController extends Controller
             $validated['features'] = [];
         }
 
+        $validated['popup_badges'] = $this->parseLines($validated['popup_badges'] ?? null);
+        $validated['popup_details'] = $this->parsePopupDetails($validated['popup_details'] ?? null);
+
         // Ensure unique slug (exclude current)
         $baseSlug = $validated['slug'];
         $counter = 1;
@@ -166,6 +180,22 @@ class ServiceController extends Controller
         return redirect()
             ->route('admin.services.index')
             ->with('success', 'Dienst is succesvol bijgewerkt.');
+    }
+
+    private function parseLines(?string $value): array
+    {
+        return array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $value ?? ''))));
+    }
+
+    private function parsePopupDetails(?string $value): array
+    {
+        return array_values(array_filter(array_map(function ($line) {
+            [$title, $description] = array_pad(array_map('trim', explode('|', $line, 2)), 2, '');
+
+            return $title !== '' && $description !== ''
+                ? ['title' => $title, 'description' => $description]
+                : null;
+        }, preg_split('/\r\n|\r|\n/', $value ?? ''))));
     }
 
     public function destroy(Service $service)
