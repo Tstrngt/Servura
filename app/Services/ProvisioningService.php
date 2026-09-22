@@ -59,7 +59,9 @@ class ProvisioningService
             $this->log($customerService, 'directadmin_aangemaakt', 'DirectAdmin-account automatisch aangemaakt.');
             $this->sendCredentials($customerService->fresh(['user', 'service.serverConnection']));
         } catch (\Throwable $exception) {
-            $this->fail($customerService, $exception->getMessage());
+            $message = $exception->getMessage();
+            $isTimeout = stripos($message, 'timed out') !== false;
+            $this->fail($customerService, $message, !$isTimeout, $isTimeout ? 'timeout' : 'error');
             throw $exception;
         }
     }
@@ -120,10 +122,10 @@ class ProvisioningService
         return substr($prefix, 0, 4) . str_pad(base_convert((string) $customerService->id, 10, 36), 4, '0', STR_PAD_LEFT);
     }
 
-    private function fail(CustomerService $customerService, string $message, bool $suspendService = true): void
+    private function fail(CustomerService $customerService, string $message, bool $suspendService = true, string $errorType = 'error'): void
     {
         $data = [
-            'provisioning_status' => 'failed',
+            'provisioning_status' => $errorType === 'timeout' ? 'processing' : 'failed',
             'provisioning_error' => Str::limit($message, 1000),
         ];
         if ($suspendService) {

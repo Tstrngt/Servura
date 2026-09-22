@@ -67,7 +67,7 @@ class DirectAdminClient
             'package' => $data['package'],
             'ip' => $this->value('shared_ip'),
             'notify' => 'no',
-        ]);
+        ], 120);
     }
 
     public function suspendUser(string $username): array
@@ -88,14 +88,14 @@ class DirectAdminClient
         ]);
     }
 
-    private function request(string $endpoint, array $data): array
+    private function request(string $endpoint, array $data, int $timeoutSeconds = null): array
     {
         if (!$this->isConfigured()) {
             throw new \RuntimeException('DirectAdmin is niet geconfigureerd.');
         }
 
         try {
-            $response = $this->http()->asForm()->post(
+            $response = $this->http($timeoutSeconds)->asForm()->post(
                 rtrim($this->value('url'), '/') . '/' . $endpoint,
                 $data + ['json' => 'yes']
             );
@@ -147,10 +147,10 @@ class DirectAdminClient
         return $this->connection?->{$key} ?? config("directadmin.{$key}");
     }
 
-    private function http(): PendingRequest
+    private function http(?int $timeoutSeconds = null): PendingRequest
     {
         $request = Http::withBasicAuth($this->value('username'), $this->value('password'))
-            ->timeout((int) ($this->value('timeout') ?: 20));
+            ->timeout($timeoutSeconds ?? (int) ($this->value('timeout') ?: 20));
 
         return $this->value('verify_ssl') ? $request : $request->withoutVerifying();
     }
