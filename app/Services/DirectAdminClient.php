@@ -115,7 +115,11 @@ class DirectAdminClient
             parse_str($body, $result);
         }
         if ((int) ($result['error'] ?? 1) !== 0) {
-            throw new \RuntimeException(trim(($result['text'] ?? 'DirectAdmin-fout') . ' ' . ($result['details'] ?? '')));
+            $message = trim(($result['text'] ?? 'DirectAdmin-fout') . ' ' . ($result['details'] ?? ''));
+            if ($message === '' || $message === 'DirectAdmin-fout') {
+                $message = 'DirectAdmin-fout (ruwe response: ' . mb_strimwidth($body, 0, 500) . ')';
+            }
+            throw new \RuntimeException($message);
         }
 
         return $result;

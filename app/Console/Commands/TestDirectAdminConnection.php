@@ -41,10 +41,17 @@ class TestDirectAdminConnection extends Command
         } catch (\Throwable $e) {
             $this->error('Verbinding mislukt: ' . $e->getMessage());
             $this->newLine();
+            $this->warn('Geprobeerd met SSL-verificatie: ' . ($connection->verify_ssl ? 'aan' : 'uit'));
             $this->warn('Controleer:');
             $this->line('- SSL-verificatie: probeer eerst met "SSL verifiëren" uit in het adminpanel.');
             $this->line('- Gebruikersnaam en wachtwoord.');
             $this->line('- Of de URL bereikbaar is vanaf deze server.');
+
+            if (!$connection->verify_ssl) {
+                $this->newLine();
+                $this->warn('SSL-verificatie staat al uit; controleer de gebruikersnaam en het wachtwoord.');
+            }
+
             return self::FAILURE;
         }
     }
