@@ -8,24 +8,11 @@
 
 @section('content')
 @include('customer.partials.sidebar')
+@include('customer.partials.topbar')
 
-<div class="min-h-screen bg-slate-50 lg:pl-64">
-    <!-- Top bar with subtle gradient -->
-    <div class="bg-white border-b border-slate-200/60 sticky top-0 z-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div>
-                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Klantportaal</p>
-            </div>
-            <div class="flex items-center gap-4">
-                <span class="text-sm text-slate-600 hidden sm:inline">{{ Auth::user()->email }}</span>
-                <span class="h-8 w-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-sm font-bold">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                </span>
-            </div>
-        </div>
-    </div>
+<div class="min-h-screen bg-slate-50 lg:pl-64 pt-32">
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         @php
             $hour = now()->format('H');
             $greeting = $hour < 12 ? 'Goedemorgen' : ($hour < 18 ? 'Goedemiddag' : 'Goedenavond');
