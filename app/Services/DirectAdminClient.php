@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\ServerConnection;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class DirectAdminClient
 {
@@ -32,10 +33,25 @@ class DirectAdminClient
             throw new \RuntimeException('De serverkoppeling is niet volledig ingevuld.');
         }
 
-        $response = $this->http()->get(rtrim($this->value('url'), '/') . '/CMD_API_LOGIN_TEST', ['json' => 'yes']);
-        $response->throw();
+        $url = rtrim($this->value('url'), '/') . '/CMD_API_LOGIN_TEST';
 
-        return $this->parseResponse($response->json(), $response->body());
+        try {
+            $response = $this->http()->get($url, ['json' => 'yes']);
+            $response->throw();
+        } catch (\Throwable $e) {
+            Log::error('DirectAdmin test connection failed', [
+                'url' => $url,
+                'username' => $this->value('username'),
+                'verify_ssl' => $this->value('verify_ssl'),
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Kan geen verbinding maken met DirectAdmin: ' . $e->getMessage(), 0, $e);
+        }
+
+        $body = $response->body();
+        Log::info('DirectAdmin test connection raw response', ['url' => $url, 'body' => $body]);
+
+        return $this->parseResponse($body);
     }
 
     public function createUser(array $data): array
@@ -78,25 +94,52 @@ class DirectAdminClient
             throw new \RuntimeException('DirectAdmin is niet geconfigureerd.');
         }
 
-        $response = $this->http()->asForm()->post(
-            rtrim($this->value('url'), '/') . '/' . $endpoint,
-            $data + ['json' => 'yes']
-        );
-        $response->throw();
-        return $this->parseResponse($response->json(), $response->body());
+        try {
+            $response = $this->http()->asForm()->post(
+                rtrim($this->value('url'), '/') . '/' . $endpoint,
+                $data + ['json' => 'yes']
+            );
+            $response->throw();
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('DirectAdmin-verzoek mislukt: ' . $e->getMessage(), 0, $e);
+        }
+
+        return $this->parseResponse($response->body());
     }
 
-    private function parseResponse(mixed $json, string $body): array
+    private function parseResponse(string $body): array
     {
-        $result = is_array($json) ? $json : [];
-        if (!$result) {
+        $body = trim($body);
+        $result = json_decode($body, true);
+        if (!is_array($result)) {
             parse_str($body, $result);
         }
-        if ((int) ($result['error'] ?? 1) !== 0) {
-            throw new \RuntimeException(trim(($result['text'] ?? 'DirectAdmin-fout') . ' ' . ($result['details'] ?? '')));
+
+        $hasError = array_key_exists('error', $result);
+        $error = (int) ($result['error'] ?? 1);
+        $success = trim((string) ($result['success'] ?? ''));
+
+        if ($hasError && $error !== 0) {
+            $message = trim(($result['text'] ?? '') . ' ' . ($result['details'] ?? ''));
+            if ($message === '') {
+                $message = 'DirectAdmin-fout (ruwe response: ' . mb_strimwidth($body, 0, 500) . ')';
+            }
+            throw new \RuntimeException($message);
         }
 
-        return $result;
+        if (!$hasError && $success !== '' && stripos($success, 'Login OK') !== false) {
+            return $result;
+        }
+
+        if (!$hasError && $success === '') {
+            return $result;
+        }
+
+        if ($hasError && $error === 0) {
+            return $result;
+        }
+
+        throw new \RuntimeException('DirectAdmin-fout (ruwe response: ' . mb_strimwidth($body, 0, 500) . ')');
     }
 
     private function value(string $key): mixed
@@ -107,7 +150,6 @@ class DirectAdminClient
     private function http(): PendingRequest
     {
         $request = Http::withBasicAuth($this->value('username'), $this->value('password'))
-            ->acceptJson()
             ->timeout((int) ($this->value('timeout') ?: 20));
 
         return $this->value('verify_ssl') ? $request : $request->withoutVerifying();

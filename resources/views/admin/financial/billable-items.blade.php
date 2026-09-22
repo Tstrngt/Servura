@@ -6,9 +6,9 @@
 @include('admin.partials.sidebar')
 
 <div class="bg-gray-50 min-h-screen lg:pl-64">
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <div class="flex items-center justify-between mb-2">
+    <div class="mx-auto w-full max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8">
+        <div class="py-4">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Financieel</h1>
                     <p class="mt-1 text-sm text-gray-600">Beheer facturen, transacties en offertes.</p>
@@ -16,9 +16,7 @@
             </div>
         </div>
 
-        <div class="px-4 sm:px-0">
-            @include('admin.financial.partials.tabs')
-        </div>
+        @include('admin.financial.partials.financial-nav')
 
         <!-- Filters -->
         <div class="px-4 sm:px-0 mb-6">
