@@ -23,12 +23,17 @@ class Ticket extends Model
         'resolved_at',
         'closed_at',
         'resolution_notes',
+        'request_type',
+        'request_details',
+        'page',
+        'customer_notes',
     ];
 
     protected $casts = [
         'last_reply_at' => 'datetime',
         'resolved_at' => 'datetime',
         'closed_at' => 'datetime',
+        'request_details' => 'array',
     ];
 
     // Boot method to generate ticket number
@@ -167,6 +172,19 @@ class Ticket extends Model
                 'text' => $this->priority,
                 'color' => 'gray'
             ]
+        };
+    }
+
+    // Get request type label
+    public function getRequestTypeLabelAttribute(): string
+    {
+        return match($this->request_type) {
+            'website_aanpassen' => 'Aanpassing',
+            'iets_toevoegen' => 'Toevoeging',
+            'website_uitbreiden' => 'Uitbreiding',
+            'hulp_nodig' => 'Hulp',
+            'algemeen' => 'Algemeen',
+            default => 'Support'
         };
     }
 

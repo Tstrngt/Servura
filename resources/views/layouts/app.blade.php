@@ -20,8 +20,10 @@
     @vite(['resources/css/app.css'])
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+
     <!-- Open Graph -->
     <meta property="og:title" content="@yield('og:title', 'Servura - MKB Websites en Hosting')">
     <meta property="og:description" content="@yield('og:description', 'Servura helpt mkb-bedrijven met professionele websites en hosting')">
@@ -38,7 +40,7 @@
 <body class="bg-gray-50" x-data="{ mobileMenu: false }">
     <!-- Page transition loader (only on public/customer pages) -->
     @unless(request()->routeIs('admin.*'))
-    <div id="page-loader" class="fixed inset-0 z-[60] flex items-center justify-center bg-white/95 backdrop-blur-sm transition-opacity duration-500">
+    <div id="page-loader" data-turbo-permanent class="fixed inset-0 z-[60] flex items-center justify-center bg-white/95 backdrop-blur-sm transition-opacity duration-500">
         <div class="flex flex-col items-center">
             <span class="logo-text text-4xl font-extrabold logo-mark mb-4 animate-pulse-soft">Servura</span>
             <svg class="animate-spin h-6 w-6 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -51,7 +53,7 @@
     @endunless
 
     <!-- Navigation -->
-    @unless(request()->routeIs('admin.*'))
+    @unless(request()->routeIs('admin.*') || request()->routeIs('customer.*'))
     @php
         // Only these pages open with a dark hero section; render the navbar's
         // dark glass theme server-side for them so there's no JS timing gap

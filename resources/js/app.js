@@ -2,6 +2,18 @@ import './bootstrap';
 
 import Alpine from 'alpinejs';
 
+// Turbo Drive: SPA-achtige navigatie binnen het klantportaal
+// Pagina's worden via AJAX opgehaald en gewisseld zonder wit scherm/herlaad.
+if (window.location.pathname.startsWith('/klant/')) {
+    import('@hotwired/turbo').then(({ Turbo }) => {
+        Turbo.start();
+        // Prefetch links bij hover zodat tab-wissels vrijwel instant aanvoelen
+        if (Turbo.config) {
+            Turbo.config.prefetch = { mode: 'hover' };
+        }
+    });
+}
+
 // Alpine.js components
 Alpine.data('mobileMenu', () => ({
     open: false,
@@ -104,30 +116,29 @@ document.addEventListener('alpine:init', () => {
 });
 
 // Intersection Observer for animations
-const observerOptions = {
-    threshold: 0.15,
-    rootMargin: '0px 0px -80px 0px'
-};
+function initAnimateOnScroll() {
+    const observerOptions = {
+        threshold: 0.15,
+        rootMargin: '0px 0px -80px 0px'
+    };
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
 
-// Observe elements that should animate on scroll
-document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.animate-on-scroll').forEach(el => {
         observer.observe(el);
     });
-});
+}
 
 // Glass navbar: switch between light/dark theme depending on the section
 // currently sitting behind it, so the "Servura" logo and links stay readable.
-document.addEventListener('DOMContentLoaded', () => {
+function initNavbarTheme() {
     const nav = document.querySelector('[data-navbar]');
     if (!nav) return;
 
@@ -160,6 +171,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // that initial state on its own.
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
+}
+
+// Run on initial load and after every Turbo Drive page swap
+document.addEventListener('DOMContentLoaded', () => {
+    initAnimateOnScroll();
+    initNavbarTheme();
+});
+document.addEventListener('turbo:load', () => {
+    initAnimateOnScroll();
+    initNavbarTheme();
 });
 
 const serviceIcons = {

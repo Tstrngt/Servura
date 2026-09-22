@@ -3,14 +3,17 @@
 @section('title', 'Mijn Offertes - Servura')
 
 @section('content')
-@include('customer.partials.sidebar')
+@include('customer.partials.topbar')
 
-<div class="bg-gray-50 min-h-screen lg:pl-64">
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <h1 class="text-2xl font-bold text-gray-900 mb-6">Mijn Offertes</h1>
+<div class="bg-slate-50 min-h-screen pt-32">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
+        <!-- Page Header -->
+        <div class="mb-10">
+            <h1 class="font-heading text-3xl font-bold text-slate-900">Mijn Offertes</h1>
+            <p class="mt-2 text-lg text-slate-500">Bekijk en beheer alle offertes voor je projecten.</p>
+        </div>
 
-            @if(session('success'))
+        @if(session('success'))
                 <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">{{ session('success') }}</div>
             @endif
             @if(session('error'))
@@ -59,7 +62,6 @@
                     <p class="text-gray-500">Geen offertes gevonden.</p>
                 </div>
             @endif
-        </div>
     </div>
 </div>
 @endsection

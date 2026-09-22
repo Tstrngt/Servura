@@ -20,6 +20,7 @@ yarn-error.log
 Thumbs.db
 
 # Servura specific
+/database/database.sqlite
 /storage/app/public/*
 /storage/framework/cache/*
 /storage/framework/cache/data/*

@@ -3,11 +3,11 @@
 @section('title', 'Nieuw Support Ticket - Servura')
 
 @section('content')
-@include('customer.partials.sidebar')
+@include('customer.partials.topbar')
 
 <!-- Create Ticket Content -->
-<div class="bg-gray-50 min-h-screen lg:pl-64">
-    <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+<div class="bg-slate-50 min-h-screen pt-32">
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="px-4 py-6 sm:px-0">
             <div class="bg-white overflow-hidden shadow rounded-lg">
