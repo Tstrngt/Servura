@@ -52,6 +52,9 @@ class TicketController extends Controller
             'description' => 'required|string|min:10',
             'priority' => 'required|in:low,medium,high,urgent',
             'category' => 'required|in:technical,billing,general,feature_request,bug_report',
+            'request_type' => 'nullable|string|max:255',
+            'page' => 'nullable|string|max:255',
+            'customer_notes' => 'nullable|string|max:5000',
             'attachments.*' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,pdf,doc,docx,txt,zip',
         ], [
             'title.required' => 'Titel is verplicht',
@@ -76,6 +79,9 @@ class TicketController extends Controller
             'description' => $request->description,
             'priority' => $request->priority,
             'category' => $request->category,
+            'request_type' => $request->request_type,
+            'page' => $request->page,
+            'customer_notes' => $request->customer_notes,
         ]);
 
         // Handle attachments

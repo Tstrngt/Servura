@@ -76,7 +76,10 @@ Route::middleware('auth')->group(function () {
     // Customer routes
     Route::middleware('customer')->prefix('klant')->name('customer.')->group(function () {
         Route::get('/dashboard', [CustomerDashboard::class, 'index'])->name('dashboard');
-        
+
+        // Services overview (moved from dashboard)
+        Route::get('/diensten', [App\Http\Controllers\Customer\ServiceController::class, 'index'])->name('services.index');
+
         // Tickets
         Route::get('/tickets', [App\Http\Controllers\Customer\TicketController::class, 'index'])->name('tickets.index');
         Route::get('/tickets/aanmaken', [App\Http\Controllers\Customer\TicketController::class, 'create'])->name('tickets.create');
