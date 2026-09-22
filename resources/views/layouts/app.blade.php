@@ -40,7 +40,7 @@
 <body class="bg-gray-50" x-data="{ mobileMenu: false }">
     <!-- Page transition loader (only on public/customer pages) -->
     @unless(request()->routeIs('admin.*'))
-    <div id="page-loader" class="fixed inset-0 z-[60] flex items-center justify-center bg-white/95 backdrop-blur-sm transition-opacity duration-500">
+    <div id="page-loader" data-turbo-permanent class="fixed inset-0 z-[60] flex items-center justify-center bg-white/95 backdrop-blur-sm transition-opacity duration-500">
         <div class="flex flex-col items-center">
             <span class="logo-text text-4xl font-extrabold logo-mark mb-4 animate-pulse-soft">Servura</span>
             <svg class="animate-spin h-6 w-6 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
