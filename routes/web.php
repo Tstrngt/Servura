@@ -79,6 +79,12 @@ Route::middleware('auth')->group(function () {
 
         // Services overview (moved from dashboard)
         Route::get('/diensten', [App\Http\Controllers\Customer\ServiceController::class, 'index'])->name('services.index');
+        Route::get('/diensten/{customerService}', [App\Http\Controllers\Customer\ServiceController::class, 'show'])->name('services.show');
+        Route::post('/diensten/{customerService}/opzeggen', [App\Http\Controllers\Customer\ServiceController::class, 'cancel'])->name('services.cancel');
+        Route::post('/diensten/{customerService}/overdragen', [App\Http\Controllers\Customer\ServiceController::class, 'transfer'])->name('services.transfer');
+        Route::post('/diensten/{customerService}/upgrade', [App\Http\Controllers\Customer\ServiceController::class, 'upgrade'])->name('services.upgrade');
+        Route::post('/diensten/{customerService}/reset-wachtwoord', [App\Http\Controllers\Customer\ServiceController::class, 'resetPassword'])->name('services.reset-password');
+        Route::post('/diensten/{customerService}/directadmin-login', [App\Http\Controllers\Customer\ServiceController::class, 'directAdminLogin'])->name('services.directadmin-login');
 
         // Tickets
         Route::get('/tickets', [App\Http\Controllers\Customer\TicketController::class, 'index'])->name('tickets.index');
