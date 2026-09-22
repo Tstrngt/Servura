@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\ServerConnection;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class DirectAdminClient
 {
@@ -32,14 +33,25 @@ class DirectAdminClient
             throw new \RuntimeException('De serverkoppeling is niet volledig ingevuld.');
         }
 
+        $url = rtrim($this->value('url'), '/') . '/CMD_API_LOGIN_TEST';
+
         try {
-            $response = $this->http()->get(rtrim($this->value('url'), '/') . '/CMD_API_LOGIN_TEST', ['json' => 'yes']);
+            $response = $this->http()->get($url, ['json' => 'yes']);
             $response->throw();
         } catch (\Throwable $e) {
+            Log::error('DirectAdmin test connection failed', [
+                'url' => $url,
+                'username' => $this->value('username'),
+                'verify_ssl' => $this->value('verify_ssl'),
+                'error' => $e->getMessage(),
+            ]);
             throw new \RuntimeException('Kan geen verbinding maken met DirectAdmin: ' . $e->getMessage(), 0, $e);
         }
 
-        return $this->parseResponse($response->body());
+        $body = $response->body();
+        Log::info('DirectAdmin test connection raw response', ['url' => $url, 'body' => $body]);
+
+        return $this->parseResponse($body);
     }
 
     public function createUser(array $data): array
@@ -117,7 +129,6 @@ class DirectAdminClient
     private function http(): PendingRequest
     {
         $request = Http::withBasicAuth($this->value('username'), $this->value('password'))
-            ->acceptJson()
             ->timeout((int) ($this->value('timeout') ?: 20));
 
         return $this->value('verify_ssl') ? $request : $request->withoutVerifying();
