@@ -24,29 +24,29 @@
                 </div>
             @endif
 
-            <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 overflow-hidden">
                 @if($invoices->count() > 0)
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                        <table class="min-w-full divide-y divide-slate-100">
+                            <thead class="bg-slate-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Factuur</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vervaldatum</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Bedrag</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase"></th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Factuur</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Datum</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Vervaldatum</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase">Bedrag</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase"></th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="bg-white divide-y divide-slate-100">
                                 @foreach($invoices as $invoice)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('customer.invoices.show', $invoice) }}" class="text-primary-600 hover:text-primary-500">{{ $invoice->invoice_number }}</a>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $invoice->invoice_date->format('d-m-Y') }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $invoice->due_date->format('d-m-Y') }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">€{{ number_format($invoice->total, 2, ',', '.') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $invoice->invoice_date->format('d-m-Y') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $invoice->due_date->format('d-m-Y') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 text-right font-medium">€{{ number_format($invoice->total, 2, ',', '.') }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $invoice->statusLabel['color'] }}-100 text-{{ $invoice->statusLabel['color'] }}-800">
                                                 {{ $invoice->statusLabel['text'] }}
@@ -70,8 +70,8 @@
                     @endif
                 @else
                     <div class="text-center py-12">
-                        <h3 class="text-sm font-medium text-gray-900">Geen facturen</h3>
-                        <p class="mt-1 text-sm text-gray-500">U heeft nog geen facturen ontvangen.</p>
+                        <h3 class="text-sm font-medium text-slate-900">Geen facturen</h3>
+                        <p class="mt-1 text-sm text-slate-500">U heeft nog geen facturen ontvangen.</p>
                     </div>
                 @endif
             </div>

@@ -131,7 +131,7 @@
                                         </svg>
                                     </span>
                                     <div>
-                                        <h3 class="font-heading text-2xl font-bold text-slate-900" x-text="title"></h3>
+                                        <h3 class="font-heading font-heading text-3xl font-bold text-slate-900" x-text="title"></h3>
                                         <p class="text-sm text-slate-500 mt-1">Vul een paar vragen in, wij regelen de rest. Je mag meerdere onderdelen selecteren.</p>
                                     </div>
                                 </div>
@@ -231,7 +231,7 @@
         <div class="border-t border-slate-200 pt-16 mt-8 mb-10">
             <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
-                    <h2 class="font-heading text-2xl font-bold text-slate-900">Recente aanvragen</h2>
+                    <h2 class="font-heading font-heading text-3xl font-bold text-slate-900">Recente aanvragen</h2>
                     <p class="mt-1 text-slate-500">Bekijk hier je laatste verzoeken en hun status.</p>
                 </div>
                 @if($recentRequests->count() > 0)
@@ -249,7 +249,7 @@
                             <div class="space-y-3">
                                 @foreach($recentRequests as $request)
                                     <a href="{{ route('customer.tickets.show', $request) }}" class="group flex items-start gap-4 p-4 rounded-xl bg-slate-50 hover:bg-white hover:shadow-md ring-1 ring-transparent hover:ring-slate-200 transition-all">
-                                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white text-slate-500 ring-1 ring-slate-200 shrink-0">
+                                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 ring-1 ring-slate-200 shrink-0">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                                         </span>
                                         <div class="flex-1 min-w-0">

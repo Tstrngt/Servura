@@ -21,27 +21,27 @@
             @endif
 
             @if($quotes->count() > 0)
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-100">
+                        <thead class="bg-slate-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Offerte</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Geldig tot</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Bedrag</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actie</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Offerte</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Datum</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Geldig tot</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase">Bedrag</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase">Actie</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="bg-white divide-y divide-slate-100">
                             @foreach($quotes as $quote)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <a href="{{ route('customer.quotes.show', $quote) }}" class="text-primary-600 hover:text-primary-500 font-medium">{{ $quote->quote_number }}</a>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $quote->quote_date->format('d-m-Y') }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $quote->valid_until->format('d-m-Y') }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">€{{ number_format($quote->total, 2, ',', '.') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $quote->quote_date->format('d-m-Y') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ $quote->valid_until->format('d-m-Y') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 text-right font-medium">€{{ number_format($quote->total, 2, ',', '.') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $quote->statusLabel['color'] }}-100 text-{{ $quote->statusLabel['color'] }}-800">
                                             {{ $quote->statusLabel['text'] }}
@@ -58,8 +58,8 @@
                     </table>
                 </div>
             @else
-                <div class="text-center py-12 bg-white rounded-lg shadow">
-                    <p class="text-gray-500">Geen offertes gevonden.</p>
+                <div class="text-center py-12 bg-white rounded-xl shadow">
+                    <p class="text-slate-500">Geen offertes gevonden.</p>
                 </div>
             @endif
     </div>
