@@ -152,9 +152,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/server-connections/{serverConnection}', [AdminServerConnectionController::class, 'update'])->name('server-connections.update');
         Route::post('/server-connections/{serverConnection}/test', [AdminServerConnectionController::class, 'test'])->name('server-connections.test');
         Route::delete('/server-connections/{serverConnection}', [AdminServerConnectionController::class, 'destroy'])->name('server-connections.destroy');
-        Route::get('/billing-settings', [AdminBillingSettingsController::class, 'edit'])->name('billing-settings.edit');
-        Route::put('/billing-settings', [AdminBillingSettingsController::class, 'update'])->name('billing-settings.update');
-
         // Financial
         Route::prefix('financial')->name('financial.')->group(function () {
             Route::get('/invoices', [FinancialController::class, 'invoices'])->name('invoices');
@@ -183,6 +180,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/invoices/{invoice}/notes', [AdminInvoiceController::class, 'storeNote'])->name('invoices.notes.store');
             Route::post('/invoices/{invoice}/payments', [AdminInvoiceController::class, 'storePayment'])->name('invoices.payments.store');
             Route::get('/logs', [FinancialController::class, 'logs'])->name('logs');
+            Route::get('/billing-settings', [AdminBillingSettingsController::class, 'edit'])->name('billing-settings.edit');
+            Route::put('/billing-settings', [AdminBillingSettingsController::class, 'update'])->name('billing-settings.update');
         });
     });
 });

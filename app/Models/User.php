@@ -58,10 +58,15 @@ class User extends Authenticatable
         return $this->role === 'customer';
     }
 
+    public function isOwner(): bool
+    {
+        return $this->role === 'owner' || $this->role === 'admin';
+    }
+
     // Check if user can access admin area
     public function canAccessAdmin(): bool
     {
-        return $this->isAdmin() || $this->isEmployee();
+        return $this->isAdmin() || $this->isEmployee() || $this->isOwner();
     }
 
     // Customer services relationship

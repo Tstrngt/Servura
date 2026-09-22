@@ -32,4 +32,24 @@ class BillingSetting extends Model
     {
         return filter_var(static::valueFor($key, $default ? '1' : '0'), FILTER_VALIDATE_BOOLEAN);
     }
+
+    public static function encryptedValueFor(string $key, mixed $default = null): mixed
+    {
+        $value = static::valueFor($key);
+
+        if ($value === null) {
+            return $default;
+        }
+
+        try {
+            return decrypt($value);
+        } catch (\Throwable $e) {
+            return $default;
+        }
+    }
+
+    public static function setEncryptedValue(string $key, mixed $value): void
+    {
+        static::setValue($key, encrypt($value));
+    }
 }
