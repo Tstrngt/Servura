@@ -23,9 +23,9 @@
                             @php
                                 $isExpiringSoon = $expiringSoon->contains('id', $customerService->id);
                             @endphp
-                            <div class="bg-slate-50 rounded-xl p-5 ring-1 ring-slate-200">
+                            <a href="{{ route('customer.services.show', $customerService) }}" class="group block bg-slate-50 rounded-xl p-5 ring-1 ring-slate-200 hover:ring-primary-300 hover:bg-slate-100 transition-all">
                                 <div class="flex items-center justify-between mb-2">
-                                    <h4 class="font-heading font-semibold text-slate-900">{{ $customerService->service->title }}</h4>
+                                    <h4 class="font-heading font-semibold text-slate-900 group-hover:text-primary-700">{{ $customerService->service->title }}</h4>
                                     <div class="flex items-center gap-2">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Actief</span>
                                         @if($isExpiringSoon)
@@ -48,7 +48,7 @@
                                         <span class="text-slate-500">t/m {{ $customerService->end_date->format('d-m-Y') }}</span>
                                     @endif
                                 </div>
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                 </div>
@@ -59,23 +59,24 @@
         <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 p-6">
             <h3 class="font-heading text-xl font-bold text-slate-900 mb-5">Alle Diensten</h3>
             @if($allServices->count() > 0)
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-slate-100">
+                <div class="-mx-6 overflow-x-auto sm:mx-0 sm:rounded-b-2xl">
+                    <table class="w-full table-fixed min-w-[640px] divide-y divide-slate-100">
                         <thead class="bg-slate-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Dienst</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Prijs</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Startdatum</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Einddatum</th>
+                                <th class="w-[30%] px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Dienst</th>
+                                <th class="w-[15%] px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                                <th class="w-[18%] px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Prijs</th>
+                                <th class="w-[14%] px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Startdatum</th>
+                                <th class="w-[14%] px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Einddatum</th>
+                                <th class="w-[9%] px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actie</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-100">
                             @foreach($allServices as $customerService)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-slate-900">{{ $customerService->service->title }}</div>
-                                        <div class="text-sm text-slate-500">{{ $customerService->service->short_description }}</div>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="truncate text-sm font-medium text-slate-900" title="{{ $customerService->service->title }}">{{ $customerService->service->title }}</div>
+                                        <div class="truncate text-sm text-slate-500" title="{{ $customerService->service->short_description }}">{{ $customerService->service->short_description }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $customerService->statusLabel['color'] }}-100 text-{{ $customerService->statusLabel['color'] }}-800">
@@ -85,6 +86,9 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{{ $customerService->formatted_price }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{{ $customerService->start_date->format('d-m-Y') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{{ $customerService->end_date ? $customerService->end_date->format('d-m-Y') : 'Onbeperkt' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                        <a href="{{ route('customer.services.show', $customerService) }}" class="font-medium text-primary-600 hover:text-primary-800">Beheren</a>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

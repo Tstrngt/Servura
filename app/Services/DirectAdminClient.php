@@ -88,6 +88,15 @@ class DirectAdminClient
         ]);
     }
 
+    public function resetPassword(string $username, string $password): array
+    {
+        return $this->request('CMD_API_PASSWD', [
+            'username' => $username,
+            'passwd' => $password,
+            'passwd2' => $password,
+        ]);
+    }
+
     private function request(string $endpoint, array $data, int $timeoutSeconds = null): array
     {
         if (!$this->isConfigured()) {
