@@ -32,10 +32,14 @@ class DirectAdminClient
             throw new \RuntimeException('De serverkoppeling is niet volledig ingevuld.');
         }
 
-        $response = $this->http()->get(rtrim($this->value('url'), '/') . '/CMD_API_LOGIN_TEST', ['json' => 'yes']);
-        $response->throw();
+        try {
+            $response = $this->http()->get(rtrim($this->value('url'), '/') . '/CMD_API_LOGIN_TEST', ['json' => 'yes']);
+            $response->throw();
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('Kan geen verbinding maken met DirectAdmin: ' . $e->getMessage(), 0, $e);
+        }
 
-        return $this->parseResponse($response->json(), $response->body());
+        return $this->parseResponse($response->body());
     }
 
     public function createUser(array $data): array
@@ -78,18 +82,24 @@ class DirectAdminClient
             throw new \RuntimeException('DirectAdmin is niet geconfigureerd.');
         }
 
-        $response = $this->http()->asForm()->post(
-            rtrim($this->value('url'), '/') . '/' . $endpoint,
-            $data + ['json' => 'yes']
-        );
-        $response->throw();
-        return $this->parseResponse($response->json(), $response->body());
+        try {
+            $response = $this->http()->asForm()->post(
+                rtrim($this->value('url'), '/') . '/' . $endpoint,
+                $data + ['json' => 'yes']
+            );
+            $response->throw();
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('DirectAdmin-verzoek mislukt: ' . $e->getMessage(), 0, $e);
+        }
+
+        return $this->parseResponse($response->body());
     }
 
-    private function parseResponse(mixed $json, string $body): array
+    private function parseResponse(string $body): array
     {
-        $result = is_array($json) ? $json : [];
-        if (!$result) {
+        $body = trim($body);
+        $result = json_decode($body, true);
+        if (!is_array($result)) {
             parse_str($body, $result);
         }
         if ((int) ($result['error'] ?? 1) !== 0) {
