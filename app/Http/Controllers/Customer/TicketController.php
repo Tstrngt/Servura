@@ -115,7 +115,7 @@ class TicketController extends Controller
         }
 
         return redirect()->route('customer.tickets.show', $ticket)
-            ->with('success', 'Uw ticket is succesvol aangemaakt. Wij nemen zo snel mogelijk contact met u op.');
+            ->with('success', 'Je ticket is succesvol aangemaakt. Wij nemen zo snel mogelijk contact met je op.');
     }
 
     /**
@@ -211,7 +211,7 @@ class TicketController extends Controller
         }
 
         return redirect()->back()
-            ->with('success', 'Uw reactie is succesvol verzonden.');
+            ->with('success', 'Je reactie is succesvol verzonden.');
     }
 
     /**

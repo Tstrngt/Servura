@@ -116,6 +116,7 @@
                         class="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl shadow-slate-900/20 ring-1 ring-slate-200">
                     <form action="{{ route('customer.tickets.store') }}" method="POST" enctype="multipart/form-data" @submit="submitting = true">
                         @csrf
+                        <input type="hidden" name="title" :value="ticketTitle">
                         <input type="hidden" name="request_type" :value="requestType">
                         <input type="hidden" name="category" :value="category">
                         <input type="hidden" name="priority" value="medium">
@@ -131,7 +132,7 @@
                                         </svg>
                                     </span>
                                     <div>
-                                        <h3 class="font-heading font-heading text-3xl font-bold text-slate-900" x-text="title"></h3>
+                                        <h3 class="font-heading text-3xl font-bold text-slate-900" x-text="title"></h3>
                                         <p class="text-sm text-slate-500 mt-1">Vul een paar vragen in, wij regelen de rest. Je mag meerdere onderdelen selecteren.</p>
                                     </div>
                                 </div>
@@ -231,7 +232,7 @@
         <div class="border-t border-slate-200 pt-16 mt-8 mb-10">
             <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
-                    <h2 class="font-heading font-heading text-3xl font-bold text-slate-900">Recente aanvragen</h2>
+                    <h2 class="font-heading text-3xl font-bold text-slate-900">Recente aanvragen</h2>
                     <p class="mt-1 text-slate-500">Bekijk hier je laatste verzoeken en hun status.</p>
                 </div>
                 @if($recentRequests->count() > 0)
@@ -362,6 +363,17 @@ function requestWizard() {
                 'hulp_nodig': 'Waarmee heb je hulp nodig?'
             };
             return labels[this.requestType] || 'Wat wil je doen?';
+        },
+
+        get ticketTitle() {
+            let title = this.title || 'Aanvraag';
+            if (this.selectedOptionsLabels.length) {
+                title += ' - ' + this.selectedOptionsLabels.join(', ');
+            }
+            if (this.page) {
+                title += ' (' + this.page + ')';
+            }
+            return title;
         },
 
         get step1Name() {
