@@ -20,8 +20,10 @@
     @vite(['resources/css/app.css'])
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+
     <!-- Open Graph -->
     <meta property="og:title" content="@yield('og:title', 'Servura - MKB Websites en Hosting')">
     <meta property="og:description" content="@yield('og:description', 'Servura helpt mkb-bedrijven met professionele websites en hosting')">
@@ -51,7 +53,7 @@
     @endunless
 
     <!-- Navigation -->
-    @unless(request()->routeIs('admin.*'))
+    @unless(request()->routeIs('admin.*') || request()->routeIs('customer.*'))
     @php
         // Only these pages open with a dark hero section; render the navbar's
         // dark glass theme server-side for them so there's no JS timing gap

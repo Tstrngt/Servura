@@ -7,30 +7,29 @@
 @endphp
 
 @section('content')
-@include('customer.partials.sidebar')
 @include('customer.partials.topbar')
 
-<div class="min-h-screen bg-slate-50 lg:pl-64 pt-32">
+<div class="min-h-screen bg-slate-50 pt-32">
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
         @php
             $hour = now()->format('H');
             $greeting = $hour < 12 ? 'Goedemorgen' : ($hour < 18 ? 'Goedemiddag' : 'Goedenavond');
         @endphp
 
         <!-- Welcome Section -->
-        <div class="mb-10">
+        <div class="mb-14">
             <h1 class="text-3xl sm:text-4xl font-heading font-bold text-slate-900 tracking-tight">
                 {{ $greeting }}, {{ Auth::user()->name }}
             </h1>
-            <p class="mt-2 text-lg text-slate-500">
+            <p class="mt-3 text-lg text-slate-500">
                 Wat wil je vandaag met je website doen?
             </p>
         </div>
 
         <!-- Primary Action Cards -->
-        <div class="mb-12" x-data="requestWizard()">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+        <div class="mb-24" x-data="requestWizard()">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 <!-- Website aanpassen -->
                 <button type="button" @click="open('website_aanpassen')"
                     class="group relative flex flex-col items-start text-left p-6 bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 overflow-hidden">
@@ -101,19 +100,20 @@
 
             <!-- Wizard Modal -->
             <div x-show="openModal" style="display: none;"
-                class="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6"
+                class="fixed inset-0 z-[70] overflow-y-auto"
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100"
                 x-transition:leave="transition ease-in duration-150"
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0">
-                <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" @click="close()" aria-hidden="true"></div>
-                <div x-show="openModal"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                    class="relative w-full max-w-xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl ring-1 ring-slate-200">
+                <div class="relative min-h-full flex items-center justify-center px-4 pt-10 pb-16 sm:px-6 sm:pt-12 sm:pb-20 lg:px-8 lg:pt-16 lg:pb-24">
+                    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" @click="close()" aria-hidden="true"></div>
+                    <div x-show="openModal"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                        class="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl shadow-slate-900/20 ring-1 ring-slate-200">
                     <form action="{{ route('customer.tickets.store') }}" method="POST" enctype="multipart/form-data" @submit="submitting = true">
                         @csrf
                         <input type="hidden" name="request_type" :value="requestType">
@@ -121,100 +121,129 @@
                         <input type="hidden" name="priority" value="medium">
                         <input type="hidden" name="title" :value="generatedTitle">
 
-                        <div class="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/95 backdrop-blur">
-                            <div>
-                                <h3 class="font-heading text-xl font-bold text-slate-900" x-text="title"></h3>
-                                <p class="text-sm text-slate-500">Vul een paar vragen in, wij regelen de rest.</p>
+                        <!-- Modal Header with accent -->
+                        <div class="px-8 py-6 border-b border-slate-100 bg-white/95 backdrop-blur rounded-t-3xl">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 text-white shadow-lg shadow-primary-500/20">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="font-heading text-2xl font-bold text-slate-900" x-text="title"></h3>
+                                        <p class="text-sm text-slate-500 mt-1">Vul een paar vragen in, wij regelen de rest. Je mag meerdere onderdelen selecteren.</p>
+                                    </div>
+                                </div>
+                                <button type="button" @click="close()" class="p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shrink-0">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
                             </div>
-                            <button type="button" @click="close()" class="p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
                         </div>
 
-                        <div class="p-6 sm:p-8 space-y-6">
-                            <!-- Step 1: What -->
+                        <div class="p-8 space-y-8">
+                            <!-- Step 1: What (multiple choice) -->
                             <div>
-                                <label class="form-label mb-3 block" x-text="step1Label"></label>
-                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                <div class="flex items-center justify-between mb-4">
+                                    <label class="form-label block" x-text="step1Label"></label>
+                                    <span class="text-xs font-medium text-primary-600 bg-primary-50 px-2 py-1 rounded-full ring-1 ring-primary-100">Meerdere opties mogelijk</span>
+                                </div>
+                                <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
                                     <template x-for="option in step1Options" :key="option.value">
-                                        <label class="relative flex flex-col items-center text-center p-4 rounded-xl ring-1 cursor-pointer transition-all"
-                                            :class="selectedOption === option.value ? 'bg-primary-50 ring-primary-500 text-primary-700 shadow-sm' : 'bg-white ring-slate-200 text-slate-700 hover:bg-slate-50'">
-                                            <input type="radio" :name="step1Name" :value="option.value" x-model="selectedOption" class="sr-only" required>
-                                            <span class="text-sm font-semibold" x-text="option.label"></span>
+                                        <label class="relative flex items-start gap-3 p-4 rounded-2xl ring-1 cursor-pointer transition-all"
+                                            :class="isSelected(option.value) ? 'bg-primary-50 ring-primary-500 shadow-sm' : 'bg-white ring-slate-200 hover:bg-slate-50'">
+                                            <input type="checkbox" name="request_details[]" :value="option.value" :checked="isSelected(option.value)" @change="toggleOption(option.value)" class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
+                                            <span class="text-sm font-semibold" :class="isSelected(option.value) ? 'text-primary-900' : 'text-slate-700'" x-text="option.label"></span>
                                         </label>
                                     </template>
                                 </div>
+                                <p x-show="selectedOptions.length === 0" class="mt-2 text-sm text-rose-600">Kies minimaal één optie.</p>
                             </div>
 
                             <!-- Step 2: Page -->
-                            <div x-show="needsPage" x-cloak>
-                                <label for="wizard-page" class="form-label mb-2 block">Op welke pagina moet dit?</label>
-                                <select id="wizard-page" name="page" x-model="page" class="form-input">
+                            <div x-show="needsPage" x-cloak class="p-5 rounded-2xl bg-slate-50 ring-1 ring-slate-200">
+                                <label for="wizard-page" class="form-label mb-2 block">Op welke pagina(n) moet dit?</label>
+                                <select id="wizard-page" name="page" x-model="page" class="form-input bg-white">
                                     <option value="">Kies een pagina</option>
                                     <option value="Homepage">Homepage</option>
                                     <option value="Over ons">Over ons</option>
                                     <option value="Diensten">Diensten</option>
                                     <option value="Contact">Contact</option>
                                     <option value="Blog">Blog</option>
+                                    <option value="Meerdere pagina's">Meerdere pagina's</option>
                                     <option value="Anders">Andere pagina</option>
                                 </select>
+                                <p class="mt-2 text-xs text-slate-500">Selecteer "Meerdere pagina's" als de wijziging op meer plekken moet.</p>
                             </div>
 
                             <!-- Step 3: Description -->
-                            <div>
+                            <div class="p-5 rounded-2xl bg-slate-50 ring-1 ring-slate-200">
                                 <label for="wizard-description" class="form-label mb-2 block">Beschrijf wat je wilt veranderen</label>
-                                <textarea id="wizard-description" name="description" rows="4" x-model="description" class="form-textarea" placeholder="Bijvoorbeeld: Ik wil een nieuwe foto van ons team op de homepage plaatsen." required></textarea>
+                                <textarea id="wizard-description" name="description" rows="5" x-model="description" class="form-textarea bg-white" placeholder="Bijvoorbeeld: Ik wil een nieuwe foto van ons team op de homepage plaatsen en de openingstijden in de footer aanpassen." required></textarea>
+                                <p class="mt-2 text-xs text-slate-500">Hoe specifieker, hoe sneller wij het kunnen uitvoeren.</p>
                             </div>
 
                             <!-- Step 4: File upload -->
-                            <div>
-                                <label class="form-label mb-2 block">Bijlage toevoegen (optioneel)</label>
-                                <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-xl hover:border-primary-400 transition-colors bg-slate-50">
-                                    <div class="space-y-1 text-center">
-                                        <svg class="mx-auto h-10 w-10 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                        <div class="flex text-sm text-slate-600 justify-center">
-                                            <label for="wizard-attachments" class="relative cursor-pointer rounded-md font-medium text-primary-600 hover:text-primary-500">
-                                                <span>Upload bestanden</span>
-                                                <input id="wizard-attachments" name="attachments[]" type="file" class="sr-only" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.zip">
-                                            </label>
+                            <div class="p-5 rounded-2xl bg-slate-50 ring-1 ring-slate-200">
+                                <label class="form-label mb-2 block">Bijlagen toevoegen (optioneel)</label>
+                                <div class="flex justify-center px-6 pt-6 pb-7 border-2 border-dashed border-slate-300 rounded-xl hover:border-primary-400 transition-colors bg-white cursor-pointer" onclick="document.getElementById('wizard-attachments').click()">
+                                    <div class="space-y-2 text-center">
+                                        <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-600 mb-1">
+                                            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                        </span>
+                                        <div class="text-sm text-slate-600">
+                                            <span class="font-medium text-primary-600">Klik om bestanden te uploaden</span>
+                                            <span class="hidden sm:inline"> of sleep ze hierheen</span>
                                         </div>
-                                        <p class="text-xs text-slate-500">PNG, JPG, GIF, PDF, DOC, DOCX, TXT, ZIP tot 10MB</p>
+                                        <p class="text-xs text-slate-500">PNG, JPG, GIF, PDF, DOC, DOCX, TXT, ZIP tot 10MB per bestand</p>
                                     </div>
                                 </div>
+                                <input id="wizard-attachments" name="attachments[]" type="file" class="sr-only" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.zip">
                             </div>
 
                             <!-- Summary -->
-                            <div class="rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
-                                <h4 class="font-semibold text-slate-900 mb-2">Samenvatting</h4>
-                                <dl class="space-y-1 text-sm">
-                                    <div class="flex justify-between"><dt class="text-slate-500">Type</dt><dd class="font-medium text-slate-900" x-text="requestTypeLabel"></dd></div>
-                                    <div x-show="selectedOptionLabel" class="flex justify-between"><dt class="text-slate-500">Wat</dt><dd class="font-medium text-slate-900" x-text="selectedOptionLabel"></dd></div>
-                                    <div x-show="page" class="flex justify-between"><dt class="text-slate-500">Pagina</dt><dd class="font-medium text-slate-900" x-text="page"></dd></div>
+                            <div class="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-6 text-white shadow-lg">
+                                <h4 class="font-heading font-semibold text-lg mb-4 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                    Samenvatting
+                                </h4>
+                                <dl class="space-y-2 text-sm">
+                                    <div class="flex justify-between border-b border-white/10 pb-2"><dt class="text-slate-400">Type aanvraag</dt><dd class="font-medium" x-text="requestTypeLabel"></dd></div>
+                                    <div x-show="selectedOptionsLabels.length" class="flex justify-between border-b border-white/10 pb-2"><dt class="text-slate-400">Geselecteerd</dt><dd class="font-medium text-right max-w-[60%]" x-text="selectedOptionsLabels.join(', ')"></dd></div>
+                                    <div x-show="page" class="flex justify-between border-b border-white/10 pb-2"><dt class="text-slate-400">Pagina</dt><dd class="font-medium" x-text="page"></dd></div>
+                                    <div x-show="description" class="flex justify-between pt-1"><dt class="text-slate-400 shrink-0">Omschrijving</dt><dd class="font-medium text-right max-w-[70%] truncate" x-text="description"></dd></div>
                                 </dl>
                             </div>
                         </div>
 
-                        <div class="sticky bottom-0 flex items-center justify-between gap-3 px-6 py-4 border-t border-slate-100 bg-slate-50 rounded-b-3xl">
+                        <div class="flex items-center justify-between gap-3 px-8 py-5 border-t border-slate-100 bg-slate-50 rounded-b-3xl">
                             <button type="button" @click="close()" class="btn btn-outline">Annuleren</button>
-                            <button type="submit" class="btn btn-primary" :disabled="submitting" x-text="submitting ? 'Versturen...' : 'Aanvraag versturen'"></button>
+                            <button type="submit" class="btn btn-primary px-6" :disabled="submitting || selectedOptions.length === 0" x-text="submitting ? 'Versturen...' : 'Aanvraag versturen'"></button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Section divider + heading -->
+        <div class="border-t border-slate-200 pt-16 mt-8 mb-10">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                    <h2 class="font-heading text-2xl font-bold text-slate-900">Recente aanvragen</h2>
+                    <p class="mt-1 text-slate-500">Bekijk hier je laatste verzoeken en hun status.</p>
+                </div>
+                @if($recentRequests->count() > 0)
+                    <a href="{{ route('customer.tickets.index') }}" class="text-sm font-medium text-primary-600 hover:text-primary-700 shrink-0">Bekijk alles</a>
+                @endif
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <!-- Recent Requests -->
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70">
-                    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-                        <h2 class="font-heading text-lg font-bold text-slate-900">Recente aanvragen</h2>
-                        @if($recentRequests->count() > 0)
-                            <a href="{{ route('customer.tickets.index') }}" class="text-sm font-medium text-primary-600 hover:text-primary-700">Bekijk alles</a>
-                        @endif
-                    </div>
                     <div class="p-6">
                         @if($recentRequests->count() > 0)
                             <div class="space-y-3">
@@ -303,16 +332,16 @@ function requestWizard() {
         openModal: false,
         submitting: false,
         requestType: '',
-        selectedOption: '',
+        selectedOptions: [],
         page: '',
         description: '',
         title: '',
         category: 'general',
 
         get generatedTitle() {
-            const optionLabel = this.selectedOptionLabel;
+            const labels = this.selectedOptionsLabels;
             const pageText = this.page ? ` - ${this.page}` : '';
-            return optionLabel ? `${this.title} - ${optionLabel}${pageText}` : this.title;
+            return labels.length ? `${this.title} - ${labels.join(', ')}${pageText}` : this.title;
         },
 
         get requestTypeLabel() {
@@ -336,7 +365,19 @@ function requestWizard() {
         },
 
         get step1Name() {
-            return 'request_detail';
+            return 'request_details';
+        },
+
+        isSelected(value) {
+            return this.selectedOptions.includes(value);
+        },
+
+        toggleOption(value) {
+            if (this.isSelected(value)) {
+                this.selectedOptions = this.selectedOptions.filter(v => v !== value);
+            } else {
+                this.selectedOptions.push(value);
+            }
         },
 
         get step1Options() {
@@ -379,12 +420,12 @@ function requestWizard() {
             return options[this.requestType] || [];
         },
 
-        get selectedOptionLabel() {
-            return this.step1Options.find(o => o.value === this.selectedOption)?.label || '';
+        get selectedOptionsLabels() {
+            return this.selectedOptions.map(value => this.step1Options.find(o => o.value === value)?.label).filter(Boolean);
         },
 
         get needsPage() {
-            return ['website_aanpassen', 'iets_toevoegen'].includes(this.requestType) && ['tekst','foto','pagina','contactgegevens','openingstijden','nieuwe_pagina','nieuwe_sectie','foto_video','blog'].includes(this.selectedOption);
+            return ['website_aanpassen', 'iets_toevoegen'].includes(this.requestType) && this.selectedOptions.some(value => ['tekst','foto','pagina','contactgegevens','openingstijden','nieuwe_pagina','nieuwe_sectie','foto_video','blog'].includes(value));
         },
 
         open(type) {
@@ -396,7 +437,7 @@ function requestWizard() {
                 'hulp_nodig': 'Hulp nodig?'
             }[type] || 'Aanvraag';
             this.category = type === 'hulp_nodig' ? 'technical' : 'general';
-            this.selectedOption = '';
+            this.selectedOptions = [];
             this.page = '';
             this.description = '';
             this.openModal = true;

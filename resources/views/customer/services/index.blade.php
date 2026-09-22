@@ -3,21 +3,14 @@
 @section('title', 'Mijn Diensten - Servura')
 
 @section('content')
-@include('customer.partials.sidebar')
 @include('customer.partials.topbar')
 
-<div class="bg-slate-50 min-h-screen lg:pl-64 pt-32">
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="px-4 py-6 sm:px-0">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <h1 class="text-2xl font-bold text-gray-900">Mijn Diensten</h1>
-                    <p class="mt-2 text-sm text-gray-700">
-                        Overzicht van al uw diensten, kosten en contractinformatie.
-                    </p>
-                </div>
-            </div>
+<div class="bg-slate-50 min-h-screen pt-32">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
+        <!-- Page Header -->
+        <div class="mb-10">
+            <h1 class="font-heading text-3xl font-bold text-slate-900">Mijn Diensten</h1>
+            <p class="mt-2 text-lg text-slate-500">Overzicht van al uw diensten, kosten en contractinformatie.</p>
         </div>
 
         <!-- Stats Grid -->

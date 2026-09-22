@@ -5,14 +5,4 @@
             <span class="logo-dot ml-1 text-2xl font-logo font-bold text-primary-500 animate-pulse-soft">.</span>
         </a>
     </div>
-    <div class="flex-1 flex flex-col justify-end p-4">
-        <div class="rounded-xl bg-slate-800/50 p-4 border border-slate-700">
-            <p class="truncate text-sm font-medium text-white">{{ Auth::user()->name }}</p>
-            <p class="truncate text-xs text-slate-400 mb-3">{{ Auth::user()->email }}</p>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="w-full rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 px-3 py-2 text-sm font-medium text-slate-200 transition-colors">Uitloggen</button>
-            </form>
-        </div>
-    </div>
 </aside>

@@ -24,6 +24,7 @@ class Ticket extends Model
         'closed_at',
         'resolution_notes',
         'request_type',
+        'request_details',
         'page',
         'customer_notes',
     ];
@@ -32,6 +33,7 @@ class Ticket extends Model
         'last_reply_at' => 'datetime',
         'resolved_at' => 'datetime',
         'closed_at' => 'datetime',
+        'request_details' => 'array',
     ];
 
     // Boot method to generate ticket number

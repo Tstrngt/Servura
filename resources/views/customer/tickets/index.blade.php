@@ -3,32 +3,21 @@
 @section('title', 'Support Tickets - Servura')
 
 @section('content')
-@include('customer.partials.sidebar')
 @include('customer.partials.topbar')
 
 <!-- Tickets Content -->
-<div class="bg-slate-50 min-h-screen lg:pl-64 pt-32">
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="px-4 py-6 sm:px-0">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="sm:flex sm:items-center sm:justify-between">
-                        <div class="sm:flex-auto">
-                            <h1 class="text-2xl font-bold text-gray-900">
-                                Support Tickets
-                            </h1>
-                            <p class="mt-2 text-sm text-gray-700">
-                                Beheer uw support tickets en volg de status van uw aanvragen.
-                            </p>
-                        </div>
-                        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                            <a href="{{ route('customer.tickets.create') }}" class="btn btn-primary">
-                                Nieuw Ticket
-                            </a>
-                        </div>
-                    </div>
-                </div>
+<div class="bg-slate-50 min-h-screen pt-32">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+            <div>
+                <h1 class="font-heading text-3xl font-bold text-slate-900">Mijn aanvragen</h1>
+                <p class="mt-2 text-lg text-slate-500">Beheer je support tickets en volg de status van je aanvragen.</p>
+            </div>
+            <div class="shrink-0">
+                <a href="{{ route('customer.tickets.create') }}" class="btn btn-primary">
+                    Nieuw Ticket
+                </a>
             </div>
         </div>
 

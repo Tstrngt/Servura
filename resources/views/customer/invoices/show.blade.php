@@ -3,11 +3,10 @@
 @section('title', "Factuur {$invoice->invoice_number} - Servura")
 
 @section('content')
-@include('customer.partials.sidebar')
 @include('customer.partials.topbar')
 
-<div class="bg-slate-50 min-h-screen lg:pl-64 pt-32">
-    <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+<div class="bg-slate-50 min-h-screen pt-32">
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div class="px-4 py-6 sm:px-0">
             @if(session('success'))
                 <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
