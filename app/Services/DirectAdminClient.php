@@ -114,15 +114,32 @@ class DirectAdminClient
         if (!is_array($result)) {
             parse_str($body, $result);
         }
-        if ((int) ($result['error'] ?? 1) !== 0) {
-            $message = trim(($result['text'] ?? 'DirectAdmin-fout') . ' ' . ($result['details'] ?? ''));
-            if ($message === '' || $message === 'DirectAdmin-fout') {
+
+        $hasError = array_key_exists('error', $result);
+        $error = (int) ($result['error'] ?? 1);
+        $success = trim((string) ($result['success'] ?? ''));
+
+        if ($hasError && $error !== 0) {
+            $message = trim(($result['text'] ?? '') . ' ' . ($result['details'] ?? ''));
+            if ($message === '') {
                 $message = 'DirectAdmin-fout (ruwe response: ' . mb_strimwidth($body, 0, 500) . ')';
             }
             throw new \RuntimeException($message);
         }
 
-        return $result;
+        if (!$hasError && $success !== '' && stripos($success, 'Login OK') !== false) {
+            return $result;
+        }
+
+        if (!$hasError && $success === '') {
+            return $result;
+        }
+
+        if ($hasError && $error === 0) {
+            return $result;
+        }
+
+        throw new \RuntimeException('DirectAdmin-fout (ruwe response: ' . mb_strimwidth($body, 0, 500) . ')');
     }
 
     private function value(string $key): mixed
