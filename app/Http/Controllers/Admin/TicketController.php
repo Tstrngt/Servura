@@ -105,6 +105,11 @@ class TicketController extends Controller
             Auth::id()
         );
 
+        // De offerte-aanvraag is verwerkt tot een offerte: ticket sluiten.
+        if (! $ticket->isClosed()) {
+            $ticket->transitionTo('closed');
+        }
+
         return redirect()
             ->route('admin.financial.quotes.edit', $quote)
             ->with('success', "Conceptofferte {$quote->quote_number} aangemaakt vanuit {$ticket->ticket_number}. Controleer en vul de prijzen aan.");

@@ -347,20 +347,50 @@ class CustomerController extends Controller
         }
 
         $validated = $request->validate([
+            'status' => ['required', Rule::in(['active', 'inactive', 'suspended', 'cancelled', 'expired'])],
+            'price' => 'required|numeric|min:0',
             'billing_cycle' => ['required', Rule::in(array_keys(ServicePrice::CYCLES))],
             'current_period_start' => 'required|date',
             'current_period_end' => 'nullable|date|after_or_equal:current_period_start',
+            'end_date' => 'nullable|date',
             'next_invoice_date' => 'nullable|date',
             'payment_method' => 'required|in:auto_debit,payment_link',
             'auto_renew' => 'boolean',
         ]);
         $validated['auto_renew'] = $request->boolean('auto_renew') && $validated['billing_cycle'] !== 'one_time';
         $validated['price_type'] = $validated['billing_cycle'];
-        $validated['end_date'] = $validated['current_period_end'] ?? null;
+        $validated['end_date'] = $validated['end_date'] ?? $validated['current_period_end'] ?? null;
         if (!$validated['auto_renew']) {
             $validated['next_invoice_date'] = null;
         }
+        if ($validated['status'] === 'active') {
+            $validated['suspension_reason'] = null;
+            $validated['suspended_at'] = null;
+        }
+        if ($validated['status'] === 'cancelled' && ! $service->cancelled_at) {
+            $validated['cancelled_at'] = now();
+        }
         $service->update($validated);
+
+        // Bij handmatig activeren van een DirectAdmin-dienst met domein:
+        // provisioning starten als die nog niet heeft plaatsgevonden.
+        if ($validated['status'] === 'active'
+            && $service->service->fulfillment_type === 'directadmin'
+            && $service->domain
+            && in_array($service->provisioning_status, ['pending', 'pending_payment', 'failed', 'processing'], true)) {
+            try {
+                app(\App\Services\ProvisioningService::class)->provision($service);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+        if ($validated['status'] === 'cancelled') {
+            try {
+                app(\App\Services\ProvisioningService::class)->suspend($service);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         return redirect()->route('admin.customers.show', [$customer, 'tab' => 'services'])
             ->with('success', 'Renewalinstellingen zijn bijgewerkt.');

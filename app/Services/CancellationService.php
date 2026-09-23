@@ -107,6 +107,8 @@ class CancellationService
                 $this->suspendExternally($cancellation->customerService);
             }
 
+            $this->createRefundTransaction($cancellation->customerService);
+
             if ((float) $cancellation->fresh()->estimated_usage_cost > 0) {
                 BillableItem::create([
                     'user_id' => $cancellation->user_id,
@@ -159,6 +161,44 @@ class CancellationService
             });
 
         return $processed;
+    }
+
+    /**
+     * Create a counter-transaction (creditering) for the amount the customer
+     * last paid for this service, so books stay balanced after cancellation.
+     */
+    private function createRefundTransaction(CustomerService $customerService): void
+    {
+        $invoice = \App\Models\Invoice::where('user_id', $customerService->user_id)
+            ->where('status', 'betaald')
+            ->where(function ($query) use ($customerService) {
+                $query->where('customer_service_id', $customerService->id)
+                    ->orWhereHas('lines', fn ($q) => $q->where('customer_service_id', $customerService->id));
+            })
+            ->latest('paid_at')
+            ->first();
+
+        if (! $invoice) {
+            return;
+        }
+
+        $reference = 'refund-'.$invoice->invoice_number.'-service-'.$customerService->id;
+        if (\App\Models\Transaction::where('reference', $reference)->exists()) {
+            return;
+        }
+
+        \App\Models\Transaction::create([
+            'transaction_number' => \App\Models\Transaction::generateNumber(),
+            'user_id' => $customerService->user_id,
+            'invoice_id' => $invoice->id,
+            'amount' => $invoice->total,
+            'type' => 'creditering',
+            'payment_method' => 'ideal',
+            'status' => 'terugbetaald',
+            'description' => "Terugbetaling na opzegging {$customerService->service->title} (factuur {$invoice->invoice_number})",
+            'transaction_date' => now(),
+            'reference' => $reference,
+        ]);
     }
 
     private function suspendExternally(CustomerService $customerService): void
