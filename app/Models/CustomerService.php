@@ -78,6 +78,11 @@ class CustomerService extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
     public function cancellationRequests()
     {
         return $this->hasMany(ServiceCancellationRequest::class);
@@ -141,6 +146,7 @@ class CustomerService extends Model
                 'text' => match ($this->suspension_reason) {
                     'non_payment' => 'Geschorst wegens wanbetaling',
                     'provisioning_failed' => 'Provisioning mislukt',
+                    'quote_request' => 'Offerte in behandeling',
                     default => 'In afwachting',
                 },
                 'color' => in_array($this->suspension_reason, ['non_payment', 'provisioning_failed'], true) ? 'red' : 'yellow',

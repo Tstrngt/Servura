@@ -45,6 +45,52 @@
         <form x-data="quoteBuilder()" @submit.prevent="submit($event)" action="{{ route('quote.builder.store') }}" method="POST" class="max-w-4xl mx-auto">
             @csrf
 
+            @if($errors->any())
+                <div class="mb-10">
+                    <div class="bg-red-50 border-l-4 border-red-400 p-5 rounded-r-xl">
+                        <h3 class="font-heading font-semibold text-red-800">Controleer uw invoer</h3>
+                        <ul class="mt-2 list-disc list-inside text-sm text-red-700 space-y-1">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Dienst -->
+            <div class="mb-14 animate-on-scroll">
+                <div class="flex items-start gap-4 mb-6">
+                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">0</span>
+                    <div>
+                        <h2 class="font-heading text-2xl font-bold text-slate-900">Waarvoor vraagt u een offerte aan?</h2>
+                        <p class="text-slate-500 mt-1">Uw aanvraag wordt direct gekoppeld aan deze dienst in uw klantportaal.</p>
+                    </div>
+                </div>
+                @if($service)
+                    <input type="hidden" name="service" value="{{ $service->slug }}">
+                    <div class="flex items-center gap-4 rounded-2xl bg-white p-5 ring-1 ring-primary-200 shadow-sm">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </span>
+                        <div>
+                            <span class="font-semibold text-slate-900 block">{{ $service->title }}</span>
+                            <a href="{{ route('quote.builder') }}" class="text-sm text-primary-600 hover:text-primary-800">Andere dienst kiezen</a>
+                        </div>
+                    </div>
+                @else
+                    <select name="service" class="form-input" required>
+                        <option value="">Kies een dienst</option>
+                        @foreach($services as $option)
+                            <option value="{{ $option->slug }}" {{ old('service') === $option->slug ? 'selected' : '' }}>{{ $option->title }}</option>
+                        @endforeach
+                    </select>
+                    @error('service')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                @endif
+            </div>
+
             <!-- Doel -->
             <div class="mb-14 animate-on-scroll">
                 <div class="flex items-start gap-4 mb-6">
@@ -305,7 +351,7 @@ function quoteBuilder() {
                 });
 
                 if (response.ok) {
-                    window.location.href = '{{ route('quote.builder') }}?success=1';
+                    window.location.href = response.redirected ? response.url : '{{ route('quote.builder') }}?success=1';
                 } else {
                     const html = await response.text();
                     const parser = new DOMParser();

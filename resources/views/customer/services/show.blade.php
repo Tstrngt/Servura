@@ -9,6 +9,7 @@
     $isDirectAdmin = $customerService->service->fulfillment_type === 'directadmin';
     $serverConnection = $customerService->service->serverConnection;
     $service = $customerService->service;
+    $quoteTicket = $customerService->tickets->firstWhere('request_type', 'offerte');
 @endphp
 
 <div class="bg-slate-50 min-h-screen pt-32">
@@ -57,7 +58,37 @@
                             Deze dienst is opgezegd en loopt af op <strong>{{ $customerService->end_date?->format('d-m-Y') ?? 'onbekend' }}</strong>.
                         </div>
                     @endif
+
+                    @if($customerService->suspension_reason === 'quote_request')
+                        <div class="mt-4 rounded-xl bg-primary-50 p-4 text-sm text-primary-800">
+                            Deze dienst is aangemaakt op basis van je offerte-aanvraag. De prijs volgt zodra de offerte is akkoord bevonden.
+                        </div>
+                    @endif
                 </div>
+
+                <!-- Quote request details -->
+                @if($quoteTicket)
+                    <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 p-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+                            <div>
+                                <h2 class="font-heading text-xl font-bold text-slate-900">Jouw aanvraag</h2>
+                                <p class="mt-1 text-sm text-slate-500">Dit heb je aangevraagd via de offerte-samensteller.</p>
+                            </div>
+                            <a href="{{ route('customer.tickets.show', $quoteTicket) }}" class="btn btn-outline whitespace-nowrap">
+                                Ticket {{ $quoteTicket->ticket_number }}
+                            </a>
+                        </div>
+                        @if($quoteTicket->request_details)
+                            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                @foreach($quoteTicket->request_details as $detail)
+                                    <li class="bg-slate-50 rounded-xl p-4 text-slate-700">{{ $detail }}</li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p class="text-sm text-slate-500 whitespace-pre-line">{{ $quoteTicket->description }}</p>
+                        @endif
+                    </div>
+                @endif
 
                 <!-- DirectAdmin details -->
                 @if($isDirectAdmin && $serverConnection)
@@ -142,6 +173,7 @@
                 @endif
 
                 <!-- Transfer -->
+                @if($customerService->isActive())
                 <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 p-6" x-data="{ open: false }">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div>
@@ -168,9 +200,10 @@
                         </form>
                     </div>
                 </div>
+                @endif
 
                 <!-- Upgrade -->
-                @if($service->prices->count() > 1)
+                @if($customerService->isActive() && $service->prices->count() > 1)
                     <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 p-6" x-data="{ open: false }">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div>

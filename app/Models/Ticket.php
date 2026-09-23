@@ -12,6 +12,7 @@ class Ticket extends Model
     protected $fillable = [
         'ticket_number',
         'user_id',
+        'customer_service_id',
         'assigned_to',
         'title',
         'description',
@@ -56,6 +57,11 @@ class Ticket extends Model
     public function assignedTo()
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function customerService()
+    {
+        return $this->belongsTo(CustomerService::class);
     }
 
     public function replies()
@@ -183,6 +189,7 @@ class Ticket extends Model
             'website_uitbreiden' => 'Uitbreiding',
             'hulp_nodig' => 'Hulp',
             'algemeen' => 'Algemeen',
+            'offerte' => 'Offerte-aanvraag',
             default => 'Support'
         };
     }

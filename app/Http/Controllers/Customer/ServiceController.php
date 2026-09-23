@@ -60,6 +60,7 @@ class ServiceController extends Controller
             'service.serverConnection',
             'service.prices' => fn ($query) => $query->where('is_enabled', true),
             'cancellationRequests' => fn ($query) => $query->latest(),
+            'tickets' => fn ($query) => $query->latest(),
         ]);
         $cancellationPreview = $customerService->isActive() && ! $customerService->cancel_at_period_end
             ? $cancellationService->preview($customerService)

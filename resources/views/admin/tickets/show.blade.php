@@ -340,6 +340,26 @@
                                     <label class="block text-sm font-medium text-gray-700">Categorie</label>
                                     <div class="mt-1 text-sm text-gray-900">{{ $ticket->categoryLabel }}</div>
                                 </div>
+                                @if($ticket->customerService)
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Gekoppelde dienst</label>
+                                        <div class="mt-1 text-sm text-gray-900">
+                                            <a href="{{ route('admin.customers.show', $ticket->user) }}" class="text-primary-600 hover:text-primary-500">
+                                                {{ $ticket->customerService->service->title }} (#{{ $ticket->customerService->id }})
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+                                @if($ticket->request_details)
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Aanvraagdetails</label>
+                                        <ul class="mt-1 text-sm text-gray-900 list-disc list-inside space-y-0.5">
+                                            @foreach($ticket->request_details as $detail)
+                                                <li>{{ $detail }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Toegewezen aan</label>
                                     <div class="mt-1 text-sm text-gray-900">{{ $ticket->assignedTo ? $ticket->assignedTo->name : 'Nog niet toegewezen' }}</div>
