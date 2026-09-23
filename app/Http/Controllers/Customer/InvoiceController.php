@@ -60,7 +60,20 @@ class InvoiceController extends Controller
             return back()->with('info', 'Deze factuur is al betaald.');
         }
 
-        $checkoutUrl = $mollieService->createPayment($invoice);
+        if ((float) $invoice->total <= 0) {
+            $invoice->update(['status' => 'betaald', 'paid_at' => now()]);
+            $mollieService->finalizePaidInvoice($invoice);
+
+            return back()->with('success', 'Deze factuur had geen openstaand bedrag en is afgesloten.');
+        }
+
+        try {
+            $checkoutUrl = $mollieService->createPayment($invoice);
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return back()->with('error', 'De betaalpagina kon niet worden geopend: '.$exception->getMessage());
+        }
 
         return redirect($checkoutUrl);
     }
