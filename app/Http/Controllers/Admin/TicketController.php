@@ -62,11 +62,52 @@ class TicketController extends Controller
             'assignedTo',
             'replies.user',
             'attachments.uploadedBy',
+            'quotes',
+            'customerService.service',
         ]);
 
         $staff = User::staff()->orderBy('name')->get();
 
         return view('admin.tickets.show', compact('ticket', 'staff'));
+    }
+
+    /**
+     * Create a draft quote from this ticket's request.
+     */
+    public function createQuote(Ticket $ticket, \App\Services\QuoteService $quoteService)
+    {
+        $ticket->load(['customerService.service', 'user']);
+
+        $lines = [];
+
+        if ($ticket->customerService?->service) {
+            $lines[] = [
+                'description' => $ticket->customerService->service->title,
+                'quantity' => 1,
+                'unit_price' => 0,
+                'service_id' => $ticket->customerService->service->id,
+            ];
+        } else {
+            $lines[] = [
+                'description' => $ticket->title,
+                'quantity' => 1,
+                'unit_price' => 0,
+            ];
+        }
+
+        $quote = $quoteService->create(
+            $ticket->user,
+            [
+                'ticket_id' => $ticket->id,
+                'internal_notes' => 'Aangemaakt vanuit ticket '.$ticket->ticket_number.'.',
+            ],
+            $lines,
+            Auth::id()
+        );
+
+        return redirect()
+            ->route('admin.financial.quotes.edit', $quote)
+            ->with('success', "Conceptofferte {$quote->quote_number} aangemaakt vanuit {$ticket->ticket_number}. Controleer en vul de prijzen aan.");
     }
 
     /**

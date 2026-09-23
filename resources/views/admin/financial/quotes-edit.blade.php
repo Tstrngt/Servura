@@ -6,7 +6,8 @@
 @include('admin.partials.sidebar')
 
 <div class="bg-gray-50 min-h-screen lg:pl-64">
-    <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto w-full {{ $ticket ? 'max-w-[1600px]' : 'max-w-4xl' }} py-6 sm:px-6 lg:px-8">
+        <div class="{{ $ticket ? 'grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_400px] gap-6 items-start' : '' }}">
         <div class="px-4 py-6 sm:px-0">
             <div class="flex items-center justify-between mb-6">
                 <div>
@@ -94,6 +95,60 @@
                     <button type="submit" class="btn btn-primary">Offerte Opslaan</button>
                 </div>
             </form>
+        </div>
+
+        @if($ticket)
+            <aside class="xl:sticky xl:top-6 space-y-6 px-4 py-6 sm:px-0">
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center justify-between gap-3">
+                            <h3 class="text-lg font-medium text-gray-900">Aanvraag {{ $ticket->ticket_number }}</h3>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->statusLabel['color'] }}-100 text-{{ $ticket->statusLabel['color'] }}-800">{{ $ticket->statusLabel['text'] }}</span>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-600">{{ $ticket->title }} — {{ $ticket->user->name }}</p>
+                        @if($ticket->customerService?->service)
+                            <p class="mt-1 text-sm text-gray-600">Dienst: <span class="font-medium text-gray-900">{{ $ticket->customerService->service->title }}</span></p>
+                        @endif
+
+                        @if($ticket->request_details)
+                            <div class="mt-4">
+                                <h4 class="text-sm font-medium text-gray-700 mb-2">Uitvraag</h4>
+                                <ul class="text-sm text-gray-600 space-y-1.5">
+                                    @foreach($ticket->request_details as $detail)
+                                        <li class="rounded-lg bg-gray-50 px-3 py-2">{{ $detail }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <div class="mt-4">
+                            <h4 class="text-sm font-medium text-gray-700 mb-2">Omschrijving</h4>
+                            <div class="max-h-48 overflow-y-auto rounded-lg bg-gray-50 p-3 text-sm text-gray-600">{!! nl2br(e($ticket->description)) !!}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Conversatie</h3>
+                        <div class="max-h-96 space-y-4 overflow-y-auto pr-1">
+                            @forelse($ticket->replies->where('is_internal', false)->take(-8) as $reply)
+                                <div class="rounded-lg bg-gray-50 p-3">
+                                    <div class="flex items-center justify-between text-xs text-gray-500">
+                                        <span class="font-medium text-gray-700">{{ $reply->user->name }}</span>
+                                        <span>{{ $reply->created_at->format('d-m-Y H:i') }}</span>
+                                    </div>
+                                    <p class="mt-1 text-sm text-gray-600">{!! nl2br(e($reply->message)) !!}</p>
+                                </div>
+                            @empty
+                                <p class="text-sm text-gray-500">Nog geen reacties.</p>
+                            @endforelse
+                        </div>
+                        <a href="{{ route('admin.tickets.show', $ticket) }}" class="mt-4 inline-block text-sm font-medium text-primary-600 hover:text-primary-500">Ticket openen</a>
+                    </div>
+                </div>
+            </aside>
+        @endif
         </div>
     </div>
 </div>

@@ -132,6 +132,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
         Route::get('/tickets', [AdminTicketController::class, 'index'])->name('tickets.index');
         Route::get('/tickets/attachments/{attachment}/download', [AdminTicketController::class, 'downloadAttachment'])->name('tickets.attachments.download');
+        Route::post('/tickets/{ticket}/offerte', [AdminTicketController::class, 'createQuote'])->name('tickets.create-quote');
         Route::get('/tickets/attachments/{attachment}/preview', [AdminTicketController::class, 'previewAttachment'])->name('tickets.attachments.preview');
         Route::get('/tickets/{ticket}', [AdminTicketController::class, 'show'])->name('tickets.show');
         Route::post('/tickets/{ticket}/reply', [AdminTicketController::class, 'reply'])->name('tickets.reply');

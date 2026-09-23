@@ -20,6 +20,9 @@
                     </p>
                 </div>
                 <div class="flex items-center space-x-3">
+                    @if($quote->ticket)
+                        <a href="{{ route('admin.tickets.show', $quote->ticket) }}" class="btn btn-outline text-sm">Ticket {{ $quote->ticket->ticket_number }}</a>
+                    @endif
                     <a href="{{ route('admin.financial.quotes.edit', $quote) }}" class="btn btn-outline text-sm">Bewerken</a>
                     <form method="POST" action="{{ route('admin.financial.quotes.destroy', $quote) }}" onsubmit="return confirm('Weet je zeker dat je deze offerte wilt verwijderen?')">
                         @csrf @method('DELETE')

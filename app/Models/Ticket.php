@@ -74,6 +74,11 @@ class Ticket extends Model
         return $this->hasMany(TicketAttachment::class);
     }
 
+    public function quotes()
+    {
+        return $this->hasMany(Quote::class);
+    }
+
     // Public replies (not internal)
     public function publicReplies()
     {
@@ -203,6 +208,7 @@ class Ticket extends Model
             'general' => 'Algemeen',
             'feature_request' => 'Feature Verzoek',
             'bug_report' => 'Bug Report',
+            'offerte' => 'Offerte-aanvraag',
             default => ucfirst($this->category)
         };
     }

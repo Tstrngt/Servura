@@ -29,6 +29,15 @@
                             </div>
                         </div>
                         <div class="flex flex-wrap gap-2">
+                            @if($ticket->category === 'offerte')
+                                @if($ticket->quotes->count() > 0)
+                                    <a href="{{ route('admin.financial.quotes.show', $ticket->quotes->last()) }}" class="btn btn-outline">Offerte {{ $ticket->quotes->last()->quote_number }} bekijken</a>
+                                @endif
+                                <form action="{{ route('admin.tickets.create-quote', $ticket) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary">Offerte maken</button>
+                                </form>
+                            @endif
                             @if(!$ticket->assigned_to || $ticket->assigned_to === Auth::id())
                                 <form action="{{ route('admin.tickets.claim', $ticket) }}" method="POST" class="inline">
                                     @csrf

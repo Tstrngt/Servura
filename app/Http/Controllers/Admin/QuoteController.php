@@ -52,17 +52,18 @@ class QuoteController extends Controller
 
     public function show(Quote $quote)
     {
-        $quote->load(['user', 'lines.service', 'convertedInvoice']);
+        $quote->load(['user', 'lines.service', 'convertedInvoice', 'ticket']);
         return view('admin.financial.quotes-show', compact('quote'));
     }
 
     public function edit(Quote $quote)
     {
-        $quote->load('lines.service');
+        $quote->load(['lines.service', 'ticket.replies.user', 'ticket.customerService.service', 'ticket.user']);
         $customers = User::customers()->orderBy('name')->get();
         $services = Service::where('is_active', true)->orderBy('title')->get();
+        $ticket = $quote->ticket;
 
-        return view('admin.financial.quotes-edit', compact('quote', 'customers', 'services'));
+        return view('admin.financial.quotes-edit', compact('quote', 'customers', 'services', 'ticket'));
     }
 
     public function update(Request $request, Quote $quote, QuoteService $quoteService)

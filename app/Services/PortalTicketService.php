@@ -13,7 +13,7 @@ class PortalTicketService
 {
     private const PRIORITIES = ['low', 'medium', 'high', 'urgent'];
 
-    private const CATEGORIES = ['technical', 'billing', 'general', 'feature_request', 'bug_report'];
+    private const CATEGORIES = ['technical', 'billing', 'general', 'feature_request', 'bug_report', 'offerte'];
 
     public function create(User $customer, array $attributes): Ticket
     {

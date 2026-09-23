@@ -12,6 +12,7 @@ class Quote extends Model
     protected $fillable = [
         'quote_number',
         'user_id',
+        'ticket_id',
         'quote_date',
         'valid_until',
         'subtotal',
@@ -51,6 +52,11 @@ class Quote extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class);
     }
 
     public function lines()

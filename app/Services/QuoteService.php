@@ -21,6 +21,7 @@ class QuoteService
         $quote = Quote::create([
             'quote_number' => Quote::generateNumber(),
             'user_id' => $customer->id,
+            'ticket_id' => $data['ticket_id'] ?? null,
             'quote_date' => now(),
             'valid_until' => now()->addDays((int) ($data['valid_days'] ?? 30)),
             'vat_percentage' => 21.00,

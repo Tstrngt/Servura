@@ -141,7 +141,7 @@ class QuoteBuilderController extends Controller
                 'title' => 'Offerte-aanvraag: '.$service->title,
                 'description' => $messageText,
                 'priority' => 'medium',
-                'category' => 'general',
+                'category' => 'offerte',
                 'request_type' => 'offerte',
                 'request_details' => array_filter([
                     'Dienst: '.$service->title,
