@@ -92,6 +92,11 @@ class Invoice extends Model
         return $this->hasMany(InvoiceDunningEvent::class);
     }
 
+    public function paymentBatchItems()
+    {
+        return $this->hasMany(PaymentBatchItem::class);
+    }
+
     public function getStatusLabelAttribute(): array
     {
         $colors = [
@@ -120,7 +125,7 @@ class Invoice extends Model
     public function scopeOverdue($query)
     {
         return $query->where('status', 'openstaand')
-                     ->where('due_date', '<', now());
+            ->where('due_date', '<', now());
     }
 
     public function recalculate()
@@ -147,6 +152,6 @@ class Invoice extends Model
             $num = 1;
         }
 
-        return sprintf("FAC-%s-%04d", $year, $num);
+        return sprintf('FAC-%s-%04d', $year, $num);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Services\CancellationService;
 use App\Services\DunningService;
 use App\Services\RenewalService;
 use Illuminate\Console\Scheduling\Schedule;
@@ -22,6 +23,10 @@ class Kernel extends ConsoleKernel
         $schedule->call(fn () => app(DunningService::class)->run())
             ->name('billing:process-dunning')
             ->dailyAt('03:00')
+            ->withoutOverlapping();
+        $schedule->call(fn () => app(CancellationService::class)->processDueApproved())
+            ->name('services:process-cancellations')
+            ->dailyAt('03:30')
             ->withoutOverlapping();
     }
 

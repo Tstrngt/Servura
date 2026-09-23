@@ -29,11 +29,11 @@
                                     <div class="flex items-center gap-2">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Actief</span>
                                         @if($isExpiringSoon)
-                                            <span class="group relative inline-flex items-center justify-center">
+                                            <span class="group relative inline-flex items-center justify-center" tabindex="0" aria-label="Deze dienst verloopt binnenkort">
                                                 <svg class="w-5 h-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                                                 </svg>
-                                                <span class="absolute bottom-full right-0 mb-2 hidden w-56 group-hover:block bg-slate-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg z-10 text-left">
+                                                <span class="absolute bottom-full right-0 mb-2 hidden w-56 group-hover:block group-focus:block bg-slate-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg z-10 text-left">
                                                     Deze dienst verloopt op {{ $customerService->end_date->format('d-m-Y') }}. Neem contact op voor verlenging.
                                                     <span class="absolute top-full right-1 -mt-1 border-4 border-transparent border-t-slate-900"></span>
                                                 </span>
@@ -59,7 +59,16 @@
         <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 p-6">
             <h3 class="font-heading text-xl font-bold text-slate-900 mb-5">Alle Diensten</h3>
             @if($allServices->count() > 0)
-                <div class="-mx-6 overflow-x-auto sm:mx-0 sm:rounded-b-2xl">
+                <div class="space-y-3 sm:hidden">
+                    @foreach($allServices as $customerService)
+                        <a href="{{ route('customer.services.show', $customerService) }}" class="block rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                            <div class="flex items-start justify-between gap-3"><h4 class="font-semibold text-slate-900">{{ $customerService->service->title }}</h4><span class="shrink-0 rounded-full bg-{{ $customerService->statusLabel['color'] }}-100 px-2.5 py-1 text-xs font-medium text-{{ $customerService->statusLabel['color'] }}-800">{{ $customerService->statusLabel['text'] }}</span></div>
+                            <p class="mt-2 text-sm text-slate-500">{{ $customerService->service->short_description }}</p>
+                            <div class="mt-4 flex items-center justify-between text-sm"><span class="font-semibold text-slate-900">{{ $customerService->formatted_price }}</span><span class="text-primary-600">Beheren</span></div>
+                        </a>
+                    @endforeach
+                </div>
+                <div class="-mx-6 hidden overflow-x-auto sm:mx-0 sm:block sm:rounded-b-2xl">
                     <table class="w-full table-fixed min-w-[640px] divide-y divide-slate-100">
                         <thead class="bg-slate-50">
                             <tr>

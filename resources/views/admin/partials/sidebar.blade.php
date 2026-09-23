@@ -16,6 +16,9 @@
         <a href="{{ route('admin.customers.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.customers.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Klanten
         </a>
+        <a href="{{ route('admin.service-cancellations.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.service-cancellations.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
+            Opzegverzoeken
+        </a>
         <a href="{{ route('admin.services.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.services.*', 'admin.service-categories.*', 'admin.server-connections.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Diensten
         </a>

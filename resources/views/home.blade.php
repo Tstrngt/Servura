@@ -221,6 +221,7 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
 </section>
 
 <!-- Portfolio Cinematic -->
+@if(config('app.portfolio_enabled', false))
 <section id="portfolio-cinematic" class="relative h-[500vh] -mb-px bg-slate-950 text-white" data-navbar-theme="dark">
     <!-- Background ambience -->
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-primary-900/30 via-slate-950 to-slate-950"></div>
@@ -422,6 +423,23 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
     update();
 })();
 </script>
+@else
+<section class="relative min-h-[70dvh] overflow-hidden bg-slate-950 text-white" data-navbar-theme="dark">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(14,165,233,0.18),transparent_42%)]"></div>
+    <div class="absolute inset-0 opacity-20 blur-sm" aria-hidden="true">
+        <div class="absolute left-[12%] top-[22%] h-52 w-72 -rotate-6 rounded-3xl border border-white/10 bg-slate-800"></div>
+        <div class="absolute right-[10%] top-[35%] h-60 w-80 rotate-6 rounded-3xl border border-white/10 bg-slate-900"></div>
+    </div>
+    <div class="relative mx-auto flex min-h-[70dvh] max-w-7xl items-center px-4 py-24 sm:px-6 lg:px-8">
+        <div class="max-w-3xl">
+            <span class="text-sm font-semibold uppercase tracking-[0.2em] text-accent-400">Portfolio</span>
+            <h2 class="mt-5 font-heading text-4xl font-bold tracking-tight text-white sm:text-6xl">Nieuw werk komt eraan.</h2>
+            <p class="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">We vullen ons portfolio momenteel met projecten die een eerlijk beeld geven van ons werk. Tot die tijd vertellen we je graag persoonlijk wat we voor jouw organisatie kunnen bouwen.</p>
+            <a href="{{ route('contact') }}" class="mt-8 inline-flex items-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">Bespreek je project</a>
+        </div>
+    </div>
+</section>
+@endif
 
 <!-- Closing CTA -->
 <section class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900" data-navbar-theme="dark">

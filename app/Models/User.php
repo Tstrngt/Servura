@@ -24,6 +24,7 @@ class User extends Authenticatable
         'country',
         'kvk_number',
         'vat_number',
+        'profile_logo_path',
         'mollie_customer_id',
         'role',
         'is_active',
@@ -172,5 +173,10 @@ class User extends Authenticatable
     public function billableItems()
     {
         return $this->hasMany(BillableItem::class);
+    }
+
+    public function paymentBatches()
+    {
+        return $this->hasMany(PaymentBatch::class);
     }
 }

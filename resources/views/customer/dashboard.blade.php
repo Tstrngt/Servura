@@ -83,7 +83,7 @@
                 </button>
 
                 <!-- Mijn website -->
-                <a href="{{ $websiteUrl ?? '#' }}" target="_blank" rel="noopener"
+                <a href="{{ $websiteUrl ?: route('customer.services.index') }}" {{ $websiteUrl ? 'target=_blank rel=noopener' : '' }}
                     class="group relative flex flex-col items-start text-left p-6 bg-slate-900 rounded-2xl shadow-lg shadow-slate-900/10 ring-1 ring-slate-800 hover:shadow-2xl hover:-translate-y-1 transition-all duration-200 overflow-hidden">
                     <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
                     <span class="relative inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 text-white mb-4 ring-1 ring-white/10 group-hover:scale-110 transition-transform">
@@ -287,25 +287,29 @@
             <div class="lg:col-span-1 space-y-6">
                 <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 p-6">
                     <h2 class="font-heading text-lg font-bold text-slate-900 mb-5">Mijn website</h2>
-                    <div class="space-y-3">
-                        @php
-                            $statusItems = [
-                                ['label' => 'Website', 'status' => 'Online', 'color' => 'emerald'],
-                                ['label' => 'Hosting', 'status' => 'Actief', 'color' => 'emerald'],
-                                ['label' => 'Domein', 'status' => 'Actief', 'color' => 'emerald'],
-                                ['label' => 'SSL', 'status' => 'Beveiligd', 'color' => 'emerald'],
-                            ];
-                        @endphp
-                        @foreach($statusItems as $item)
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50">
-                                <div class="flex items-center gap-3">
-                                    <span class="h-2.5 w-2.5 rounded-full bg-{{ $item['color'] }}-500"></span>
-                                    <span class="text-sm font-medium text-slate-700">{{ $item['label'] }}</span>
-                                </div>
-                                <span class="text-sm font-semibold text-{{ $item['color'] }}-700">{{ $item['status'] }}</span>
+                    @if($primaryWebsite)
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+                                <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span><span class="text-sm font-medium text-slate-700">Dienst</span></div>
+                                <span class="text-sm font-semibold text-emerald-700">Actief</span>
                             </div>
-                        @endforeach
-                    </div>
+                            <div class="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+                                <div class="flex min-w-0 items-center gap-3"><span class="h-2.5 w-2.5 shrink-0 rounded-full bg-primary-500"></span><span class="truncate text-sm font-medium text-slate-700">Domein</span></div>
+                                <span class="ml-3 truncate text-sm font-semibold text-slate-900">{{ $primaryWebsite->domain }}</span>
+                            </div>
+                            @if($primaryWebsite->service->fulfillment_type === 'directadmin')
+                                <div class="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+                                    <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full {{ $primaryWebsite->provisioning_status === 'active' ? 'bg-emerald-500' : 'bg-amber-500' }}"></span><span class="text-sm font-medium text-slate-700">Hosting</span></div>
+                                    <span class="text-sm font-semibold {{ $primaryWebsite->provisioning_status === 'active' ? 'text-emerald-700' : 'text-amber-700' }}">{{ $primaryWebsite->provisioning_status === 'active' ? 'Actief' : 'Wordt ingericht' }}</span>
+                                </div>
+                            @endif
+                        </div>
+                    @else
+                        <div class="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+                            Er is nog geen website of domein aan je account gekoppeld.
+                            <a href="{{ route('customer.services.index') }}" class="mt-2 block font-semibold text-primary-600 hover:text-primary-800">Bekijk mijn diensten</a>
+                        </div>
+                    @endif
                     @if($websiteUrl)
                         <a href="{{ $websiteUrl }}" target="_blank" rel="noopener" class="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition-colors">
                             Website bekijken

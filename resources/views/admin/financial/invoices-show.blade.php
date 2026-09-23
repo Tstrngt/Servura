@@ -22,6 +22,7 @@
                     </p>
                 </div>
                 <div class="flex items-center space-x-3">
+                    <a href="{{ route('admin.financial.invoices.download', $invoice) }}" class="btn btn-outline text-sm">PDF downloaden</a>
                     <a href="{{ route('admin.financial.invoices.edit', $invoice) }}" class="btn btn-outline text-sm">Bewerken</a>
                     <form method="POST" action="{{ route('admin.financial.invoices.destroy', $invoice) }}" onsubmit="return confirm('Weet je zeker dat je deze factuur wilt verwijderen?')">
                         @csrf @method('DELETE')

@@ -17,9 +17,17 @@
         </div>
 
         <div class="px-4 py-6 sm:px-0">
+            <div class="mb-4 flex gap-2 overflow-x-auto pb-1">
+                @foreach(['' => 'Alle tickets', 'unassigned' => 'Nieuw & onbeheerd', 'mine' => 'Aan mij toegewezen', 'waiting' => 'Wacht op klant', 'resolved' => 'Afgerond'] as $queue => $label)
+                    <a href="{{ route('admin.tickets.index', array_filter(['queue' => $queue])) }}" class="whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium {{ request('queue', '') === $queue ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50' }}">{{ $label }}</a>
+                @endforeach
+            </div>
             <div class="bg-white shadow rounded-lg">
                 <div class="px-4 py-5 sm:p-6">
                     <form method="GET" action="{{ route('admin.tickets.index') }}" class="grid grid-cols-1 gap-4 md:grid-cols-4">
+                        @if(request('queue'))
+                            <input type="hidden" name="queue" value="{{ request('queue') }}">
+                        @endif
                         <input name="search" value="{{ request('search') }}" placeholder="Zoek op nummer, titel of klant" class="form-input md:col-span-2">
                         <select name="status" class="form-input">
                             <option value="">Alle statussen</option>
@@ -63,7 +71,10 @@
                                             <p class="text-sm font-medium text-gray-900">{{ $ticket->ticket_number }}</p>
                                             <p class="text-sm text-gray-500">{{ $ticket->title }}</p>
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-700">{{ $ticket->user->name }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-700">
+                                            <div>{{ $ticket->user->name }}</div>
+                                            <div class="mt-1 text-xs text-slate-400">{{ $ticket->assignedTo ? 'Behandelaar: ' . $ticket->assignedTo->name : 'Nog niet opgepakt' }}</div>
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->statusLabel['color'] }}-100 text-{{ $ticket->statusLabel['color'] }}-800">
                                                 {{ $ticket->statusLabel['text'] }}
@@ -77,6 +88,12 @@
                                         <td class="px-6 py-4 text-sm text-gray-500">{{ ($ticket->last_reply_at ?? $ticket->created_at)->diffForHumans() }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div class="flex items-center justify-end space-x-3">
+                                                @if(!$ticket->assigned_to)
+                                                    <form method="POST" action="{{ route('admin.tickets.claim', $ticket) }}">
+                                                        @csrf
+                                                        <button type="submit" class="text-emerald-600 hover:text-emerald-800">Oppakken</button>
+                                                    </form>
+                                                @endif
                                                 <a href="{{ route('admin.tickets.show', $ticket) }}" class="text-primary-600 hover:text-primary-900">Bekijk</a>
                                                 <form method="POST" action="{{ route('admin.tickets.destroy', $ticket) }}" class="inline" onsubmit="return confirm('Weet je zeker dat je dit ticket wilt verwijderen?')">
                                                     @csrf @method('DELETE')

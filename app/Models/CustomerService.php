@@ -78,11 +78,16 @@ class CustomerService extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function cancellationRequests()
+    {
+        return $this->hasMany(ServiceCancellationRequest::class);
+    }
+
     // Status checking methods
     public function isActive(): bool
     {
-        return $this->status === 'active' && 
-               (!$this->end_date || $this->end_date >= now());
+        return $this->status === 'active' &&
+               (! $this->end_date || $this->end_date >= now());
     }
 
     public function isInactive(): bool
@@ -97,7 +102,7 @@ class CustomerService extends Model
 
     public function isExpired(): bool
     {
-        return $this->status === 'expired' || 
+        return $this->status === 'expired' ||
                ($this->end_date && $this->end_date < now());
     }
 
@@ -109,7 +114,7 @@ class CustomerService extends Model
         }
 
         $price = number_format($this->price, 2, ',', '.');
-        
+
         switch ($this->price_type) {
             case 'maandelijks':
                 return "€ {$price}/maand";
@@ -123,14 +128,14 @@ class CustomerService extends Model
     // Get status label with color
     public function getStatusLabelAttribute(): array
     {
-        return match($this->status) {
+        return match ($this->status) {
             'active' => [
                 'text' => 'Actief',
-                'color' => 'green'
+                'color' => 'green',
             ],
             'inactive' => [
                 'text' => 'Inactief',
-                'color' => 'gray'
+                'color' => 'gray',
             ],
             'suspended' => [
                 'text' => match ($this->suspension_reason) {
@@ -138,19 +143,19 @@ class CustomerService extends Model
                     'provisioning_failed' => 'Provisioning mislukt',
                     default => 'In afwachting',
                 },
-                'color' => in_array($this->suspension_reason, ['non_payment', 'provisioning_failed'], true) ? 'red' : 'yellow'
+                'color' => in_array($this->suspension_reason, ['non_payment', 'provisioning_failed'], true) ? 'red' : 'yellow',
             ],
             'cancelled' => [
                 'text' => 'Geannuleerd',
-                'color' => 'red'
+                'color' => 'red',
             ],
             'expired' => [
                 'text' => 'Verlopen',
-                'color' => 'orange'
+                'color' => 'orange',
             ],
             default => [
                 'text' => $this->status,
-                'color' => 'gray'
+                'color' => 'gray',
             ]
         };
     }

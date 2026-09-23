@@ -28,6 +28,7 @@
                 </p>
             </div>
             <div class="flex gap-2 items-center">
+                    <a href="{{ route('customer.invoices.download', $invoice) }}" class="btn btn-outline">PDF downloaden</a>
                     @if(in_array($invoice->status, ['verzonden', 'vervallen']))
                         <form method="POST" action="{{ route('customer.invoices.pay', $invoice) }}">
                             @csrf

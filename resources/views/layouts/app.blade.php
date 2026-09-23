@@ -218,8 +218,23 @@
                     <p class="text-gray-300 mb-4">
                         Servura biedt de oplossing voor mkb-ondernemers van het opbouwen van een online omgeving en het hosten. Tot hulp bij aanpassingen.
                     </p>
-                    <div class="flex space-x-4">
-                        <!-- Social media links can be added here -->
+                    @php
+                        $socialLinks = [
+                            'instagram' => ['label' => 'Instagram', 'path' => 'M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zM16 11.37A4 4 0 1111.37 8 4 4 0 0116 11.37zM17.5 6.5h.01'],
+                            'linkedin' => ['label' => 'LinkedIn', 'path' => 'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-4 0v7h-4v-7a6 6 0 016-6zM2 9h4v12H2zM4 2a2 2 0 110 4 2 2 0 010-4z'],
+                            'facebook' => ['label' => 'Facebook', 'path' => 'M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z'],
+                            'youtube' => ['label' => 'YouTube', 'path' => 'M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 001.94-2A29 29 0 0023 12a29 29 0 00-.46-5.58zM9.75 15.02V8.98L15.5 12z'],
+                            'tiktok' => ['label' => 'TikTok', 'path' => 'M15 3v10.5a4.5 4.5 0 11-4.5-4.5M15 3c.6 2.4 2.1 3.9 4.5 4.5'],
+                        ];
+                    @endphp
+                    <div class="flex flex-wrap gap-3">
+                        @foreach($socialLinks as $key => $social)
+                            @if(config('social.' . $key))
+                                <a href="{{ config('social.' . $key) }}" target="_blank" rel="noopener noreferrer" class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-slate-300 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white" aria-label="Servura op {{ $social['label'] }}">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $social['path'] }}"/></svg>
+                                </a>
+                            @endif
+                        @endforeach
                     </div>
                 </div>
 

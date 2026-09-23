@@ -29,6 +29,12 @@
                             </div>
                         </div>
                         <div class="flex flex-wrap gap-2">
+                            @if(!$ticket->assigned_to || $ticket->assigned_to === Auth::id())
+                                <form action="{{ route('admin.tickets.claim', $ticket) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary">{{ $ticket->assigned_to === Auth::id() ? 'Door mij opgepakt' : 'Ticket oppakken' }}</button>
+                                </form>
+                            @endif
                             @if($ticket->canBeClosed())
                                 <form action="{{ route('admin.tickets.close', $ticket) }}" method="POST" class="inline" onsubmit="return confirm('Weet u zeker dat u dit ticket wilt sluiten?')">
                                     @csrf

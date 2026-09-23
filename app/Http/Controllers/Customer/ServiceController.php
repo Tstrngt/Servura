@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomerService;
-use App\Models\Ticket;
-use App\Models\User;
+use App\Services\CancellationService;
 use App\Services\DirectAdminClient;
+use App\Services\PortalTicketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -52,41 +52,42 @@ class ServiceController extends Controller
         ));
     }
 
-    public function show(CustomerService $customerService)
+    public function show(CustomerService $customerService, CancellationService $cancellationService)
     {
         $this->authorizeView($customerService);
 
-        $customerService->load(['service.serverConnection', 'service.prices' => fn ($query) => $query->where('is_enabled', true)]);
+        $customerService->load([
+            'service.serverConnection',
+            'service.prices' => fn ($query) => $query->where('is_enabled', true),
+            'cancellationRequests' => fn ($query) => $query->latest(),
+        ]);
+        $cancellationPreview = $customerService->isActive() && ! $customerService->cancel_at_period_end
+            ? $cancellationService->preview($customerService)
+            : null;
 
-        return view('customer.services.show', compact('customerService'));
+        return view('customer.services.show', compact('customerService', 'cancellationPreview'));
     }
 
-    public function cancel(Request $request, CustomerService $customerService)
-    {
+    public function cancel(
+        Request $request,
+        CustomerService $customerService,
+        CancellationService $cancellationService,
+        PortalTicketService $ticketService
+    ) {
         $this->authorizeView($customerService);
+        $validated = $request->validate(['reason' => ['nullable', 'string', 'max:1000']]);
 
-        if (!$customerService->isActive()) {
-            return back()->with('error', 'Deze dienst is al inactief of geannuleerd.');
-        }
+        $cancellation = $cancellationService->request(
+            Auth::user(),
+            $customerService,
+            $validated['reason'] ?? null,
+            $ticketService
+        );
 
-        $customerService->update([
-            'cancel_at_period_end' => true,
-            'cancelled_at' => now(),
-        ]);
-
-        Ticket::create([
-            'user_id' => Auth::id(),
-            'subject' => 'Opzegging ' . $customerService->service->title,
-            'message' => 'De klant heeft de dienst opgezegd via het klantportaal. Periode loopt t/m ' . ($customerService->end_date?->format('d-m-Y') ?? 'onbekend') . '.',
-            'status' => 'open',
-            'priority' => 'normal',
-            'page' => 'services',
-        ]);
-
-        return back()->with('success', 'De dienst is opgezegd. Hij blijft actief tot het einde van de huidige periode.');
+        return back()->with('success', 'Je opzegverzoek is ingediend. De geplande einddatum is '.$cancellation->effective_at->format('d-m-Y').'.');
     }
 
-    public function transfer(Request $request, CustomerService $customerService)
+    public function transfer(Request $request, CustomerService $customerService, PortalTicketService $ticketService)
     {
         $this->authorizeView($customerService);
 
@@ -95,19 +96,20 @@ class ServiceController extends Controller
             'reason' => 'nullable|string|max:1000',
         ]);
 
-        Ticket::create([
-            'user_id' => Auth::id(),
-            'subject' => 'Overdrachtsaanvraag ' . $customerService->service->title,
-            'message' => 'De klant wil deze dienst overdragen naar: ' . $validated['email'] . "\n\n" . ($validated['reason'] ?? 'Geen reden opgegeven.'),
-            'status' => 'open',
-            'priority' => 'normal',
-            'page' => 'services',
+        $ticketService->create(Auth::user(), [
+            'title' => 'Overdrachtsaanvraag '.$customerService->service->title,
+            'description' => 'Ik wil deze dienst overdragen naar '.$validated['email'].".\n\n".($validated['reason'] ?? 'Geen aanvullende reden opgegeven.'),
+            'priority' => 'medium',
+            'category' => 'general',
+            'request_type' => 'dienst_overdragen',
+            'request_details' => ['service:'.$customerService->id, 'nieuwe_eigenaar:'.$validated['email']],
+            'page' => 'Mijn diensten',
         ]);
 
         return back()->with('success', 'Je overdrachtsaanvraag is ontvangen. We nemen contact op zodra deze is verwerkt.');
     }
 
-    public function upgrade(Request $request, CustomerService $customerService)
+    public function upgrade(Request $request, CustomerService $customerService, PortalTicketService $ticketService)
     {
         $this->authorizeView($customerService);
 
@@ -118,17 +120,18 @@ class ServiceController extends Controller
 
         $targetPrice = $customerService->service->prices->firstWhere('id', $validated['target_service_price_id']);
 
-        if (!$targetPrice || !$targetPrice->is_enabled) {
+        if (! $targetPrice || ! $targetPrice->is_enabled) {
             return back()->with('error', 'Gekozen pakket is niet beschikbaar.');
         }
 
-        Ticket::create([
-            'user_id' => Auth::id(),
-            'subject' => 'Upgrade-aanvraag ' . $customerService->service->title,
-            'message' => 'De klant wil upgraden naar pakket: ' . $targetPrice->label . ' (€' . number_format($targetPrice->price, 2, ',', '.') . ').\n\n' . ($validated['reason'] ?? 'Geen reden opgegeven.'),
-            'status' => 'open',
-            'priority' => 'normal',
-            'page' => 'services',
+        $ticketService->create(Auth::user(), [
+            'title' => 'Upgrade-aanvraag '.$customerService->service->title,
+            'description' => 'Ik wil upgraden naar '.$targetPrice->label.' (€'.number_format($targetPrice->price, 2, ',', '.').").\n\n".($validated['reason'] ?? 'Geen aanvullende reden opgegeven.'),
+            'priority' => 'medium',
+            'category' => 'feature_request',
+            'request_type' => 'dienst_upgraden',
+            'request_details' => ['service:'.$customerService->id, 'pakket:'.$targetPrice->id],
+            'page' => 'Mijn diensten',
         ]);
 
         return back()->with('success', 'Je upgrade-aanvraag is ontvangen. We nemen contact op zodra deze is verwerkt.');
@@ -138,7 +141,7 @@ class ServiceController extends Controller
     {
         $this->authorizeView($customerService);
 
-        if ($customerService->service->fulfillment_type !== 'directadmin' || !$customerService->external_username || !$customerService->service->serverConnection) {
+        if ($customerService->service->fulfillment_type !== 'directadmin' || ! $customerService->external_username || ! $customerService->service->serverConnection) {
             return back()->with('error', 'Wachtwoord reset is alleen beschikbaar voor actieve DirectAdmin-diensten.');
         }
 
@@ -155,7 +158,7 @@ class ServiceController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Wachtwoord reset mislukt: ' . $e->getMessage());
+            return back()->with('error', 'Wachtwoord reset mislukt: '.$e->getMessage());
         }
     }
 
@@ -163,7 +166,7 @@ class ServiceController extends Controller
     {
         $this->authorizeView($customerService);
 
-        if ($customerService->service->fulfillment_type !== 'directadmin' || !$customerService->external_username || !$customerService->external_password || !$customerService->service->serverConnection) {
+        if ($customerService->service->fulfillment_type !== 'directadmin' || ! $customerService->external_username || ! $customerService->external_password || ! $customerService->service->serverConnection) {
             return back()->with('error', 'Direct inloggen is alleen beschikbaar voor actieve DirectAdmin-diensten.');
         }
 
@@ -171,7 +174,7 @@ class ServiceController extends Controller
 
         return view('customer.services.directadmin-login', [
             'customerService' => $customerService,
-            'loginUrl' => $serverUrl . '/CMD_LOGIN',
+            'loginUrl' => $serverUrl.'/CMD_LOGIN',
             'username' => $customerService->external_username,
             'password' => $customerService->external_password,
         ]);

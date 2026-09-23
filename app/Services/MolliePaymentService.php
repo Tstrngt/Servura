@@ -5,9 +5,12 @@ namespace App\Services;
 use App\Models\CustomerService;
 use App\Models\Invoice;
 use App\Models\Order;
+use App\Models\PaymentBatch;
+use App\Models\PaymentBatchItem;
 use App\Models\Transaction;
 use App\Models\TransactionLog;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Mollie\Laravel\Facades\Mollie;
 
 class MolliePaymentService
@@ -15,8 +18,7 @@ class MolliePaymentService
     public function __construct(
         private SubscriptionPeriodService $periods,
         private ProvisioningService $provisioning
-    ) {
-    }
+    ) {}
 
     /**
      * Create a Mollie payment for an invoice.
@@ -63,9 +65,76 @@ class MolliePaymentService
         return $payment->getCheckoutUrl();
     }
 
+    public function createBatchPayment(User $user, array $invoiceIds): PaymentBatch
+    {
+        $batch = DB::transaction(function () use ($user, $invoiceIds) {
+            $invoices = Invoice::query()
+                ->where('user_id', $user->id)
+                ->whereIn('id', array_unique($invoiceIds))
+                ->whereIn('status', ['verzonden', 'openstaand', 'vervallen'])
+                ->lockForUpdate()
+                ->get();
+
+            if ($invoices->count() !== count(array_unique($invoiceIds)) || $invoices->isEmpty()) {
+                throw new \InvalidArgumentException('Een of meer facturen zijn niet beschikbaar voor betaling.');
+            }
+
+            $blockedInvoiceIds = PaymentBatchItem::query()
+                ->whereIn('invoice_id', $invoices->modelKeys())
+                ->whereHas('batch', fn ($query) => $query->whereIn('status', ['pending', 'processing']))
+                ->pluck('invoice_id');
+
+            if ($blockedInvoiceIds->isNotEmpty()) {
+                throw new \InvalidArgumentException('Een van deze facturen zit al in een lopende betaling.');
+            }
+
+            $batch = PaymentBatch::create([
+                'user_id' => $user->id,
+                'batch_number' => PaymentBatch::generateNumber(),
+                'amount' => $invoices->sum(fn (Invoice $invoice) => (float) $invoice->total),
+                'status' => 'pending',
+            ]);
+
+            $invoices->each(fn (Invoice $invoice) => $batch->items()->create([
+                'invoice_id' => $invoice->id,
+                'amount' => $invoice->total,
+                'status' => 'pending',
+            ]));
+
+            return $batch->load('items.invoice');
+        });
+
+        try {
+            $payment = Mollie::api()->payments->create([
+                'amount' => [
+                    'currency' => 'EUR',
+                    'value' => number_format($batch->amount, 2, '.', ''),
+                ],
+                'description' => "Betaling {$batch->batch_number}",
+                'redirectUrl' => route('customer.financial.payment.return', $batch),
+                'webhookUrl' => route('mollie.webhook'),
+                'metadata' => [
+                    'payment_batch_id' => $batch->id,
+                    'batch_number' => $batch->batch_number,
+                ],
+            ]);
+
+            $batch->update([
+                'mollie_payment_id' => $payment->id,
+                'checkout_url' => $payment->getCheckoutUrl(),
+                'status' => 'processing',
+            ]);
+        } catch (\Throwable $exception) {
+            $batch->update(['status' => 'failed']);
+            throw $exception;
+        }
+
+        return $batch->fresh('items.invoice');
+    }
+
     public function createRecurringPayment(Invoice $invoice): void
     {
-        if (!$invoice->user->mollie_customer_id) {
+        if (! $invoice->user->mollie_customer_id) {
             throw new \RuntimeException('Geen Mollie-klant beschikbaar voor automatische incasso.');
         }
 
@@ -117,7 +186,7 @@ class MolliePaymentService
                 || ($customerService->external_username && $customerService->external_suspended_at);
             if ($isRenewal) {
                 $this->periods->applyRenewalPeriod($customerService, $invoice->period_start, $invoice->period_end);
-            } elseif (!$customerService->current_period_start) {
+            } elseif (! $customerService->current_period_start) {
                 $this->periods->activateInitialPeriod($customerService);
             } else {
                 $customerService->update([
@@ -130,7 +199,7 @@ class MolliePaymentService
             $customerService->refresh()->loadMissing(['user', 'service.serverConnection']);
             if ($wasExternallySuspended) {
                 $this->provisioning->unsuspend($customerService);
-            } elseif (!$isRenewal
+            } elseif (! $isRenewal
                 && $customerService->service->fulfillment_type === 'directadmin'
                 && in_array($customerService->provisioning_status, ['pending_payment', 'processing', 'failed'], true)
                 && $customerService->domain
@@ -138,7 +207,7 @@ class MolliePaymentService
                 $this->provisioning->provision($customerService);
             } elseif ($isRenewal
                 && $customerService->provisioning_status === 'failed'
-                && !$customerService->external_username) {
+                && ! $customerService->external_username) {
                 $customerService->update([
                     'status' => 'active',
                     'suspension_reason' => null,
@@ -160,12 +229,20 @@ class MolliePaymentService
     public function handleWebhook(string $paymentId): void
     {
         $payment = Mollie::api()->payments->get($paymentId);
+
+        if (isset($payment->metadata->payment_batch_id)) {
+            $this->handleBatchWebhook($payment);
+
+            return;
+        }
+
         $invoiceId = $payment->metadata->invoice_id;
         $invoice = Invoice::findOrFail($invoiceId);
 
         if ($payment->isPaid()) {
             if ($invoice->status === 'betaald') {
                 $this->finalizePaidInvoice($invoice);
+
                 return;
             }
 
@@ -211,6 +288,58 @@ class MolliePaymentService
                 'description' => "Betaling voor factuur {$invoice->invoice_number} mislukt/geannuleerd",
                 'metadata' => ['mollie_payment_id' => $paymentId, 'status' => $payment->status],
             ]);
+        }
+    }
+
+    private function handleBatchWebhook(object $payment): void
+    {
+        $batch = PaymentBatch::with('items.invoice')->findOrFail($payment->metadata->payment_batch_id);
+
+        if ($batch->mollie_payment_id !== $payment->id) {
+            throw new \RuntimeException('Mollie betaling hoort niet bij deze betaalbatch.');
+        }
+
+        if ($payment->isPaid()) {
+            DB::transaction(function () use ($batch, $payment) {
+                $lockedBatch = PaymentBatch::query()->lockForUpdate()->findOrFail($batch->id);
+
+                if ($lockedBatch->status === 'paid') {
+                    return;
+                }
+
+                $lockedBatch->load('items.invoice');
+                $lockedBatch->items->each(function (PaymentBatchItem $item) use ($payment) {
+                    $invoice = $item->invoice;
+
+                    if ($invoice->status !== 'betaald') {
+                        $invoice->update(['status' => 'betaald', 'paid_at' => now()]);
+                        Transaction::create([
+                            'transaction_number' => Transaction::generateNumber(),
+                            'user_id' => $invoice->user_id,
+                            'invoice_id' => $invoice->id,
+                            'amount' => $item->amount,
+                            'type' => 'inkomst',
+                            'payment_method' => 'ideal',
+                            'status' => 'voltooid',
+                            'description' => "Batchbetaling factuur {$invoice->invoice_number}",
+                            'transaction_date' => now(),
+                            'reference' => $payment->id.':'.$invoice->id,
+                        ]);
+                        $this->finalizePaidInvoice($invoice);
+                    }
+
+                    $item->update(['status' => 'paid', 'paid_at' => now()]);
+                });
+
+                $lockedBatch->update(['status' => 'paid', 'paid_at' => now()]);
+            });
+
+            return;
+        }
+
+        if ($payment->isFailed() || $payment->isExpired() || $payment->isCanceled()) {
+            $batch->update(['status' => 'failed']);
+            $batch->items()->where('status', 'pending')->update(['status' => 'failed']);
         }
     }
 }

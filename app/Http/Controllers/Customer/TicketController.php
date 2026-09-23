@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\Ticket;
-use App\Models\TicketReply;
 use App\Models\TicketAttachment;
+use App\Models\TicketReply;
 use App\Models\User;
+use App\Services\PortalTicketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +46,7 @@ class TicketController extends Controller
     /**
      * Store a newly created ticket in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, PortalTicketService $ticketService)
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
@@ -75,23 +76,13 @@ class TicketController extends Controller
                 ->withInput();
         }
 
-        $ticket = Ticket::create([
-            'user_id' => Auth::id(),
-            'title' => $request->title,
-            'description' => $request->description,
-            'priority' => $request->priority,
-            'category' => $request->category,
-            'request_type' => $request->request_type,
-            'request_details' => $request->input('request_details', []),
-            'page' => $request->page,
-            'customer_notes' => $request->customer_notes,
-        ]);
+        $ticket = $ticketService->create(Auth::user(), $validator->validated());
 
         // Handle attachments
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('ticket-attachments', 'public');
-                
+
                 TicketAttachment::create([
                     'ticket_id' => $ticket->id,
                     'uploaded_by' => Auth::id(),
@@ -101,17 +92,6 @@ class TicketController extends Controller
                     'file_size' => $file->getSize(),
                 ]);
             }
-        }
-
-        // Notify staff about new ticket
-        foreach (User::staff()->get() as $staff) {
-            Notification::notify(
-                $staff,
-                'ticket_created',
-                'Nieuw ticket',
-                Auth::user()->name . ' heeft ticket ' . $ticket->ticket_number . ' aangemaakt.',
-                route('admin.tickets.show', $ticket)
-            );
         }
 
         return redirect()->route('customer.tickets.show', $ticket)
@@ -147,7 +127,7 @@ class TicketController extends Controller
         }
 
         // Check if ticket can be replied to
-        if (!$ticket->canBeReplied()) {
+        if (! $ticket->canBeReplied()) {
             return redirect()->back()
                 ->with('error', 'Dit ticket kan niet meer beantwoord worden.');
         }
@@ -180,7 +160,7 @@ class TicketController extends Controller
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('ticket-attachments', 'public');
-                
+
                 TicketAttachment::create([
                     'ticket_id' => $ticket->id,
                     'uploaded_by' => Auth::id(),
@@ -194,9 +174,9 @@ class TicketController extends Controller
 
         // Update ticket status and last reply
         if ($ticket->isWaitingForCustomer()) {
-            $ticket->update(['status' => 'open']);
+            $ticket->transitionTo('open');
         }
-        
+
         $ticket->updateLastReply();
 
         // Notify staff about new reply
@@ -205,7 +185,7 @@ class TicketController extends Controller
                 $staff,
                 'ticket_reply',
                 'Nieuwe reactie',
-                Auth::user()->name . ' heeft gereageerd op ticket ' . $ticket->ticket_number . '.',
+                Auth::user()->name.' heeft gereageerd op ticket '.$ticket->ticket_number.'.',
                 route('admin.tickets.show', $ticket)
             );
         }
@@ -224,7 +204,7 @@ class TicketController extends Controller
             abort(403);
         }
 
-        if (!$ticket->canBeClosed()) {
+        if (! $ticket->canBeClosed()) {
             return redirect()->back()
                 ->with('error', 'Dit ticket kan niet worden gesloten.');
         }
@@ -245,9 +225,9 @@ class TicketController extends Controller
             abort(403);
         }
 
-        $filePath = storage_path('app/public/' . $attachment->file_path);
-        
-        if (!file_exists($filePath)) {
+        $filePath = storage_path('app/public/'.$attachment->file_path);
+
+        if (! file_exists($filePath)) {
             abort(404);
         }
 
@@ -264,13 +244,13 @@ class TicketController extends Controller
             abort(403);
         }
 
-        if (!$attachment->isImage()) {
+        if (! $attachment->isImage()) {
             abort(404);
         }
 
-        $filePath = storage_path('app/public/' . $attachment->file_path);
-        
-        if (!file_exists($filePath)) {
+        $filePath = storage_path('app/public/'.$attachment->file_path);
+
+        if (! file_exists($filePath)) {
             abort(404);
         }
 

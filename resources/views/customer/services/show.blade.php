@@ -12,7 +12,7 @@
 @endphp
 
 <div class="bg-slate-50 min-h-screen pt-32">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
         <div class="mb-8">
             <a href="{{ route('customer.services.index') }}" class="text-sm font-semibold text-primary-700 hover:text-primary-900">← Terug naar Mijn Diensten</a>
             <h1 class="font-heading text-3xl font-bold text-slate-900 mt-3">{{ $service->title }}</h1>
@@ -119,12 +119,23 @@
                             </div>
                             <button type="button" @click="open = true" class="btn btn-outline text-red-600 border-red-200 hover:bg-red-50">Opzeggen</button>
                         </div>
-                        <div x-show="open" x-cloak class="mt-5 rounded-xl bg-red-50 p-4">
-                            <p class="text-sm text-red-800 mb-4">Weet je zeker dat je deze dienst wilt opzeggen? Deze blijft actief tot <strong>{{ $customerService->end_date?->format('d-m-Y') ?? 'het einde van de periode' }}</strong>.</p>
-                            <form action="{{ route('customer.services.cancel', $customerService) }}" method="POST" class="flex gap-3">
+                        <div x-show="open" x-cloak class="mt-5 rounded-xl bg-red-50 p-5 ring-1 ring-red-100">
+                            <h3 class="font-semibold text-red-950">Controleer je opzegging</h3>
+                            <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                                <div class="rounded-lg bg-white/70 p-3"><dt class="text-red-700">Geplande einddatum</dt><dd class="mt-1 font-semibold text-red-950">{{ $cancellationPreview['effective_at']->format('d-m-Y') }}</dd></div>
+                                <div class="rounded-lg bg-white/70 p-3"><dt class="text-red-700">Geschatte gebruikskosten</dt><dd class="mt-1 font-semibold text-red-950">{{ $cancellationPreview['is_free'] ? 'Kosteloos' : '€ ' . number_format($cancellationPreview['estimated_usage_cost'], 2, ',', '.') }}</dd></div>
+                            </dl>
+                            <p class="mt-4 text-sm text-red-800">{{ $cancellationPreview['is_free'] ? 'Je valt binnen de kosteloze bedenktijd van 7 dagen.' : 'Na de eerste 7 dagen geldt één maand opzegtermijn. Eventuele gebruikskosten worden door Servura gecontroleerd voordat ze definitief worden.' }}</p>
+                            <form action="{{ route('customer.services.cancel', $customerService) }}" method="POST" class="mt-4 space-y-4">
                                 @csrf
-                                <button type="button" @click="open = false" class="btn btn-outline">Annuleren</button>
-                                <button type="submit" class="btn btn-primary bg-red-600 hover:bg-red-700 border-red-600">Ja, opzeggen</button>
+                                <div>
+                                    <label for="cancel_reason" class="block text-sm font-medium text-red-950">Reden (optioneel)</label>
+                                    <textarea id="cancel_reason" name="reason" rows="3" class="form-input mt-1 w-full" placeholder="Vertel ons eventueel waarom je opzegt."></textarea>
+                                </div>
+                                <div class="flex flex-wrap gap-3">
+                                    <button type="button" @click="open = false" class="btn btn-outline">Annuleren</button>
+                                    <button type="submit" class="btn btn-primary border-red-600 bg-red-600 hover:bg-red-700">Opzegverzoek indienen</button>
+                                </div>
                             </form>
                         </div>
                     </div>

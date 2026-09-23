@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\Ticket;
-use App\Models\TicketReply;
 use App\Models\TicketAttachment;
+use App\Models\TicketReply;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -27,6 +28,10 @@ class TicketController extends Controller
             ->with(['user', 'assignedTo'])
             ->when($request->input('status') === 'overdue', fn ($query) => $query->overdue())
             ->when($request->filled('status') && $request->input('status') !== 'overdue', fn ($query) => $query->where('status', $request->string('status')->toString()))
+            ->when($request->input('queue') === 'unassigned', fn ($query) => $query->whereNull('assigned_to')->whereNotIn('status', ['resolved', 'closed']))
+            ->when($request->input('queue') === 'mine', fn ($query) => $query->where('assigned_to', Auth::id())->whereNotIn('status', ['resolved', 'closed']))
+            ->when($request->input('queue') === 'waiting', fn ($query) => $query->where('status', 'waiting_for_customer'))
+            ->when($request->input('queue') === 'resolved', fn ($query) => $query->whereIn('status', ['resolved', 'closed']))
             ->when($request->filled('priority'), fn ($query) => $query->where('priority', $request->string('priority')->toString()))
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->string('search')->toString();
@@ -91,7 +96,7 @@ class TicketController extends Controller
         $isInternal = $request->boolean('is_internal');
 
         // Public replies are not allowed on closed/resolved tickets
-        if (!$isInternal && !$ticket->canBeReplied()) {
+        if (! $isInternal && ! $ticket->canBeReplied()) {
             return redirect()->back()
                 ->with('error', 'Dit ticket kan geen publieke reactie meer ontvangen.');
         }
@@ -121,26 +126,18 @@ class TicketController extends Controller
 
         // Update status if requested and reply is public
         $newStatus = $request->input('status_after_reply');
-        if (!$isInternal && $newStatus && in_array($newStatus, ['open', 'in_progress', 'waiting_for_customer', 'resolved'])) {
-            $updateData = ['status' => $newStatus];
-
-            if ($newStatus === 'resolved' && !$ticket->resolved_at) {
-                $updateData['resolved_at'] = now();
-            } elseif ($newStatus !== 'resolved') {
-                $updateData['resolved_at'] = null;
-            }
-
-            $ticket->update($updateData);
+        if (! $isInternal && $newStatus) {
+            $ticket->transitionTo($newStatus);
         }
 
-        if (!$isInternal) {
+        if (! $isInternal) {
             $ticket->updateLastReply();
 
             Notification::notify(
                 $ticket->user,
                 'ticket_reply',
                 'Nieuwe reactie op uw ticket',
-                Auth::user()->name . ' heeft gereageerd op ticket ' . $ticket->ticket_number . '.',
+                Auth::user()->name.' heeft gereageerd op ticket '.$ticket->ticket_number.'.',
                 route('customer.tickets.show', $ticket)
             );
         }
@@ -170,12 +167,37 @@ class TicketController extends Controller
             $ticket->user,
             'ticket_updated',
             'Ticket bijgewerkt',
-            'Uw ticket ' . $ticket->ticket_number . ' is bijgewerkt.',
+            'Uw ticket '.$ticket->ticket_number.' is bijgewerkt.',
             route('customer.tickets.show', $ticket)
         );
 
         return redirect()->route('admin.tickets.show', $ticket)
             ->with('success', 'Ticket bijgewerkt.');
+    }
+
+    public function claim(Ticket $ticket)
+    {
+        $claimed = DB::transaction(function () use ($ticket) {
+            $lockedTicket = Ticket::query()->lockForUpdate()->findOrFail($ticket->id);
+
+            if ($lockedTicket->assigned_to && $lockedTicket->assigned_to !== Auth::id()) {
+                return false;
+            }
+
+            $lockedTicket->update(['assigned_to' => Auth::id()]);
+
+            if ($lockedTicket->status === 'open') {
+                $lockedTicket->transitionTo('in_progress');
+            }
+
+            return true;
+        });
+
+        if (! $claimed) {
+            return back()->with('error', 'Dit ticket is inmiddels door een andere medewerker opgepakt.');
+        }
+
+        return back()->with('success', 'Ticket staat nu op jouw naam.');
     }
 
     /**
@@ -200,13 +222,13 @@ class TicketController extends Controller
                 User::find($validated['assigned_to']),
                 'ticket_assigned',
                 'Ticket toegewezen',
-                'Ticket ' . $ticket->ticket_number . ' is aan u toegewezen.',
+                'Ticket '.$ticket->ticket_number.' is aan u toegewezen.',
                 route('admin.tickets.show', $ticket)
             );
         }
 
         $message = $validated['assigned_to']
-            ? 'Ticket toegewezen aan ' . User::find($validated['assigned_to'])->name . '.'
+            ? 'Ticket toegewezen aan '.User::find($validated['assigned_to'])->name.'.'
             : 'Ticket niet meer toegewezen.';
 
         return redirect()->route('admin.tickets.show', $ticket)
@@ -222,22 +244,18 @@ class TicketController extends Controller
             'resolution_notes' => 'nullable|string|max:5000',
         ]);
 
-        if (!$ticket->canBeClosed()) {
+        if (! $ticket->canBeClosed()) {
             return redirect()->route('admin.tickets.show', $ticket)
                 ->with('error', 'Dit ticket is al gesloten.');
         }
 
-        $ticket->update([
-            'status' => 'closed',
-            'closed_at' => now(),
-            'resolution_notes' => $validated['resolution_notes'] ?? $ticket->resolution_notes,
-        ]);
+        $ticket->markAsClosed($validated['resolution_notes'] ?? null);
 
         Notification::notify(
             $ticket->user,
             'ticket_closed',
             'Ticket gesloten',
-            'Uw ticket ' . $ticket->ticket_number . ' is gesloten.',
+            'Uw ticket '.$ticket->ticket_number.' is gesloten.',
             route('customer.tickets.show', $ticket)
         );
 
@@ -256,7 +274,7 @@ class TicketController extends Controller
             $ticket->user,
             'ticket_reopened',
             'Ticket heropend',
-            'Uw ticket ' . $ticket->ticket_number . ' is heropend.',
+            'Uw ticket '.$ticket->ticket_number.' is heropend.',
             route('customer.tickets.show', $ticket)
         );
 
@@ -269,9 +287,9 @@ class TicketController extends Controller
      */
     public function downloadAttachment(TicketAttachment $attachment)
     {
-        $filePath = storage_path('app/public/' . $attachment->file_path);
+        $filePath = storage_path('app/public/'.$attachment->file_path);
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             abort(404);
         }
 
@@ -301,13 +319,13 @@ class TicketController extends Controller
      */
     public function previewAttachment(TicketAttachment $attachment)
     {
-        if (!$attachment->isImage()) {
+        if (! $attachment->isImage()) {
             abort(404);
         }
 
-        $filePath = storage_path('app/public/' . $attachment->file_path);
+        $filePath = storage_path('app/public/'.$attachment->file_path);
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             abort(404);
         }
 

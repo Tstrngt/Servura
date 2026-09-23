@@ -68,7 +68,19 @@
         <!-- Tickets Table -->
         <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 p-6">
                     @if($tickets->count() > 0)
-                        <div class="overflow-x-auto">
+                        <div class="space-y-3 md:hidden">
+                            @foreach($tickets as $ticket)
+                                <a href="{{ route('customer.tickets.show', $ticket) }}" class="block rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="min-w-0"><p class="text-xs font-semibold text-slate-500">{{ $ticket->ticket_number }}</p><h2 class="mt-1 truncate font-semibold text-slate-900">{{ $ticket->title }}</h2></div>
+                                        <span class="shrink-0 rounded-full bg-{{ $ticket->statusLabel['color'] }}-100 px-2.5 py-1 text-xs font-medium text-{{ $ticket->statusLabel['color'] }}-800">{{ $ticket->statusLabel['text'] }}</span>
+                                    </div>
+                                    <p class="mt-3 text-sm leading-relaxed text-slate-500">{{ Str::limit($ticket->description, 110) }}</p>
+                                    <div class="mt-4 flex items-center justify-between text-xs text-slate-500"><span>{{ $ticket->categoryLabel }}</span><span>{{ ($ticket->last_reply_at ?? $ticket->created_at)->diffForHumans() }}</span></div>
+                                </a>
+                            @endforeach
+                        </div>
+                        <div class="hidden overflow-x-auto md:block">
                             <table class="min-w-full divide-y divide-slate-100">
                                 <thead class="bg-slate-50">
                                     <tr>

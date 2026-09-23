@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Ticket extends Model
 {
@@ -43,7 +42,7 @@ class Ticket extends Model
 
         static::creating(function ($ticket) {
             if (empty($ticket->ticket_number)) {
-                $ticket->ticket_number = 'SR-' . date('Y') . '-' . str_pad(static::max('id') + 1, 4, '0', STR_PAD_LEFT);
+                $ticket->ticket_number = 'SR-'.date('Y').'-'.str_pad(static::max('id') + 1, 4, '0', STR_PAD_LEFT);
             }
         });
     }
@@ -114,36 +113,36 @@ class Ticket extends Model
 
     public function canBeClosed(): bool
     {
-        return !$this->isClosed();
+        return ! $this->isClosed();
     }
 
     // Get status label with color
     public function getStatusLabelAttribute(): array
     {
-        return match($this->status) {
+        return match ($this->status) {
             'open' => [
                 'text' => 'Open',
-                'color' => 'blue'
+                'color' => 'blue',
             ],
             'in_progress' => [
                 'text' => 'In Behandeling',
-                'color' => 'yellow'
+                'color' => 'yellow',
             ],
             'waiting_for_customer' => [
                 'text' => 'Wacht op Klant',
-                'color' => 'orange'
+                'color' => 'orange',
             ],
             'resolved' => [
                 'text' => 'Opgelost',
-                'color' => 'green'
+                'color' => 'green',
             ],
             'closed' => [
                 'text' => 'Gesloten',
-                'color' => 'gray'
+                'color' => 'gray',
             ],
             default => [
                 'text' => $this->status,
-                'color' => 'gray'
+                'color' => 'gray',
             ]
         };
     }
@@ -151,26 +150,26 @@ class Ticket extends Model
     // Get priority label with color
     public function getPriorityLabelAttribute(): array
     {
-        return match($this->priority) {
+        return match ($this->priority) {
             'low' => [
                 'text' => 'Laag',
-                'color' => 'gray'
+                'color' => 'gray',
             ],
             'medium' => [
                 'text' => 'Medium',
-                'color' => 'blue'
+                'color' => 'blue',
             ],
             'high' => [
                 'text' => 'Hoog',
-                'color' => 'orange'
+                'color' => 'orange',
             ],
             'urgent' => [
                 'text' => 'Urgent',
-                'color' => 'red'
+                'color' => 'red',
             ],
             default => [
                 'text' => $this->priority,
-                'color' => 'gray'
+                'color' => 'gray',
             ]
         };
     }
@@ -178,7 +177,7 @@ class Ticket extends Model
     // Get request type label
     public function getRequestTypeLabelAttribute(): string
     {
-        return match($this->request_type) {
+        return match ($this->request_type) {
             'website_aanpassen' => 'Aanpassing',
             'iets_toevoegen' => 'Toevoeging',
             'website_uitbreiden' => 'Uitbreiding',
@@ -191,7 +190,7 @@ class Ticket extends Model
     // Get category label
     public function getCategoryLabelAttribute(): string
     {
-        return match($this->category) {
+        return match ($this->category) {
             'technical' => 'Technisch',
             'billing' => 'Facturatie',
             'general' => 'Algemeen',
@@ -207,34 +206,46 @@ class Ticket extends Model
         $this->update(['last_reply_at' => now()]);
     }
 
-    // Mark as resolved
-    public function markAsResolved(string $notes = null): void
+    public function transitionTo(string $status, ?string $resolutionNotes = null): void
     {
-        $this->update([
-            'status' => 'resolved',
-            'resolved_at' => now(),
-            'resolution_notes' => $notes,
-        ]);
+        if (! in_array($status, ['open', 'in_progress', 'waiting_for_customer', 'resolved', 'closed'], true)) {
+            throw new \InvalidArgumentException('Ongeldige ticketstatus.');
+        }
+
+        $attributes = ['status' => $status];
+
+        if ($status === 'resolved') {
+            $attributes['resolved_at'] = $this->resolved_at ?? now();
+            $attributes['closed_at'] = null;
+            $attributes['resolution_notes'] = $resolutionNotes ?? $this->resolution_notes;
+        } elseif ($status === 'closed') {
+            $attributes['closed_at'] = now();
+            $attributes['resolution_notes'] = $resolutionNotes ?? $this->resolution_notes;
+        } else {
+            $attributes['resolved_at'] = null;
+            $attributes['closed_at'] = null;
+
+            if ($status === 'open') {
+                $attributes['resolution_notes'] = null;
+            }
+        }
+
+        $this->update($attributes);
     }
 
-    // Mark as closed
-    public function markAsClosed(): void
+    public function markAsResolved(?string $notes = null): void
     {
-        $this->update([
-            'status' => 'closed',
-            'closed_at' => now(),
-        ]);
+        $this->transitionTo('resolved', $notes);
     }
 
-    // Reopen ticket
+    public function markAsClosed(?string $notes = null): void
+    {
+        $this->transitionTo('closed', $notes);
+    }
+
     public function reopen(): void
     {
-        $this->update([
-            'status' => 'open',
-            'resolved_at' => null,
-            'closed_at' => null,
-            'resolution_notes' => null,
-        ]);
+        $this->transitionTo('open');
     }
 
     // Check if ticket is overdue (no reply for 48 hours)
@@ -245,6 +256,7 @@ class Ticket extends Model
         }
 
         $lastActivity = $this->last_reply_at ?? $this->created_at;
+
         return $lastActivity->lt(now()->subHours(48));
     }
 
@@ -316,7 +328,7 @@ class Ticket extends Model
     {
         return $query->where(function ($q) {
             $q->where('last_reply_at', '<', now()->subHours(48))
-              ->orWhere('created_at', '<', now()->subHours(48));
+                ->orWhere('created_at', '<', now()->subHours(48));
         })->whereNotIn('status', ['resolved', 'closed']);
     }
 

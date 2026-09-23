@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\Transaction;
-use App\Models\User;
 use App\Models\TransactionLog;
+use App\Models\User;
 use App\Services\InvoiceService;
 use App\Services\MolliePaymentService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -22,6 +23,7 @@ class InvoiceController extends Controller
     public function create()
     {
         $customers = User::customers()->orderBy('name')->get();
+
         return view('admin.financial.invoices-create', compact('customers'));
     }
 
@@ -47,6 +49,15 @@ class InvoiceController extends Controller
             ->with('success', "Factuur {$invoice->invoice_number} aangemaakt.");
     }
 
+    public function download(Invoice $invoice)
+    {
+        $invoice->load(['lines', 'user']);
+
+        return Pdf::loadView('pdf.invoice', compact('invoice'))
+            ->setPaper('a4')
+            ->download($invoice->invoice_number.'.pdf');
+    }
+
     public function show(Invoice $invoice)
     {
         $invoice->load(['user', 'lines', 'transactions', 'quote']);
@@ -54,6 +65,7 @@ class InvoiceController extends Controller
             ->where('loggable_id', $invoice->id)
             ->latest()
             ->get();
+
         return view('admin.financial.invoices-show', compact('invoice', 'logs'));
     }
 
@@ -61,6 +73,7 @@ class InvoiceController extends Controller
     {
         $invoice->load('lines');
         $customers = User::customers()->orderBy('name')->get();
+
         return view('admin.financial.invoices-edit', compact('invoice', 'customers'));
     }
 
@@ -136,7 +149,7 @@ class InvoiceController extends Controller
             'loggable_type' => Invoice::class,
             'loggable_id' => $invoice->id,
             'action' => 'status_gewijzigd',
-            'description' => "Factuur {$invoice->invoice_number} status gewijzigd van " . (Invoice::STATUSES[$oldStatus] ?? $oldStatus) . " naar " . (Invoice::STATUSES[$request->status] ?? $request->status),
+            'description' => "Factuur {$invoice->invoice_number} status gewijzigd van ".(Invoice::STATUSES[$oldStatus] ?? $oldStatus).' naar '.(Invoice::STATUSES[$request->status] ?? $request->status),
             'performed_by' => auth()->id(),
         ]);
 
@@ -148,9 +161,9 @@ class InvoiceController extends Controller
         $request->validate(['internal_notes' => 'required|string']);
 
         $existing = $invoice->internal_notes;
-        $newNote = '[' . now()->format('d-m-Y H:i') . ' - ' . auth()->user()->name . "]\n" . $request->internal_notes;
+        $newNote = '['.now()->format('d-m-Y H:i').' - '.auth()->user()->name."]\n".$request->internal_notes;
         $invoice->update([
-            'internal_notes' => $existing ? $existing . "\n\n" . $newNote : $newNote,
+            'internal_notes' => $existing ? $existing."\n\n".$newNote : $newNote,
         ]);
 
         return back()->with('success', 'Notitie is toegevoegd.');
@@ -188,7 +201,7 @@ class InvoiceController extends Controller
             'loggable_type' => Invoice::class,
             'loggable_id' => $invoice->id,
             'action' => 'betaling_toegevoegd',
-            'description' => "Handmatige betaling van €" . number_format($request->amount, 2, ',', '.') . " toegevoegd aan factuur {$invoice->invoice_number}",
+            'description' => 'Handmatige betaling van €'.number_format($request->amount, 2, ',', '.')." toegevoegd aan factuur {$invoice->invoice_number}",
             'performed_by' => auth()->id(),
         ]);
 
