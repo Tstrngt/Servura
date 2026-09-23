@@ -56,8 +56,11 @@ class ProvisioningService
                 // DirectAdmin kan een foutmelding teruggeven terwijl het account
                 // al (deels) is aangemaakt. Controleer daarom altijd of de user
                 // daadwerkelijk bestaat voordat we de provisioning als mislukt
-                // markeren.
-                if (! $client->userExists($username)) {
+                // markeren. "username already exists" betekent ook dat het
+                // account er is (bijv. restant van een eerdere poging).
+                $alreadyExists = stripos($createException->getMessage(), 'already exists') !== false
+                    || stripos($createException->getMessage(), 'bestaat al') !== false;
+                if (! $alreadyExists && ! $client->userExists($username)) {
                     throw $createException;
                 }
                 $this->log($customerService, 'directadmin_waarschuwing', 'DirectAdmin meldde een fout, maar het account bestaat wel: ' . Str::limit($createException->getMessage(), 300));

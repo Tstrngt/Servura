@@ -78,7 +78,18 @@ class DirectAdminClient
         try {
             $result = $this->request('CMD_API_SHOW_USER_CONFIG', ['user' => $username]);
 
-            return filled($result);
+            if (filled($result)) {
+                return true;
+            }
+        } catch (\Throwable) {
+            // val terug op de gebruikerslijst hieronder
+        }
+
+        try {
+            $result = $this->request('CMD_API_SHOW_USERS');
+            $list = $result['list'] ?? $result;
+
+            return is_array($list) && in_array($username, $list, true);
         } catch (\Throwable) {
             return false;
         }
