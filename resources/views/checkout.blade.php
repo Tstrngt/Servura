@@ -9,7 +9,7 @@
     $initialCountry = old('country', array_key_exists((string) $user?->country, $countries) ? $user->country : 'NL');
 @endphp
 <div class="min-h-screen bg-slate-50 py-12 lg:py-16">
-    <form action="{{ route('checkout.store', $service) }}" method="POST" x-data="{ selected: @js((string) old('service_price_id', $initialPrice->id)), country: @js($initialCountry), prices: @js($service->prices->mapWithKeys(fn ($price) => [(string) $price->id => (float) $price->price])), rates: @js($countryRates), submitting: false, rate() { return Number(this.rates[this.country] ?? 0) } }" @submit="submitting = true" class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:px-8">
+    <form action="{{ route('checkout.store', $service) }}" method="POST" data-turbo="false" x-data="{ selected: @js((string) old('service_price_id', $initialPrice->id)), country: @js($initialCountry), prices: @js($service->prices->mapWithKeys(fn ($price) => [(string) $price->id => (float) $price->price])), rates: @js($countryRates), submitting: false, rate() { return Number(this.rates[this.country] ?? 0) } }" @submit="submitting = true" class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:px-8">
         @csrf
         <div class="space-y-6">
             <div>

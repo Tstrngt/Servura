@@ -48,7 +48,7 @@
         </nav>
 
         @if($tab === 'open')
-            <form action="{{ route('customer.financial.pay') }}" method="POST" x-data="{ selected: [] }">
+            <form action="{{ route('customer.financial.pay') }}" method="POST" x-data="{ selected: [] }" data-turbo="false">
                 @csrf
                 <section class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/70">
                     <div class="flex flex-col gap-3 border-b border-slate-100 p-6 sm:flex-row sm:items-center sm:justify-between">

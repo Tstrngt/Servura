@@ -29,8 +29,8 @@
             </div>
             <div class="flex gap-2 items-center">
                     <a href="{{ route('customer.invoices.download', $invoice) }}" class="btn btn-outline">PDF downloaden</a>
-                    @if(in_array($invoice->status, ['verzonden', 'vervallen']))
-                        <form method="POST" action="{{ route('customer.invoices.pay', $invoice) }}">
+                    @if(in_array($invoice->status, ['verzonden', 'openstaand', 'vervallen']))
+                        <form method="POST" action="{{ route('customer.invoices.pay', $invoice) }}" data-turbo="false">
                             @csrf
                             <button type="submit" class="btn btn-primary">Nu Betalen</button>
                         </form>

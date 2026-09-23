@@ -53,8 +53,8 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right">
-                                            @if(in_array($invoice->status, ['verzonden', 'vervallen']))
-                                                <form method="POST" action="{{ route('customer.invoices.pay', $invoice) }}" class="inline">
+                                            @if(in_array($invoice->status, ['verzonden', 'openstaand', 'vervallen']))
+                                                <form method="POST" action="{{ route('customer.invoices.pay', $invoice) }}" class="inline" data-turbo="false">
                                                     @csrf
                                                     <button type="submit" class="btn btn-primary text-sm py-1 px-3">Betalen</button>
                                                 </form>
