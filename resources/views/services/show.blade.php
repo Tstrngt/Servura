@@ -175,7 +175,7 @@
             Neem contact met ons op voor een gratis adviesgesprek en persoonlijke offerte.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{{ route('contact') }}?service={{ $service->slug }}" class="btn bg-white text-primary-600 hover:bg-primary-50 text-lg px-8 py-4">
+            <a href="{{ route('quote.builder') }}?service={{ $service->slug }}" class="btn bg-white text-primary-600 hover:bg-primary-50 text-lg px-8 py-4">
                 Vraag Offerte Aan
             </a>
             <a href="tel:0612345678" class="btn btn-outline border-white text-white hover:bg-white hover:text-primary-600 text-lg px-8 py-4">
