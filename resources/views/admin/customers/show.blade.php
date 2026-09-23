@@ -351,6 +351,35 @@
                                                                 <button type="submit" class="btn btn-primary whitespace-nowrap" {{ !$cs->auto_renew || $cs->billing_cycle === 'one_time' ? 'disabled' : '' }}>Renewal nu verwerken</button>
                                                             </form>
                                                         </div>
+
+                                                        @if($cs->service->fulfillment_type === 'directadmin')
+                                                            <div class="mt-4 border-t border-slate-200 pt-4">
+                                                                <h4 class="text-sm font-semibold text-slate-900">DirectAdmin-provisioning</h4>
+                                                                <dl class="mt-2 grid grid-cols-2 gap-2 text-xs text-slate-600 sm:grid-cols-4">
+                                                                    <div><dt class="text-slate-400">Domein</dt><dd class="font-medium text-slate-900">{{ $cs->domain ?? 'Niet ingevuld' }}</dd></div>
+                                                                    <div><dt class="text-slate-400">Gebruikersnaam</dt><dd class="font-medium text-slate-900">{{ $cs->external_username ?? '-' }}</dd></div>
+                                                                    <div><dt class="text-slate-400">Provisioning</dt><dd class="font-medium text-slate-900">{{ $cs->provisioning_status }}</dd></div>
+                                                                    <div><dt class="text-slate-400">Provisioned</dt><dd class="font-medium text-slate-900">{{ $cs->provisioned_at?->format('d-m-Y H:i') ?? '-' }}</dd></div>
+                                                                </dl>
+                                                                @if($cs->provisioning_error)
+                                                                    <p class="mt-2 rounded-lg bg-red-50 p-2 text-xs text-red-700">{{ $cs->provisioning_error }}</p>
+                                                                @endif
+                                                                @if($cs->suspension_reason === 'domain_required')
+                                                                    <p class="mt-2 rounded-lg bg-amber-50 p-2 text-xs text-amber-800">Deze dienst is betaald maar wacht op een domein voordat het hostingaccount wordt aangemaakt.</p>
+                                                                @endif
+                                                                <div class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
+                                                                    <form method="POST" action="{{ route('admin.customers.services.domain', [$customer, $cs]) }}" class="flex flex-1 items-end gap-2">
+                                                                        @csrf
+                                                                        <div class="flex-1"><label class="form-label">Domein</label><input type="text" name="domain" class="form-input" required value="{{ $cs->domain }}" placeholder="klantdomein.nl"></div>
+                                                                        <button type="submit" class="btn btn-outline whitespace-nowrap">Domein opslaan</button>
+                                                                    </form>
+                                                                    <form method="POST" action="{{ route('admin.customers.services.provision', [$customer, $cs]) }}" onsubmit="return confirm('DirectAdmin-account nu (opnieuw) aanmaken?')">
+                                                                        @csrf
+                                                                        <button type="submit" class="btn btn-primary whitespace-nowrap" {{ !$cs->domain ? 'disabled' : '' }}>Provisioning starten</button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                 </details>
                                             </td>

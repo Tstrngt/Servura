@@ -162,6 +162,8 @@ Route::middleware('auth')->group(function () {
         Route::patch('/customers/{customer}/services/{service}/renewal', [AdminCustomerController::class, 'updateServiceRenewal'])->name('customers.services.renewal.update');
         Route::post('/customers/{customer}/services/{service}/renewal/process', [AdminCustomerController::class, 'processServiceRenewal'])->name('customers.services.renewal.process');
         Route::post('/customers/{customer}/services/{service}/cancel', [AdminCustomerController::class, 'cancelService'])->name('customers.services.cancel');
+        Route::post('/customers/{customer}/services/{service}/domain', [AdminCustomerController::class, 'updateServiceDomain'])->name('customers.services.domain');
+        Route::post('/customers/{customer}/services/{service}/provision', [AdminCustomerController::class, 'provisionService'])->name('customers.services.provision');
         Route::get('/customers/{customer}/tickets', [AdminCustomerController::class, 'tickets'])->name('customers.tickets');
 
         // Services (bind by id, not slug)

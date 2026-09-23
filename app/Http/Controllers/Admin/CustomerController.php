@@ -412,4 +412,63 @@ class CustomerController extends Controller
             ->route('admin.customers.show', [$customer, 'tab' => 'services'])
             ->with('success', 'Dienst is geannuleerd.');
     }
+
+    /**
+     * Set the domain for a customer service (required before DirectAdmin provisioning).
+     */
+    public function updateServiceDomain(Request $request, User $customer, CustomerService $service)
+    {
+        if (!$customer->isCustomer() || $service->user_id !== $customer->id) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'domain' => ['required', 'string', 'max:253', 'regex:/^(?!-)(?:[a-z0-9-]{1,63}\.)+[a-z]{2,63}$/i'],
+        ]);
+
+        $service->update(['domain' => strtolower($validated['domain'])]);
+
+        return redirect()
+            ->route('admin.customers.show', [$customer, 'tab' => 'services'])
+            ->with('success', 'Domein is opgeslagen. Je kunt nu de provisioning starten.');
+    }
+
+    /**
+     * (Re)start DirectAdmin provisioning for a customer service.
+     */
+    public function provisionService(User $customer, CustomerService $service, \App\Services\ProvisioningService $provisioning)
+    {
+        if (!$customer->isCustomer() || $service->user_id !== $customer->id) {
+            abort(404);
+        }
+
+        if ($service->service->fulfillment_type !== 'directadmin') {
+            return back()->with('error', 'Deze dienst heeft geen DirectAdmin-provisioning.');
+        }
+
+        if (! $service->domain) {
+            return back()->with('error', 'Vul eerst een domein in voordat provisioning kan starten.');
+        }
+
+        try {
+            $provisioning->provision($service);
+
+            $service->refresh();
+            if ($service->provisioning_status === 'active') {
+                $service->update([
+                    'status' => 'active',
+                    'suspension_reason' => null,
+                    'suspended_at' => null,
+                ]);
+            }
+
+            return redirect()
+                ->route('admin.customers.show', [$customer, 'tab' => 'services'])
+                ->with('success', 'Provisioning is gestart voor '.$service->domain.'.');
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return back()->with('error', 'Provisioning mislukt: '.$exception->getMessage());
+        }
+    }
 }

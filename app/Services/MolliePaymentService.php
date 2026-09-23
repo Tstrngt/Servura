@@ -180,7 +180,28 @@ class MolliePaymentService
             $isRenewal = $invoice->period_start && $invoice->period_end;
             $wasExternallySuspended = $customerService->provisioning_status === 'suspended'
                 || ($customerService->external_username && $customerService->external_suspended_at);
-            if ($isRenewal) {
+            $needsDomain = $customerService->service->fulfillment_type === 'directadmin'
+                && ! $customerService->domain
+                && ! $customerService->external_username;
+
+            if ($needsDomain) {
+                $customerService->update([
+                    'status' => 'suspended',
+                    'suspension_reason' => 'domain_required',
+                    'suspended_at' => now(),
+                ]);
+
+                User::staff()->each(function (User $staff) use ($customerService) {
+                    \App\Models\Notification::notify(
+                        $staff,
+                        'service',
+                        'Domein nodig voor provisioning',
+                        "Dienst {$customerService->service->title} van {$customerService->user->name} is betaald, maar er is geen domein bekend. Vul het domein in en start provisioning.",
+                        route('admin.customers.show', [$customerService->user, 'tab' => 'services'])
+                    );
+                });
+
+            } elseif ($isRenewal) {
                 $this->periods->applyRenewalPeriod($customerService, $invoice->period_start, $invoice->period_end);
             } elseif (! $customerService->current_period_start) {
                 $this->periods->activateInitialPeriod($customerService);

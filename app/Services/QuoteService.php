@@ -99,22 +99,42 @@ class QuoteService
         $quote->recalculate();
 
         // Sync suspended customer services for product lines
-        $existingServiceIds = CustomerService::where('user_id', $quote->user_id)
-            ->where('status', 'suspended')
-            ->pluck('service_id')
-            ->toArray();
-
         foreach ($quote->lines()->whereNotNull('service_id')->get() as $line) {
-            if (!in_array($line->service_id, $existingServiceIds)) {
-                CustomerService::create([
-                    'user_id' => $quote->user_id,
-                    'service_id' => $line->service_id,
-                    'status' => 'suspended',
-                    'price' => $line->unit_price,
-                    'price_type' => Service::find($line->service_id)->price_type ?? 'eenmalig',
-                    'start_date' => now(),
+            $service = Service::find($line->service_id);
+            $billingCycle = match ($service?->price_type) {
+                'maandelijks' => 'monthly',
+                'jaarlijks' => 'yearly',
+                default => 'one_time',
+            };
+
+            $existing = CustomerService::where('user_id', $quote->user_id)
+                ->where('service_id', $line->service_id)
+                ->where('status', 'suspended')
+                ->first();
+
+            if ($existing) {
+                $existing->update([
+                    'suspension_reason' => 'pending_payment',
+                    'provisioning_status' => $service?->fulfillment_type === 'directadmin' ? 'pending_payment' : 'not_required',
+                    'billing_cycle' => $billingCycle,
                 ]);
+                continue;
             }
+
+            CustomerService::create([
+                'user_id' => $quote->user_id,
+                'service_id' => $line->service_id,
+                'status' => 'suspended',
+                'suspension_reason' => 'pending_payment',
+                'provisioning_status' => $service?->fulfillment_type === 'directadmin' ? 'pending_payment' : 'not_required',
+                'price' => $line->unit_price,
+                'price_type' => $service?->price_type ?? 'eenmalig',
+                'billing_cycle' => $billingCycle,
+                'auto_renew' => $billingCycle !== 'one_time',
+                'payment_method' => 'payment_link',
+                'start_date' => now(),
+                'notes' => 'Aangemaakt via offerte '.$quote->quote_number.'; wacht op akkoord en betaling.',
+            ]);
         }
     }
 
@@ -194,6 +214,12 @@ class QuoteService
             'action' => 'geaccepteerd',
             'description' => "Offerte {$quote->quote_number} geaccepteerd, factuur {$invoice->invoice_number} aangemaakt",
         ]);
+
+        // Zonder openstaand bedrag is er niets te betalen: meteen afronden.
+        if ((float) $invoice->total <= 0) {
+            $invoice->update(['status' => 'betaald', 'paid_at' => now()]);
+            app(\App\Services\MolliePaymentService::class)->finalizePaidInvoice($invoice);
+        }
 
         return $invoice;
     }
