@@ -127,12 +127,12 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @foreach($service->popup_details as $detail)
                                 <div class="flex items-start gap-3 bg-slate-50 rounded-xl p-4">
-                                    @if($detail['icon'] ?? false)
-                                        <span class="text-primary-600">{!! $detail['icon'] !!}</span>
-                                    @endif
+                                    <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-100 text-primary-600" x-data="{ icon: @js($detail['icon'] ?? 'sparkles') }">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" x-html="window.serviceIconSvg(icon)"></svg>
+                                    </span>
                                     <div class="text-sm">
-                                        <div class="font-medium text-slate-900">{{ $detail['label'] ?? '' }}</div>
-                                        <div class="text-slate-500">{{ $detail['value'] ?? '' }}</div>
+                                        <div class="font-medium text-slate-900">{{ $detail['title'] ?? '' }}</div>
+                                        <div class="text-slate-500">{{ $detail['description'] ?? '' }}</div>
                                     </div>
                                 </div>
                             @endforeach
