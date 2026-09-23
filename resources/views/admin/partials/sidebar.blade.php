@@ -10,14 +10,8 @@
         <a href="{{ route('admin.dashboard') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Dashboard
         </a>
-        <a href="{{ route('admin.tickets.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.tickets.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
-            Tickets
-        </a>
-        <a href="{{ route('admin.customers.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.customers.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
+        <a href="{{ route('admin.customers.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.customers.*', 'admin.tickets.*', 'admin.service-cancellations.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Klanten
-        </a>
-        <a href="{{ route('admin.service-cancellations.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.service-cancellations.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
-            Opzegverzoeken
         </a>
         <a href="{{ route('admin.services.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.services.*', 'admin.service-categories.*', 'admin.server-connections.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Diensten
@@ -39,7 +33,6 @@
     <a href="{{ route('admin.dashboard') }}" class="font-bold">Servura Admin</a>
     <div class="flex gap-3 text-sm">
         <a href="{{ route('admin.dashboard') }}">Dashboard</a>
-        <a href="{{ route('admin.tickets.index') }}">Tickets</a>
         <a href="{{ route('admin.customers.index') }}">Klanten</a>
         <a href="{{ route('admin.services.index') }}">Diensten</a>
         <a href="{{ route('admin.financial.invoices') }}">Financieel</a>

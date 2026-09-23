@@ -65,10 +65,10 @@
 
 <!-- Customer Details Content -->
 <div class="bg-gray-50 min-h-screen lg:pl-64">
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto w-full max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="px-4 py-6 sm:px-0">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="overflow-hidden">
                 <div class="px-4 py-5 sm:p-6">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -106,8 +106,13 @@
                                 Bewerken
                             </a>
                             <button onclick="openPasswordModal()" class="btn btn-outline">
-                                Wachtwoord Resetten
+                                Wachtwoord resetten
                             </button>
+                            <form method="POST" action="{{ route('admin.customers.destroy', $customer) }}" onsubmit="return confirm('Weet je zeker dat je deze klant wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline border-red-300 text-red-600 hover:bg-red-50">Verwijderen</button>
+                            </form>
                         </div>
                     </div>
                 </div>

@@ -65,10 +65,10 @@
 
 <!-- Customer Services Content -->
 <div class="bg-gray-50 min-h-screen lg:pl-64">
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto w-full max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="px-4 py-6 sm:px-0">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="overflow-hidden">
                 <div class="px-4 py-5 sm:p-6">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">

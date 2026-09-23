@@ -1,0 +1,5 @@
+<nav class="mb-6 flex gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1" aria-label="Klantenbeheer">
+    <a href="{{ route('admin.customers.index') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.customers.*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Klanten</a>
+    <a href="{{ route('admin.tickets.index') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.tickets.*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Tickets</a>
+    <a href="{{ route('admin.service-cancellations.index') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.service-cancellations.*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Opzegverzoeken</a>
+</nav>

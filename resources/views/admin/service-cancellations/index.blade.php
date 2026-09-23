@@ -5,18 +5,20 @@
 @section('content')
 @include('admin.partials.sidebar')
 
-<div class="min-h-screen bg-slate-50 lg:pl-64">
-    <main class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <header class="mb-8">
-            <h1 class="font-heading text-3xl font-bold text-slate-900">Opzegverzoeken</h1>
-            <p class="mt-2 text-slate-500">Controleer einddatums en eventuele gebruikskosten voordat een dienst stopt.</p>
+<div class="min-h-screen bg-gray-50 lg:pl-64">
+    <main class="mx-auto w-full max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8">
+        <header class="py-4">
+            <h1 class="text-2xl font-bold text-gray-900">Klanten</h1>
+            <p class="mt-1 text-sm text-gray-600">Beheer klanten, supporttickets en opzegverzoeken.</p>
         </header>
+
+        @include('admin.partials.customers-nav')
 
         @if(session('success'))<div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">{{ session('success') }}</div>@endif
 
         <div class="space-y-4">
             @forelse($cancellations as $cancellation)
-                <article class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70">
+                <article class="rounded-lg bg-white p-6 shadow">
                     <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                         <div>
                             <div class="flex flex-wrap items-center gap-2">
@@ -53,7 +55,7 @@
                     </div>
                 </article>
             @empty
-                <div class="rounded-2xl bg-white p-12 text-center text-sm text-slate-500 ring-1 ring-slate-200/70">Er zijn geen opzegverzoeken.</div>
+                <div class="rounded-lg bg-white p-12 text-center text-sm text-gray-500 shadow">Er zijn geen opzegverzoeken.</div>
             @endforelse
         </div>
         <div class="mt-6">{{ $cancellations->links() }}</div>
