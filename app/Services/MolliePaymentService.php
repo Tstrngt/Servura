@@ -67,6 +67,11 @@ class MolliePaymentService
 
     public function createBatchPayment(User $user, array $invoiceIds): PaymentBatch
     {
+        $reusable = $this->resolveOpenBatches($user, $invoiceIds);
+        if ($reusable) {
+            return $reusable;
+        }
+
         $batch = DB::transaction(function () use ($user, $invoiceIds) {
             $invoices = Invoice::query()
                 ->where('user_id', $user->id)
@@ -77,15 +82,6 @@ class MolliePaymentService
 
             if ($invoices->count() !== count(array_unique($invoiceIds)) || $invoices->isEmpty()) {
                 throw new \InvalidArgumentException('Een of meer facturen zijn niet beschikbaar voor betaling.');
-            }
-
-            $blockedInvoiceIds = PaymentBatchItem::query()
-                ->whereIn('invoice_id', $invoices->modelKeys())
-                ->whereHas('batch', fn ($query) => $query->whereIn('status', ['pending', 'processing']))
-                ->pluck('invoice_id');
-
-            if ($blockedInvoiceIds->isNotEmpty()) {
-                throw new \InvalidArgumentException('Een van deze facturen zit al in een lopende betaling.');
             }
 
             $batch = PaymentBatch::create([
@@ -289,6 +285,62 @@ class MolliePaymentService
                 'metadata' => ['mollie_payment_id' => $paymentId, 'status' => $payment->status],
             ]);
         }
+    }
+
+    /**
+     * Resolve stale/open payment batches for the given invoices.
+     * Returns a reusable open batch, or null when a new batch may be created.
+     */
+    private function resolveOpenBatches(User $user, array $invoiceIds): ?PaymentBatch
+    {
+        $batches = PaymentBatch::query()
+            ->where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'processing'])
+            ->whereHas('items', fn ($query) => $query->whereIn('invoice_id', array_unique($invoiceIds)))
+            ->oldest()
+            ->get();
+
+        foreach ($batches as $openBatch) {
+            if (! $openBatch->mollie_payment_id) {
+                // Batch without a Mollie payment is stale once creation has long passed.
+                if ($openBatch->created_at->lt(now()->subMinutes(15))) {
+                    $openBatch->update(['status' => 'failed']);
+                    $openBatch->items()->where('status', 'pending')->update(['status' => 'failed']);
+                }
+                continue;
+            }
+
+            $payment = Mollie::api()->payments->get($openBatch->mollie_payment_id);
+
+            if ($payment->isPaid()) {
+                $this->handleBatchWebhook($payment);
+                continue;
+            }
+
+            if ($payment->isFailed() || $payment->isExpired() || $payment->isCanceled()) {
+                $openBatch->update(['status' => 'failed']);
+                $openBatch->items()->where('status', 'pending')->update(['status' => 'failed']);
+                continue;
+            }
+
+            // Payment still open at Mollie: reuse the existing checkout link.
+            if ($openBatch->checkout_url) {
+                return $openBatch;
+            }
+        }
+
+        $blockedInvoiceIds = PaymentBatchItem::query()
+            ->whereIn('invoice_id', array_unique($invoiceIds))
+            ->whereHas('batch', fn ($query) => $query
+                ->where('user_id', $user->id)
+                ->whereIn('status', ['pending', 'processing']))
+            ->pluck('invoice_id');
+
+        if ($blockedInvoiceIds->isNotEmpty()) {
+            throw new \InvalidArgumentException('Een van deze facturen zit al in een lopende betaling.');
+        }
+
+        return null;
     }
 
     private function handleBatchWebhook(object $payment): void
