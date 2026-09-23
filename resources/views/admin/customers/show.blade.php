@@ -286,7 +286,10 @@
                     <div class="px-4 py-5 sm:p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-medium text-gray-900">Diensten</h3>
-                            <a href="{{ route('admin.financial.quotes.create') }}" class="btn btn-primary text-sm">Offerte Aanmaken</a>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="openServiceModal('assign')" class="btn btn-outline text-sm">Dienst Toewijzen</button>
+                                <a href="{{ route('admin.financial.quotes.create') }}" class="btn btn-primary text-sm">Offerte Aanmaken</a>
+                            </div>
                         </div>
 
                         @if($customer->customerServices->count() > 0)
@@ -316,79 +319,7 @@
                                                 {{ $cs->start_date->format('d-m-Y') }} — {{ $cs->end_date ? $cs->end_date->format('d-m-Y') : '∞' }}
                                             </td>
                                             <td class="px-4 py-3 whitespace-nowrap text-right">
-                                                @if($cs->status === 'active')
-                                                    <form method="POST" action="{{ route('admin.customers.services.cancel', [$customer, $cs]) }}" class="inline" onsubmit="return confirm('Weet je zeker dat je deze dienst wilt annuleren?')">
-                                                        @csrf
-                                                        <button type="submit" class="text-sm text-red-600 hover:text-red-500">Annuleren</button>
-                                                    </form>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <tr class="bg-slate-50/60">
-                                            <td colspan="5" class="px-4 py-3">
-                                                <details>
-                                                    <summary class="cursor-pointer text-sm font-semibold text-primary-700 hover:text-primary-900">Renewal beheren en testen</summary>
-                                                    <div class="mt-4 rounded-xl bg-white p-4 ring-1 ring-slate-200">
-                                                        <form method="POST" action="{{ route('admin.customers.services.renewal.update', [$customer, $cs]) }}">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-                                                                <div><label class="form-label">Betaalperiode</label><select name="billing_cycle" class="form-input">@foreach($billingCycles as $cycle => $label)<option value="{{ $cycle }}" {{ $cs->billing_cycle === $cycle ? 'selected' : '' }}>{{ $label }}</option>@endforeach</select></div>
-                                                                <div><label class="form-label">Periode vanaf</label><input type="date" name="current_period_start" class="form-input" required value="{{ $cs->current_period_start?->format('Y-m-d') ?? $cs->start_date?->format('Y-m-d') }}"></div>
-                                                                <div><label class="form-label">Periode tot</label><input type="date" name="current_period_end" class="form-input" value="{{ $cs->current_period_end?->format('Y-m-d') }}"></div>
-                                                                <div><label class="form-label">Volgende factuurdatum</label><input type="date" name="next_invoice_date" class="form-input" value="{{ $cs->next_invoice_date?->format('Y-m-d') }}"></div>
-                                                                <div><label class="form-label">Betaalmethode</label><select name="payment_method" class="form-input"><option value="payment_link" {{ $cs->payment_method === 'payment_link' ? 'selected' : '' }}>Factuur met betaallink</option><option value="auto_debit" {{ $cs->payment_method === 'auto_debit' ? 'selected' : '' }}>Automatische incasso</option></select></div>
-                                                            </div>
-                                                            <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                                                <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="auto_renew" value="1" {{ $cs->auto_renew ? 'checked' : '' }} class="rounded border-slate-300 text-primary-600"> Automatisch verlengen</label>
-                                                                <button type="submit" class="btn btn-outline">Renewalinstellingen opslaan</button>
-                                                            </div>
-                                                        </form>
-                                                        <div class="mt-4 flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
-                                                            <p class="text-xs leading-relaxed text-slate-500">Zet de volgende factuurdatum op vandaag of eerder, sla op en verwerk daarna de renewal. De idempotentiecontrole voorkomt een tweede factuur voor dezelfde periode.</p>
-                                                            <div class="flex items-center gap-2">
-                                                                <form method="POST" action="{{ route('admin.customers.services.renewal.process', [$customer, $cs]) }}" onsubmit="return confirm('Renewal nu verwerken? Dit maakt een echte factuur en start de ingestelde Mollie-betaalmethode.')">
-                                                                    @csrf
-                                                                    <button type="submit" class="btn btn-primary whitespace-nowrap" {{ !$cs->auto_renew || $cs->billing_cycle === 'one_time' ? 'disabled' : '' }}>Renewal nu verwerken</button>
-                                                                </form>
-                                                                <form method="POST" action="{{ route('admin.customers.services.destroy', [$customer, $cs]) }}" onsubmit="return confirm('Dienst definitief verwijderen? Gekoppelde facturen en tickets blijven bestaan maar verliezen de koppeling.')">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" class="btn btn-outline border-red-200 text-red-600 hover:bg-red-50 whitespace-nowrap">Verwijderen</button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-
-                                                        @if($cs->service->fulfillment_type === 'directadmin')
-                                                            <div class="mt-4 border-t border-slate-200 pt-4">
-                                                                <h4 class="text-sm font-semibold text-slate-900">DirectAdmin-provisioning</h4>
-                                                                <dl class="mt-2 grid grid-cols-2 gap-2 text-xs text-slate-600 sm:grid-cols-4">
-                                                                    <div><dt class="text-slate-400">Domein</dt><dd class="font-medium text-slate-900">{{ $cs->domain ?? 'Niet ingevuld' }}</dd></div>
-                                                                    <div><dt class="text-slate-400">Gebruikersnaam</dt><dd class="font-medium text-slate-900">{{ $cs->external_username ?? '-' }}</dd></div>
-                                                                    <div><dt class="text-slate-400">Provisioning</dt><dd class="font-medium text-slate-900">{{ $cs->provisioning_status }}</dd></div>
-                                                                    <div><dt class="text-slate-400">Provisioned</dt><dd class="font-medium text-slate-900">{{ $cs->provisioned_at?->format('d-m-Y H:i') ?? '-' }}</dd></div>
-                                                                </dl>
-                                                                @if($cs->provisioning_error)
-                                                                    <p class="mt-2 rounded-lg bg-red-50 p-2 text-xs text-red-700">{{ $cs->provisioning_error }}</p>
-                                                                @endif
-                                                                @if($cs->suspension_reason === 'domain_required')
-                                                                    <p class="mt-2 rounded-lg bg-amber-50 p-2 text-xs text-amber-800">Deze dienst is betaald maar wacht op een domein voordat het hostingaccount wordt aangemaakt.</p>
-                                                                @endif
-                                                                <div class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
-                                                                    <form method="POST" action="{{ route('admin.customers.services.domain', [$customer, $cs]) }}" class="flex flex-1 items-end gap-2">
-                                                                        @csrf
-                                                                        <div class="flex-1"><label class="form-label">Domein</label><input type="text" name="domain" class="form-input" required value="{{ $cs->domain }}" placeholder="klantdomein.nl"></div>
-                                                                        <button type="submit" class="btn btn-outline whitespace-nowrap">Domein opslaan</button>
-                                                                    </form>
-                                                                    <form method="POST" action="{{ route('admin.customers.services.provision', [$customer, $cs]) }}" onsubmit="return confirm('DirectAdmin-account nu (opnieuw) aanmaken?')">
-                                                                        @csrf
-                                                                        <button type="submit" class="btn btn-primary whitespace-nowrap" {{ !$cs->domain ? 'disabled' : '' }}>Provisioning starten</button>
-                                                                    </form>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                </details>
+                                                <button type="button" onclick="openServiceModal({{ $cs->id }})" class="btn btn-outline text-xs">Beheren</button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -402,6 +333,153 @@
                         @endif
                     </div>
                 </div>
+
+                {{-- Dienst toewijzen modal --}}
+                <div id="serviceModal-assign" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/60 p-4 backdrop-blur-sm">
+                    <div class="relative mx-auto mt-10 w-full max-w-xl rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200">
+                        <div class="flex items-start justify-between border-b border-slate-200 px-6 py-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-900">Dienst toewijzen</h3>
+                                <p class="mt-0.5 text-xs text-slate-500">Wijs een product direct toe aan {{ $customer->name }} — er wordt een actieve dienst aangemaakt.</p>
+                            </div>
+                            <button type="button" onclick="closeServiceModal('assign')" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                        <form method="POST" action="{{ route('admin.customers.services.store', $customer) }}" class="space-y-4 px-6 py-5">
+                            @csrf
+                            <div>
+                                <label class="form-label" for="assign_service_id">Dienst *</label>
+                                <select id="assign_service_id" name="service_id" class="form-input" required>
+                                    <option value="">Kies een dienst…</option>
+                                    @foreach($availableServices as $availableService)
+                                        <option value="{{ $availableService->id }}">{{ $availableService->title }} — {{ $availableService->formatted_price }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label class="form-label" for="assign_price">Prijs (leeg = standaardprijs)</label>
+                                    <input id="assign_price" type="number" name="price" min="0" step="0.01" class="form-input" placeholder="0.00">
+                                </div>
+                                <div>
+                                    <label class="form-label" for="assign_price_type">Prijstype</label>
+                                    <select id="assign_price_type" name="price_type" class="form-input">
+                                        <option value="">Standaard</option>
+                                        <option value="eenmalig">Eenmalig</option>
+                                        <option value="maandelijks">Maandelijks</option>
+                                        <option value="jaarlijks">Jaarlijks</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label" for="assign_domain">Domein (verplicht voor DirectAdmin-diensten)</label>
+                                <input id="assign_domain" type="text" name="domain" class="form-input" placeholder="klantdomein.nl">
+                            </div>
+                            <div class="flex justify-end gap-3 border-t border-slate-200 pt-4">
+                                <button type="button" onclick="closeServiceModal('assign')" class="btn btn-outline">Annuleren</button>
+                                <button type="submit" class="btn btn-primary">Toewijzen</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {{-- Service beheer-modals --}}
+                @foreach($customer->customerServices as $cs)
+                    <div id="serviceModal-{{ $cs->id }}" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/60 p-4 backdrop-blur-sm">
+                        <div class="relative mx-auto mt-10 w-full max-w-3xl rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200">
+                            <div class="flex items-start justify-between border-b border-slate-200 px-6 py-4">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-slate-900">{{ $cs->service->title }}</h3>
+                                    <p class="mt-0.5 text-xs text-slate-500">
+                                        {{ $cs->formatted_price }} •
+                                        <span class="inline-flex items-center rounded-full bg-{{ $cs->statusLabel['color'] }}-100 px-2 py-0.5 font-medium text-{{ $cs->statusLabel['color'] }}-800">{{ $cs->statusLabel['text'] }}</span>
+                                        • {{ $cs->start_date->format('d-m-Y') }} — {{ $cs->end_date ? $cs->end_date->format('d-m-Y') : '∞' }}
+                                    </p>
+                                </div>
+                                <button type="button" onclick="closeServiceModal({{ $cs->id }})" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+
+                            <div class="max-h-[70vh] space-y-6 overflow-y-auto px-6 py-5">
+                                {{-- Facturatie & renewal --}}
+                                <section>
+                                    <h4 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Facturatie & verlenging</h4>
+                                    <form method="POST" action="{{ route('admin.customers.services.renewal.update', [$customer, $cs]) }}" class="mt-3">
+                                        @csrf
+                                        @method('PATCH')
+                                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                                            <div><label class="form-label">Betaalperiode</label><select name="billing_cycle" class="form-input">@foreach($billingCycles as $cycle => $label)<option value="{{ $cycle }}" {{ $cs->billing_cycle === $cycle ? 'selected' : '' }}>{{ $label }}</option>@endforeach</select></div>
+                                            <div><label class="form-label">Periode vanaf</label><input type="date" name="current_period_start" class="form-input" required value="{{ $cs->current_period_start?->format('Y-m-d') ?? $cs->start_date?->format('Y-m-d') }}"></div>
+                                            <div><label class="form-label">Periode tot</label><input type="date" name="current_period_end" class="form-input" value="{{ $cs->current_period_end?->format('Y-m-d') }}"></div>
+                                            <div><label class="form-label">Volgende factuurdatum</label><input type="date" name="next_invoice_date" class="form-input" value="{{ $cs->next_invoice_date?->format('Y-m-d') }}"></div>
+                                            <div><label class="form-label">Betaalmethode</label><select name="payment_method" class="form-input"><option value="payment_link" {{ $cs->payment_method === 'payment_link' ? 'selected' : '' }}>Factuur met betaallink</option><option value="auto_debit" {{ $cs->payment_method === 'auto_debit' ? 'selected' : '' }}>Automatische incasso</option></select></div>
+                                        </div>
+                                        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                            <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="auto_renew" value="1" {{ $cs->auto_renew ? 'checked' : '' }} class="rounded border-slate-300 text-primary-600"> Automatisch verlengen</label>
+                                            <button type="submit" class="btn btn-outline">Instellingen opslaan</button>
+                                        </div>
+                                    </form>
+                                    <div class="mt-3 flex items-center justify-between rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
+                                        <p class="text-xs leading-relaxed text-slate-500">Zet de volgende factuurdatum op vandaag of eerder, sla op en verwerk daarna de renewal.</p>
+                                        <form method="POST" action="{{ route('admin.customers.services.renewal.process', [$customer, $cs]) }}" onsubmit="return confirm('Renewal nu verwerken? Dit maakt een echte factuur en start de ingestelde Mollie-betaalmethode.')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-primary whitespace-nowrap" {{ !$cs->auto_renew || $cs->billing_cycle === 'one_time' ? 'disabled' : '' }}>Renewal nu verwerken</button>
+                                        </form>
+                                    </div>
+                                </section>
+
+                                {{-- DirectAdmin --}}
+                                @if($cs->service->fulfillment_type === 'directadmin')
+                                    <section class="border-t border-slate-200 pt-5">
+                                        <h4 class="text-sm font-semibold uppercase tracking-wide text-slate-500">DirectAdmin</h4>
+                                        <dl class="mt-3 grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
+                                            <div class="rounded-lg bg-slate-50 p-3 ring-1 ring-slate-200"><dt class="text-slate-400">Domein</dt><dd class="mt-0.5 font-medium text-slate-900">{{ $cs->domain ?? 'Niet ingevuld' }}</dd></div>
+                                            <div class="rounded-lg bg-slate-50 p-3 ring-1 ring-slate-200"><dt class="text-slate-400">Gebruikersnaam</dt><dd class="mt-0.5 font-medium text-slate-900">{{ $cs->external_username ?? '-' }}</dd></div>
+                                            <div class="rounded-lg bg-slate-50 p-3 ring-1 ring-slate-200"><dt class="text-slate-400">Provisioning</dt><dd class="mt-0.5 font-medium text-slate-900">{{ $cs->provisioning_status }}</dd></div>
+                                            <div class="rounded-lg bg-slate-50 p-3 ring-1 ring-slate-200"><dt class="text-slate-400">Provisioned</dt><dd class="mt-0.5 font-medium text-slate-900">{{ $cs->provisioned_at?->format('d-m-Y H:i') ?? '-' }}</dd></div>
+                                        </dl>
+                                        @if($cs->provisioning_error)
+                                            <p class="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-700 ring-1 ring-red-100">{{ $cs->provisioning_error }}</p>
+                                        @endif
+                                        @if($cs->suspension_reason === 'domain_required')
+                                            <p class="mt-3 rounded-lg bg-amber-50 p-3 text-xs text-amber-800 ring-1 ring-amber-100">Deze dienst is betaald maar wacht op een domein voordat het hostingaccount wordt aangemaakt.</p>
+                                        @endif
+                                        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+                                            <form method="POST" action="{{ route('admin.customers.services.domain', [$customer, $cs]) }}" class="flex flex-1 items-end gap-2">
+                                                @csrf
+                                                <div class="flex-1"><label class="form-label">Domein</label><input type="text" name="domain" class="form-input" required value="{{ $cs->domain }}" placeholder="klantdomein.nl"></div>
+                                                <button type="submit" class="btn btn-outline whitespace-nowrap">Domein opslaan</button>
+                                            </form>
+                                            <form method="POST" action="{{ route('admin.customers.services.provision', [$customer, $cs]) }}" onsubmit="return confirm('DirectAdmin-account nu (opnieuw) aanmaken?')">
+                                                @csrf
+                                                <button type="submit" class="btn btn-primary whitespace-nowrap" {{ !$cs->domain ? 'disabled' : '' }}>Provisioning starten</button>
+                                            </form>
+                                        </div>
+                                    </section>
+                                @endif
+                            </div>
+
+                            <div class="flex items-center justify-between border-t border-slate-200 px-6 py-4">
+                                <form method="POST" action="{{ route('admin.customers.services.destroy', [$customer, $cs]) }}" onsubmit="return confirm('Dienst definitief verwijderen? Gekoppelde facturen en tickets blijven bestaan maar verliezen de koppeling.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-sm font-medium text-red-600 hover:text-red-500">Dienst verwijderen</button>
+                                </form>
+                                <div class="flex items-center gap-2">
+                                    @if($cs->status === 'active')
+                                        <form method="POST" action="{{ route('admin.customers.services.cancel', [$customer, $cs]) }}" onsubmit="return confirm('Weet je zeker dat je deze dienst wilt annuleren?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-outline border-red-200 text-red-600 hover:bg-red-50">Annuleren</button>
+                                        </form>
+                                    @endif
+                                    <button type="button" onclick="closeServiceModal({{ $cs->id }})" class="btn btn-outline">Sluiten</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
 
             @elseif(request('tab') === 'invoices')
                 <!-- Invoices Tab -->
@@ -519,5 +597,27 @@ function openPasswordModal() {
 function closePasswordModal() {
     document.getElementById('passwordModal').classList.add('hidden');
 }
+function openServiceModal(id) {
+    document.getElementById('serviceModal-' + id).classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeServiceModal(id) {
+    document.getElementById('serviceModal-' + id).classList.add('hidden');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('[id^="serviceModal-"]:not(.hidden)').forEach(function (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        });
+    }
+});
+document.addEventListener('click', function (e) {
+    if (e.target.id && e.target.id.startsWith('serviceModal-')) {
+        e.target.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+});
 </script>
 @endsection

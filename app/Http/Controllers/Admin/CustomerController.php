@@ -319,6 +319,7 @@ class CustomerController extends Controller
             'service_id' => 'required|exists:services,id',
             'price' => 'nullable|numeric|min:0',
             'price_type' => 'nullable|in:eenmalig,maandelijks,jaarlijks',
+            'domain' => ['nullable', 'string', 'max:253', 'regex:/^(?!-)(?:[a-z0-9-]{1,63}\.)+[a-z]{2,63}$/i'],
         ]);
 
         $service = Service::findOrFail($request->service_id);
@@ -329,6 +330,8 @@ class CustomerController extends Controller
             'status' => 'active',
             'price' => $request->filled('price') ? $request->price : ($service->price ?? 0),
             'price_type' => $request->filled('price_type') ? $request->price_type : ($service->price_type ?? 'eenmalig'),
+            'domain' => $request->filled('domain') ? strtolower($request->domain) : null,
+            'provisioning_status' => $service->fulfillment_type === 'directadmin' ? 'pending' : 'not_required',
             'start_date' => now(),
         ]);
 
