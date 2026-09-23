@@ -434,6 +434,25 @@ class CustomerController extends Controller
     }
 
     /**
+     * Delete a customer service.
+     */
+    public function destroyService(User $customer, CustomerService $service)
+    {
+        if (!$customer->isCustomer() || $service->user_id !== $customer->id) {
+            abort(404);
+        }
+
+        $service->invoices()->update(['customer_service_id' => null]);
+        $service->tickets()->update(['customer_service_id' => null]);
+        $service->cancellationRequests()->delete();
+        $service->delete();
+
+        return redirect()
+            ->route('admin.customers.show', [$customer, 'tab' => 'services'])
+            ->with('success', 'Dienst is verwijderd.');
+    }
+
+    /**
      * (Re)start DirectAdmin provisioning for a customer service.
      */
     public function provisionService(User $customer, CustomerService $service, \App\Services\ProvisioningService $provisioning)

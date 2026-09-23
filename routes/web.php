@@ -164,6 +164,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/customers/{customer}/services/{service}/cancel', [AdminCustomerController::class, 'cancelService'])->name('customers.services.cancel');
         Route::post('/customers/{customer}/services/{service}/domain', [AdminCustomerController::class, 'updateServiceDomain'])->name('customers.services.domain');
         Route::post('/customers/{customer}/services/{service}/provision', [AdminCustomerController::class, 'provisionService'])->name('customers.services.provision');
+        Route::delete('/customers/{customer}/services/{service}', [AdminCustomerController::class, 'destroyService'])->name('customers.services.destroy');
         Route::get('/customers/{customer}/tickets', [AdminCustomerController::class, 'tickets'])->name('customers.tickets');
 
         // Services (bind by id, not slug)

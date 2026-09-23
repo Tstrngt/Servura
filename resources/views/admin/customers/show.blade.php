@@ -346,10 +346,17 @@
                                                         </form>
                                                         <div class="mt-4 flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
                                                             <p class="text-xs leading-relaxed text-slate-500">Zet de volgende factuurdatum op vandaag of eerder, sla op en verwerk daarna de renewal. De idempotentiecontrole voorkomt een tweede factuur voor dezelfde periode.</p>
-                                                            <form method="POST" action="{{ route('admin.customers.services.renewal.process', [$customer, $cs]) }}" onsubmit="return confirm('Renewal nu verwerken? Dit maakt een echte factuur en start de ingestelde Mollie-betaalmethode.')">
-                                                                @csrf
-                                                                <button type="submit" class="btn btn-primary whitespace-nowrap" {{ !$cs->auto_renew || $cs->billing_cycle === 'one_time' ? 'disabled' : '' }}>Renewal nu verwerken</button>
-                                                            </form>
+                                                            <div class="flex items-center gap-2">
+                                                                <form method="POST" action="{{ route('admin.customers.services.renewal.process', [$customer, $cs]) }}" onsubmit="return confirm('Renewal nu verwerken? Dit maakt een echte factuur en start de ingestelde Mollie-betaalmethode.')">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-primary whitespace-nowrap" {{ !$cs->auto_renew || $cs->billing_cycle === 'one_time' ? 'disabled' : '' }}>Renewal nu verwerken</button>
+                                                                </form>
+                                                                <form method="POST" action="{{ route('admin.customers.services.destroy', [$customer, $cs]) }}" onsubmit="return confirm('Dienst definitief verwijderen? Gekoppelde facturen en tickets blijven bestaan maar verliezen de koppeling.')">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit" class="btn btn-outline border-red-200 text-red-600 hover:bg-red-50 whitespace-nowrap">Verwijderen</button>
+                                                                </form>
+                                                            </div>
                                                         </div>
 
                                                         @if($cs->service->fulfillment_type === 'directadmin')
