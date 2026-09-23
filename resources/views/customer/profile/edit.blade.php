@@ -16,7 +16,7 @@
             <div class="mb-8 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">{{ session('success') }}</div>
         @endif
 
-        <div class="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
             <form action="{{ route('customer.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
                 @csrf
                 @method('PUT')
@@ -93,7 +93,7 @@
                 </div>
             </form>
 
-            <aside class="space-y-8">
+            <aside class="space-y-8 lg:self-start">
                 <section class="rounded-2xl bg-slate-900 p-6 text-white shadow-xl shadow-slate-900/10">
                     <h2 class="font-heading text-lg font-bold">Bedrijfslogo</h2>
                     <div class="mt-5 flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/15">

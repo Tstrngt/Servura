@@ -117,7 +117,7 @@
                                 <h2 class="font-heading text-xl font-bold text-slate-900">Dienst opzeggen</h2>
                                 <p class="mt-1 text-sm text-slate-500">De dienst blijft actief tot het einde van de huidige periode.</p>
                             </div>
-                            <button type="button" @click="open = true" class="btn btn-outline text-red-600 border-red-200 hover:bg-red-50">Opzeggen</button>
+                            <button type="button" @click="open = true" class="btn btn-outline">Opzeggen</button>
                         </div>
                         <div x-show="open" x-cloak class="mt-5 rounded-xl bg-red-50 p-5 ring-1 ring-red-100">
                             <h3 class="font-semibold text-red-950">Controleer je opzegging</h3>
