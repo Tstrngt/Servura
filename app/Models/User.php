@@ -88,6 +88,18 @@ class User extends Authenticatable
             });
     }
 
+    /**
+     * Whether the customer has an active service with priority support
+     * (e.g. a maintenance package). Used to badge tickets for staff.
+     */
+    public function hasPrioritySupport(): bool
+    {
+        return $this->customerServices()
+            ->where('status', 'active')
+            ->whereHas('service', fn ($query) => $query->where('priority_support', true))
+            ->exists();
+    }
+
     // Get all services including inactive
     public function allServices()
     {

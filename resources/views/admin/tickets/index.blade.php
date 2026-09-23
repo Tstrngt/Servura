@@ -76,7 +76,12 @@
                                         <p class="text-sm text-gray-500">{{ $ticket->title }}</p>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-700">
-                                        <div>{{ $ticket->user->name }}</div>
+                                        <div class="flex items-center gap-2">
+                                            <span>{{ $ticket->user->name }}</span>
+                                            @if($ticket->user->hasPrioritySupport())
+                                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">Prioriteit</span>
+                                            @endif
+                                        </div>
                                         <div class="mt-1 text-xs text-slate-400">{{ $ticket->assignedTo ? 'Behandelaar: ' . $ticket->assignedTo->name : 'Nog niet opgepakt' }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-{{ $ticket->statusLabel['color'] }}-100 text-{{ $ticket->statusLabel['color'] }}-800">{{ $ticket->statusLabel['text'] }}</span></td>

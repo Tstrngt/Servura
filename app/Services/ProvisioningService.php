@@ -44,13 +44,24 @@ class ProvisioningService
 
         try {
             $client = $this->directAdmin->using($customerService->service->serverConnection);
-            $client->createUser([
-                'username' => $username,
-                'password' => $password,
-                'email' => $customerService->user->email,
-                'domain' => $customerService->domain,
-                'package' => $customerService->service->provider_package,
-            ]);
+            try {
+                $client->createUser([
+                    'username' => $username,
+                    'password' => $password,
+                    'email' => $customerService->user->email,
+                    'domain' => $customerService->domain,
+                    'package' => $customerService->service->provider_package,
+                ]);
+            } catch (\Throwable $createException) {
+                // DirectAdmin kan een foutmelding teruggeven terwijl het account
+                // al (deels) is aangemaakt. Controleer daarom altijd of de user
+                // daadwerkelijk bestaat voordat we de provisioning als mislukt
+                // markeren.
+                if (! $client->userExists($username)) {
+                    throw $createException;
+                }
+                $this->log($customerService, 'directadmin_waarschuwing', 'DirectAdmin meldde een fout, maar het account bestaat wel: ' . Str::limit($createException->getMessage(), 300));
+            }
             $customerService->update([
                 'provisioning_status' => 'active',
                 'provisioned_at' => now(),

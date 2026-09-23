@@ -32,6 +32,12 @@ class PortalTicketService
             throw ValidationException::withMessages(['category' => 'Ongeldige categorie.']);
         }
 
+        // Klanten met een actief prioriteitspakket (bijv. onderhoud) krijgen
+        // automatisch hoge prioriteit.
+        if ($customer->hasPrioritySupport() && in_array($priority, ['low', 'medium'], true)) {
+            $priority = 'high';
+        }
+
         return DB::transaction(function () use ($customer, $attributes, $priority, $category) {
             $ticket = Ticket::create([
                 'user_id' => $customer->id,

@@ -343,6 +343,9 @@
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $ticket->priorityLabel['color'] }}-100 text-{{ $ticket->priorityLabel['color'] }}-800">
                                             {{ $ticket->priorityLabel['text'] }}
                                         </span>
+                                        @if($ticket->user->hasPrioritySupport())
+                                            <span class="ml-1 inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800" title="Klant heeft een actief prioriteitspakket">Prioriteitsklant</span>
+                                        @endif
                                     </div>
                                 </div>
                                 <div>

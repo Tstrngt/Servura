@@ -92,6 +92,7 @@ class ServiceController extends Controller
             'popup_details.*.icon' => 'required|in:sparkles,code,device,search,server,support,shield,chart,globe,bolt',
             'popup_price_note' => 'nullable|string|max:500',
             'is_popular' => 'boolean',
+            'priority_support' => 'boolean',
             'is_active' => 'boolean',
             'show_on_homepage' => 'boolean',
             'show_on_services_page' => 'boolean',
@@ -109,6 +110,7 @@ class ServiceController extends Controller
 
         $validated['slug'] = Str::slug($validated['title']);
         $validated['is_popular'] = $request->boolean('is_popular');
+        $validated['priority_support'] = $request->boolean('priority_support');
         $validated['is_active'] = $request->boolean('is_active');
         $validated['show_on_homepage'] = $request->boolean('show_on_homepage');
         $validated['show_on_services_page'] = $request->boolean('show_on_services_page');
@@ -186,6 +188,7 @@ class ServiceController extends Controller
             'popup_details.*.icon' => 'required|in:sparkles,code,device,search,server,support,shield,chart,globe,bolt',
             'popup_price_note' => 'nullable|string|max:500',
             'is_popular' => 'boolean',
+            'priority_support' => 'boolean',
             'is_active' => 'boolean',
             'show_on_homepage' => 'boolean',
             'show_on_services_page' => 'boolean',
@@ -203,6 +206,7 @@ class ServiceController extends Controller
 
         $validated['slug'] = Str::slug($validated['title']);
         $validated['is_popular'] = $request->boolean('is_popular');
+        $validated['priority_support'] = $request->boolean('priority_support');
         $validated['is_active'] = $request->boolean('is_active');
         $validated['show_on_homepage'] = $request->boolean('show_on_homepage');
         $validated['show_on_services_page'] = $request->boolean('show_on_services_page');

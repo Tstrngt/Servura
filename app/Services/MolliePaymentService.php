@@ -174,8 +174,24 @@ class MolliePaymentService
 
     public function finalizePaidInvoice(Invoice $invoice): void
     {
-        $customerService = $invoice->customerService
-            ?? CustomerService::find($invoice->lines()->whereNotNull('customer_service_id')->value('customer_service_id'));
+        $serviceIds = $invoice->lines()
+            ->whereNotNull('customer_service_id')
+            ->pluck('customer_service_id')
+            ->push($invoice->customer_service_id)
+            ->filter()
+            ->unique();
+
+        foreach (CustomerService::whereIn('id', $serviceIds)->get() as $customerService) {
+            $this->finalizeCustomerService($invoice, $customerService);
+        }
+
+        Order::where('invoice_id', $invoice->id)
+            ->where('status', 'pending_payment')
+            ->update(['status' => 'paid', 'paid_at' => now()]);
+    }
+
+    private function finalizeCustomerService(Invoice $invoice, CustomerService $customerService): void
+    {
         if ($customerService) {
             $isRenewal = $invoice->period_start && $invoice->period_end;
             $wasExternallySuspended = $customerService->provisioning_status === 'suspended'
@@ -234,10 +250,6 @@ class MolliePaymentService
                 ]);
             }
         }
-
-        Order::where('invoice_id', $invoice->id)
-            ->where('status', 'pending_payment')
-            ->update(['status' => 'paid', 'paid_at' => now()]);
     }
 
     /**

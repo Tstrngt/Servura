@@ -245,6 +245,10 @@
                                 <input type="checkbox" name="is_popular" value="1" {{ old('is_popular') ? 'checked' : '' }} class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
                                 <span class="ml-2 text-sm text-gray-700">Markeren als populair</span>
                             </label>
+                            <label class="flex items-center rounded-xl bg-amber-50 px-4 py-3 ring-1 ring-amber-200">
+                                <input type="checkbox" name="priority_support" value="1" {{ old('priority_support') ? 'checked' : '' }} class="rounded border-amber-300 text-amber-600 shadow-sm focus:border-amber-300 focus:ring focus:ring-amber-200 focus:ring-opacity-50">
+                                <span class="ml-2 text-sm text-amber-900">Prioriteitssupport (klant krijgt prioriteitsbadge)</span>
+                            </label>
                         </div>
                         </div>
 

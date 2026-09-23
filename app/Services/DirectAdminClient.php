@@ -70,6 +70,20 @@ class DirectAdminClient
         ], 120);
     }
 
+    /**
+     * Check whether a user account exists on the server.
+     */
+    public function userExists(string $username): bool
+    {
+        try {
+            $result = $this->request('CMD_API_SHOW_USER_CONFIG', ['user' => $username]);
+
+            return filled($result);
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
     public function suspendUser(string $username): array
     {
         return $this->request('CMD_API_SELECT_USERS', [
