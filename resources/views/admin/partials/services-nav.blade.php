@@ -1,5 +1,4 @@
 <nav class="mb-6 flex gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1" aria-label="Dienstenbeheer">
     <a href="{{ route('admin.services.index') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.services.*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Diensten</a>
     <a href="{{ route('admin.service-categories.index') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.service-categories.*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Productcategorieën</a>
-    <a href="{{ route('admin.server-connections.index') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.server-connections.*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Serverkoppelingen</a>
 </nav>

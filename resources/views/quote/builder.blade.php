@@ -101,20 +101,12 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    @php
-                        $goals = [
-                            ['id' => 'goal_brochure', 'value' => 'Visitekaartje / online brochure', 'label' => 'Visitekaartje / online brochure', 'note' => 'Informatie over uw bedrijf tonen'],
-                            ['id' => 'goal_leads', 'value' => 'Meer leads en aanvragen', 'label' => 'Meer leads en aanvragen', 'note' => 'Bezoekers omzetten in contactaanvragen'],
-                            ['id' => 'goal_sales', 'value' => 'Producten of diensten verkopen', 'label' => 'Producten of diensten verkopen', 'note' => 'Webshop of boekingssysteem'],
-                            ['id' => 'goal_service', 'value' => 'Service richting klanten', 'label' => 'Service richting klanten', 'note' => 'Klantenportaal of informatiehub'],
-                        ];
-                    @endphp
-                    @foreach($goals as $goal)
+                    @foreach($form['goals'] as $goal)
                         <label class="relative flex items-start gap-4 rounded-2xl bg-white p-5 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
-                            <input type="radio" name="goal" value="{{ $goal['value'] }}" class="mt-1 h-4 w-4 text-primary-600 border-slate-300 focus:ring-primary-500" required>
+                            <input type="radio" name="goal" value="{{ $goal['label'] }}" class="mt-1 h-4 w-4 text-primary-600 border-slate-300 focus:ring-primary-500" required>
                             <div>
                                 <span class="font-semibold text-slate-900 block">{{ $goal['label'] }}</span>
-                                <span class="text-sm text-slate-500">{{ $goal['note'] }}</span>
+                                @if($goal['note'] !== '')<span class="text-sm text-slate-500">{{ $goal['note'] }}</span>@endif
                             </div>
                         </label>
                     @endforeach
@@ -133,11 +125,9 @@
                     </div>
                     <select name="pages" class="form-input mt-auto" required>
                         <option value="">Kies een optie</option>
-                        <option value="1-5">1 - 5 pagina's</option>
-                        <option value="6-10">6 - 10 pagina's</option>
-                        <option value="11-20">11 - 20 pagina's</option>
-                        <option value="21-50">21 - 50 pagina's</option>
-                        <option value="50+">Meer dan 50 pagina's</option>
+                        @foreach($form['pages'] as $option)
+                            <option value="{{ $option }}" {{ old('pages') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -151,10 +141,9 @@
                     </div>
                     <select name="visitors" class="form-input mt-auto" required>
                         <option value="">Kies een optie</option>
-                        <option value="<1000">Minder dan 1.000</option>
-                        <option value="1000-5000">1.000 - 5.000</option>
-                        <option value="5000-25000">5.000 - 25.000</option>
-                        <option value="25000+">Meer dan 25.000</option>
+                        @foreach($form['visitors'] as $option)
+                            <option value="{{ $option }}" {{ old('visitors') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -171,9 +160,9 @@
                     </div>
                     <select name="design" class="form-input mt-auto" required>
                         <option value="">Kies een optie</option>
-                        <option value="existing">Ik heb al een huisstijl / logo</option>
-                        <option value="new">Ik wil een nieuw logo en huisstijl</option>
-                        <option value="advice">Ik wil voorbeelden en advies</option>
+                        @foreach($form['design'] as $option)
+                            <option value="{{ $option['label'] }}" {{ old('design') === $option['label'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -199,25 +188,12 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @php
-                        $features = [
-                            ['id' => 'cms', 'label' => 'CMS (zelf beheren)', 'note' => 'Inbegrepen bij de meeste websites'],
-                            ['id' => 'blog', 'label' => 'Blog / nieuws', 'note' => 'Vaak € 300 - € 800 extra'],
-                            ['id' => 'forms', 'label' => 'Contact- / leadformulieren', 'note' => 'Standaard bij de meeste pakketten'],
-                            ['id' => 'seo', 'label' => 'SEO-basis', 'note' => 'Vaak € 500 - € 1.500'],
-                            ['id' => 'webshop', 'label' => 'Webshop / betalingen', 'note' => 'Vanaf € 5.000 bij de meeste bureaus'],
-                            ['id' => 'multilingual', 'label' => 'Meertalig', 'note' => 'Vaak € 500 - € 1.500 per taal'],
-                            ['id' => 'crm', 'label' => 'Koppeling CRM / ERP', 'note' => 'Vaak vanaf € 1.000'],
-                            ['id' => 'portal', 'label' => 'Klantenportaal / login', 'note' => 'Vaak € 2.000 - € 5.000'],
-                            ['id' => 'booking', 'label' => 'Afspraken systeem', 'note' => 'Vaak € 750 - € 2.000'],
-                        ];
-                    @endphp
-                    @foreach($features as $feature)
+                    @foreach($form['features'] as $feature)
                         <label class="relative flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
                             <input type="checkbox" name="features[]" value="{{ $feature['label'] }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
                             <div>
                                 <span class="font-semibold text-slate-900 text-sm block">{{ $feature['label'] }}</span>
-                                <span class="text-xs text-slate-400">{{ $feature['note'] }}</span>
+                                @if($feature['note'] !== '')<span class="text-xs text-slate-400">{{ $feature['note'] }}</span>@endif
                             </div>
                         </label>
                     @endforeach
@@ -234,18 +210,12 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <label class="relative flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
-                        <input type="checkbox" name="content[]" value="Eigen teksten en beelden" class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                        <span class="font-semibold text-slate-900 text-sm">Ik lever teksten en beelden zelf aan</span>
-                    </label>
-                    <label class="relative flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
-                        <input type="checkbox" name="content[]" value="Teksten laten schrijven" class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                        <span class="font-semibold text-slate-900 text-sm">Ik wil hulp bij teksten</span>
-                    </label>
-                    <label class="relative flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
-                        <input type="checkbox" name="content[]" value="Fotografie / beelden" class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                        <span class="font-semibold text-slate-900 text-sm">Ik wil fotografie / beelden</span>
-                    </label>
+                    @foreach($form['content'] as $option)
+                        <label class="relative flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
+                            <input type="checkbox" name="content[]" value="{{ $option['label'] }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
+                            <span class="font-semibold text-slate-900 text-sm">{{ $option['label'] }}</span>
+                        </label>
+                    @endforeach
                 </div>
             </div>
 
@@ -261,10 +231,9 @@
                     </div>
                     <select name="timeline" class="form-input mt-auto" required>
                         <option value="">Kies een optie</option>
-                        <option value="asap">Zo snel mogelijk</option>
-                        <option value="1-2months">Binnen 1 - 2 maanden</option>
-                        <option value="3-6months">Binnen 3 - 6 maanden</option>
-                        <option value="flexible">Geen haast</option>
+                        @foreach($form['timeline'] as $option)
+                            <option value="{{ $option }}" {{ old('timeline') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -278,11 +247,9 @@
                     </div>
                     <select name="budget" class="form-input mt-auto">
                         <option value="">Kies een budgetindicatie</option>
-                        <option value="<2500">Minder dan € 2.500</option>
-                        <option value="2500-5000">€ 2.500 - € 5.000</option>
-                        <option value="5000-10000">€ 5.000 - € 10.000</option>
-                        <option value="10000-25000">€ 10.000 - € 25.000</option>
-                        <option value="25000+">Meer dan € 25.000</option>
+                        @foreach($form['budget'] as $option)
+                            <option value="{{ $option }}" {{ old('budget') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -324,6 +291,8 @@
                     </div>
                 </div>
             </div>
+
+            @include('partials.captcha')
 
             <!-- Submit -->
             <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-slate-200 animate-on-scroll">

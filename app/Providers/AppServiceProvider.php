@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureMollieKey();
         $this->configureMailSettings();
+        $this->configureSiteSettings();
 
         View::composer('*', function ($view) {
             if (Auth::check()) {
@@ -78,6 +79,36 @@ class AppServiceProvider extends ServiceProvider
                 'address' => BillingSetting::valueFor('mail_from_address'),
                 'name' => BillingSetting::valueFor('mail_from_name'),
             ]) ?: Config::get('mail.from'));
+        } catch (\Throwable $e) {
+            // Database may not be available during migrations or cache warming.
+        }
+    }
+
+    /**
+     * Load site settings (locale, social links, newsletter) into config
+     * so views can read them without hitting the database per render.
+     */
+    private function configureSiteSettings(): void
+    {
+        try {
+            Config::set('site', [
+                'name' => BillingSetting::valueFor('site_name', config('app.name')),
+                'location' => BillingSetting::valueFor('site_location', ''),
+                'date_format' => BillingSetting::valueFor('date_format', 'd-m-Y'),
+                'default_country' => BillingSetting::valueFor('default_country', 'NL'),
+                'default_language' => BillingSetting::valueFor('default_language', 'nl'),
+                'language_menu' => BillingSetting::boolean('language_menu_enabled'),
+                'newsletter_enabled' => BillingSetting::boolean('newsletter_enabled'),
+            ]);
+
+            Config::set('social', [
+                'instagram' => BillingSetting::valueFor('social_instagram', ''),
+                'linkedin' => BillingSetting::valueFor('social_linkedin', ''),
+                'facebook' => BillingSetting::valueFor('social_facebook', ''),
+                'youtube' => BillingSetting::valueFor('social_youtube', ''),
+                'tiktok' => BillingSetting::valueFor('social_tiktok', ''),
+                'x' => BillingSetting::valueFor('social_x', ''),
+            ]);
         } catch (\Throwable $e) {
             // Database may not be available during migrations or cache warming.
         }

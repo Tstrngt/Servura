@@ -10,13 +10,13 @@
         <div class="py-4">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Financieel</h1>
-                    <p class="mt-1 text-sm text-gray-600">Facturen, transacties en systeeminstellingen.</p>
+                    <h1 class="text-2xl font-bold text-gray-900">Instellingen</h1>
+                    <p class="mt-1 text-sm text-gray-600">Facturatie, BTW en automatische opschoning.</p>
                 </div>
             </div>
         </div>
 
-        @include('admin.financial.partials.financial-nav')
+        @include('admin.partials.settings-nav')
 
         @if(session('success'))
             <div class="mb-4">
@@ -35,7 +35,7 @@
         @endif
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
-            <form action="{{ route('admin.financial.billing-settings.update') }}" method="POST" class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <form action="{{ route('admin.settings.billing.update') }}" method="POST" class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
                 @csrf
                 @method('PUT')
                 <h2 class="text-lg font-semibold text-slate-900">BTW en betaaltermijnen</h2>
@@ -60,6 +60,11 @@
                         <label class="form-label" for="suspension_grace_days">Respijt na vervaldatum (dagen)</label>
                         <input class="form-input" id="suspension_grace_days" name="suspension_grace_days" type="number" min="0" max="90" required value="{{ old('suspension_grace_days', $settings['suspension_grace_days']) }}">
                     </div>
+                    <div class="form-group">
+                        <label class="form-label" for="da_delete_after_days">DA-account verwijderen na annulering (dagen)</label>
+                        <input class="form-input" id="da_delete_after_days" name="da_delete_after_days" type="number" min="0" max="3650" required value="{{ old('da_delete_after_days', $settings['da_delete_after_days']) }}">
+                        <p class="mt-1 text-xs text-slate-500">Na een opzegging wordt het DirectAdmin-account geschorst en na dit aantal dagen definitief verwijderd. 0 = meteen verwijderen.</p>
+                    </div>
                 </div>
                 <label class="mt-4 flex items-start gap-3 rounded-xl bg-amber-50 p-4 ring-1 ring-amber-200">
                     <input type="checkbox" name="country_vat_enabled" value="1" {{ old('country_vat_enabled', $settings['country_vat_enabled']) ? 'checked' : '' }} class="mt-1 rounded border-amber-300 text-primary-600">
@@ -68,7 +73,7 @@
 
                 <div class="mt-8 border-t border-slate-200 pt-6">
                     <h2 class="text-lg font-semibold text-slate-900">Mollie-betaalprovider</h2>
-                    <p class="mt-1 text-sm text-slate-600">De Mollie API-key beheer je voortaan onder Instellingen.</p>
+                    <p class="mt-1 text-sm text-slate-600">De Mollie API-key beheer je onder Instellingen → Betalingen.</p>
                     <a href="{{ route('admin.settings.payments') }}" class="mt-3 inline-flex items-center text-sm font-semibold text-primary-600 hover:text-primary-800">Naar Instellingen → Betalingen</a>
                 </div>
 

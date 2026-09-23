@@ -3,7 +3,4 @@
     <a href="{{ route('admin.financial.transactions') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.financial.transactions*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Transacties</a>
     <a href="{{ route('admin.financial.quotes') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.financial.quotes*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Offertes</a>
     <a href="{{ route('admin.financial.logs') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.financial.logs*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Logboek</a>
-    @if(Auth::user()->isOwner())
-        <a href="{{ route('admin.financial.billing-settings.edit') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.financial.billing-settings*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Facturatie-instellingen</a>
-    @endif
 </nav>

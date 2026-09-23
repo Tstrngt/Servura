@@ -107,7 +107,7 @@ class CancellationService
                 $this->suspendExternally($cancellation->customerService);
             }
 
-            $this->createRefundTransaction($cancellation->customerService);
+            $this->createRefundTransaction($cancellation->customerService, $cancellation->fresh()->effective_at);
 
             if ((float) $cancellation->fresh()->estimated_usage_cost > 0) {
                 BillableItem::create([
@@ -155,6 +155,7 @@ class CancellationService
                         ]);
                         $request->update(['status' => 'completed']);
                         $this->suspendExternally($request->customerService);
+                        $this->createRefundTransaction($request->customerService, $request->effective_at);
                     });
                     $processed++;
                 }
@@ -164,38 +165,66 @@ class CancellationService
     }
 
     /**
-     * Create a counter-transaction (creditering) for the amount the customer
-     * last paid for this service, so books stay balanced after cancellation.
+     * Refund policy:
+     * - First 7 days after the FIRST payment (renewals do not reset this): 100% back.
+     * - Day 8-31 after the first payment: pro-rata refund of the last payment,
+     *   based on the unused portion of the current billing period.
+     * - After day 31: no automatic refund.
      */
-    private function createRefundTransaction(CustomerService $customerService): void
+    private function createRefundTransaction(CustomerService $customerService, $effectiveAt = null): void
     {
-        $invoice = \App\Models\Invoice::where('user_id', $customerService->user_id)
+        $paidQuery = \App\Models\Invoice::where('user_id', $customerService->user_id)
             ->where('status', 'betaald')
             ->where(function ($query) use ($customerService) {
                 $query->where('customer_service_id', $customerService->id)
                     ->orWhereHas('lines', fn ($q) => $q->where('customer_service_id', $customerService->id));
-            })
-            ->latest('paid_at')
-            ->first();
+            });
 
-        if (! $invoice) {
+        $firstPaid = (clone $paidQuery)->oldest('paid_at')->first();
+        $lastPaid = (clone $paidQuery)->latest('paid_at')->first();
+
+        if (! $lastPaid || ! $firstPaid?->paid_at) {
             return;
         }
 
-        $reference = 'refund-'.$invoice->invoice_number.'-service-'.$customerService->id;
+        $reference = 'refund-'.$lastPaid->invoice_number.'-service-'.$customerService->id;
         if (\App\Models\Transaction::where('reference', $reference)->exists()) {
+            return;
+        }
+
+        $asOf = ($effectiveAt ?? now())->copy()->startOfDay();
+        $daysSinceFirstPayment = $firstPaid->paid_at->copy()->startOfDay()->diffInDays($asOf, false);
+
+        if ($daysSinceFirstPayment > 31) {
+            return;
+        }
+
+        if ($daysSinceFirstPayment <= 7) {
+            $amount = (float) $lastPaid->total;
+            $policy = 'volledige terugbetaling binnen 7 dagen';
+        } else {
+            $periodStart = ($customerService->current_period_start ?? $firstPaid->paid_at)->copy()->startOfDay();
+            $periodEnd = ($customerService->current_period_end ?? $this->fallbackPeriodEnd($customerService, $periodStart))->copy()->startOfDay();
+            $totalDays = max(1, $periodStart->diffInDays($periodEnd));
+            $usedDays = min($totalDays, max(0, $periodStart->diffInDays($asOf, false)));
+            $unusedRatio = 1 - ($usedDays / $totalDays);
+            $amount = round((float) $lastPaid->total * $unusedRatio, 2);
+            $policy = sprintf('pro-rata terugbetaling (%d%% ongebruikt)', (int) round($unusedRatio * 100));
+        }
+
+        if ($amount <= 0) {
             return;
         }
 
         \App\Models\Transaction::create([
             'transaction_number' => \App\Models\Transaction::generateNumber(),
             'user_id' => $customerService->user_id,
-            'invoice_id' => $invoice->id,
-            'amount' => $invoice->total,
+            'invoice_id' => $lastPaid->id,
+            'amount' => $amount,
             'type' => 'creditering',
             'payment_method' => 'ideal',
             'status' => 'terugbetaald',
-            'description' => "Terugbetaling na opzegging {$customerService->service->title} (factuur {$invoice->invoice_number})",
+            'description' => "Terugbetaling na opzegging {$customerService->service->title} ({$policy}, factuur {$lastPaid->invoice_number})",
             'transaction_date' => now(),
             'reference' => $reference,
         ]);

@@ -21,6 +21,7 @@ class BillingSettingsController extends Controller
             'invoice_due_days' => BillingSetting::integer('invoice_due_days', 14),
             'suspension_grace_days' => BillingSetting::integer('suspension_grace_days', 7),
             'business_country' => BillingSetting::valueFor('business_country', 'NL'),
+            'da_delete_after_days' => BillingSetting::integer('da_delete_after_days', 30),
             'mollie_key' => BillingSetting::encryptedValueFor('mollie_key', ''),
         ];
 
@@ -54,11 +55,13 @@ class BillingSettingsController extends Controller
             'suspension_grace_days' => 'required|integer|min:0|max:90',
             'business_country' => 'required|string|size:2',
             'country_vat_enabled' => 'boolean',
+            'da_delete_after_days' => 'required|integer|min:0|max:3650',
         ]);
 
         BillingSetting::setValue('default_vat_rate', $validated['default_vat_rate']);
         BillingSetting::setValue('invoice_due_days', $validated['invoice_due_days']);
         BillingSetting::setValue('suspension_grace_days', $validated['suspension_grace_days']);
+        BillingSetting::setValue('da_delete_after_days', $validated['da_delete_after_days']);
         BillingSetting::setValue('business_country', strtoupper($validated['business_country']));
         BillingSetting::setValue('country_vat_enabled', $request->boolean('country_vat_enabled') ? '1' : '0');
 

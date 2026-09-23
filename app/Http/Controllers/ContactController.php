@@ -47,6 +47,13 @@ class ContactController extends Controller
                 ->withInput();
         }
 
+        $captcha = app(\App\Services\CaptchaService::class);
+        if (! $captcha->verify($request->input($captcha->tokenField()), $request->ip())) {
+            return redirect()->route('contact')
+                ->withErrors(['captcha' => 'Bevestig dat u geen robot bent.'])
+                ->withInput();
+        }
+
         // Additional spam detection
         $message = $request->input('message');
         $isSpam = $this->detectSpam($message, $request->ip());

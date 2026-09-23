@@ -121,6 +121,8 @@
                                 <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
                             </div>
 
+                            @include('partials.captcha')
+
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
                                 <p class="text-sm text-slate-500">Velden met * zijn verplicht</p>
                                 <button type="submit" class="btn btn-primary px-7 py-3.5 shadow-lg shadow-primary-500/25 disabled:cursor-not-allowed disabled:opacity-60" :disabled="submitting" x-text="submitting ? 'Verzenden...' : 'Verstuur Bericht'"></button>

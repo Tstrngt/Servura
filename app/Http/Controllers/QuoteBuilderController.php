@@ -25,8 +25,9 @@ class QuoteBuilderController extends Controller
             : null;
 
         $services = Service::where('is_active', true)->orderBy('title')->get(['id', 'slug', 'title']);
+        $form = \App\Support\QuoteFormFields::resolve();
 
-        return view('quote.builder', compact('service', 'services'));
+        return view('quote.builder', compact('service', 'services', 'form'));
     }
 
     public function store(Request $request, PortalTicketService $ticketService)
@@ -65,6 +66,13 @@ class QuoteBuilderController extends Controller
         if ($validator->fails()) {
             return redirect()->route('quote.builder', ['service' => $request->input('service')])
                 ->withErrors($validator)
+                ->withInput();
+        }
+
+        $captcha = app(\App\Services\CaptchaService::class);
+        if (! $captcha->verify($request->input($captcha->tokenField()), $request->ip())) {
+            return redirect()->route('quote.builder', ['service' => $request->input('service')])
+                ->withErrors(['captcha' => 'Bevestig dat u geen robot bent.'])
                 ->withInput();
         }
 

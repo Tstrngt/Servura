@@ -7,7 +7,7 @@
 <div class="min-h-screen bg-gray-50 lg:pl-64">
     <div class="mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8">
         <div class="mb-6"><h1 class="text-2xl font-bold text-slate-900">Serverkoppelingen</h1><p class="mt-1 text-sm text-slate-600">Beheer infrastructuurproviders voor automatische provisioning.</p></div>
-        @include('admin.partials.services-nav')
+        @include('admin.partials.settings-nav')
 
         <div class="grid grid-cols-1 gap-6 xl:grid-cols-[400px_minmax(0,1fr)]">
             <form action="{{ route('admin.server-connections.store') }}" method="POST" class="h-fit rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">

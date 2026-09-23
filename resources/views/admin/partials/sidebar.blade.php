@@ -13,14 +13,14 @@
         <a href="{{ route('admin.customers.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.customers.*', 'admin.tickets.*', 'admin.service-cancellations.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Klanten
         </a>
-        <a href="{{ route('admin.services.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.services.*', 'admin.service-categories.*', 'admin.server-connections.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
+        <a href="{{ route('admin.services.index') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.services.*', 'admin.service-categories.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Diensten
         </a>
         <a href="{{ route('admin.financial.invoices') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.financial.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Financieel
         </a>
         @if(Auth::user()->isOwner())
-            <a href="{{ route('admin.settings.general') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.settings.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
+            <a href="{{ route('admin.settings.general') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.settings.*', 'admin.server-connections.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
                 Instellingen
             </a>
         @endif

@@ -51,11 +51,59 @@
                     <input class="form-input" id="contact_address" name="contact_address" type="text" value="{{ old('contact_address', $settings['contact_address']) }}">
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="da_delete_after_days">DA-account verwijderen na annulering (dagen)</label>
-                    <input class="form-input" id="da_delete_after_days" name="da_delete_after_days" type="number" min="0" max="3650" value="{{ old('da_delete_after_days', $settings['da_delete_after_days']) }}">
-                    <p class="mt-1 text-xs text-slate-500">Na een opzegging wordt het DirectAdmin-account geschorst en na dit aantal dagen definitief verwijderd. 0 = meteen verwijderen.</p>
+                    <label class="form-label" for="site_location">Locatie (bijv. "Amsterdam, NL")</label>
+                    <input class="form-input" id="site_location" name="site_location" type="text" value="{{ old('site_location', $settings['site_location']) }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="date_format">Datumformaat</label>
+                    <select class="form-input" id="date_format" name="date_format" required>
+                        @foreach(['d-m-Y' => '31-12-2025 (d-m-Y)', 'd/m/Y' => '31/12/2025 (d/m/Y)', 'Y-m-d' => '2025-12-31 (Y-m-d)', 'm/d/Y' => '12/31/2025 (m/d/Y)'] as $value => $label)
+                            <option value="{{ $value }}" {{ old('date_format', $settings['date_format']) === $value ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="default_country">Standaardland</label>
+                    <select class="form-input" id="default_country" name="default_country" required>
+                        @foreach(['NL' => 'Nederland', 'BE' => 'België', 'DE' => 'Duitsland', 'GB' => 'Verenigd Koninkrijk'] as $value => $label)
+                            <option value="{{ $value }}" {{ old('default_country', $settings['default_country']) === $value ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="default_language">Standaardtaal</label>
+                    <select class="form-input" id="default_language" name="default_language" required>
+                        @foreach(['nl' => 'Nederlands', 'en' => 'Engels', 'de' => 'Duits', 'fr' => 'Frans'] as $value => $label)
+                            <option value="{{ $value }}" {{ old('default_language', $settings['default_language']) === $value ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
+
+            <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <label class="flex items-start gap-3 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                    <input type="checkbox" name="language_menu_enabled" value="1" {{ old('language_menu_enabled', $settings['language_menu_enabled']) ? 'checked' : '' }} class="mt-1 rounded border-slate-300 text-primary-600">
+                    <span><strong class="block text-sm text-slate-900">Taalmenu in de navigatie</strong><span class="mt-1 block text-sm text-slate-600">Toont een taalkeuze in de header (voorbereiding op meertaligheid).</span></span>
+                </label>
+                <label class="flex items-start gap-3 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                    <input type="checkbox" name="newsletter_enabled" value="1" {{ old('newsletter_enabled', $settings['newsletter_enabled']) ? 'checked' : '' }} class="mt-1 rounded border-slate-300 text-primary-600">
+                    <span><strong class="block text-sm text-slate-900">Nieuwsbrief aanmelden in footer</strong><span class="mt-1 block text-sm text-slate-600">Toont een aanmeldformulier in de footer van de site.</span></span>
+                </label>
+            </div>
+
+            <div class="mt-8 border-t border-slate-200 pt-6">
+                <h3 class="text-base font-semibold text-slate-900">Social media</h3>
+                <p class="mt-1 text-sm text-slate-600">Ingevulde links verschijnen automatisch met het bijbehorende icoon in de footer van de hele site.</p>
+                <div class="mt-4 grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                    @foreach(['instagram' => 'Instagram', 'linkedin' => 'LinkedIn', 'facebook' => 'Facebook', 'x' => 'X (Twitter)', 'youtube' => 'YouTube', 'tiktok' => 'TikTok'] as $key => $label)
+                        <div class="form-group">
+                            <label class="form-label" for="social_{{ $key }}">{{ $label }}</label>
+                            <input class="form-input" id="social_{{ $key }}" name="social_{{ $key }}" type="url" placeholder="https://…" value="{{ old("social_$key", $settings["social_$key"]) }}">
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
             <div class="mt-6 flex justify-end">
                 <button type="submit" class="btn btn-primary">Instellingen opslaan</button>
             </div>

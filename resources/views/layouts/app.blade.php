@@ -94,6 +94,23 @@
 
                 <!-- CTA + Login -->
                 <div class="hidden md:flex items-center gap-3 justify-self-end">
+                    @if(config('site.language_menu'))
+                        <div class="relative" x-data="{ langOpen: false }">
+                            <button type="button" @click="langOpen = !langOpen" class="icon-btn inline-flex h-10 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold uppercase tracking-wide text-slate-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors" aria-label="Taal kiezen">
+                                {{ strtoupper(app()->getLocale()) }}
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <div x-show="langOpen" @click.outside="langOpen = false" x-transition class="absolute right-0 top-12 z-50 w-40 overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-slate-200" style="display:none">
+                                @foreach(['nl' => 'Nederlands', 'en' => 'English', 'de' => 'Deutsch', 'fr' => 'Français'] as $locale => $label)
+                                    <form method="POST" action="{{ route('locale.switch') }}">
+                                        @csrf
+                                        <input type="hidden" name="locale" value="{{ $locale }}">
+                                        <button type="submit" class="block w-full px-4 py-2.5 text-left text-sm {{ app()->getLocale() === $locale ? 'font-semibold text-primary-600 bg-primary-50' : 'text-slate-600 hover:bg-slate-50' }}">{{ $label }}</button>
+                                    </form>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                     @guest
                         <a href="{{ route('login') }}" title="Inloggen" aria-label="Inloggen" class="icon-btn inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-colors">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,6 +242,7 @@
                             'facebook' => ['label' => 'Facebook', 'path' => 'M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z'],
                             'youtube' => ['label' => 'YouTube', 'path' => 'M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 001.94-2A29 29 0 0023 12a29 29 0 00-.46-5.58zM9.75 15.02V8.98L15.5 12z'],
                             'tiktok' => ['label' => 'TikTok', 'path' => 'M15 3v10.5a4.5 4.5 0 11-4.5-4.5M15 3c.6 2.4 2.1 3.9 4.5 4.5'],
+                            'x' => ['label' => 'X', 'path' => 'M4 4l16 16M20 4L4 20'],
                         ];
                     @endphp
                     <div class="flex flex-wrap gap-3">
@@ -257,6 +275,24 @@
                         <li>We reageren binnen 48 uur</li>
                         <li>Gratis adviesgesprek</li>
                     </ul>
+
+                    @if(config('site.newsletter_enabled'))
+                        <div class="mt-6">
+                            <h4 class="text-sm font-semibold mb-2 text-white">Nieuwsbrief</h4>
+                            @if(session('newsletter_success'))
+                                <p class="text-sm text-emerald-400">{{ session('newsletter_success') }}</p>
+                            @else
+                                <form action="{{ route('newsletter.subscribe') }}" method="POST" class="flex gap-2">
+                                    @csrf
+                                    <input type="email" name="email" required placeholder="jouw@email.nl" class="w-full min-w-0 rounded-lg border-0 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-400 ring-1 ring-white/10 focus:ring-2 focus:ring-primary-400">
+                                    <button type="submit" class="shrink-0 rounded-lg bg-primary-600 px-3 py-2 text-sm font-semibold text-white hover:bg-primary-500">Aanmelden</button>
+                                </form>
+                                @error('email')
+                                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                                @enderror
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
 

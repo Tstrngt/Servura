@@ -61,6 +61,20 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact.stor
 Route::get('/offerte-samenstellen', [QuoteBuilderController::class, 'index'])->name('quote.builder');
 Route::post('/offerte-samenstellen', [QuoteBuilderController::class, 'store'])->name('quote.builder.store');
 
+// Nieuwsbrief
+Route::post('/nieuwsbrief', [App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::get('/nieuwsbrief/afmelden/{token}', [App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+
+// Taalwissel (voorbereiding meertaligheid)
+Route::post('/taal', function (\Illuminate\Http\Request $request) {
+    $locale = $request->input('locale', 'nl');
+    if (in_array($locale, ['nl', 'en', 'de', 'fr'], true)) {
+        $request->session()->put('locale', $locale);
+    }
+
+    return back();
+})->name('locale.switch');
+
 // Authentication routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -224,6 +238,13 @@ Route::middleware('auth')->group(function () {
             Route::post('/mail/test', [App\Http\Controllers\Admin\SettingController::class, 'sendTestMail'])->name('mail.test');
             Route::get('/betalingen', [App\Http\Controllers\Admin\SettingController::class, 'payments'])->name('payments');
             Route::put('/betalingen', [App\Http\Controllers\Admin\SettingController::class, 'updatePayments'])->name('payments.update');
+            Route::get('/facturatie', [AdminBillingSettingsController::class, 'edit'])->name('billing');
+            Route::put('/facturatie', [AdminBillingSettingsController::class, 'update'])->name('billing.update');
+            Route::get('/offerteformulier', [App\Http\Controllers\Admin\SettingController::class, 'formbuilder'])->name('formbuilder');
+            Route::put('/offerteformulier', [App\Http\Controllers\Admin\SettingController::class, 'updateFormbuilder'])->name('formbuilder.update');
+            Route::get('/beveiliging', [App\Http\Controllers\Admin\SettingController::class, 'security'])->name('security');
+            Route::put('/beveiliging', [App\Http\Controllers\Admin\SettingController::class, 'updateSecurity'])->name('security.update');
+            Route::get('/nieuwsbrief', [App\Http\Controllers\Admin\SettingController::class, 'newsletter'])->name('newsletter');
             Route::post('/klanten-resetten', [App\Http\Controllers\Admin\SettingController::class, 'resetCustomers'])->name('reset-customers');
         });
     });

@@ -20,7 +20,18 @@ class SettingController extends Controller
             'contact_email' => BillingSetting::valueFor('contact_email', config('mail.from.address')),
             'contact_phone' => BillingSetting::valueFor('contact_phone', ''),
             'contact_address' => BillingSetting::valueFor('contact_address', ''),
-            'da_delete_after_days' => BillingSetting::integer('da_delete_after_days', 30),
+            'site_location' => BillingSetting::valueFor('site_location', ''),
+            'date_format' => BillingSetting::valueFor('date_format', 'd-m-Y'),
+            'default_country' => BillingSetting::valueFor('default_country', 'NL'),
+            'default_language' => BillingSetting::valueFor('default_language', 'nl'),
+            'language_menu_enabled' => BillingSetting::boolean('language_menu_enabled'),
+            'newsletter_enabled' => BillingSetting::boolean('newsletter_enabled'),
+            'social_instagram' => BillingSetting::valueFor('social_instagram', ''),
+            'social_linkedin' => BillingSetting::valueFor('social_linkedin', ''),
+            'social_facebook' => BillingSetting::valueFor('social_facebook', ''),
+            'social_youtube' => BillingSetting::valueFor('social_youtube', ''),
+            'social_tiktok' => BillingSetting::valueFor('social_tiktok', ''),
+            'social_x' => BillingSetting::valueFor('social_x', ''),
         ];
 
         return view('admin.settings.general', compact('settings'));
@@ -35,14 +46,108 @@ class SettingController extends Controller
             'contact_email' => 'nullable|email|max:255',
             'contact_phone' => 'nullable|string|max:30',
             'contact_address' => 'nullable|string|max:500',
-            'da_delete_after_days' => 'nullable|integer|min:0|max:3650',
+            'site_location' => 'nullable|string|max:255',
+            'date_format' => ['required', Rule::in(['d-m-Y', 'd/m/Y', 'Y-m-d', 'm/d/Y'])],
+            'default_country' => 'required|string|size:2',
+            'default_language' => ['required', Rule::in(['nl', 'en', 'de', 'fr'])],
+            'language_menu_enabled' => 'boolean',
+            'newsletter_enabled' => 'boolean',
+            'social_instagram' => 'nullable|url|max:255',
+            'social_linkedin' => 'nullable|url|max:255',
+            'social_facebook' => 'nullable|url|max:255',
+            'social_youtube' => 'nullable|url|max:255',
+            'social_tiktok' => 'nullable|url|max:255',
+            'social_x' => 'nullable|url|max:255',
         ]);
 
+        $validated['language_menu_enabled'] = $request->boolean('language_menu_enabled');
+        $validated['newsletter_enabled'] = $request->boolean('newsletter_enabled');
+
         foreach ($validated as $key => $value) {
-            BillingSetting::setValue($key, $value ?? '');
+            BillingSetting::setValue($key, is_bool($value) ? ($value ? '1' : '0') : ($value ?? ''));
         }
 
         return back()->with('success', 'Algemene instellingen zijn opgeslagen.');
+    }
+
+    public function formbuilder()
+    {
+        $this->authorizeOwner();
+
+        $groups = \App\Support\QuoteFormFields::resolve();
+        $lines = collect($groups)->map(fn ($options) => \App\Support\QuoteFormFields::toLines($options));
+
+        return view('admin.settings.formbuilder', compact('lines'));
+    }
+
+    public function updateFormbuilder(Request $request)
+    {
+        $this->authorizeOwner();
+
+        $validated = $request->validate(
+            collect(array_keys(\App\Support\QuoteFormFields::GROUPS))
+                ->mapWithKeys(fn ($key) => ["fields.$key" => 'nullable|string|max:20000'])
+                ->all()
+        );
+
+        $fields = [];
+        foreach (\App\Support\QuoteFormFields::GROUPS as $key => $label) {
+            $parsed = \App\Support\QuoteFormFields::parseLines($request->input("fields.$key", ''));
+            if (count($parsed) > 0) {
+                $fields[$key] = $parsed;
+            }
+        }
+
+        BillingSetting::setValue('quote_form_fields', json_encode($fields));
+
+        return back()->with('success', 'Offerteformulier is bijgewerkt.');
+    }
+
+    public function security()
+    {
+        $this->authorizeOwner();
+
+        $captcha = [
+            'enabled' => BillingSetting::boolean('captcha_enabled'),
+            'provider' => BillingSetting::valueFor('captcha_provider', 'recaptcha_v2'),
+            'site_key' => BillingSetting::valueFor('captcha_site_key', ''),
+            'has_secret' => BillingSetting::encryptedValueFor('captcha_secret_key', '') !== '',
+        ];
+
+        return view('admin.settings.security', compact('captcha'));
+    }
+
+    public function updateSecurity(Request $request)
+    {
+        $this->authorizeOwner();
+
+        $validated = $request->validate([
+            'captcha_enabled' => 'boolean',
+            'captcha_provider' => ['required', Rule::in(array_keys(\App\Services\CaptchaService::PROVIDERS))],
+            'captcha_site_key' => 'nullable|string|max:255',
+            'captcha_secret_key' => 'nullable|string|max:255',
+        ]);
+
+        BillingSetting::setValue('captcha_enabled', $request->boolean('captcha_enabled') ? '1' : '0');
+        BillingSetting::setValue('captcha_provider', $validated['captcha_provider']);
+        BillingSetting::setValue('captcha_site_key', $validated['captcha_site_key'] ?? '');
+        if (filled($validated['captcha_secret_key'] ?? null)) {
+            BillingSetting::setEncryptedValue('captcha_secret_key', $validated['captcha_secret_key']);
+        }
+
+        return back()->with('success', 'Beveiligingsinstellingen zijn opgeslagen.');
+    }
+
+    public function newsletter()
+    {
+        $this->authorizeOwner();
+
+        $subscribers = \App\Models\NewsletterSubscriber::latest('subscribed_at')->paginate(25);
+
+        return view('admin.settings.newsletter', [
+            'subscribers' => $subscribers,
+            'enabled' => BillingSetting::boolean('newsletter_enabled'),
+        ]);
     }
 
     public function mail()
