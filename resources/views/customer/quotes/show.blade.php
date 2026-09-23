@@ -80,7 +80,7 @@
                             @csrf
                             <button type="submit" class="btn btn-outline text-red-600 border-red-300 hover:bg-red-50" onclick="return confirm('Weet je zeker dat je deze offerte wilt afwijzen?')">Afwijzen</button>
                         </form>
-                        <form method="POST" action="{{ route('customer.quotes.accept', $quote) }}">
+                        <form method="POST" action="{{ route('customer.quotes.accept', $quote) }}" data-turbo="false">
                             @csrf
                             <button type="submit" class="btn btn-primary">Akkoord & Betalen</button>
                         </form>
