@@ -211,6 +211,16 @@ Route::middleware('auth')->group(function () {
             Route::get('/billing-settings', [AdminBillingSettingsController::class, 'edit'])->name('billing-settings.edit');
             Route::put('/billing-settings', [AdminBillingSettingsController::class, 'update'])->name('billing-settings.update');
         });
+
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Admin\SettingController::class, 'general'])->name('general');
+            Route::put('/algemeen', [App\Http\Controllers\Admin\SettingController::class, 'updateGeneral'])->name('general.update');
+            Route::get('/mail', [App\Http\Controllers\Admin\SettingController::class, 'mail'])->name('mail');
+            Route::put('/mail', [App\Http\Controllers\Admin\SettingController::class, 'updateMail'])->name('mail.update');
+            Route::post('/mail/test', [App\Http\Controllers\Admin\SettingController::class, 'sendTestMail'])->name('mail.test');
+            Route::get('/betalingen', [App\Http\Controllers\Admin\SettingController::class, 'payments'])->name('payments');
+            Route::put('/betalingen', [App\Http\Controllers\Admin\SettingController::class, 'updatePayments'])->name('payments.update');
+        });
     });
 });
 

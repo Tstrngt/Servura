@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\BillingSetting;
 use App\Models\ServerConnection;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Validation\Rule;
 
 class BillingSettingsController extends Controller
 {
@@ -56,8 +54,6 @@ class BillingSettingsController extends Controller
             'suspension_grace_days' => 'required|integer|min:0|max:90',
             'business_country' => 'required|string|size:2',
             'country_vat_enabled' => 'boolean',
-            'mollie_key' => 'nullable|string|max:255',
-            'mollie_key_mode' => ['required', Rule::in(['test', 'live'])],
         ]);
 
         BillingSetting::setValue('default_vat_rate', $validated['default_vat_rate']);
@@ -65,16 +61,6 @@ class BillingSettingsController extends Controller
         BillingSetting::setValue('suspension_grace_days', $validated['suspension_grace_days']);
         BillingSetting::setValue('business_country', strtoupper($validated['business_country']));
         BillingSetting::setValue('country_vat_enabled', $request->boolean('country_vat_enabled') ? '1' : '0');
-
-        $mollieKey = trim($validated['mollie_key'] ?? '');
-        if ($mollieKey !== '') {
-            if (!str_starts_with($mollieKey, 'test_') && !str_starts_with($mollieKey, 'live_')) {
-                $prefix = $validated['mollie_key_mode'] === 'live' ? 'live_' : 'test_';
-                $mollieKey = $prefix . $mollieKey;
-            }
-            BillingSetting::setEncryptedValue('mollie_key', $mollieKey);
-            Config::set('mollie.key', $mollieKey);
-        }
 
         return back()->with('success', 'Facturatie-instellingen zijn opgeslagen.');
     }

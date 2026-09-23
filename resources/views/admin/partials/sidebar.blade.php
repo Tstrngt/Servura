@@ -19,6 +19,11 @@
         <a href="{{ route('admin.financial.invoices') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.financial.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
             Financieel
         </a>
+        @if(Auth::user()->isOwner())
+            <a href="{{ route('admin.settings.general') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('admin.settings.*') ? 'bg-primary-600 text-white' : 'hover:bg-slate-800 hover:text-white' }}">
+                Instellingen
+            </a>
+        @endif
     </nav>
     <div class="border-t border-slate-700 p-4">
         <p class="truncate text-sm font-medium text-white">{{ Auth::user()->name }}</p>
@@ -36,5 +41,8 @@
         <a href="{{ route('admin.customers.index') }}">Klanten</a>
         <a href="{{ route('admin.services.index') }}">Diensten</a>
         <a href="{{ route('admin.financial.invoices') }}">Financieel</a>
+        @if(Auth::user()->isOwner())
+            <a href="{{ route('admin.settings.general') }}">Instellingen</a>
+        @endif
     </div>
 </div>

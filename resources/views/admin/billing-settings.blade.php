@@ -66,21 +66,10 @@
                     <span><strong class="block text-sm text-amber-950">Landgebonden BTW inschakelen</strong><span class="mt-1 block text-sm leading-relaxed text-amber-800">Past het lokale standaardtarief toe voor EU-landen en 0% buiten de EU. Laat dit uitgeschakeld totdat internationale verkoop en fiscale validatie zijn ingericht.</span></span>
                 </label>
 
-                <h2 class="mt-8 border-t border-slate-200 pt-6 text-lg font-semibold text-slate-900">Mollie-betaalprovider</h2>
-                <p class="mt-1 text-sm text-slate-600">De API-key wordt versleuteld in de database opgeslagen en is alleen zichtbaar voor de eigenaar.</p>
-                <div class="mt-4 grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-                    <div class="form-group">
-                        <label class="form-label" for="mollie_key">API-key</label>
-                        <input class="form-input" id="mollie_key" name="mollie_key" type="password" autocomplete="off" placeholder="••••••" value="{{ old('mollie_key') }}">
-                        <p class="mt-1 text-xs text-slate-500">Laat leeg om ongewijzigd te laten.</p>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="mollie_key_mode">Modus bij nieuwe invoer</label>
-                        <select class="form-input" id="mollie_key_mode" name="mollie_key_mode">
-                            <option value="test" {{ old('mollie_key_mode', 'test') === 'test' ? 'selected' : '' }}>Test</option>
-                            <option value="live" {{ old('mollie_key_mode') === 'live' ? 'selected' : '' }}>Live</option>
-                        </select>
-                    </div>
+                <div class="mt-8 border-t border-slate-200 pt-6">
+                    <h2 class="text-lg font-semibold text-slate-900">Mollie-betaalprovider</h2>
+                    <p class="mt-1 text-sm text-slate-600">De Mollie API-key beheer je voortaan onder Instellingen.</p>
+                    <a href="{{ route('admin.settings.payments') }}" class="mt-3 inline-flex items-center text-sm font-semibold text-primary-600 hover:text-primary-800">Naar Instellingen → Betalingen</a>
                 </div>
 
                 <div class="mt-6 flex justify-end">

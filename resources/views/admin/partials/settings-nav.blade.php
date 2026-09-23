@@ -1,0 +1,5 @@
+<nav class="mb-6 flex gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1" aria-label="Instellingen">
+    <a href="{{ route('admin.settings.general') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.settings.general*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Algemeen</a>
+    <a href="{{ route('admin.settings.mail') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.settings.mail*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Mail</a>
+    <a href="{{ route('admin.settings.payments') }}" class="whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors {{ request()->routeIs('admin.settings.payments*') ? 'bg-white text-primary-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white/70 hover:text-slate-900' }}">Betalingen</a>
+</nav>
