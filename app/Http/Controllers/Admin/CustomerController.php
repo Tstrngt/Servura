@@ -213,27 +213,14 @@ class CustomerController extends Controller
             abort(404);
         }
 
-        // Check if customer has active services or tickets
-        if ($customer->activeServices()->count() > 0 || $customer->openTickets()->count() > 0) {
-            return redirect()
-                ->route('admin.customers.index')
-                ->with('error', 'Kan klant niet verwijderen. Klant heeft nog actieve diensten of open tickets.');
-        }
-
-        DB::beginTransaction();
         try {
-            // Delete related data
-            $customer->customerServices()->delete();
-            $customer->tickets()->delete();
-            $customer->delete();
-
-            DB::commit();
+            app(\App\Services\CustomerDataResetService::class)->purge($customer);
 
             return redirect()
                 ->route('admin.customers.index')
-                ->with('success', 'Klant is succesvol verwijderd.');
-        } catch (\Exception $e) {
-            DB::rollBack();
+                ->with('success', 'Klant en alle bijbehorende gegevens zijn definitief verwijderd.');
+        } catch (\Throwable $e) {
+            report($e);
 
             return redirect()
                 ->route('admin.customers.index')

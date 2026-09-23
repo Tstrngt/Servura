@@ -224,6 +224,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/mail/test', [App\Http\Controllers\Admin\SettingController::class, 'sendTestMail'])->name('mail.test');
             Route::get('/betalingen', [App\Http\Controllers\Admin\SettingController::class, 'payments'])->name('payments');
             Route::put('/betalingen', [App\Http\Controllers\Admin\SettingController::class, 'updatePayments'])->name('payments.update');
+            Route::post('/klanten-resetten', [App\Http\Controllers\Admin\SettingController::class, 'resetCustomers'])->name('reset-customers');
         });
     });
 });

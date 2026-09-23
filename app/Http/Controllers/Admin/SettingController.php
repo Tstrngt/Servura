@@ -144,6 +144,22 @@ class SettingController extends Controller
         return back()->with('success', 'Betaalprovider-instellingen zijn opgeslagen.');
     }
 
+    /**
+     * Delete every customer account and all related data (test-mode reset).
+     */
+    public function resetCustomers(Request $request, \App\Services\CustomerDataResetService $reset)
+    {
+        $this->authorizeOwner();
+
+        $request->validate([
+            'confirm' => ['required', Rule::in(['RESET'])],
+        ]);
+
+        $count = $reset->purgeAllCustomers();
+
+        return back()->with('success', $count.' klantaccount(s) en alle bijbehorende gegevens zijn verwijderd.');
+    }
+
     private function authorizeOwner(): void
     {
         if (! auth()->user()->isOwner()) {
