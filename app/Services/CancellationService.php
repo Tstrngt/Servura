@@ -98,6 +98,14 @@ class CancellationService
             ]);
             $cancellation->customerService->update(['end_date' => $cancellation->fresh()->effective_at]);
 
+            if ($cancellation->fresh()->effective_at->isPast()) {
+                $cancellation->customerService->update([
+                    'status' => 'cancelled',
+                    'auto_renew' => false,
+                ]);
+                $cancellation->update(['status' => 'completed']);
+            }
+
             if ((float) $cancellation->fresh()->estimated_usage_cost > 0) {
                 BillableItem::create([
                     'user_id' => $cancellation->user_id,
