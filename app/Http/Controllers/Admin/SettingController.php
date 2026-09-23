@@ -20,6 +20,7 @@ class SettingController extends Controller
             'contact_email' => BillingSetting::valueFor('contact_email', config('mail.from.address')),
             'contact_phone' => BillingSetting::valueFor('contact_phone', ''),
             'contact_address' => BillingSetting::valueFor('contact_address', ''),
+            'da_delete_after_days' => BillingSetting::integer('da_delete_after_days', 30),
         ];
 
         return view('admin.settings.general', compact('settings'));
@@ -34,6 +35,7 @@ class SettingController extends Controller
             'contact_email' => 'nullable|email|max:255',
             'contact_phone' => 'nullable|string|max:30',
             'contact_address' => 'nullable|string|max:500',
+            'da_delete_after_days' => 'nullable|integer|min:0|max:3650',
         ]);
 
         foreach ($validated as $key => $value) {

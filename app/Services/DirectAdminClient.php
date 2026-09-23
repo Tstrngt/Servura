@@ -113,6 +113,19 @@ class DirectAdminClient
         ]);
     }
 
+    /**
+     * Permanently delete a user account including all data.
+     */
+    public function deleteUser(string $username): array
+    {
+        return $this->request('CMD_API_SELECT_USERS', [
+            'location' => 'CMD_SELECT_USERS',
+            'delete' => 'yes',
+            'confirmed' => 'yes',
+            'select0' => $username,
+        ]);
+    }
+
     public function resetPassword(string $username, string $password): array
     {
         return $this->request('CMD_API_PASSWD', [

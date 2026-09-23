@@ -128,6 +128,47 @@ class ProvisioningService
         }
     }
 
+    /**
+     * Permanently delete DirectAdmin accounts for cancelled services whose
+     * retention period has passed. Runs daily via the scheduler.
+     */
+    public function deleteDueCancelled(): int
+    {
+        $days = \App\Models\BillingSetting::integer('da_delete_after_days', 30);
+        $deleted = 0;
+
+        CustomerService::query()
+            ->where('status', 'cancelled')
+            ->where('provisioning_status', 'suspended')
+            ->whereNotNull('external_username')
+            ->whereDate('external_suspended_at', '<=', now()->subDays($days))
+            ->with(['service.serverConnection', 'user'])
+            ->chunkById(50, function ($services) use (&$deleted) {
+                foreach ($services as $customerService) {
+                    if ($customerService->service->fulfillment_type !== 'directadmin' || ! $customerService->service->serverConnection) {
+                        continue;
+                    }
+
+                    try {
+                        $this->directAdmin->using($customerService->service->serverConnection)
+                            ->deleteUser($customerService->external_username);
+
+                        $customerService->update([
+                            'provisioning_status' => 'deleted',
+                            'provisioning_error' => null,
+                        ]);
+                        $this->log($customerService, 'directadmin_verwijderd', 'DirectAdmin-account definitief verwijderd na opzegging.');
+                        $deleted++;
+                    } catch (\Throwable $exception) {
+                        report($exception);
+                        $this->log($customerService, 'directadmin_verwijderen_mislukt', 'Verwijderen DirectAdmin-account mislukt: ' . Str::limit($exception->getMessage(), 500));
+                    }
+                }
+            });
+
+        return $deleted;
+    }
+
     private function generateUsername(CustomerService $customerService): string
     {
         $prefix = strtolower(preg_replace('/[^a-z0-9]/i', '', explode('.', $customerService->domain)[0]));

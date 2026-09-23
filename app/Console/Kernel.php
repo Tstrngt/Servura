@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Services\CancellationService;
 use App\Services\DunningService;
+use App\Services\ProvisioningService;
 use App\Services\RenewalService;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -27,6 +28,10 @@ class Kernel extends ConsoleKernel
         $schedule->call(fn () => app(CancellationService::class)->processDueApproved())
             ->name('services:process-cancellations')
             ->dailyAt('03:30')
+            ->withoutOverlapping();
+        $schedule->call(fn () => app(ProvisioningService::class)->deleteDueCancelled())
+            ->name('services:delete-cancelled-accounts')
+            ->dailyAt('03:45')
             ->withoutOverlapping();
     }
 

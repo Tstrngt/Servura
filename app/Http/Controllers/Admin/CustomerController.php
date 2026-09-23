@@ -396,7 +396,13 @@ class CustomerController extends Controller
             abort(404);
         }
 
-        $service->update(['status' => 'cancelled']);
+        $service->update(['status' => 'cancelled', 'auto_renew' => false, 'cancelled_at' => now()]);
+
+        try {
+            app(\App\Services\ProvisioningService::class)->suspend($service);
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return redirect()
             ->route('admin.customers.show', [$customer, 'tab' => 'services'])

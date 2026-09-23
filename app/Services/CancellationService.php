@@ -104,6 +104,7 @@ class CancellationService
                     'auto_renew' => false,
                 ]);
                 $cancellation->update(['status' => 'completed']);
+                $this->suspendExternally($cancellation->customerService);
             }
 
             if ((float) $cancellation->fresh()->estimated_usage_cost > 0) {
@@ -151,12 +152,22 @@ class CancellationService
                             'auto_renew' => false,
                         ]);
                         $request->update(['status' => 'completed']);
+                        $this->suspendExternally($request->customerService);
                     });
                     $processed++;
                 }
             });
 
         return $processed;
+    }
+
+    private function suspendExternally(CustomerService $customerService): void
+    {
+        try {
+            app(ProvisioningService::class)->suspend($customerService);
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
     }
 
     private function fallbackPeriodEnd(CustomerService $customerService, $periodStart)

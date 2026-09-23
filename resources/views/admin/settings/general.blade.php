@@ -50,6 +50,11 @@
                     <label class="form-label" for="contact_address">Adres</label>
                     <input class="form-input" id="contact_address" name="contact_address" type="text" value="{{ old('contact_address', $settings['contact_address']) }}">
                 </div>
+                <div class="form-group">
+                    <label class="form-label" for="da_delete_after_days">DA-account verwijderen na annulering (dagen)</label>
+                    <input class="form-input" id="da_delete_after_days" name="da_delete_after_days" type="number" min="0" max="3650" value="{{ old('da_delete_after_days', $settings['da_delete_after_days']) }}">
+                    <p class="mt-1 text-xs text-slate-500">Na een opzegging wordt het DirectAdmin-account geschorst en na dit aantal dagen definitief verwijderd. 0 = meteen verwijderen.</p>
+                </div>
             </div>
             <div class="mt-6 flex justify-end">
                 <button type="submit" class="btn btn-primary">Instellingen opslaan</button>
