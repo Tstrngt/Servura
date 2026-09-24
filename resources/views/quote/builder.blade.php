@@ -126,7 +126,7 @@
                     <select name="pages" class="form-input mt-auto" required>
                         <option value="">Kies een optie</option>
                         @foreach($form['pages'] as $option)
-                            <option value="{{ $option }}" {{ old('pages') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                            <option value="{{ $option['label'] }}" {{ old('pages') === $option['label'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -142,7 +142,7 @@
                     <select name="visitors" class="form-input mt-auto" required>
                         <option value="">Kies een optie</option>
                         @foreach($form['visitors'] as $option)
-                            <option value="{{ $option }}" {{ old('visitors') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                            <option value="{{ $option['label'] }}" {{ old('visitors') === $option['label'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -232,7 +232,7 @@
                     <select name="timeline" class="form-input mt-auto" required>
                         <option value="">Kies een optie</option>
                         @foreach($form['timeline'] as $option)
-                            <option value="{{ $option }}" {{ old('timeline') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                            <option value="{{ $option['label'] }}" {{ old('timeline') === $option['label'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -248,7 +248,7 @@
                     <select name="budget" class="form-input mt-auto">
                         <option value="">Kies een budgetindicatie</option>
                         @foreach($form['budget'] as $option)
-                            <option value="{{ $option }}" {{ old('budget') === $option ? 'selected' : '' }}>{{ $option }}</option>
+                            <option value="{{ $option['label'] }}" {{ old('budget') === $option['label'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
