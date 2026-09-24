@@ -67,7 +67,22 @@ class CheckoutController extends Controller
             $rules['domain'] = ['required', 'string', 'max:253', 'regex:/^(?!-)(?:[a-z0-9-]{1,63}\.)+[a-z]{2,63}$/i'];
         }
 
-        if (!Auth::check()) {
+        if (! Auth::check()) {
+            $existingUser = User::where('email', $request->input('email'))->first();
+
+            if ($existingUser && $existingUser->isCustomer()) {
+                $request->session()->put('url.intended', route('checkout.show', $service));
+
+                return redirect()->route('login')
+                    ->with('success', 'U heeft al een account. Log in om verder te gaan met uw bestelling.');
+            }
+
+            if ($existingUser && ! $existingUser->isCustomer()) {
+                return redirect()->back()
+                    ->withErrors(['email' => 'Dit e-mailadres is gekoppeld aan een intern account. Gebruik een ander e-mailadres.'])
+                    ->withInput();
+            }
+
             $rules['email'] = 'required|email|max:255|unique:users,email';
             $rules['password'] = 'required|string|min:8|confirmed';
         }
