@@ -134,6 +134,9 @@
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $customer->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
                                             {{ $customer->is_active ? 'Actief' : 'Inactief' }}
                                         </span>
+                                        @if(is_null($customer->email_verified_at))
+                                            <span class="ml-1 inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">E-mail niet geverifieerd</span>
+                                        @endif
                                     </div>
                                 </div>
                                 <div>

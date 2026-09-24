@@ -50,6 +50,7 @@ class QuoteBuilderController extends Controller
             'company' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
+            'password' => [Rule::requiredIf(fn () => ! Auth::check()), 'nullable', 'string', 'min:8', 'confirmed'],
         ], [
             'service.required' => 'Kies waarvoor u een offerte aanvraagt.',
             'service.exists' => 'De gekozen dienst is niet beschikbaar.',
@@ -116,14 +117,17 @@ class QuoteBuilderController extends Controller
             }
 
             if (! $user) {
+                $plainPassword = $request->input('password', Str::random(16));
                 $user = User::create([
                     'name' => $request->input('name'),
                     'email' => $request->input('email'),
-                    'password' => Hash::make(Str::random(32)),
+                    'password' => Hash::make($plainPassword),
                     'company' => $request->input('company'),
                     'phone' => $request->input('phone'),
+                    'country' => config('site.default_country', 'NL'),
                     'role' => 'customer',
                     'is_active' => true,
+                    'email_verification_token' => Str::random(48),
                 ]);
                 $isNewUser = true;
             } else {
@@ -184,12 +188,13 @@ class QuoteBuilderController extends Controller
         ]);
 
         if ($isNewUser) {
-            Password::sendResetLink(['email' => $user->email]);
+            app(\App\Services\CustomerNotificationService::class)->accountCreated($user, $plainPassword);
+            app(\App\Services\CustomerNotificationService::class)->ticketCreated($user, $ticket);
             Auth::login($user);
             $request->session()->regenerate();
 
             return redirect()->route('customer.services.show', $customerService)
-                ->with('success', 'Uw aanvraag is ontvangen en gekoppeld aan uw nieuwe account. U ontvangt een e-mail om een wachtwoord in te stellen. Ticket '.$ticket->ticket_number.' is geopend voor verdere afstemming.');
+                ->with('success', 'Uw aanvraag is ontvangen en gekoppeld aan uw nieuwe account. Bevestig uw e-mailadres via de link die u heeft ontvangen. Ticket '.$ticket->ticket_number.' is geopend voor verdere afstemming.');
         }
 
         if ($isExistingAccount) {

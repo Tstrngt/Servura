@@ -62,6 +62,8 @@ class PortalTicketService
                 );
             });
 
+            app(\App\Services\CustomerNotificationService::class)->ticketCreated($customer, $ticket);
+
             return $ticket;
         });
     }

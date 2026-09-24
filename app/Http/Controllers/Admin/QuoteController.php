@@ -122,6 +122,7 @@ class QuoteController extends Controller
 
         if ($newStatus === 'verzonden' && !$quote->sent_at) {
             $quoteService->markSent($quote, auth()->id());
+            app(\App\Services\CustomerNotificationService::class)->quoteReady($quote->user, $quote);
         } else {
             $quote->update(['status' => $newStatus]);
 

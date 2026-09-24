@@ -101,10 +101,12 @@ class CancellationService
             if ($cancellation->fresh()->effective_at->isPast()) {
                 $cancellation->customerService->update([
                     'status' => 'cancelled',
+                    'suspension_reason' => 'cancellation',
                     'auto_renew' => false,
                 ]);
                 $cancellation->update(['status' => 'completed']);
                 $this->suspendExternally($cancellation->customerService);
+                $this->notifySuspended($cancellation->customerService->fresh());
             }
 
             $this->createRefundTransaction($cancellation->customerService, $cancellation->fresh()->effective_at);
@@ -150,6 +152,7 @@ class CancellationService
                     DB::transaction(function () use ($request) {
                         $request->customerService->update([
                             'status' => 'cancelled',
+                            'suspension_reason' => 'cancellation',
                             'end_date' => $request->effective_at,
                             'auto_renew' => false,
                         ]);
@@ -157,6 +160,7 @@ class CancellationService
                         $this->suspendExternally($request->customerService);
                         $this->createRefundTransaction($request->customerService, $request->effective_at);
                     });
+                    $this->notifySuspended($request->customerService->fresh());
                     $processed++;
                 }
             });
@@ -237,6 +241,19 @@ class CancellationService
         } catch (\Throwable $exception) {
             report($exception);
         }
+    }
+
+    private function notifySuspended(CustomerService $customerService): void
+    {
+        app(\App\Services\CustomerNotificationService::class)->serviceSuspended(
+            $customerService->user,
+            $customerService,
+            match ($customerService->suspension_reason) {
+                'cancellation' => 'uw dienst is opgezegd',
+                'payment_overdue' => 'openstaande betaling',
+                default => 'uw dienst is tijdelijk opgeschort',
+            }
+        );
     }
 
     private function fallbackPeriodEnd(CustomerService $customerService, $periodStart)

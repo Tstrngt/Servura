@@ -144,6 +144,10 @@ class InvoiceController extends Controller
             $payments->finalizePaidInvoice($invoice);
         }
 
+        if (in_array($request->status, ['openstaand', 'verzonden'], true) && ! in_array($oldStatus, ['openstaand', 'verzonden', 'betaald'], true)) {
+            app(\App\Services\CustomerNotificationService::class)->invoiceReady($invoice->user, $invoice);
+        }
+
         TransactionLog::create([
             'user_id' => $invoice->user_id,
             'loggable_type' => Invoice::class,
@@ -214,6 +218,8 @@ class InvoiceController extends Controller
             'status' => 'openstaand',
             'sent_at' => now(),
         ]);
+
+        app(\App\Services\CustomerNotificationService::class)->invoiceReady($invoice->user, $invoice);
 
         TransactionLog::create([
             'user_id' => $invoice->user_id,

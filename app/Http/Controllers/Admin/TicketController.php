@@ -186,6 +186,8 @@ class TicketController extends Controller
                 Auth::user()->name.' heeft gereageerd op ticket '.$ticket->ticket_number.'.',
                 route('customer.tickets.show', $ticket)
             );
+
+            app(\App\Services\CustomerNotificationService::class)->ticketReplied($ticket->user, $ticket);
         }
 
         return redirect()->route('admin.tickets.show', $ticket)
@@ -304,6 +306,8 @@ class TicketController extends Controller
             'Uw ticket '.$ticket->ticket_number.' is gesloten.',
             route('customer.tickets.show', $ticket)
         );
+
+        app(\App\Services\CustomerNotificationService::class)->ticketClosed($ticket->user, $ticket);
 
         return redirect()->route('admin.tickets.show', $ticket)
             ->with('success', 'Ticket gesloten.');

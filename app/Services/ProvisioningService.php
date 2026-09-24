@@ -98,6 +98,11 @@ class ProvisioningService
                 'provisioning_error' => null,
             ]);
             $this->log($customerService, 'directadmin_geschorst', 'DirectAdmin-account geschorst wegens wanbetaling.');
+            app(\App\Services\CustomerNotificationService::class)->serviceSuspended(
+                $customerService->user,
+                $customerService->fresh(),
+                $this->suspensionReason($customerService)
+            );
         } catch (\Throwable $exception) {
             $this->fail($customerService, $exception->getMessage(), false);
             throw $exception;
@@ -177,6 +182,17 @@ class ProvisioningService
         return substr($prefix, 0, 4) . str_pad(base_convert((string) $customerService->id, 10, 36), 4, '0', STR_PAD_LEFT);
     }
 
+    private function suspensionReason(CustomerService $customerService): string
+    {
+        return match ($customerService->suspension_reason) {
+            'payment_overdue' => 'openstaande betaling',
+            'provisioning_failed' => 'probleem bij het activeren van de dienst',
+            'domain_required' => 'domein ontbreekt',
+            'manual' => 'handmatige actie door ons team',
+            default => 'openstaande betaling of technische reden',
+        };
+    }
+
     private function fail(CustomerService $customerService, string $message, bool $suspendService = true, string $errorType = 'error'): void
     {
         $data = [
@@ -212,13 +228,6 @@ class ProvisioningService
             route('customer.dashboard')
         );
 
-        try {
-            Mail::send('hosting-credentials-email', ['customerService' => $customerService], function ($message) use ($customerService) {
-                $message->to($customerService->user->email, $customerService->user->name)
-                    ->subject("Hostingaccount voor {$customerService->domain}");
-            });
-        } catch (\Throwable $exception) {
-            report($exception);
-        }
+        app(\App\Services\CustomerNotificationService::class)->serviceActivated($customerService->user, $customerService->fresh());
     }
 }

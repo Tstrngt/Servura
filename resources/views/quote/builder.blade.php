@@ -289,6 +289,22 @@
                         <label for="phone" class="form-label">Telefoonnummer</label>
                         <input type="tel" id="phone" name="phone" class="form-input">
                     </div>
+                    @guest
+                        <div class="form-group sm:col-span-2 rounded-xl bg-primary-50/40 p-4 ring-1 ring-primary-200">
+                            <p class="mb-3 text-sm font-medium text-slate-800">We maken direct een account aan, zodat u de status van uw aanvraag kunt volgen.</p>
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label for="password" class="form-label">Wachtwoord *</label>
+                                    <input type="password" id="password" name="password" class="form-input" minlength="8" required>
+                                    <p class="mt-1 text-xs text-slate-500">Minimaal 8 tekens</p>
+                                </div>
+                                <div>
+                                    <label for="password_confirmation" class="form-label">Wachtwoord bevestigen *</label>
+                                    <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" minlength="8" required>
+                                </div>
+                            </div>
+                        </div>
+                    @endguest
                 </div>
             </div>
 

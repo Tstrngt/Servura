@@ -79,20 +79,23 @@ class CheckoutController extends Controller
             ->firstOrFail();
         $tax = $taxService->calculate((float) $price->price, $validated['country']);
 
-        [$order, $user] = DB::transaction(function () use ($validated, $service, $price, $tax, $invoiceService) {
+        [$order, $user, $isNewUser] = DB::transaction(function () use ($validated, $service, $price, $tax, $invoiceService) {
             $user = Auth::user();
             $userData = collect($validated)->only([
                 'name', 'company', 'phone', 'street', 'house_number', 'postal_code', 'city',
                 'country', 'kvk_number', 'vat_number',
             ])->all();
 
+            $isNewUser = false;
             if (!$user) {
                 $user = User::create($userData + [
                     'email' => $validated['email'],
                     'password' => Hash::make($validated['password']),
                     'role' => 'customer',
                     'is_active' => true,
+                    'email_verification_token' => \Illuminate\Support\Str::random(48),
                 ]);
+                $isNewUser = true;
             } else {
                 $user->update($userData);
             }
@@ -134,8 +137,14 @@ class CheckoutController extends Controller
                 'status' => 'pending_payment',
             ]);
 
-            return [$order, $user];
+            return [$order, $user, $isNewUser];
         });
+
+        $notification = app(\App\Services\CustomerNotificationService::class);
+        if ($isNewUser) {
+            $notification->accountCreated($user, $validated['password']);
+        }
+        $notification->orderPlaced($user, $order);
 
         if (!Auth::check()) {
             Auth::login($user);
