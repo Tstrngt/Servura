@@ -180,7 +180,7 @@ class QuoteBuilderController extends Controller
                 'page' => 'offerte-samenstellen',
                 'customer_notes' => $request->input('notes'),
                 'customer_service_id' => $customerService->id,
-            ]);
+            ], false);
 
             return [$customerService, $ticket, $user];
         });
@@ -199,6 +199,7 @@ class QuoteBuilderController extends Controller
 
         if ($isNewUser) {
             app(\App\Services\CustomerNotificationService::class)->accountCreated($user, $plainPassword);
+            app(\App\Services\CustomerNotificationService::class)->ticketCreated($user, $ticket);
             Auth::login($user);
             $request->session()->regenerate();
 

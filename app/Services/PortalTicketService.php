@@ -15,7 +15,7 @@ class PortalTicketService
 
     private const CATEGORIES = ['technical', 'billing', 'general', 'feature_request', 'bug_report', 'offerte'];
 
-    public function create(User $customer, array $attributes): Ticket
+    public function create(User $customer, array $attributes, bool $sendCustomerNotification = true): Ticket
     {
         if (! $customer->isCustomer()) {
             throw ValidationException::withMessages(['customer' => 'Alleen klanten kunnen een aanvraag indienen.']);
@@ -62,7 +62,9 @@ class PortalTicketService
                 );
             });
 
-            app(\App\Services\CustomerNotificationService::class)->ticketCreated($customer, $ticket);
+            if ($sendCustomerNotification) {
+                app(\App\Services\CustomerNotificationService::class)->ticketCreated($customer, $ticket);
+            }
 
             return $ticket;
         });
