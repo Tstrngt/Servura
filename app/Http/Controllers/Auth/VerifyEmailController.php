@@ -24,6 +24,10 @@ class VerifyEmailController extends Controller
             ]);
         }
 
+        if (auth()->check()) {
+            return redirect()->route('customer.dashboard')->with('success', 'Uw e-mailadres is bevestigd.');
+        }
+
         return redirect()->route('login')->with('success', 'Uw e-mailadres is bevestigd. U kunt nu inloggen.');
     }
 

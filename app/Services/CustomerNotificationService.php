@@ -60,9 +60,7 @@ class CustomerNotificationService
             return false;
         }
 
-        if (! $user->email_verification_token) {
-            $user->update(['email_verification_token' => \Illuminate\Support\Str::random(48)]);
-        }
+        $user->update(['email_verification_token' => \Illuminate\Support\Str::random(48)]);
 
         $this->send($user, 'verify-email', [
             'user' => $user,

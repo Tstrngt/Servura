@@ -87,9 +87,9 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/wachtwoord-reset/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
     Route::post('/wachtwoord-reset', [NewPasswordController::class, 'store'])->name('password.update');
-
-    Route::get('/email/verificatie/{token}', [\App\Http\Controllers\Auth\VerifyEmailController::class, 'verify'])->name('verification.verify');
 });
+
+Route::get('/email/verificatie/{token}', [\App\Http\Controllers\Auth\VerifyEmailController::class, 'verify'])->name('verification.verify');
 
 // Authenticated routes
 Route::middleware('auth')->group(function () {
