@@ -23,6 +23,7 @@
     </div>
 </section>
 
+<style>[x-cloak] { display: none !important; }</style>
 <!-- Quote Builder Form -->
 <section class="relative py-24 lg:py-32 bg-slate-50 overflow-hidden">
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[44rem] h-[22rem] bg-primary-400/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -57,6 +58,26 @@
                     </div>
                 </div>
             @endif
+
+            @guest
+                <!-- Accountkeuze -->
+                <div x-show="mode === null" x-cloak class="mb-10 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 animate-on-scroll">
+                    <h2 class="font-heading text-2xl font-bold text-slate-900">Heeft u al een Servura-account?</h2>
+                    <p class="mt-1 text-slate-500">Zo kunnen we uw offerte-aanvraag koppelen aan het juiste account.</p>
+                    <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <button type="button" @click="mode = 'new'" class="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-slate-50 p-6 text-center hover:border-primary-400 hover:bg-primary-50">
+                            <span class="font-semibold text-slate-900">Nee, ik ben nieuw</span>
+                            <span class="text-xs text-slate-500">Account aanmaken tijdens de aanvraag</span>
+                        </button>
+                        <a href="{{ route('quote.builder.login', ['service' => $service?->slug]) }}" class="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-slate-50 p-6 text-center hover:border-primary-400 hover:bg-primary-50">
+                            <span class="font-semibold text-slate-900">Ja, ik heb al een account</span>
+                            <span class="text-xs text-slate-500">Inloggen om verder te gaan</span>
+                        </a>
+                    </div>
+                </div>
+            @endguest
+
+            <div x-show="mode !== null" x-transition x-cloak>
 
             <!-- Dienst -->
             <div class="mb-14 animate-on-scroll">
@@ -308,12 +329,14 @@
                 </div>
             </div>
 
-            @include('partials.captcha')
+                @include('partials.captcha')
+
+            </div>
 
             <!-- Submit -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-slate-200 animate-on-scroll">
+            <div x-show="mode !== null" x-cloak class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-slate-200 animate-on-scroll">
                 <p class="text-sm text-slate-500">Velden met * zijn verplicht. Wij gebruiken uw gegevens alleen voor deze offerte-aanvraag.</p>
-                <button type="submit" class="btn btn-primary px-8 py-3.5 shadow-lg shadow-primary-500/25 disabled:cursor-not-allowed disabled:opacity-60" :disabled="submitting" x-text="submitting ? 'Verzenden...' : 'Offerte-aanvraag versturen'"></button>
+                <button type="submit" class="btn btn-primary px-8 py-3.5 shadow-lg shadow-primary-500/25 disabled:cursor-not-allowed disabled:opacity-60" :disabled="submitting || mode === null" x-text="submitting ? 'Verzenden...' : 'Offerte-aanvraag versturen'"></button>
             </div>
         </form>
     </div>
@@ -322,6 +345,7 @@
 <script>
 function quoteBuilder() {
     return {
+        mode: @json(auth()->check() ? 'existing' : (old('email') ? 'new' : null)),
         submitting: false,
         async submit(event) {
             this.submitting = true;

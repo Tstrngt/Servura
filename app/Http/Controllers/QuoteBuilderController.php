@@ -30,6 +30,14 @@ class QuoteBuilderController extends Controller
         return view('quote.builder', compact('service', 'services', 'form'));
     }
 
+    public function loginPrompt(Request $request)
+    {
+        session(['url.intended' => route('quote.builder', ['service' => $request->input('service')])]);
+
+        return redirect()->route('login')
+            ->with('success', 'Log in om verder te gaan met uw offerte-aanvraag.');
+    }
+
     public function store(Request $request, PortalTicketService $ticketService)
     {
         $validator = Validator::make($request->all(), [
@@ -87,6 +95,13 @@ class QuoteBuilderController extends Controller
                     ->withErrors(['email' => 'Dit e-mailadres is gekoppeld aan een intern account. Gebruik een ander e-mailadres.'])
                     ->withInput();
             }
+
+            if ($existingUser && $existingUser->isCustomer()) {
+                session(['url.intended' => route('quote.builder', ['service' => $request->input('service')])]);
+
+                return redirect()->route('login')
+                    ->with('success', 'U heeft al een account. Log in om verder te gaan met uw offerte-aanvraag.');
+            }
         }
 
         $features = $request->input('features', []);
@@ -106,15 +121,9 @@ class QuoteBuilderController extends Controller
         $messageText .= "Extra informatie:\n" . ($request->input('notes') ?: '-');
 
         $isNewUser = false;
-        $isExistingAccount = false;
 
-        [$customerService, $ticket, $user] = DB::transaction(function () use ($request, $service, $messageText, $features, $content, $ticketService, &$isNewUser, &$isExistingAccount) {
+        [$customerService, $ticket, $user] = DB::transaction(function () use ($request, $service, $messageText, $features, $content, $ticketService, &$isNewUser) {
             $user = Auth::user();
-
-            if (! $user) {
-                $user = User::where('email', $request->input('email'))->first();
-                $isExistingAccount = (bool) $user;
-            }
 
             if (! $user) {
                 $plainPassword = $request->input('password', Str::random(16));
@@ -195,11 +204,6 @@ class QuoteBuilderController extends Controller
 
             return redirect()->route('customer.services.show', $customerService)
                 ->with('success', 'Uw aanvraag is ontvangen en gekoppeld aan uw nieuwe account. Bevestig uw e-mailadres via de link die u heeft ontvangen. Ticket '.$ticket->ticket_number.' is geopend voor verdere afstemming.');
-        }
-
-        if ($isExistingAccount) {
-            return redirect()->route('login')
-                ->with('success', 'Uw aanvraag is gekoppeld aan uw bestaande account. Log in om de status te volgen via ticket '.$ticket->ticket_number.'.');
         }
 
         return redirect()->route('customer.services.show', $customerService)

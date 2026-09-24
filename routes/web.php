@@ -60,6 +60,7 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact.stor
 
 // Offerte samenstellen (niet in hoofdnavigatie)
 Route::get('/offerte-samenstellen', [QuoteBuilderController::class, 'index'])->name('quote.builder');
+Route::get('/offerte-samenstellen/inloggen', [QuoteBuilderController::class, 'loginPrompt'])->name('quote.builder.login');
 Route::post('/offerte-samenstellen', [QuoteBuilderController::class, 'store'])->name('quote.builder.store');
 
 // Nieuwsbrief
