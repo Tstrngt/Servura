@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\CustomerNotificationService;
 use Illuminate\Http\Request;
 
 class VerifyEmailController extends Controller
@@ -24,5 +25,18 @@ class VerifyEmailController extends Controller
         }
 
         return redirect()->route('login')->with('success', 'Uw e-mailadres is bevestigd. U kunt nu inloggen.');
+    }
+
+    public function resend(Request $request, CustomerNotificationService $notifications)
+    {
+        $user = $request->user();
+
+        if ($user->email_verified_at) {
+            return back()->with('success', 'Uw e-mailadres is al bevestigd.');
+        }
+
+        $notifications->sendEmailVerification($user);
+
+        return back()->with('success', 'De bevestigingsmail is opnieuw naar '.$user->email.' verstuurd.');
     }
 }

@@ -94,6 +94,7 @@ Route::middleware('guest')->group(function () {
 // Authenticated routes
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::post('/email/verificatie/opnieuw', [\App\Http\Controllers\Auth\VerifyEmailController::class, 'resend'])->name('verification.send');
 
     // Customer routes
     Route::middleware('customer')->prefix('klant')->name('customer.')->group(function () {

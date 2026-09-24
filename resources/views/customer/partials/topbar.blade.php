@@ -111,3 +111,20 @@ $unreadNotifications = Auth::user()->notifications()->unread()->limit(6)->get();
         </div>
     </div>
 </div>
+
+@if(auth()->check() && is_null(auth()->user()->email_verified_at))
+    <div class="bg-amber-50 border-b border-amber-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-sm text-amber-800">
+                    <strong>E-mailadres nog niet bevestigd.</strong>
+                    Bevestig uw e-mailadres om alle functies van het klantportaal te gebruiken.
+                </p>
+                <form action="{{ route('verification.send') }}" method="POST" class="shrink-0">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-900 ring-1 ring-amber-200 hover:bg-amber-200">Bevestigingsmail opnieuw versturen</button>
+                </form>
+            </div>
+        </div>
+    </div>
+@endif

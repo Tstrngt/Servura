@@ -54,6 +54,24 @@ class CustomerNotificationService
         ]);
     }
 
+    public function sendEmailVerification(User $user): bool
+    {
+        if ($user->email_verified_at) {
+            return false;
+        }
+
+        if (! $user->email_verification_token) {
+            $user->update(['email_verification_token' => \Illuminate\Support\Str::random(48)]);
+        }
+
+        $this->send($user, 'verify-email', [
+            'user' => $user,
+            'verificationUrl' => route('verification.verify', ['token' => $user->email_verification_token]),
+        ]);
+
+        return true;
+    }
+
     public function ticketCreated(User $user, Ticket $ticket): void
     {
         $this->send($user, 'ticket-created', [
@@ -119,6 +137,7 @@ class CustomerNotificationService
     {
         return match ($view) {
             'account-created' => 'Welkom bij '.config('site.name', config('app.name')).' — bevestig uw e-mailadres',
+            'verify-email' => 'Bevestig uw e-mailadres',
             'order-placed' => 'Bedankt voor uw bestelling',
             'hosting-activated' => 'Uw hostingaccount is actief',
             'service-suspended' => 'Uw dienst is tijdelijk opgeschort',
