@@ -38,7 +38,7 @@ class PortalTicketService
             $priority = 'high';
         }
 
-        return DB::transaction(function () use ($customer, $attributes, $priority, $category) {
+        return DB::transaction(function () use ($customer, $attributes, $priority, $category, $sendCustomerNotification) {
             $ticket = Ticket::create([
                 'user_id' => $customer->id,
                 'customer_service_id' => Arr::get($attributes, 'customer_service_id'),
