@@ -121,8 +121,9 @@ class QuoteBuilderController extends Controller
         $messageText .= "Extra informatie:\n" . ($request->input('notes') ?: '-');
 
         $isNewUser = false;
+        $plainPassword = null;
 
-        [$customerService, $ticket, $user] = DB::transaction(function () use ($request, $service, $messageText, $features, $content, $ticketService, &$isNewUser) {
+        [$customerService, $ticket, $user] = DB::transaction(function () use ($request, $service, $messageText, $features, $content, $ticketService, &$isNewUser, &$plainPassword) {
             $user = Auth::user();
 
             if (! $user) {
