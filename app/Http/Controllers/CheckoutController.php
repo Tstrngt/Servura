@@ -18,6 +18,14 @@ use Illuminate\Validation\Rule;
 
 class CheckoutController extends Controller
 {
+    public function loginPrompt(Service $service)
+    {
+        session(['url.intended' => route('checkout.show', $service)]);
+
+        return redirect()->route('login')
+            ->with('success', 'Log in om verder te gaan met uw bestelling.');
+    }
+
     public function show(Service $service, TaxService $taxService)
     {
         abort_unless($service->is_active, 404);

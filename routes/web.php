@@ -51,6 +51,7 @@ Route::get('/over-ons', [AboutController::class, 'index'])->name('about');
 Route::get('/diensten', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/diensten/{service}', [ServiceController::class, 'show'])->name('services.show');
 Route::get('/bestellen/{service}', [CheckoutController::class, 'show'])->name('checkout.show');
+Route::get('/bestellen/{service}/inloggen', [CheckoutController::class, 'loginPrompt'])->name('checkout.login');
 Route::post('/bestellen/{service}', [CheckoutController::class, 'store'])->name('checkout.store');
 
 // Contact
