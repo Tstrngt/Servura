@@ -110,7 +110,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/diensten/{customerService}/overdragen', [App\Http\Controllers\Customer\ServiceController::class, 'transfer'])->name('services.transfer');
         Route::post('/diensten/{customerService}/upgrade', [App\Http\Controllers\Customer\ServiceController::class, 'upgrade'])->name('services.upgrade');
         Route::post('/diensten/{customerService}/reset-wachtwoord', [App\Http\Controllers\Customer\ServiceController::class, 'resetPassword'])->name('services.reset-password');
-        Route::post('/diensten/{customerService}/directadmin-login', [App\Http\Controllers\Customer\ServiceController::class, 'directAdminLogin'])->name('services.directadmin-login');
+        Route::match(['get', 'post'], '/diensten/{customerService}/directadmin-login', [App\Http\Controllers\Customer\ServiceController::class, 'directAdminLogin'])->name('services.directadmin-login');
 
         // Tickets
         Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
