@@ -188,8 +188,8 @@
 
     <!-- Main Content -->
     <main>
-        <!-- Success/Error Messages (only on non-admin pages; admin views handle their own placement) -->
-        @if(!request()->routeIs('admin.*'))
+        <!-- Success/Error Messages (not on admin pages or login; those views handle their own placement) -->
+        @if(!request()->routeIs('admin.*') && !request()->routeIs('login'))
             @if(session('success'))
                 <div class="bg-green-50 border-l-4 border-green-400 p-4">
                     <div class="max-w-7xl mx-auto flex">
@@ -226,7 +226,7 @@
 
     <!-- Footer -->
     @unless(request()->routeIs('admin.*'))
-    <footer class="footer {{ request()->routeIs('home') || request()->routeIs('about') || request()->routeIs('services.*') || request()->routeIs('contact') ? 'mt-0' : 'mt-16' }}">
+    <footer class="footer {{ request()->routeIs('home') || request()->routeIs('about') || request()->routeIs('services.*') || request()->routeIs('contact') || request()->routeIs('login') ? 'mt-0' : 'mt-16' }}">
         <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- Company Info -->
