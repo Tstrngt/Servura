@@ -158,7 +158,7 @@ class CustomerNotificationService
             };
 
             if ($customHtml !== '') {
-                Mail::html(strtr($customHtml, $variables), $callback);
+                Mail::send('emails.custom', ['html' => strtr($customHtml, $variables), 'subject' => $subject], $callback);
             } else {
                 Mail::send("emails.{$view}", $data, $callback);
             }

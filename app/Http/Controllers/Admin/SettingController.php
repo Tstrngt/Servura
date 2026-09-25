@@ -273,8 +273,8 @@ class SettingController extends Controller
         $templates = collect(\App\Support\EmailTemplateRegistry::TEMPLATES)->map(fn ($label, $key) => [
             'key' => $key,
             'label' => $label,
-            'subject' => BillingSetting::valueFor("email_template_{$key}_subject", ''),
-            'html' => BillingSetting::valueFor("email_template_{$key}_html", ''),
+            'subject' => BillingSetting::valueFor("email_template_{$key}_subject") ?: \App\Support\EmailTemplateRegistry::SUBJECTS[$key],
+            'html' => BillingSetting::valueFor("email_template_{$key}_html") ?: \App\Support\EmailTemplateRegistry::HTML[$key],
         ]);
         $recipient = BillingSetting::valueFor('contact_form_recipient', 'vraag@servura.nl');
         $variables = \App\Support\EmailTemplateRegistry::VARIABLES;
