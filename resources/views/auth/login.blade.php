@@ -17,9 +17,11 @@
 
 @section('content')
 <div class="login-shell relative flex min-h-[calc(100dvh-4rem)] items-center justify-center overflow-hidden bg-slate-100 px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
-    <div class="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
-        <div class="absolute inset-y-0 left-0 w-1/2 bg-slate-950"></div>
-        <div class="absolute -left-24 top-10 h-80 w-80 rounded-full bg-primary-600/15 blur-3xl"></div>
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div class="absolute inset-0 bg-gradient-to-b from-white via-slate-100 to-slate-200/80"></div>
+        <div class="absolute -left-40 -top-40 h-[30rem] w-[30rem] rounded-full bg-primary-200/50 blur-3xl"></div>
+        <div class="absolute -bottom-48 -right-40 h-[32rem] w-[32rem] rounded-full bg-primary-300/25 blur-3xl"></div>
+        <div class="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,rgb(15_23_42)_1px,transparent_1px),linear-gradient(to_bottom,rgb(15_23_42)_1px,transparent_1px)] [background-size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_at_center,black_25%,transparent_80%)]"></div>
     </div>
     <div class="relative z-10 grid w-full max-w-6xl overflow-hidden rounded-3xl bg-white shadow-2xl shadow-slate-950/20 ring-1 ring-slate-200/70 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
 
