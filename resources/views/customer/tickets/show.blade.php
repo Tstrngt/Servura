@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Ticket {{ $ticket->ticket_number }} - Servura')
+@section('title', 'Ticket ' . $ticket->ticket_number . ' - Servura')
 
 @section('content')
 @include('customer.partials.topbar')

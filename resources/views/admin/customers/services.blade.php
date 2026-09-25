@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Diensten van {{ $customer->name }} - Servura Admin')
+@section('title', 'Diensten van ' . $customer->name . ' - Servura Admin')
 
 @section('content')
 @include('admin.partials.sidebar')
