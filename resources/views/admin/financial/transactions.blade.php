@@ -103,7 +103,16 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($transactions as $transaction)
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $transaction->transaction_number }}</td>
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                                            <div>{{ $transaction->transaction_number }}</div>
+                                            @if($transaction->parentTransaction)
+                                                <div class="mt-1 text-xs font-normal text-purple-600">Terugbetaling van {{ $transaction->parentTransaction->transaction_number }}</div>
+                                            @elseif($transaction->refunds->isNotEmpty())
+                                                @foreach($transaction->refunds as $refund)
+                                                    <div class="mt-1 text-xs font-normal text-purple-600">Terugbetaald via {{ $refund->transaction_number }}</div>
+                                                @endforeach
+                                            @endif
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-gray-900">{{ $transaction->user->name }}</div>
                                             <div class="text-sm text-gray-500">{{ $transaction->user->company }}</div>

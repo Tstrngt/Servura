@@ -188,6 +188,14 @@ class MolliePaymentService
         Order::where('invoice_id', $invoice->id)
             ->where('status', 'pending_payment')
             ->update(['status' => 'paid', 'paid_at' => now()]);
+
+        $claimed = Invoice::whereKey($invoice->id)
+            ->whereNull('payment_confirmation_sent_at')
+            ->update(['payment_confirmation_sent_at' => now()]);
+
+        if ($claimed) {
+            app(CustomerNotificationService::class)->paymentConfirmed($invoice->user, $invoice->fresh());
+        }
     }
 
     private function finalizeCustomerService(Invoice $invoice, CustomerService $customerService): void

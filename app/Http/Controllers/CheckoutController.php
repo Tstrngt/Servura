@@ -165,7 +165,7 @@ class CheckoutController extends Controller
 
         $notification = app(\App\Services\CustomerNotificationService::class);
         if ($isNewUser) {
-            $notification->accountCreated($user, $validated['password']);
+            $notification->accountCreated($user);
         }
         $notification->orderPlaced($user, $order);
 

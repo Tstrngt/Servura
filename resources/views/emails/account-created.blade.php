@@ -9,7 +9,7 @@
 <div class="box">
     <strong>Uw inloggegevens</strong><br>
     E-mailadres: {{ $user->email }}<br>
-    Wachtwoord: {{ $plainPassword }}
+    Wachtwoord: het door u gekozen wachtwoord
 </div>
 
 <p>Bevestig uw e-mailadres via onderstaande knop:</p>

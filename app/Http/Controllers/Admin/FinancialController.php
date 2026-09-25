@@ -41,7 +41,7 @@ class FinancialController extends Controller
 
     public function transactions(Request $request)
     {
-        $query = Transaction::with(['user', 'invoice']);
+        $query = Transaction::with(['user', 'invoice', 'parentTransaction', 'refunds']);
 
         if ($request->filled('search')) {
             $search = $request->search;

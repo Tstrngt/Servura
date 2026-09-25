@@ -198,7 +198,7 @@ class QuoteBuilderController extends Controller
         ]);
 
         if ($isNewUser) {
-            app(\App\Services\CustomerNotificationService::class)->accountCreated($user, $plainPassword);
+            app(\App\Services\CustomerNotificationService::class)->accountCreated($user);
             app(\App\Services\CustomerNotificationService::class)->ticketCreated($user, $ticket);
             Auth::login($user);
             $request->session()->regenerate();

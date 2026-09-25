@@ -13,6 +13,7 @@ class Transaction extends Model
         'transaction_number',
         'user_id',
         'invoice_id',
+        'parent_transaction_id',
         'amount',
         'type',
         'payment_method',
@@ -55,6 +56,16 @@ class Transaction extends Model
     public function invoice()
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function parentTransaction()
+    {
+        return $this->belongsTo(self::class, 'parent_transaction_id');
+    }
+
+    public function refunds()
+    {
+        return $this->hasMany(self::class, 'parent_transaction_id');
     }
 
     public function getStatusLabelAttribute(): array

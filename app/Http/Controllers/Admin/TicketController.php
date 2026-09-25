@@ -147,7 +147,7 @@ class TicketController extends Controller
                 ->with('error', 'Dit ticket kan geen publieke reactie meer ontvangen.');
         }
 
-        TicketReply::create([
+        $reply = TicketReply::create([
             'ticket_id' => $ticket->id,
             'user_id' => Auth::id(),
             'message' => $request->message,
@@ -187,7 +187,7 @@ class TicketController extends Controller
                 route('customer.tickets.show', $ticket)
             );
 
-            app(\App\Services\CustomerNotificationService::class)->ticketReplied($ticket->user, $ticket);
+            app(\App\Services\CustomerNotificationService::class)->ticketReplied($ticket->user, $ticket, $reply);
         }
 
         return redirect()->route('admin.tickets.show', $ticket)

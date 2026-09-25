@@ -6,7 +6,9 @@ use App\Models\CustomerService;
 use App\Models\Invoice;
 use App\Models\Quote;
 use App\Models\Ticket;
+use App\Models\TicketReply;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 
 /**
@@ -15,11 +17,10 @@ use Illuminate\Support\Facades\Mail;
  */
 class CustomerNotificationService
 {
-    public function accountCreated(User $user, string $plainPassword): void
+    public function accountCreated(User $user): void
     {
         $this->send($user, 'account-created', [
             'user' => $user,
-            'plainPassword' => $plainPassword,
             'verificationUrl' => route('verification.verify', ['token' => $user->email_verification_token]),
         ]);
     }
@@ -79,7 +80,7 @@ class CustomerNotificationService
         ]);
     }
 
-    public function ticketReplied(User $user, Ticket $ticket, bool $byCustomer = false): void
+    public function ticketReplied(User $user, Ticket $ticket, TicketReply $reply, bool $byCustomer = false): void
     {
         if ($byCustomer) {
             return;
@@ -88,6 +89,7 @@ class CustomerNotificationService
         $this->send($user, 'ticket-replied', [
             'user' => $user,
             'ticket' => $ticket,
+            'reply' => $reply,
             'ticketUrl' => route('customer.tickets.show', $ticket),
         ]);
     }
@@ -103,28 +105,53 @@ class CustomerNotificationService
 
     public function invoiceReady(User $user, Invoice $invoice): void
     {
+        $invoice->loadMissing(['lines', 'user']);
         $this->send($user, 'invoice-ready', [
             'user' => $user,
             'invoice' => $invoice,
             'invoiceUrl' => route('customer.invoices.show', $invoice),
-        ]);
+        ], [[
+            'data' => Pdf::loadView('pdf.invoice', compact('invoice'))->setPaper('a4')->output(),
+            'name' => $invoice->invoice_number.'.pdf',
+        ]]);
     }
 
     public function quoteReady(User $user, Quote $quote): void
     {
+        $quote->loadMissing(['lines', 'user']);
         $this->send($user, 'quote-ready', [
             'user' => $user,
             'quote' => $quote,
             'quoteUrl' => route('customer.quotes.show', $quote),
-        ]);
+        ], [[
+            'data' => Pdf::loadView('pdf.quote', compact('quote'))->setPaper('a4')->output(),
+            'name' => $quote->quote_number.'.pdf',
+        ]]);
     }
 
-    private function send(User $user, string $view, array $data): void
+    public function paymentConfirmed(User $user, Invoice $invoice): void
+    {
+        $invoice->loadMissing(['lines', 'user']);
+        $this->send($user, 'payment-confirmed', [
+            'user' => $user,
+            'invoice' => $invoice,
+            'invoiceUrl' => route('customer.invoices.show', $invoice),
+        ], [[
+            'data' => Pdf::loadView('pdf.invoice', compact('invoice'))->setPaper('a4')->output(),
+            'name' => $invoice->invoice_number.'.pdf',
+        ]]);
+    }
+
+    private function send(User $user, string $view, array $data, array $attachments = []): void
     {
         try {
-            Mail::send("emails.{$view}", $data, function ($message) use ($user, $view) {
+            Mail::send("emails.{$view}", $data, function ($message) use ($user, $view, $attachments) {
                 $message->to($user->email, $user->name)
                     ->subject($this->subjectFor($view));
+
+                foreach ($attachments as $attachment) {
+                    $message->attachData($attachment['data'], $attachment['name'], ['mime' => 'application/pdf']);
+                }
             });
         } catch (\Throwable $e) {
             report($e);
@@ -142,8 +169,9 @@ class CustomerNotificationService
             'ticket-created' => 'We hebben uw aanvraag ontvangen',
             'ticket-replied' => 'Er is gereageerd op uw aanvraag',
             'ticket-closed' => 'Uw aanvraag is gesloten',
-            'invoice-ready' => 'Er staat een factuur voor u klaar',
-            'quote-ready' => 'Er staat een offerte voor u klaar',
+            'invoice-ready' => 'Uw factuur staat klaar',
+            'quote-ready' => 'Uw persoonlijke offerte staat klaar',
+            'payment-confirmed' => 'Betaling ontvangen — bedankt',
             default => 'Bericht van '.config('site.name', config('app.name')),
         };
     }

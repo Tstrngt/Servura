@@ -220,10 +220,18 @@ class CancellationService
             return;
         }
 
+        $originalPayment = \App\Models\Transaction::where('invoice_id', $lastPaid->id)
+            ->where('type', 'inkomst')
+            ->where('status', 'voltooid')
+            ->latest('transaction_date')
+            ->latest('id')
+            ->first();
+
         \App\Models\Transaction::create([
             'transaction_number' => \App\Models\Transaction::generateNumber(),
             'user_id' => $customerService->user_id,
             'invoice_id' => $lastPaid->id,
+            'parent_transaction_id' => $originalPayment?->id,
             'amount' => $amount,
             'type' => 'creditering',
             'payment_method' => 'ideal',

@@ -23,6 +23,7 @@ class Invoice extends Model
         'internal_notes',
         'sent_at',
         'paid_at',
+        'payment_confirmation_sent_at',
         'mollie_payment_id',
         'payment_url',
         'quote_id',
@@ -41,6 +42,7 @@ class Invoice extends Model
         'vat_percentage' => 'decimal:2',
         'sent_at' => 'datetime',
         'paid_at' => 'datetime',
+        'payment_confirmation_sent_at' => 'datetime',
         'period_start' => 'date',
         'period_end' => 'date',
     ];
