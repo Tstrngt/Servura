@@ -16,12 +16,17 @@
 @endphp
 
 @section('content')
-<div class="login-shell grid min-h-[calc(100dvh-4rem)] bg-white lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+<div class="login-shell relative flex min-h-[calc(100dvh-4rem)] items-center justify-center overflow-hidden bg-slate-100 px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
+    <div class="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
+        <div class="absolute inset-y-0 left-0 w-1/2 bg-slate-950"></div>
+        <div class="absolute -left-24 top-10 h-80 w-80 rounded-full bg-primary-600/15 blur-3xl"></div>
+    </div>
+    <div class="relative z-10 grid w-full max-w-6xl overflow-hidden rounded-3xl bg-white shadow-2xl shadow-slate-950/20 ring-1 ring-slate-200/70 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
 
     {{-- Portal panel: bridges into the dark klantportaal. Content starts on the
          navbar container's left edge; the group is centered like the form and
          the help line sits on the bottom edge. --}}
-    <aside class="login-panel relative hidden overflow-hidden bg-slate-950 text-white lg:flex lg:flex-col lg:justify-center lg:py-14 lg:pr-12 xl:pr-16" aria-label="Wat u in het klantportaal vindt">
+    <aside class="login-panel relative hidden overflow-hidden bg-slate-950 text-white lg:flex lg:flex-col lg:justify-center lg:px-10 lg:py-12 xl:px-14 xl:py-14" aria-label="Wat u in het klantportaal vindt">
         <div class="pointer-events-none absolute inset-0" aria-hidden="true">
             <div class="login-glow absolute -left-40 -top-40 h-[32rem] w-[32rem] rounded-full bg-primary-600/25 blur-3xl"></div>
             <div class="login-glow login-glow-late absolute -bottom-48 right-[-10rem] h-[28rem] w-[28rem] rounded-full bg-primary-900/60 blur-3xl"></div>
@@ -207,5 +212,6 @@
             </p>
         </div>
     </section>
+    </div>
 </div>
 @endsection

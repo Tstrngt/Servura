@@ -864,13 +864,6 @@ h1, h2, h3, h4, h5, h6 {
     background: #0284c7;
 }
 
-/* Login — panel content starts on the navbar container's left edge
-   (max-w-7xl + lg:px-8), measured against the page-wide shell. */
-.login-shell { container-type: inline-size; }
-@media (min-width: 1024px) {
-    .login-panel { padding-left: max(2rem, calc((100cqw - 80rem) / 2 + 2rem)); }
-}
-
 /* Login motion — the portal panel "switches on" while the page loader fades
    (~700ms), the form itself never waits. Feedback motion: a rejected login
    nudges the fields, errors and notices slide in, the eye icon crossfades. */
