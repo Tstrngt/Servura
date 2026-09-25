@@ -21,22 +21,22 @@
     {{-- Portal panel: bridges into the dark klantportaal. Content starts on the
          navbar container's left edge; the group is centered like the form and
          the help line sits on the bottom edge. --}}
-    <aside class="login-panel relative hidden overflow-hidden bg-slate-950 text-white lg:grid lg:grid-rows-[1fr_auto_1fr] lg:py-14 lg:pr-12 xl:pr-16" aria-label="Wat u in het klantportaal vindt">
+    <aside class="login-panel relative hidden overflow-hidden bg-slate-950 text-white lg:flex lg:flex-col lg:justify-center lg:py-14 lg:pr-12 xl:pr-16" aria-label="Wat u in het klantportaal vindt">
         <div class="pointer-events-none absolute inset-0" aria-hidden="true">
             <div class="login-glow absolute -left-40 -top-40 h-[32rem] w-[32rem] rounded-full bg-primary-600/25 blur-3xl"></div>
             <div class="login-glow login-glow-late absolute -bottom-48 right-[-10rem] h-[28rem] w-[28rem] rounded-full bg-primary-900/60 blur-3xl"></div>
             <div class="login-grid absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:3rem_3rem] [mask-image:linear-gradient(to_bottom,black,transparent_75%)]"></div>
         </div>
 
-        <div class="relative row-start-2 max-w-md">
-            <p class="login-rise text-sm font-semibold text-primary-300" style="--i: 0">Klantportaal</p>
-            <p class="login-headline mt-4 font-heading text-4xl font-bold leading-[1.1] tracking-tight text-balance xl:text-5xl">
+        <div class="relative max-w-md">
+            <p class="text-sm font-semibold text-primary-300">Klantportaal</p>
+            <p class="mt-4 text-balance font-heading text-4xl font-bold leading-[1.1] tracking-tight xl:text-5xl">
                 Alles van uw website op één plek.
             </p>
 
-            <ul class="mt-10 space-y-6 xl:mt-12 xl:space-y-7" role="list">
+            <ul class="mt-8 space-y-5 xl:mt-10 xl:space-y-6" role="list">
                 @foreach($portalAreas as $area)
-                    <li class="login-rise flex gap-4" style="--i: {{ $loop->index + 3 }}">
+                    <li class="flex gap-4">
                         <span class="login-tile mt-0.5 flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-white/[0.06] text-primary-300 ring-1 ring-inset ring-white/10">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="{{ $area['icon'] }}" />
@@ -51,7 +51,7 @@
             </ul>
         </div>
 
-        <p class="login-rise relative row-start-3 self-end pt-10 text-sm text-slate-400" style="--i: 8">
+        <p class="relative mt-10 text-sm text-slate-400">
             Hulp nodig bij inloggen?
             <a href="{{ route('contact') }}" class="font-semibold text-white underline decoration-white/30 underline-offset-4 transition-colors hover:decoration-white focus:outline-none focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary-300">Neem contact op</a>
         </p>
@@ -59,7 +59,7 @@
 
     {{-- Form --}}
     <section class="flex items-start justify-center px-4 pb-14 pt-10 sm:px-6 sm:pt-16 lg:items-center lg:px-12 lg:py-14">
-        <div class="w-full max-w-sm">
+        <div class="w-full max-w-md">
             <p class="text-sm font-semibold text-primary-700 lg:hidden">Klantportaal</p>
             <h1 class="mt-2 font-heading text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:mt-0">Inloggen</h1>
             <p class="mt-3 text-base text-slate-600">Welkom terug. Log in met het e-mailadres van uw Servura-account.</p>
