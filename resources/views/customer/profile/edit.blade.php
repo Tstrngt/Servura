@@ -17,7 +17,7 @@
         @endif
 
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
-            <form action="{{ route('customer.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+            <form action="{{ route('customer.profile.update') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-8">
                 @csrf
                 @method('PUT')
 
