@@ -64,7 +64,15 @@
                         <a href="{{ route('customer.services.show', $customerService) }}" class="block rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
                             <div class="flex items-start justify-between gap-3"><h4 class="font-semibold text-slate-900">{{ $customerService->service->title }}</h4><span class="shrink-0 rounded-full bg-{{ $customerService->statusLabel['color'] }}-100 px-2.5 py-1 text-xs font-medium text-{{ $customerService->statusLabel['color'] }}-800">{{ $customerService->statusLabel['text'] }}</span></div>
                             <p class="mt-2 text-sm text-slate-500">{{ $customerService->service->short_description }}</p>
-                            <div class="mt-4 flex items-center justify-between text-sm"><span class="font-semibold text-slate-900">{{ $customerService->formatted_price }}</span><span class="text-primary-600">Beheren</span></div>
+                            <div class="mt-4 flex items-center justify-between text-sm">
+                                <span class="font-semibold text-slate-900">{{ $customerService->formatted_price }}</span>
+                                <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-primary-600" aria-hidden="true">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.75A3.75 3.75 0 1 0 12 8.25a3.75 3.75 0 0 0 0 7.5Z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12a7.5 7.5 0 0 0-.105-1.25l2.03-1.58-2-3.464-2.48 1a7.5 7.5 0 0 0-2.16-1.25L14.43 2.8h-4l-.36 2.656a7.5 7.5 0 0 0-2.16 1.25l-2.48-1-2 3.464 2.03 1.58a7.5 7.5 0 0 0 0 2.5l-2.03 1.58 2 3.464 2.48-1a7.5 7.5 0 0 0 2.16 1.25l.36 2.656h4l.36-2.656a7.5 7.5 0 0 0 2.16-1.25l2.48 1 2-3.464-2.03-1.58A7.5 7.5 0 0 0 19.5 12Z"/>
+                                    </svg>
+                                </span>
+                            </div>
                         </a>
                     @endforeach
                 </div>
@@ -82,7 +90,7 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-100">
                             @foreach($allServices as $customerService)
-                                <tr class="hover:bg-slate-50 transition-colors">
+                                <tr role="link" tabindex="0" aria-label="Beheer dienst {{ $customerService->service->title }}" data-href="{{ route('customer.services.show', $customerService) }}" onclick="window.location.href = this.dataset.href" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.location.href = this.dataset.href; }" class="cursor-pointer transition-colors duration-150 hover:bg-slate-50 focus:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500">
                                     <td class="px-6 py-4">
                                         <div class="truncate text-sm font-medium text-slate-900" title="{{ $customerService->service->title }}">{{ $customerService->service->title }}</div>
                                         <div class="truncate text-sm text-slate-500" title="{{ $customerService->service->short_description }}">{{ $customerService->service->short_description }}</div>
@@ -96,7 +104,13 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{{ $customerService->start_date->format('d-m-Y') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{{ $customerService->end_date ? $customerService->end_date->format('d-m-Y') : 'Onbeperkt' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                        <a href="{{ route('customer.services.show', $customerService) }}" class="font-medium text-primary-600 hover:text-primary-800">Beheren</a>
+                                        <a href="{{ route('customer.services.show', $customerService) }}" tabindex="-1" aria-label="Beheer dienst {{ $customerService->service->title }}" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors duration-150 hover:bg-primary-50 hover:text-primary-600" onclick="event.stopPropagation()">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.75A3.75 3.75 0 1 0 12 8.25a3.75 3.75 0 0 0 0 7.5Z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12a7.5 7.5 0 0 0-.105-1.25l2.03-1.58-2-3.464-2.48 1a7.5 7.5 0 0 0-2.16-1.25L14.43 2.8h-4l-.36 2.656a7.5 7.5 0 0 0-2.16 1.25l-2.48-1-2 3.464 2.03 1.58a7.5 7.5 0 0 0 0 2.5l-2.03 1.58 2 3.464 2.48-1a7.5 7.5 0 0 0 2.16 1.25l.36 2.656h4l.36-2.656a7.5 7.5 0 0 0 2.16-1.25l2.48 1 2-3.464-2.03-1.58A7.5 7.5 0 0 0 19.5 12Z"/>
+                                            </svg>
+                                            <span class="sr-only">Dienst beheren</span>
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
