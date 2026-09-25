@@ -58,9 +58,13 @@ class ProvisioningService
                 // daadwerkelijk bestaat voordat we de provisioning als mislukt
                 // markeren. "username already exists" betekent ook dat het
                 // account er is (bijv. restant van een eerdere poging).
-                $alreadyExists = stripos($createException->getMessage(), 'already exists') !== false
-                    || stripos($createException->getMessage(), 'bestaat al') !== false;
-                if (! $alreadyExists && ! $client->userExists($username)) {
+                $responseMessage = $createException->getMessage();
+                $alreadyExists = stripos($responseMessage, 'already exists') !== false
+                    || stripos($responseMessage, 'bestaat al') !== false;
+                $createdDespiteError = stripos($responseMessage, 'Unix User created successfully') !== false
+                    && (stripos($responseMessage, 'Domain Created Successfully') !== false
+                        || stripos($responseMessage, 'successful created') !== false);
+                if (! $alreadyExists && ! $createdDespiteError && ! $client->userExists($username)) {
                     throw $createException;
                 }
                 $this->log($customerService, 'directadmin_waarschuwing', 'DirectAdmin meldde een fout, maar het account bestaat wel: ' . Str::limit($createException->getMessage(), 300));
