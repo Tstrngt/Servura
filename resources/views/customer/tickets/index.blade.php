@@ -22,11 +22,11 @@
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 p-6 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="mb-8 rounded-2xl bg-slate-900 p-6 text-white shadow-xl shadow-slate-900/10 ring-1 ring-white/10">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
-                    <select class="form-input" id="status-filter">
+                    <label class="mb-1 block text-sm font-medium text-slate-200">Status</label>
+                    <select class="form-input border-slate-200 bg-white text-slate-900" id="status-filter">
                                 <option value="">Alle statussen</option>
                                 <option value="open">Open</option>
                                 <option value="in_progress">In behandeling</option>
@@ -36,8 +36,8 @@
                             </select>
                         </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Prioriteit</label>
-                    <select class="form-input" id="priority-filter">
+                    <label class="mb-1 block text-sm font-medium text-slate-200">Prioriteit</label>
+                    <select class="form-input border-slate-200 bg-white text-slate-900" id="priority-filter">
                                 <option value="">Alle prioriteiten</option>
                                 <option value="low">Laag</option>
                                 <option value="medium">Medium</option>
@@ -46,8 +46,8 @@
                             </select>
                         </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Categorie</label>
-                    <select class="form-input" id="category-filter">
+                    <label class="mb-1 block text-sm font-medium text-slate-200">Categorie</label>
+                    <select class="form-input border-slate-200 bg-white text-slate-900" id="category-filter">
                                 <option value="">Alle categorieën</option>
                                 <option value="technical">Technisch</option>
                                 <option value="billing">Facturatie</option>
@@ -57,8 +57,8 @@
                             </select>
                         </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">&nbsp;</label>
-                    <button type="button" class="btn btn-outline w-full" onclick="resetFilters()">
+                    <label class="mb-1 block text-sm font-medium text-transparent" aria-hidden="true">Actie</label>
+                    <button type="button" class="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-white/15 active:bg-white/20" onclick="resetFilters()">
                         Reset Filters
                     </button>
                 </div>
