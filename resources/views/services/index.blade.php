@@ -204,7 +204,7 @@ $steps = [
 </section>
 
 <!-- Process / Roadmap -->
-<section class="py-24 lg:py-32 bg-white overflow-hidden">
+<section class="bg-slate-50 py-24 lg:py-32">
     <div class="max-w-7xl mx-auto px-6">
         <div class="max-w-2xl mx-auto text-center mb-16 lg:mb-20 animate-on-scroll">
             <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Werkwijze</span>
@@ -215,89 +215,71 @@ $steps = [
         </div>
 
         @php
-            $roadmapColors = [
-                ['ring' => 'ring-amber-300', 'text' => 'text-amber-800', 'soft' => 'bg-amber-50', 'border' => 'ring-amber-200'],
-                ['ring' => 'ring-orange-300', 'text' => 'text-orange-800', 'soft' => 'bg-orange-50', 'border' => 'ring-orange-200'],
-                ['ring' => 'ring-yellow-400', 'text' => 'text-yellow-800', 'soft' => 'bg-yellow-50', 'border' => 'ring-yellow-200'],
-                ['ring' => 'ring-amber-500', 'text' => 'text-amber-900', 'soft' => 'bg-amber-100', 'border' => 'ring-amber-300'],
-            ];
-            $roadmapIcons = [
-                '<svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.548.546 6.5 6.5 0 01-1.557 1.116 18.664 18.664 0 01-3.787.59 18.65 18.65 0 01-3.787-.59 6.5 6.5 0 01-1.557-1.116A9.38 9.38 0 009 19.128M12 14.25a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z"/></svg>',
-                '<svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M9 16h6M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>',
-                '<svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-2.25l-6 13.5"/></svg>',
-                '<svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2.25s-5.25 3.25-5.25 8.25v2.75L4.5 15.5h15l-2.25-2.25v-2.75c0-5-5.25-8.25-5.25-8.25zM12 14.75a2.25 2.25 0 110 4.5 2.25 2.25 0 010-4.5z"/></svg>',
-            ];
-            $roadmapPos = [
-                ['left' => '6%', 'anchor' => 'top'],
-                ['left' => '35%', 'anchor' => 'bottom'],
-                ['left' => '64%', 'anchor' => 'top'],
-                ['left' => '93%', 'anchor' => 'bottom'],
-            ];
+            $buildLabels = ['Idee bepalen', 'Blauwdruk maken', 'Doorontwikkelen', 'Website lanceren'];
         @endphp
-
-        <!-- Desktop treasure map roadmap -->
-        <div class="hidden lg:block relative px-8 pt-10 pb-20 animate-on-scroll">
-            <div class="absolute inset-0 opacity-60 pointer-events-none" style="background-image: radial-gradient(rgba(180,83,9,0.10) 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
-            <div class="absolute -top-2 -left-2 flex items-center justify-center w-14 h-14 rounded-full bg-amber-100 ring-4 ring-amber-300 text-amber-700 shadow-lg rotate-[-12deg]" aria-label="Start">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M6 18L18 6"/>
-                </svg>
+        <div class="relative mt-14" x-data="{ rocketFlying: false, rocketStyle: '', launchRocket(element) { if (this.rocketFlying) return; const rect = element.querySelector('[data-shuttle]').getBoundingClientRect(); this.rocketStyle = `--rocket-x:${rect.left + rect.width / 2}px;--rocket-y:${rect.top + rect.height / 2}px;--rocket-travel-y:${-(rect.top + 220)}px`; this.rocketFlying = true; setTimeout(() => this.rocketFlying = false, 2900) } }">
+            <div x-show="rocketFlying" :style="rocketStyle" class="site-rocket-launch pointer-events-none fixed z-[70] text-primary-500" style="display: none;" aria-hidden="true">
+                <svg class="h-28 w-28 drop-shadow-2xl" viewBox="0 0 48 64" fill="none"><path d="M24 3C15 12 13 28 15 43h18c2-15 0-31-9-40Z" fill="#e2e8f0" stroke="#0ea5e9" stroke-width="2"/><path d="m15 30-10 15 11-3m17-12 10 15-11-3" fill="#94a3b8" stroke="#0ea5e9" stroke-width="2"/><path d="M19 43v8m10-8v8" stroke="#334155" stroke-width="3"/><path class="site-rocket-flame" d="M18 52 24 63l6-11" fill="#22d3ee" stroke="#0ea5e9" stroke-width="1.5"/><circle cx="24" cy="22" r="4" fill="#082f49" stroke="#67e8f9" stroke-width="1.5"/></svg>
             </div>
-
-            <div class="relative" style="height: 30rem;">
-                <svg class="absolute inset-0 w-full h-full" viewBox="0 0 1000 480" fill="none" preserveAspectRatio="none">
-                    <path d="M60,32 C205,32 205,448 350,448 C495,448 495,32 640,32 C785,32 785,448 930,448"
-                        stroke="#b45309" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 18" opacity="0.55" />
-                </svg>
-
-                @foreach($steps as $index => $step)
-                    @php $c = $roadmapColors[$index % 4]; $pos = $roadmapPos[$index]; @endphp
-                    <div class="absolute w-52 -translate-x-1/2 flex flex-col items-center text-center {{ $pos['anchor'] === 'top' ? 'top-0' : 'bottom-0 flex-col-reverse' }}"
-                        style="left: {{ $pos['left'] }};">
-                        <div class="roadmap-node animate-on-scroll relative {{ $pos['anchor'] === 'top' ? 'mb-4' : 'mt-4' }}" style="transition-delay: {{ $index * 0.15 }}s">
-                            <span class="absolute inset-0 rounded-full {{ $c['soft'] }} opacity-70 animate-ping"></span>
-                            <span class="relative flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg ring-4 {{ $c['ring'] }} animate-float" style="animation-delay: {{ $index * 0.4 }}s">
-                                {!! $roadmapIcons[$index] !!}
-                            </span>
-                        </div>
-                        <div class="{{ $c['soft'] }} rounded-2xl p-4 ring-1 {{ $c['border'] }} shadow-sm animate-on-scroll" style="transition-delay: {{ $index * 0.15 + 0.1 }}s">
-                            <h4 class="font-heading font-bold text-slate-900 text-sm mb-1.5">{{ $step['title'] }}</h4>
-                            <p class="text-xs text-slate-600 leading-relaxed">{{ $step['text'] }}</p>
-                        </div>
-                    </div>
-                @endforeach
-
-                <div class="absolute -right-12 -bottom-3 flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 ring-[5px] ring-emerald-300 text-emerald-700 shadow-xl" aria-label="Finish">
-                    <svg class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM7 4H5a2 2 0 002 2M17 4h2a2 2 0 01-2 2"/>
-                    </svg>
-                </div>
+            <div x-show="rocketFlying" :style="rocketStyle" class="site-rocket-smoke pointer-events-none fixed z-[65]" style="display: none;" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
             </div>
-        </div>
-
-        <!-- Mobile / tablet vertical roadmap -->
-        <div class="lg:hidden relative p-6">
-            <div class="absolute left-[2.75rem] top-8 bottom-8 w-0 border-l-2 border-dashed border-amber-400/70"></div>
-            <div class="space-y-8">
+            <div class="grid items-stretch gap-6 md:grid-cols-2 lg:grid-cols-4 lg:gap-5">
                 @foreach($steps as $index => $step)
-                    @php $c = $roadmapColors[$index % 4]; @endphp
-                    <div class="relative flex gap-5 animate-on-scroll" style="transition-delay: {{ $index * 0.1 }}s">
-                        <span class="relative z-10 flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-lg ring-4 {{ $c['ring'] }}">
-                            {!! $roadmapIcons[$index] !!}
-                        </span>
-                        <div class="{{ $c['soft'] }} rounded-2xl p-4 ring-1 {{ $c['border'] }} flex-1">
-                            <h4 class="font-heading font-bold text-slate-900 mb-1.5">{{ $step['title'] }}</h4>
-                            <p class="text-sm text-slate-600 leading-relaxed">{{ $step['text'] }}</p>
+                    <article @if($index === 3) @mouseenter="launchRocket($el)" @focusin="launchRocket($el)" tabindex="0" @endif class="group relative z-10 flex h-full flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 transition-[transform,box-shadow] duration-200 hover:shadow-xl hover:-translate-y-1 hover:shadow-primary-900/10 sm:p-6">
+                        <div class="relative h-52 overflow-hidden rounded-xl bg-slate-950 p-5 text-white sm:h-60 lg:h-48 lg:p-4">
+                            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#38bdf8 1px, transparent 1px); background-size: 16px 16px;"></div>
+                            @if($index === 0)
+                                <div class="absolute left-5 top-6 w-28 rounded-xl rounded-bl-sm bg-white p-3 shadow-lg transition-transform duration-200 group-hover:-translate-y-1"><div class="h-2 w-16 rounded bg-slate-300"></div><div class="mt-2 h-2 w-10 rounded bg-slate-200"></div></div>
+                                <div class="absolute bottom-6 right-5 w-24 rounded-xl rounded-br-sm bg-primary-500 p-3 shadow-lg transition-transform duration-200 group-hover:translate-y-1"><div class="h-2 w-14 rounded bg-white/80"></div><div class="mt-2 h-2 w-9 rounded bg-white/50"></div></div>
+                            @elseif($index === 1)
+                                <div class="absolute inset-6 rounded-lg border-2 border-dashed border-primary-300 bg-primary-950/80 p-3 transition-colors duration-200 group-hover:border-cyan-300"><div class="h-3 w-20 rounded border border-primary-300"></div><div class="mt-3 h-10 rounded border border-primary-300/70"></div><div class="mt-3 grid grid-cols-3 gap-2"><span class="h-8 rounded border border-primary-300/60"></span><span class="h-8 rounded border border-primary-300/60"></span><span class="h-8 rounded border border-primary-300/60"></span></div></div>
+                            @elseif($index === 2)
+                                <div class="absolute inset-6 rounded-lg bg-white p-3 shadow-xl transition-transform duration-200 group-hover:scale-[1.02]"><div class="flex gap-1"><span class="h-1.5 w-1.5 rounded-full bg-rose-400"></span><span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span></div><div class="mt-3 h-9 rounded bg-primary-200"></div><div class="mt-3 grid grid-cols-2 gap-2"><span class="h-9 rounded bg-slate-100"></span><span class="h-9 rounded bg-slate-100"></span></div></div><span class="absolute bottom-4 right-4 rounded-lg bg-slate-900 px-2 py-1 font-mono text-xs text-cyan-300">&lt;/&gt;</span>
+                            @else
+                                <div class="absolute inset-6 rounded-lg bg-white p-3 shadow-xl transition-transform duration-200 group-hover:-translate-y-1"><div class="flex items-center justify-between"><div class="h-2 w-16 rounded bg-slate-200"></div><span class="rounded-full bg-emerald-100 px-2 py-1 text-[9px] font-bold text-emerald-700">LIVE</span></div><div class="mt-3 h-12 rounded bg-gradient-to-r from-primary-300 to-cyan-200"></div><div class="mt-3 flex gap-2"><span class="h-7 flex-1 rounded bg-slate-100"></span><span class="h-7 flex-1 rounded bg-slate-100"></span></div></div><span class="absolute right-4 top-4 h-3 w-3 rounded-full bg-cyan-300 shadow-[0_0_18px_6px_rgba(103,232,249,.45)]"></span>
+                            @endif
                         </div>
-                    </div>
+                        <div class="mt-5 flex min-w-0 flex-1 flex-col">
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-xs font-bold uppercase tracking-wider text-primary-600">{{ $buildLabels[$index] }}</span>
+                                <span class="font-mono text-xs text-slate-400">0{{ $index + 1 }}/04</span>
+                            </div>
+                            <h3 class="mt-2 font-heading text-xl font-bold text-slate-900">{{ $step['title'] }}</h3>
+                            <p class="mt-3 text-sm leading-7 text-slate-600">{{ $step['text'] }}</p>
+                            <div class="relative mt-auto h-40 overflow-hidden rounded-xl bg-slate-950 ring-1 ring-slate-800" aria-label="Shuttlebouw fase {{ $index + 1 }} van 4">
+                                <div class="absolute inset-0 opacity-20" style="background-image: linear-gradient(rgba(56,189,248,.18) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,.18) 1px, transparent 1px); background-size: 18px 18px;"></div>
+                                <div class="absolute inset-x-3 bottom-4 h-1 rounded bg-slate-700"></div>
+                                @if($index <= 2)
+                                    <div class="absolute bottom-5 left-3 h-24 w-9 border-x-2 border-t-2 border-slate-500"><span class="absolute left-0 top-5 h-px w-full rotate-[32deg] bg-slate-500"></span><span class="absolute left-0 top-12 h-px w-full -rotate-[32deg] bg-slate-500"></span><span class="absolute left-0 top-[4.2rem] h-px w-full rotate-[32deg] bg-slate-500"></span></div>
+                                @endif
+                                @if($index >= 1)
+                                    <div class="absolute right-3 top-4 h-2 w-20 bg-slate-500"><span class="absolute right-0 top-0 h-20 w-2 bg-slate-500"></span><span class="absolute left-5 top-2 h-10 w-px bg-cyan-300/70"></span><span class="absolute left-[1.05rem] top-11 h-2 w-2 rounded-full border border-cyan-300"></span></div>
+                                @endif
+                                @if($index === 2)<div class="absolute bottom-5 right-5 flex gap-1"><span class="h-2 w-2 animate-pulse rounded-full bg-emerald-400"></span><span class="h-2 w-2 rounded-full bg-amber-400"></span></div>@endif
+                                @if($index <= 2)
+                                    <div class="absolute bottom-5 left-[24%] z-20 h-8 w-5 text-cyan-300"><span class="absolute left-1.5 top-0 h-2 w-2 rounded-full bg-current"></span><span class="absolute left-2 top-2 h-4 w-1 rounded bg-current"></span><span class="absolute left-0 top-3 h-1 w-5 rotate-[-18deg] bg-current"></span><span class="absolute bottom-0 left-1 h-3 w-1 -rotate-12 bg-current"></span><span class="absolute bottom-0 right-1 h-3 w-1 rotate-12 bg-current"></span></div>
+                                    <div class="absolute bottom-5 right-[20%] z-20 h-8 w-5 text-primary-300"><span class="absolute left-1.5 top-0 h-2 w-2 rounded-full bg-current"></span><span class="absolute left-2 top-2 h-4 w-1 rounded bg-current"></span><span class="absolute left-0 top-3 h-1 w-5 rotate-12 bg-current"></span><span class="absolute bottom-0 left-1 h-3 w-1 -rotate-12 bg-current"></span><span class="absolute bottom-0 right-1 h-3 w-1 rotate-12 bg-current"></span></div>
+                                @endif
+                                @if($index === 3)
+                                    <div class="absolute bottom-4 left-[36%] h-3 w-24 -translate-x-1/2 rounded-t bg-slate-600"></div>
+                                    <div class="absolute bottom-7 right-[10%] h-28 w-12 border-2 border-slate-500 bg-slate-900/80"><span class="absolute inset-x-0 top-5 h-px rotate-[28deg] bg-slate-500"></span><span class="absolute inset-x-0 top-12 h-px -rotate-[28deg] bg-slate-500"></span><span class="absolute inset-x-0 top-[4.7rem] h-px rotate-[28deg] bg-slate-500"></span><span class="absolute inset-x-0 top-4 h-1 bg-slate-500"></span><span class="absolute inset-x-0 top-10 h-1 bg-slate-500"></span><span class="absolute inset-x-0 top-[4.1rem] h-1 bg-slate-500"></span></div>
+                                    <div class="absolute right-[19%] top-8 h-2 w-[38%] origin-right bg-slate-500"></div>
+                                    <div class="absolute right-[19%] top-[4.1rem] h-2 w-[32%] origin-right bg-slate-600"></div>
+                                    <div class="absolute right-[19%] top-[6.1rem] h-2 w-[26%] origin-right bg-slate-500"></div>
+                                @endif
+                                <svg @if($index === 3) data-shuttle @endif class="absolute bottom-4 h-28 w-24 -translate-x-1/2 transition-transform duration-200 {{ $index === 3 ? 'left-[36%] group-hover:-translate-y-1' : 'left-1/2' }}" viewBox="0 0 48 64" fill="none" aria-hidden="true">
+                                    <path d="M24 4C16 13 14 27 15 45h18c1-18-1-32-9-41Z" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="{{ $index === 0 ? '4 3' : '0' }}"/>
+                                    <path d="M24 8v36M16 31h16" stroke="#64748b" stroke-width="1.5"/>
+                                    @if($index >= 1)<path d="M24 5C18 14 17 27 18 42h12c1-15 0-28-6-37Z" fill="#e2e8f0"/><path d="M18 24h12M18 34h12" stroke="#94a3b8"/>@endif
+                                    @if($index >= 2)<path d="M19 43v8m10-8v8" stroke="#334155" stroke-width="3"/><path d="M19 52 24 62l5-10" fill="#67e8f9" stroke="#0ea5e9" stroke-width="1.5"/>@endif
+                                    @if($index === 3)<path d="m16 29-9 15 10-3m15-12 9 15-10-3" fill="#cbd5e1" stroke="#0ea5e9" stroke-width="1.5"/><circle cx="24" cy="21" r="4" fill="#082f49" stroke="#67e8f9" stroke-width="1.5"/>@endif
+                                </svg>
+                                <span class="absolute left-3 top-2 font-mono text-[10px] font-semibold text-cyan-200">ASSEMBLY {{ ($index + 1) * 25 }}%</span>
+                            </div>
+                        </div>
+                    </article>
                 @endforeach
-                <div class="flex justify-center pt-2">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-100 ring-4 ring-emerald-300 text-emerald-700 shadow-lg" aria-label="Finish">
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM7 4H5a2 2 0 002 2M17 4h2a2 2 0 01-2 2"/>
-                        </svg>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

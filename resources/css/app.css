@@ -829,6 +829,54 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateY(0) scale(1);
 }
 
+.site-rocket-launch {
+    left: calc(var(--rocket-x) - 3.5rem);
+    top: calc(var(--rocket-y) - 3.5rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .site-rocket-launch {
+        animation: site-rocket-flight 2.7s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+    }
+    .site-rocket-flame { animation: site-rocket-flame 0.12s ease-in-out infinite alternate; }
+}
+
+@keyframes site-rocket-flight {
+    0% { transform: translate3d(0, 0, 0) scale(.72); opacity: 0; animation-timing-function: cubic-bezier(.37, 0, .63, 1); }
+    8% { transform: translate3d(0, -.5rem, 0) scale(.76); opacity: 1; }
+    48% { transform: translate3d(0, -10vh, 0) scale(.88); opacity: 1; animation-timing-function: cubic-bezier(.7, 0, 1, .5); }
+    62% { transform: translate3d(0, -15vh, 0) scale(.94); opacity: 1; }
+    86% { opacity: 1; }
+    100% { transform: translate3d(0, var(--rocket-travel-y), 0) scale(1.18); opacity: 0; }
+}
+@keyframes site-rocket-flame { to { transform: translate(-1px, 1px) scale(1.35); } }
+
+.site-rocket-smoke {
+    left: var(--rocket-x);
+    top: calc(var(--rocket-y) + 1.5rem);
+    height: 1px;
+    width: 1px;
+}
+.site-rocket-smoke span {
+    position: absolute;
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 9999px;
+    background: rgb(148 163 184 / .65);
+    opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+    .site-rocket-smoke span { animation: site-rocket-smoke 1.5s ease-out forwards; }
+    .site-rocket-smoke span:nth-child(2) { left: -1rem; animation-delay: .08s; }
+    .site-rocket-smoke span:nth-child(3) { left: 1rem; animation-delay: .16s; }
+    .site-rocket-smoke span:nth-child(4) { left: -1.7rem; animation-delay: .24s; }
+    .site-rocket-smoke span:nth-child(5) { left: 1.7rem; animation-delay: .32s; }
+}
+@keyframes site-rocket-smoke {
+    0% { opacity: .8; filter: blur(0); }
+    100% { opacity: 0; transform: translateY(3.5rem) scale(3.2); filter: blur(3px); }
+}
+
 /* World map — animated flight-path lines drawn per selected datacenter */
 .map-flightpath {
     stroke-dasharray: 260;
