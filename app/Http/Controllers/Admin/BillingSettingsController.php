@@ -65,6 +65,10 @@ class BillingSettingsController extends Controller
         BillingSetting::setValue('business_country', strtoupper($validated['business_country']));
         BillingSetting::setValue('country_vat_enabled', $request->boolean('country_vat_enabled') ? '1' : '0');
 
+        if ((int) $validated['da_delete_after_days'] === 0) {
+            app(\App\Services\ProvisioningService::class)->deleteDueCancelled();
+        }
+
         return back()->with('success', 'Facturatie-instellingen zijn opgeslagen.');
     }
 }

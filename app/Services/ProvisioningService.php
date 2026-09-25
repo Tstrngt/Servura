@@ -91,6 +91,9 @@ class ProvisioningService
             return;
         }
         if ($customerService->provisioning_status === 'suspended') {
+            if ($customerService->status === 'cancelled' && \App\Models\BillingSetting::integer('da_delete_after_days', 30) === 0) {
+                $this->deleteAccount($customerService);
+            }
             return;
         }
 
@@ -107,6 +110,9 @@ class ProvisioningService
                 $customerService->fresh(),
                 $this->suspensionReason($customerService)
             );
+            if ($customerService->status === 'cancelled' && \App\Models\BillingSetting::integer('da_delete_after_days', 30) === 0) {
+                $this->deleteAccount($customerService->fresh());
+            }
         } catch (\Throwable $exception) {
             $this->fail($customerService, $exception->getMessage(), false);
             throw $exception;
@@ -158,24 +164,39 @@ class ProvisioningService
                         continue;
                     }
 
-                    try {
-                        $this->directAdmin->using($customerService->service->serverConnection)
-                            ->deleteUser($customerService->external_username);
-
-                        $customerService->update([
-                            'provisioning_status' => 'deleted',
-                            'provisioning_error' => null,
-                        ]);
-                        $this->log($customerService, 'directadmin_verwijderd', 'DirectAdmin-account definitief verwijderd na opzegging.');
+                    if ($this->deleteAccount($customerService)) {
                         $deleted++;
-                    } catch (\Throwable $exception) {
-                        report($exception);
-                        $this->log($customerService, 'directadmin_verwijderen_mislukt', 'Verwijderen DirectAdmin-account mislukt: ' . Str::limit($exception->getMessage(), 500));
                     }
                 }
             });
 
         return $deleted;
+    }
+
+    private function deleteAccount(CustomerService $customerService): bool
+    {
+        $customerService->loadMissing('service.serverConnection');
+        if ($customerService->service->fulfillment_type !== 'directadmin' || ! $customerService->external_username || ! $customerService->service->serverConnection) {
+            return false;
+        }
+
+        try {
+            $this->directAdmin->using($customerService->service->serverConnection)
+                ->deleteUser($customerService->external_username);
+
+            $customerService->update([
+                'provisioning_status' => 'deleted',
+                'provisioning_error' => null,
+            ]);
+            $this->log($customerService, 'directadmin_verwijderd', 'DirectAdmin-account definitief verwijderd na opzegging.');
+
+            return true;
+        } catch (\Throwable $exception) {
+            report($exception);
+            $this->log($customerService, 'directadmin_verwijderen_mislukt', 'Verwijderen DirectAdmin-account mislukt: ' . Str::limit($exception->getMessage(), 500));
+
+            return false;
+        }
     }
 
     private function generateUsername(CustomerService $customerService): string
