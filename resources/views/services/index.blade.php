@@ -217,16 +217,10 @@ $steps = [
         @php
             $buildLabels = ['Idee bepalen', 'Blauwdruk maken', 'Doorontwikkelen', 'Website lanceren'];
         @endphp
-        <div class="relative mt-14" x-data="{ rocketFlying: false, rocketStyle: '', launchRocket(element) { if (this.rocketFlying) return; const rect = element.querySelector('[data-shuttle]').getBoundingClientRect(); this.rocketStyle = `--rocket-x:${rect.left + rect.width / 2}px;--rocket-y:${rect.top + rect.height / 2}px;--rocket-travel-y:${-(rect.top + 220)}px`; this.rocketFlying = true; setTimeout(() => this.rocketFlying = false, 2900) } }">
-            <div x-show="rocketFlying" :style="rocketStyle" class="site-rocket-launch pointer-events-none fixed z-[70] text-primary-500" style="display: none;" aria-hidden="true">
-                <svg class="h-28 w-28 drop-shadow-2xl" viewBox="0 0 48 64" fill="none"><path d="M24 3C15 12 13 28 15 43h18c2-15 0-31-9-40Z" fill="#e2e8f0" stroke="#0ea5e9" stroke-width="2"/><path d="m15 30-10 15 11-3m17-12 10 15-11-3" fill="#94a3b8" stroke="#0ea5e9" stroke-width="2"/><path d="M19 43v8m10-8v8" stroke="#334155" stroke-width="3"/><path class="site-rocket-flame" d="M18 52 24 63l6-11" fill="#22d3ee" stroke="#0ea5e9" stroke-width="1.5"/><circle cx="24" cy="22" r="4" fill="#082f49" stroke="#67e8f9" stroke-width="1.5"/></svg>
-            </div>
-            <div x-show="rocketFlying" :style="rocketStyle" class="site-rocket-smoke pointer-events-none fixed z-[65]" style="display: none;" aria-hidden="true">
-                <span></span><span></span><span></span><span></span><span></span>
-            </div>
+        <div class="relative mt-14">
             <div class="grid items-stretch gap-6 md:grid-cols-2 lg:grid-cols-4 lg:gap-5">
                 @foreach($steps as $index => $step)
-                    <article @if($index === 3) @mouseenter="launchRocket($el)" @focusin="launchRocket($el)" tabindex="0" @endif class="group relative z-10 flex h-full flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 transition-[transform,box-shadow] duration-200 hover:shadow-xl hover:-translate-y-1 hover:shadow-primary-900/10 sm:p-6">
+                    <article class="group relative z-10 flex h-full flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 transition-[transform,box-shadow] duration-200 hover:shadow-xl hover:-translate-y-1 hover:shadow-primary-900/10 sm:p-6">
                         <div class="relative h-52 overflow-hidden rounded-xl bg-slate-950 p-5 text-white sm:h-60 lg:h-48 lg:p-4">
                             <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#38bdf8 1px, transparent 1px); background-size: 16px 16px;"></div>
                             @if($index === 0)
@@ -247,36 +241,6 @@ $steps = [
                             </div>
                             <h3 class="mt-2 font-heading text-xl font-bold text-slate-900">{{ $step['title'] }}</h3>
                             <p class="mt-3 text-sm leading-7 text-slate-600">{{ $step['text'] }}</p>
-                            <div class="relative mt-auto h-40 overflow-hidden rounded-xl bg-slate-950 ring-1 ring-slate-800" aria-label="Shuttlebouw fase {{ $index + 1 }} van 4">
-                                <div class="absolute inset-0 opacity-20" style="background-image: linear-gradient(rgba(56,189,248,.18) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,.18) 1px, transparent 1px); background-size: 18px 18px;"></div>
-                                <div class="absolute inset-x-3 bottom-4 h-1 rounded bg-slate-700"></div>
-                                @if($index <= 2)
-                                    <div class="absolute bottom-5 left-3 h-24 w-9 border-x-2 border-t-2 border-slate-500"><span class="absolute left-0 top-5 h-px w-full rotate-[32deg] bg-slate-500"></span><span class="absolute left-0 top-12 h-px w-full -rotate-[32deg] bg-slate-500"></span><span class="absolute left-0 top-[4.2rem] h-px w-full rotate-[32deg] bg-slate-500"></span></div>
-                                @endif
-                                @if($index >= 1)
-                                    <div class="absolute right-3 top-4 h-2 w-20 bg-slate-500"><span class="absolute right-0 top-0 h-20 w-2 bg-slate-500"></span><span class="absolute left-5 top-2 h-10 w-px bg-cyan-300/70"></span><span class="absolute left-[1.05rem] top-11 h-2 w-2 rounded-full border border-cyan-300"></span></div>
-                                @endif
-                                @if($index === 2)<div class="absolute bottom-5 right-5 flex gap-1"><span class="h-2 w-2 animate-pulse rounded-full bg-emerald-400"></span><span class="h-2 w-2 rounded-full bg-amber-400"></span></div>@endif
-                                @if($index <= 2)
-                                    <div class="absolute bottom-5 left-[24%] z-20 h-8 w-5 text-cyan-300"><span class="absolute left-1.5 top-0 h-2 w-2 rounded-full bg-current"></span><span class="absolute left-2 top-2 h-4 w-1 rounded bg-current"></span><span class="absolute left-0 top-3 h-1 w-5 rotate-[-18deg] bg-current"></span><span class="absolute bottom-0 left-1 h-3 w-1 -rotate-12 bg-current"></span><span class="absolute bottom-0 right-1 h-3 w-1 rotate-12 bg-current"></span></div>
-                                    <div class="absolute bottom-5 right-[20%] z-20 h-8 w-5 text-primary-300"><span class="absolute left-1.5 top-0 h-2 w-2 rounded-full bg-current"></span><span class="absolute left-2 top-2 h-4 w-1 rounded bg-current"></span><span class="absolute left-0 top-3 h-1 w-5 rotate-12 bg-current"></span><span class="absolute bottom-0 left-1 h-3 w-1 -rotate-12 bg-current"></span><span class="absolute bottom-0 right-1 h-3 w-1 rotate-12 bg-current"></span></div>
-                                @endif
-                                @if($index === 3)
-                                    <div class="absolute bottom-4 left-[36%] h-3 w-24 -translate-x-1/2 rounded-t bg-slate-600"></div>
-                                    <div class="absolute bottom-7 right-[10%] h-28 w-12 border-2 border-slate-500 bg-slate-900/80"><span class="absolute inset-x-0 top-5 h-px rotate-[28deg] bg-slate-500"></span><span class="absolute inset-x-0 top-12 h-px -rotate-[28deg] bg-slate-500"></span><span class="absolute inset-x-0 top-[4.7rem] h-px rotate-[28deg] bg-slate-500"></span><span class="absolute inset-x-0 top-4 h-1 bg-slate-500"></span><span class="absolute inset-x-0 top-10 h-1 bg-slate-500"></span><span class="absolute inset-x-0 top-[4.1rem] h-1 bg-slate-500"></span></div>
-                                    <div class="absolute right-[19%] top-8 h-2 w-[38%] origin-right bg-slate-500"></div>
-                                    <div class="absolute right-[19%] top-[4.1rem] h-2 w-[32%] origin-right bg-slate-600"></div>
-                                    <div class="absolute right-[19%] top-[6.1rem] h-2 w-[26%] origin-right bg-slate-500"></div>
-                                @endif
-                                <svg @if($index === 3) data-shuttle @endif class="absolute bottom-4 h-28 w-24 -translate-x-1/2 transition-transform duration-200 {{ $index === 3 ? 'left-[36%] group-hover:-translate-y-1' : 'left-1/2' }}" viewBox="0 0 48 64" fill="none" aria-hidden="true">
-                                    <path d="M24 4C16 13 14 27 15 45h18c1-18-1-32-9-41Z" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="{{ $index === 0 ? '4 3' : '0' }}"/>
-                                    <path d="M24 8v36M16 31h16" stroke="#64748b" stroke-width="1.5"/>
-                                    @if($index >= 1)<path d="M24 5C18 14 17 27 18 42h12c1-15 0-28-6-37Z" fill="#e2e8f0"/><path d="M18 24h12M18 34h12" stroke="#94a3b8"/>@endif
-                                    @if($index >= 2)<path d="M19 43v8m10-8v8" stroke="#334155" stroke-width="3"/><path d="M19 52 24 62l5-10" fill="#67e8f9" stroke="#0ea5e9" stroke-width="1.5"/>@endif
-                                    @if($index === 3)<path d="m16 29-9 15 10-3m15-12 9 15-10-3" fill="#cbd5e1" stroke="#0ea5e9" stroke-width="1.5"/><circle cx="24" cy="21" r="4" fill="#082f49" stroke="#67e8f9" stroke-width="1.5"/>@endif
-                                </svg>
-                                <span class="absolute left-3 top-2 font-mono text-[10px] font-semibold text-cyan-200">ASSEMBLY {{ ($index + 1) * 25 }}%</span>
-                            </div>
                         </div>
                     </article>
                 @endforeach
