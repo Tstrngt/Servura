@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -58,7 +59,7 @@ class ContactController extends Controller
         $message = $request->input('message');
         $isSpam = $this->detectSpam($message, $request->ip());
 
-        ContactMessage::create([
+        $contactMessage = ContactMessage::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'company' => $request->input('company'),
@@ -71,6 +72,18 @@ class ContactController extends Controller
             'user_agent' => $request->userAgent(),
             'is_spam' => $isSpam,
         ]);
+
+        if (! $isSpam) {
+            try {
+                Mail::send('emails.contact-received', ['contactMessage' => $contactMessage], function ($mail) use ($contactMessage) {
+                    $mail->to('vraag@servura.nl')
+                        ->replyTo($contactMessage->email, $contactMessage->name)
+                        ->subject('Nieuw contactbericht: '.$contactMessage->subject);
+                });
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
+        }
 
         return redirect()->route('contact')
             ->with('success', 'Bedankt voor uw bericht. We nemen zo snel mogelijk contact met u op.');
