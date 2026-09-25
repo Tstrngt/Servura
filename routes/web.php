@@ -253,6 +253,10 @@ Route::middleware('auth')->group(function () {
             Route::put('/beveiliging', [App\Http\Controllers\Admin\SettingController::class, 'updateSecurity'])->name('security.update');
             Route::get('/nieuwsbrief', [App\Http\Controllers\Admin\SettingController::class, 'newsletter'])->name('newsletter');
             Route::post('/klanten-resetten', [App\Http\Controllers\Admin\SettingController::class, 'resetCustomers'])->name('reset-customers');
+            Route::get('/medewerkers', [App\Http\Controllers\Admin\StaffController::class, 'index'])->name('staff');
+            Route::post('/medewerkers', [App\Http\Controllers\Admin\StaffController::class, 'store'])->name('staff.store');
+            Route::put('/medewerkers/{staff}', [App\Http\Controllers\Admin\StaffController::class, 'update'])->name('staff.update');
+            Route::delete('/medewerkers/{staff}', [App\Http\Controllers\Admin\StaffController::class, 'destroy'])->name('staff.destroy');
         });
     });
 });

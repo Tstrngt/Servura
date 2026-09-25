@@ -63,7 +63,7 @@ class User extends Authenticatable
 
     public function isOwner(): bool
     {
-        return $this->role === 'owner' || $this->role === 'admin';
+        return $this->role === 'owner';
     }
 
     // Check if user can access admin area
@@ -161,7 +161,7 @@ class User extends Authenticatable
     // Scope for staff (admin + employee)
     public function scopeStaff($query)
     {
-        return $query->whereIn('role', ['admin', 'employee']);
+        return $query->whereIn('role', ['owner', 'admin', 'employee']);
     }
 
     public function orders()

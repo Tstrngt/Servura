@@ -27,7 +27,7 @@
     </nav>
     <div class="border-t border-slate-700 p-4">
         <p class="truncate text-sm font-medium text-white">{{ Auth::user()->name }}</p>
-        <p class="mb-3 text-xs text-slate-400">{{ Auth::user()->role === 'admin' ? 'Administrator' : 'Medewerker' }}</p>
+        <p class="mb-3 text-xs text-slate-400">{{ ['owner' => 'Eigenaar', 'admin' => 'Administrator', 'employee' => 'Medewerker'][Auth::user()->role] ?? Auth::user()->role }}</p>
         <form action="{{ route('logout') }}" method="POST">
             @csrf
             <button type="submit" class="w-full rounded-lg border border-slate-600 px-3 py-2 text-sm font-medium hover:bg-slate-800">Uitloggen</button>
