@@ -154,8 +154,8 @@
                                                 {{ $ticket->last_reply_at ? $ticket->last_reply_at->diffForHumans() : $ticket->created_at->diffForHumans() }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a href="{{ route('admin.tickets.show', $ticket) }}" class="text-primary-600 hover:text-primary-900">
-                                                    Bekijk
+                                                <a href="{{ route('admin.tickets.show', $ticket) }}" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 ring-1 ring-slate-200 transition-colors hover:bg-primary-50 hover:text-primary-700 hover:ring-primary-200" title="Bekijken" aria-label="Ticket {{ $ticket->ticket_number }} bekijken">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z"/><circle cx="12" cy="12" r="2.75"/></svg>
                                                 </a>
                                             </td>
                                         </tr>

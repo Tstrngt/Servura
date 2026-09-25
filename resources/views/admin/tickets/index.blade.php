@@ -92,14 +92,18 @@
                                             @if(!$ticket->assigned_to)
                                                 <form method="POST" action="{{ route('admin.tickets.claim', $ticket) }}">
                                                     @csrf
-                                                    <button type="submit" class="text-sm font-medium text-emerald-600 hover:text-emerald-800">Oppakken</button>
+                                                    <button type="submit" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 ring-1 ring-slate-200 transition-colors hover:bg-emerald-50 hover:text-emerald-700 hover:ring-emerald-200" title="Ticket oppakken" aria-label="Ticket {{ $ticket->ticket_number }} oppakken">
+                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3M13.5 6A3.75 3.75 0 1 1 6 6a3.75 3.75 0 0 1 7.5 0ZM3 20.25a6.75 6.75 0 0 1 13.5 0v.75H3v-.75Z"/></svg>
+                                                    </button>
                                                 </form>
                                             @endif
-                                            <a href="{{ route('admin.tickets.show', $ticket) }}" class="text-sm font-medium text-primary-600 hover:text-primary-500">Bekijk</a>
+                                            <a href="{{ route('admin.tickets.show', $ticket) }}" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 ring-1 ring-slate-200 transition-colors hover:bg-primary-50 hover:text-primary-700 hover:ring-primary-200" title="Bekijken" aria-label="Ticket {{ $ticket->ticket_number }} bekijken">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z"/><circle cx="12" cy="12" r="2.75"/></svg>
+                                            </a>
                                             <form method="POST" action="{{ route('admin.tickets.destroy', $ticket) }}" onsubmit="return confirm('Weet je zeker dat je dit ticket wilt verwijderen?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-400 hover:text-red-600" title="Verwijderen" aria-label="Ticket {{ $ticket->ticket_number }} verwijderen">
+                                                <button type="submit" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 ring-1 ring-slate-200 transition-colors hover:bg-red-50 hover:text-red-600 hover:ring-red-200" title="Verwijderen" aria-label="Ticket {{ $ticket->ticket_number }} verwijderen">
                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                 </button>
                                             </form>

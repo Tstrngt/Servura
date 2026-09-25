@@ -322,7 +322,9 @@
                                                 {{ $cs->start_date->format('d-m-Y') }} — {{ $cs->end_date ? $cs->end_date->format('d-m-Y') : '∞' }}
                                             </td>
                                             <td class="px-4 py-3 whitespace-nowrap text-right">
-                                                <button type="button" onclick="openServiceModal({{ $cs->id }})" class="btn btn-outline text-xs">Beheren</button>
+                                                <button type="button" onclick="openServiceModal({{ $cs->id }})" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 ring-1 ring-slate-200 transition-colors hover:bg-primary-50 hover:text-primary-700 hover:ring-primary-200" title="Dienst beheren" aria-label="{{ $cs->service->title }} beheren">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15.75A3.75 3.75 0 1 0 12 8.25a3.75 3.75 0 0 0 0 7.5Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12a7.5 7.5 0 0 0-.105-1.25l2.03-1.58-2-3.464-2.48 1a7.5 7.5 0 0 0-2.16-1.25L14.43 2.8h-4l-.36 2.656a7.5 7.5 0 0 0-2.16 1.25l-2.48-1-2 3.464 2.03 1.58a7.5 7.5 0 0 0 0 2.5l-2.03 1.58 2 3.464 2.48-1a7.5 7.5 0 0 0 2.16 1.25l.36 2.656h4l.36-2.656a7.5 7.5 0 0 0 2.16-1.25l2.48 1 2-3.464-2.03-1.58A7.5 7.5 0 0 0 19.5 12Z"/></svg>
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach

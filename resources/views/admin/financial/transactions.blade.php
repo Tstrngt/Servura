@@ -128,12 +128,12 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
                                             <div class="flex items-center justify-end space-x-2">
-                                                <a href="{{ route('admin.financial.transactions.edit', $transaction) }}" class="text-gray-400 hover:text-gray-600" title="Bewerken">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                <a href="{{ route('admin.financial.transactions.edit', $transaction) }}" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 ring-1 ring-slate-200 transition-colors hover:bg-primary-50 hover:text-primary-700 hover:ring-primary-200" title="Bewerken" aria-label="Transactie {{ $transaction->transaction_number }} bewerken">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931ZM16.862 4.487 19.5 7.125"/></svg>
                                                 </a>
                                                 <form method="POST" action="{{ route('admin.financial.transactions.destroy', $transaction) }}" class="inline" onsubmit="return confirm('Weet je zeker dat je deze transactie wilt verwijderen?')">
                                                     @csrf @method('DELETE')
-                                                    <button type="submit" class="text-red-400 hover:text-red-600" title="Verwijderen">
+                                                    <button type="submit" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 ring-1 ring-slate-200 transition-colors hover:bg-red-50 hover:text-red-600 hover:ring-red-200" title="Verwijderen" aria-label="Transactie {{ $transaction->transaction_number }} verwijderen">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                     </button>
                                                 </form>

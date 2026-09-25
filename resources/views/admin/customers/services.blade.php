@@ -134,7 +134,9 @@
                                             @if($service->status === 'active')
                                                 <form method="POST" action="{{ route('admin.customers.services.cancel', [$customer, $service]) }}" class="inline" onsubmit="return confirm('Weet je zeker dat je deze dienst wilt annuleren?')">
                                                     @csrf
-                                                    <button type="submit" class="text-red-600 hover:text-red-900">Annuleren</button>
+                                                    <button type="submit" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 ring-1 ring-slate-200 transition-colors hover:bg-red-50 hover:text-red-600 hover:ring-red-200" title="Dienst annuleren" aria-label="{{ $service->service->title }} annuleren">
+                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                                                    </button>
                                                 </form>
                                             @endif
                                         </td>
