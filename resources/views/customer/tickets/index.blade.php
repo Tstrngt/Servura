@@ -109,7 +109,7 @@
                                 </thead>
                                 <tbody class="bg-white divide-y divide-slate-100">
                                     @foreach($tickets as $ticket)
-                                        <tr class="hover:bg-slate-50">
+                                        <tr role="link" tabindex="0" aria-label="Bekijk ticket {{ $ticket->ticket_number }}" data-href="{{ route('customer.tickets.show', $ticket) }}" onclick="window.location.href = this.dataset.href" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.location.href = this.dataset.href; }" class="cursor-pointer transition-colors duration-150 hover:bg-slate-50 focus:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500">
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
                                                 {{ $ticket->ticket_number }}
                                             </td>
@@ -138,8 +138,12 @@
                                                 {{ $ticket->last_reply_at ? $ticket->last_reply_at->diffForHumans() : $ticket->created_at->diffForHumans() }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a href="{{ route('customer.tickets.show', $ticket) }}" class="text-primary-600 hover:text-primary-900">
-                                                    Bekijk
+                                                <a href="{{ route('customer.tickets.show', $ticket) }}" tabindex="-1" aria-label="Bekijk ticket {{ $ticket->ticket_number }}" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors duration-150 hover:bg-primary-50 hover:text-primary-600" onclick="event.stopPropagation()">
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" aria-hidden="true">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z"/>
+                                                        <circle cx="12" cy="12" r="2.75"/>
+                                                    </svg>
+                                                    <span class="sr-only">Bekijk ticket</span>
                                                 </a>
                                             </td>
                                         </tr>
