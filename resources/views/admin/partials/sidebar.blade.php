@@ -26,7 +26,7 @@
         @endif
     </nav>
     <div class="border-t border-slate-700 p-4">
-        <p class="truncate text-sm font-medium text-white">{{ Auth::user()->name }}</p>
+        <a href="{{ route('admin.profile.edit') }}" class="block truncate text-sm font-medium text-white hover:text-primary-300">{{ Auth::user()->name }}</a>
         <p class="mb-3 text-xs text-slate-400">{{ ['owner' => 'Eigenaar', 'admin' => 'Administrator', 'employee' => 'Medewerker'][Auth::user()->role] ?? Auth::user()->role }}</p>
         <form action="{{ route('logout') }}" method="POST">
             @csrf

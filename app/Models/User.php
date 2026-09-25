@@ -16,6 +16,7 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
+        'ticket_signature',
         'company',
         'street',
         'house_number',

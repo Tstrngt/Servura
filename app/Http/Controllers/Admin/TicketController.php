@@ -147,10 +147,15 @@ class TicketController extends Controller
                 ->with('error', 'Dit ticket kan geen publieke reactie meer ontvangen.');
         }
 
+        $replyMessage = $request->message;
+        if (! $isInternal && filled(Auth::user()->ticket_signature)) {
+            $replyMessage .= "\n\n—\n".trim(Auth::user()->ticket_signature);
+        }
+
         $reply = TicketReply::create([
             'ticket_id' => $ticket->id,
             'user_id' => Auth::id(),
-            'message' => $request->message,
+            'message' => $replyMessage,
             'is_internal' => $isInternal,
         ]);
 

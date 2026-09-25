@@ -186,6 +186,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/customers/{customer}/services/{service}', [AdminCustomerController::class, 'destroyService'])->name('customers.services.destroy');
         Route::get('/customers/{customer}/tickets', [AdminCustomerController::class, 'tickets'])->name('customers.tickets');
 
+        Route::get('/mijn-profiel', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/mijn-profiel', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+
         // Services (bind by id, not slug)
         Route::get('/services', [AdminServiceController::class, 'index'])->name('services.index');
         Route::get('/services/create', [AdminServiceController::class, 'create'])->name('services.create');
