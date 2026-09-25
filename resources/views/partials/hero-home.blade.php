@@ -1,6 +1,6 @@
 <!-- Hero Section: two-column, scroll-driven "website wordt gebouwd" in a monitor -->
-<section id="hero-build" class="relative -mt-16 pt-16 h-[240vh] bg-slate-950 text-white" data-navbar-theme="dark">
-    <div class="sticky top-16 h-[calc(100vh-4rem)] overflow-hidden flex items-center" data-hero-build data-hero-parallax>
+<section id="hero-build" class="relative -mt-16 h-[240vh] bg-slate-950 pt-16 text-white" data-navbar-theme="dark">
+    <div class="sticky top-16 flex h-[calc(100dvh-4rem)] items-start overflow-hidden pt-6 md:h-[calc(100vh-4rem)] md:items-center md:pt-0" data-hero-build data-hero-parallax>
         <!-- Ambient light -->
         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-800/40 via-slate-950 to-slate-950"></div>
         <div class="absolute -left-40 top-1/3 h-96 w-96 rounded-full bg-accent-500/10 blur-3xl" data-parallax="0.4"></div>
@@ -26,16 +26,9 @@
                     Wij bouwen 'm van begin tot eind — ontwerp, techniek, hosting en onderhoud.
                     U heeft één vast aanspreekpunt en hoeft er zelf niets technisch van te weten.
                 </p>
-                <div class="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
-                    <a href="{{ route('contact') }}" class="btn btn-primary text-base px-7 py-3.5">
+                <div class="mt-8">
+                    <a href="{{ route('contact') }}" class="btn btn-primary w-full px-7 py-3.5 text-base sm:w-auto">
                         Plan een vrijblijvend gesprek
-                    </a>
-                    {{-- TODO: vervang ‹TELEFOON› door het echte telefoonnummer vóór livegang --}}
-                    <a href="tel:‹TELEFOON›" class="inline-flex items-center gap-2 font-medium text-slate-200 hover:text-white transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                        </svg>
-                        Of bel ons: ‹TELEFOON›
                     </a>
                 </div>
                 <!-- Human element: the team you actually speak to. Real photos can replace the monograms later. -->

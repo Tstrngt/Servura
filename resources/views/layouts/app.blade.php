@@ -67,7 +67,7 @@
     @endphp
     <nav class="site-navbar sticky top-0 z-50 {{ $navStartsDark ? 'is-dark' : '' }}" data-navbar>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-3 items-center h-16">
+            <div class="grid h-16 grid-cols-[minmax(0,1fr)_auto] items-center md:grid-cols-3">
                 <!-- Logo -->
                 <div class="justify-self-start">
                     <a href="{{ route('home') }}" class="flex items-center group" aria-label="Servura home">
