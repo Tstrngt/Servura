@@ -222,7 +222,7 @@
 
                 <div class="flex gap-4">
                     <span class="flex-shrink-0 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 text-primary-600 ring-1 ring-primary-100">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M15.59 14.37a6 6 0 01-5.84 7.38h-4.6m5.84-7.38a6 6 0 00-5.84-7.38h-4.6m5.84 7.38v2.61m5.84-2.61a6 6 0 015.84 7.38h-4.6m5.84-7.38a6 6 0 00-5.84-7.38h-4.6m5.84 7.38v2.61M12 12h.008v.008H12V12z" /></svg>
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25M6.75 17.25 1.5 12l5.25-5.25M14.25 3.75l-4.5 16.5" /></svg>
                     </span>
                     <div>
                         <h4 class="font-heading font-semibold text-slate-900">Op maat, geen templates</h4>
