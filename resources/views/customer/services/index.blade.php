@@ -16,16 +16,16 @@
         <!-- Active Services -->
         @if($activeServices->count() > 0)
             <div class="mb-10">
-                <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 p-6">
-                    <h3 class="font-heading text-xl font-bold text-slate-900 mb-5">Actieve Diensten</h3>
+                <div class="rounded-2xl bg-slate-900 p-6 text-white shadow-xl shadow-slate-900/10 ring-1 ring-white/10">
+                    <h3 class="mb-5 font-heading text-xl font-bold text-white">Actieve Diensten</h3>
                     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach($activeServices as $customerService)
                             @php
                                 $isExpiringSoon = $expiringSoon->contains('id', $customerService->id);
                             @endphp
-                            <a href="{{ route('customer.services.show', $customerService) }}" class="group block bg-slate-50 rounded-xl p-5 ring-1 ring-slate-200 hover:ring-primary-300 hover:bg-slate-100 transition-all">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h4 class="font-heading font-semibold text-slate-900 group-hover:text-primary-700">{{ $customerService->service->title }}</h4>
+                            <a href="{{ route('customer.services.show', $customerService) }}" class="group block rounded-xl bg-white/10 p-5 ring-1 ring-white/15 transition-colors duration-150 hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400">
+                                <div class="mb-2 flex items-center justify-between">
+                                    <h4 class="font-heading font-semibold text-white transition-colors duration-150 group-hover:text-primary-300">{{ $customerService->service->title }}</h4>
                                     <div class="flex items-center gap-2">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Actief</span>
                                         @if($isExpiringSoon)
@@ -41,11 +41,11 @@
                                         @endif
                                     </div>
                                 </div>
-                                <p class="text-sm text-slate-600 mb-3">{{ $customerService->service->short_description }}</p>
+                                <p class="mb-3 text-sm text-slate-300">{{ $customerService->service->short_description }}</p>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-slate-500">{{ $customerService->formatted_price }}</span>
+                                    <span class="text-slate-300">{{ $customerService->formatted_price }}</span>
                                     @if($customerService->end_date)
-                                        <span class="text-slate-500">t/m {{ $customerService->end_date->format('d-m-Y') }}</span>
+                                        <span class="text-slate-300">t/m {{ $customerService->end_date->format('d-m-Y') }}</span>
                                     @endif
                                 </div>
                             </a>
