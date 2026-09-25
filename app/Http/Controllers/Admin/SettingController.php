@@ -267,6 +267,37 @@ class SettingController extends Controller
         return back()->with('success', $count.' klantaccount(s) en alle bijbehorende gegevens zijn verwijderd.');
     }
 
+    public function emailTemplates()
+    {
+        $this->authorizeOwner();
+        $templates = collect(\App\Support\EmailTemplateRegistry::TEMPLATES)->map(fn ($label, $key) => [
+            'key' => $key,
+            'label' => $label,
+            'subject' => BillingSetting::valueFor("email_template_{$key}_subject", ''),
+            'html' => BillingSetting::valueFor("email_template_{$key}_html", ''),
+        ]);
+        $recipient = BillingSetting::valueFor('contact_form_recipient', 'vraag@servura.nl');
+        $variables = \App\Support\EmailTemplateRegistry::VARIABLES;
+
+        return view('admin.settings.email-templates', compact('templates', 'recipient', 'variables'));
+    }
+
+    public function updateEmailTemplates(Request $request)
+    {
+        $this->authorizeOwner();
+        $validated = $request->validate([
+            'contact_form_recipient' => 'required|email|max:255',
+            'template_key' => ['required', Rule::in(array_keys(\App\Support\EmailTemplateRegistry::TEMPLATES))],
+            'subject' => 'nullable|string|max:255',
+            'html' => 'nullable|string|max:100000',
+        ]);
+        BillingSetting::setValue('contact_form_recipient', $validated['contact_form_recipient']);
+        BillingSetting::setValue("email_template_{$validated['template_key']}_subject", $validated['subject'] ?? '');
+        BillingSetting::setValue("email_template_{$validated['template_key']}_html", $validated['html'] ?? '');
+
+        return back()->with('success', 'E-mailtemplate is opgeslagen.');
+    }
+
     private function authorizeOwner(): void
     {
         if (! auth()->user()->isOwner()) {

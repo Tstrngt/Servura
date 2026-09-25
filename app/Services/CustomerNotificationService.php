@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\BillingSetting;
 use App\Models\CustomerService;
 use App\Models\Invoice;
 use App\Models\Quote;
@@ -145,17 +146,44 @@ class CustomerNotificationService
     private function send(User $user, string $view, array $data, array $attachments = []): void
     {
         try {
-            Mail::send("emails.{$view}", $data, function ($message) use ($user, $view, $attachments) {
-                $message->to($user->email, $user->name)
-                    ->subject($this->subjectFor($view));
-
+            $subject = BillingSetting::valueFor("email_template_{$view}_subject", '') ?: $this->subjectFor($view);
+            $customHtml = BillingSetting::valueFor("email_template_{$view}_html", '');
+            $variables = $this->variables($user, $data);
+            $subject = strtr($subject, $variables);
+            $callback = function ($message) use ($user, $subject, $attachments) {
+                $message->to($user->email, $user->name)->subject($subject);
                 foreach ($attachments as $attachment) {
                     $message->attachData($attachment['data'], $attachment['name'], ['mime' => 'application/pdf']);
                 }
-            });
+            };
+
+            if ($customHtml !== '') {
+                Mail::html(strtr($customHtml, $variables), $callback);
+            } else {
+                Mail::send("emails.{$view}", $data, $callback);
+            }
         } catch (\Throwable $e) {
             report($e);
         }
+    }
+
+    private function variables(User $user, array $data): array
+    {
+        $ticket = $data['ticket'] ?? null;
+        $invoice = $data['invoice'] ?? ($data['order']->invoice ?? null);
+        $quote = $data['quote'] ?? null;
+        $service = $data['service'] ?? null;
+        $url = $data['verificationUrl'] ?? $data['orderUrl'] ?? $data['loginUrl'] ?? $data['dashboardUrl'] ?? $data['ticketUrl'] ?? $data['invoiceUrl'] ?? $data['quoteUrl'] ?? '';
+
+        return [
+            '{{klant_naam}}' => e($user->name), '{{klant_email}}' => e($user->email),
+            '{{ticket_nummer}}' => e($ticket?->ticket_number ?? ''), '{{ticket_titel}}' => e($ticket?->title ?? ''),
+            '{{reactie}}' => nl2br(e($data['reply']->message ?? '')), '{{factuur_nummer}}' => e($invoice?->invoice_number ?? ''),
+            '{{offerte_nummer}}' => e($quote?->quote_number ?? ''), '{{bedrag}}' => number_format((float) ($invoice?->total ?? $quote?->total ?? 0), 2, ',', '.'),
+            '{{dienst_naam}}' => e($service?->service?->title ?? ''), '{{domein}}' => e($service?->domain ?? ''),
+            '{{gebruikersnaam}}' => e($service?->external_username ?? ''), '{{wachtwoord}}' => e($service?->external_password ?? ''),
+            '{{reden}}' => e($data['reason'] ?? ''), '{{actie_url}}' => e($url), '{{site_naam}}' => e(config('site.name', config('app.name'))),
+        ];
     }
 
     private function subjectFor(string $view): string

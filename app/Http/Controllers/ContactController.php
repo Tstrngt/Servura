@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BillingSetting;
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -76,7 +77,7 @@ class ContactController extends Controller
         if (! $isSpam) {
             try {
                 Mail::send('emails.contact-received', ['contactMessage' => $contactMessage], function ($mail) use ($contactMessage) {
-                    $mail->to('vraag@servura.nl')
+                    $mail->to(BillingSetting::valueFor('contact_form_recipient', 'vraag@servura.nl'))
                         ->replyTo($contactMessage->email, $contactMessage->name)
                         ->subject('Nieuw contactbericht: '.$contactMessage->subject);
                 });

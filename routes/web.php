@@ -241,6 +241,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/mail', [App\Http\Controllers\Admin\SettingController::class, 'mail'])->name('mail');
             Route::put('/mail', [App\Http\Controllers\Admin\SettingController::class, 'updateMail'])->name('mail.update');
             Route::post('/mail/test', [App\Http\Controllers\Admin\SettingController::class, 'sendTestMail'])->name('mail.test');
+            Route::get('/emailtemplates', [App\Http\Controllers\Admin\SettingController::class, 'emailTemplates'])->name('email-templates');
+            Route::put('/emailtemplates', [App\Http\Controllers\Admin\SettingController::class, 'updateEmailTemplates'])->name('email-templates.update');
             Route::get('/betalingen', [App\Http\Controllers\Admin\SettingController::class, 'payments'])->name('payments');
             Route::put('/betalingen', [App\Http\Controllers\Admin\SettingController::class, 'updatePayments'])->name('payments.update');
             Route::get('/facturatie', [AdminBillingSettingsController::class, 'edit'])->name('billing');
