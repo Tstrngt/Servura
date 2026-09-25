@@ -34,12 +34,17 @@ class StaffController extends Controller
     public function update(Request $request, User $staff)
     {
         $this->authorizeOwner();
-        abort_unless(in_array($staff->role, ['admin', 'employee'], true), 403);
+        abort_unless(in_array($staff->role, ['owner', 'admin', 'employee'], true), 403);
         $data = $request->validate([
             'name' => 'required|string|max:255', 'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($staff)],
-            'role' => ['required', Rule::in(['admin', 'employee'])], 'is_active' => 'boolean', 'password' => 'nullable|string|min:12|confirmed',
+            'role' => ['nullable', Rule::in(['admin', 'employee'])], 'is_active' => 'boolean', 'password' => 'nullable|string|min:12|confirmed',
         ]);
-        $data['is_active'] = $request->boolean('is_active');
+        if ($staff->isOwner()) {
+            $data['role'] = 'owner';
+            $data['is_active'] = true;
+        } else {
+            $data['is_active'] = $request->boolean('is_active');
+        }
         if (blank($data['password'] ?? null)) unset($data['password']);
         $staff->update($data);
 
