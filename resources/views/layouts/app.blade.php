@@ -117,7 +117,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
                         </a>
-                        <a href="{{ route('contact') }}" class="btn btn-primary nav-cta">
+                        <a href="{{ route('quote.builder') }}" class="btn btn-primary nav-cta">
                             Offerte Aanvragen
                         </a>
                     @else
@@ -168,7 +168,7 @@
                         <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
                             Inloggen
                         </a>
-                        <a href="{{ route('contact') }}" class="block w-full text-center btn btn-primary">
+                        <a href="{{ route('quote.builder') }}" class="block w-full text-center btn btn-primary">
                             Offerte Aanvragen
                         </a>
                     @else
