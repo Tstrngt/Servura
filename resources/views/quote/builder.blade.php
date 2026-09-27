@@ -8,6 +8,18 @@
 
 @php
 $currentDefaults = $service ? ($packageDefaults[$service->slug] ?? []) : [];
+$initialQuoteFields = [
+    'goal' => old('goal', $currentDefaults['goal'] ?? ''),
+    'pages' => old('pages', $currentDefaults['pages'] ?? ''),
+    'visitors' => old('visitors', $currentDefaults['visitors'] ?? ''),
+    'design' => old('design', $currentDefaults['design'] ?? ''),
+    'timeline' => old('timeline', ''),
+    'budget' => old('budget', ''),
+];
+$initialQuoteSelected = [
+    'features' => old('features', $currentDefaults['features'] ?? []),
+    'content' => old('content', $currentDefaults['content'] ?? []),
+];
 @endphp
 
 <!-- Hero Section -->
@@ -216,23 +228,22 @@ $currentDefaults = $service ? ($packageDefaults[$service->slug] ?? []) : [];
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach($form['features'] as $feature)
-                        @php $featureLabelJs = json_encode($feature['label']); @endphp
                         <label class="relative flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
-                            <template x-if="isIncluded('features', {{ $featureLabelJs }})">
+                            <template x-if="isIncluded('features', @js($feature['label']))">
                                 <input type="hidden" name="features[]" value="{{ $feature['label'] }}">
                             </template>
                             <input
                                 type="checkbox"
                                 value="{{ $feature['label'] }}"
                                 class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
-                                :disabled="isIncluded('features', {{ $featureLabelJs }})"
-                                :name="isIncluded('features', {{ $featureLabelJs }}) ? null : 'features[]'"
+                                :disabled="isIncluded('features', @js($feature['label']))"
+                                :name="isIncluded('features', @js($feature['label'])) ? null : 'features[]'"
                                 x-model="selected.features"
                             >
                             <div class="flex-1">
                                 <div class="flex items-center gap-2">
                                     <span class="font-semibold text-slate-900 text-sm block">{{ $feature['label'] }}</span>
-                                    <span x-show="isIncluded('features', {{ $featureLabelJs }})" class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Inbegrepen</span>
+                                    <span x-show="isIncluded('features', @js($feature['label']))" class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Inbegrepen</span>
                                 </div>
                                 @if($feature['note'] !== '')<span class="text-xs text-slate-400">{{ $feature['note'] }}</span>@endif
                             </div>
@@ -252,23 +263,22 @@ $currentDefaults = $service ? ($packageDefaults[$service->slug] ?? []) : [];
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     @foreach($form['content'] as $option)
-                        @php $contentLabelJs = json_encode($option['label']); @endphp
                         <label class="relative flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
-                            <template x-if="isIncluded('content', {{ $contentLabelJs }})">
+                            <template x-if="isIncluded('content', @js($option['label']))">
                                 <input type="hidden" name="content[]" value="{{ $option['label'] }}">
                             </template>
                             <input
                                 type="checkbox"
                                 value="{{ $option['label'] }}"
                                 class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
-                                :disabled="isIncluded('content', {{ $contentLabelJs }})"
-                                :name="isIncluded('content', {{ $contentLabelJs }}) ? null : 'content[]'"
+                                :disabled="isIncluded('content', @js($option['label']))"
+                                :name="isIncluded('content', @js($option['label'])) ? null : 'content[]'"
                                 x-model="selected.content"
                             >
                             <div class="flex-1">
                                 <div class="flex items-center gap-2">
                                     <span class="font-semibold text-slate-900 text-sm">{{ $option['label'] }}</span>
-                                    <span x-show="isIncluded('content', {{ $contentLabelJs }})" class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Inbegrepen</span>
+                                    <span x-show="isIncluded('content', @js($option['label']))" class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Inbegrepen</span>
                                 </div>
                             </div>
                         </label>
@@ -385,18 +395,8 @@ function quoteBuilder() {
         serviceMode: @json($service ? 'fixed' : 'choose'),
         selectedService: @json(old('service', $service?->slug ?? '')),
         packages: @json($packageDefaults),
-        fields: @json([
-            'goal' => old('goal', $currentDefaults['goal'] ?? ''),
-            'pages' => old('pages', $currentDefaults['pages'] ?? ''),
-            'visitors' => old('visitors', $currentDefaults['visitors'] ?? ''),
-            'design' => old('design', $currentDefaults['design'] ?? ''),
-            'timeline' => old('timeline', ''),
-            'budget' => old('budget', ''),
-        ]),
-        selected: @json([
-            'features' => old('features', $currentDefaults['features'] ?? []),
-            'content' => old('content', $currentDefaults['content'] ?? []),
-        ]),
+        fields: @json($initialQuoteFields),
+        selected: @json($initialQuoteSelected),
         isIncluded(group, label) {
             const defs = this.packages[this.selectedService] || {};
             return (defs[group] || []).includes(label);
