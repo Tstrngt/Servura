@@ -55,6 +55,8 @@ class QuoteFormFields
                 ['label' => 'Blog / nieuws', 'note' => 'Vanaf + €'.($extras['blog'] ?? 100)],
                 ['label' => 'Contact- / leadformulieren', 'note' => 'Inbegrepen bij alle websitepakketten'],
                 ['label' => 'SEO-basis', 'note' => 'Inbegrepen bij alle websitepakketten'],
+                ['label' => 'Analytics', 'note' => 'Inbegrepen bij Pro'],
+                ['label' => 'Portfolio / projectenmodule', 'note' => 'Inbegrepen bij Pro'],
                 ['label' => 'Webshop / betalingen', 'note' => 'Vanaf + €'.($extras['webshopFrom'] ?? 500)],
                 ['label' => 'Meertalig', 'note' => '+ €'.($extras['multilingualPerLanguage'] ?? 150).' per taal'],
                 ['label' => 'Koppeling CRM / ERP', 'note' => 'Vanaf + €'.($extras['crmErpFrom'] ?? 300)],
@@ -62,7 +64,7 @@ class QuoteFormFields
                 ['label' => 'Afspraken systeem', 'note' => 'Vanaf + €'.($extras['appointmentSystemFrom'] ?? 250)],
             ],
             'content' => [
-                ['label' => 'Ik lever teksten en beelden zelf aan', 'note' => 'Inbegrepen'],
+                ['label' => 'Ik lever teksten en beelden zelf aan', 'note' => 'Geen meerprijs'],
                 ['label' => 'Ik wil hulp bij teksten', 'note' => 'Vanaf + €'.($extras['copywritingPerPageFrom'] ?? 75).' per pagina'],
                 ['label' => 'Ik wil hulp met fotografie / beelden', 'note' => 'Prijs op aanvraag'],
             ],

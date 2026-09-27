@@ -18,49 +18,44 @@ class QuotePackageDefaults
 
         return match (str_replace('-website', '', $service->slug)) {
             'starter' => [
-                'goal' => 'Visitekaartje / online brochure',
+                'goal' => null,
                 'pages' => $config['includedPagesLabel'] ?? "tot 4 pagina's",
-                'visitors' => 'Minder dan 1.000',
-                'design' => $config['designDefault'] ?? 'Ik heb een logo en kleuren',
+                'visitors' => null,
+                'design' => null,
                 'features' => [
                     'CMS (zelf beheren)',
                     'Contact- / leadformulieren',
+                    'SEO-basis',
                 ],
-                'content' => [
-                    'Ik lever teksten en beelden zelf aan',
-                ],
+                'content' => [],
             ],
             'business' => [
-                'goal' => 'Meer leads en aanvragen',
+                'goal' => null,
                 'pages' => $config['includedPagesLabel'] ?? "tot 7 pagina's",
-                'visitors' => '1.000 - 5.000',
-                'design' => $config['designDefault'] ?? 'Ik heb een complete huisstijl',
+                'visitors' => null,
+                'design' => null,
                 'features' => [
                     'CMS (zelf beheren)',
+                    'Blog / nieuws',
                     'Contact- / leadformulieren',
                     'SEO-basis',
-                    'Blog / nieuws',
                 ],
-                'content' => [
-                    'Ik lever teksten en beelden zelf aan',
-                ],
+                'content' => [],
             ],
             'pro' => [
-                'goal' => 'Producten of diensten verkopen',
+                'goal' => null,
                 'pages' => $config['includedPagesLabel'] ?? "tot 10 pagina's",
-                'visitors' => '5.000 - 25.000',
-                'design' => $config['designDefault'] ?? 'Ik wil hulp bij de vormgeving',
+                'visitors' => null,
+                'design' => null,
                 'features' => [
                     'CMS (zelf beheren)',
+                    'Blog / nieuws',
                     'Contact- / leadformulieren',
                     'SEO-basis',
-                    'Blog / nieuws',
-                    'Webshop / betalingen',
-                    'Meertalig',
+                    'Analytics',
+                    'Portfolio / projectenmodule',
                 ],
-                'content' => [
-                    'Ik wil hulp bij teksten',
-                ],
+                'content' => [],
             ],
             default => [
                 'goal' => null,
