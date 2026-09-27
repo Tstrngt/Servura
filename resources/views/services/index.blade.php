@@ -19,24 +19,24 @@ $steps = [
     <div class="relative max-w-7xl mx-auto px-6 py-24 lg:py-32">
         <div class="max-w-2xl animate-slide-up">
             <h1 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight">
-                Websites en hosting die met uw bedrijf meegroeien.
+                Alles voor uw website, van start tot groei
             </h1>
             <p class="mt-6 max-w-xl text-lg leading-relaxed text-white/90">
-                Kies het pakket dat past bij uw ambities. Wij regelen ontwerp, techniek, hosting en onderhoud — zodat u zich kunt richten op ondernemen.
+                Van ontwerp en ontwikkeling tot hosting en onderhoud. Kies het pakket dat bij uw organisatie past en breid later eenvoudig uit wanneer dat nodig is.
             </p>
         </div>
     </div>
 </section>
 
 <!-- Webdesign Producten -->
-<section id="pakketten" class="relative bg-slate-50 py-24 lg:py-32"
+<section id="pakketten" class="relative bg-slate-50 pt-24 lg:pt-32 pb-12 lg:pb-16"
     x-data="{ open: false, service: null, show(s) { this.service = s; this.open = true; document.body.style.overflow = 'hidden'; }, hide() { this.open = false; this.service = null; document.body.style.overflow = 'auto'; } }"
     @keydown.escape.window="hide">
     <div class="max-w-7xl mx-auto px-6">
         <div class="mb-12 animate-on-scroll">
             <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Onze diensten</span>
-            <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">Onze pakketten</h2>
-            <p class="text-lg text-slate-600 max-w-2xl">Kies het plan dat past bij uw bedrijf. Alle pakketten zijn volledig ontzorgd.</p>
+            <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">Kies het pakket dat bij u past</h2>
+            <p class="text-lg text-slate-600 max-w-2xl">Van een compacte website tot uitgebreidere oplossingen voor bedrijven die meer nodig hebben. Elk pakket bevat een duidelijke basis en kan waar nodig worden uitgebreid.</p>
         </div>
 
         @php
@@ -204,7 +204,7 @@ $steps = [
 </section>
 
 <!-- Process / Roadmap -->
-<section class="bg-slate-50 py-24 lg:py-32">
+<section class="bg-slate-50 pt-12 lg:pt-16 pb-24 lg:pb-32">
     <div class="max-w-7xl mx-auto px-6">
         <div class="max-w-2xl mx-auto text-center mb-16 lg:mb-20 animate-on-scroll">
             <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Werkwijze</span>
@@ -509,11 +509,6 @@ $steps = [
         <div class="mt-10 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4 animate-on-scroll">
             <a href="{{ route('contact') }}" class="btn btn-light text-base px-8 py-4">
                 Plan een vrijblijvend gesprek
-            </a>
-            {{-- TODO: vervang ‹TELEFOON› door het echte telefoonnummer vóór livegang --}}
-            <a href="tel:‹TELEFOON›" class="inline-flex items-center justify-center gap-2 font-medium text-primary-50 hover:text-white transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                Of bel ons direct
             </a>
         </div>
     </div>
