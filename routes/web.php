@@ -56,15 +56,15 @@ Route::post('/bestellen/{service}', [CheckoutController::class, 'store'])->name(
 
 // Contact
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:10,1')->name('contact.store');
 
 // Offerte samenstellen (niet in hoofdnavigatie)
 Route::get('/offerte-samenstellen', [QuoteBuilderController::class, 'index'])->name('quote.builder');
 Route::get('/offerte-samenstellen/inloggen', [QuoteBuilderController::class, 'loginPrompt'])->name('quote.builder.login');
-Route::post('/offerte-samenstellen', [QuoteBuilderController::class, 'store'])->name('quote.builder.store');
+Route::post('/offerte-samenstellen', [QuoteBuilderController::class, 'store'])->middleware('throttle:10,1')->name('quote.builder.store');
 
 // Nieuwsbrief
-Route::post('/nieuwsbrief', [App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::post('/nieuwsbrief', [App\Http\Controllers\NewsletterController::class, 'subscribe'])->middleware('throttle:10,1')->name('newsletter.subscribe');
 Route::get('/nieuwsbrief/afmelden/{token}', [App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
 // Taalwissel (voorbereiding meertaligheid)
@@ -197,6 +197,11 @@ Route::middleware('auth')->group(function () {
         Route::put('/services/{service:id}', [AdminServiceController::class, 'update'])->name('services.update');
         Route::delete('/services/{service:id}', [AdminServiceController::class, 'destroy'])->name('services.destroy');
         Route::get('/service-categories', [AdminServiceCategoryController::class, 'index'])->name('service-categories.index');
+
+        // Abuse reports
+        Route::get('/abuse-reports', [\App\Http\Controllers\Admin\AbuseReportController::class, 'index'])->name('abuse-reports.index');
+        Route::get('/abuse-reports/{abuseReport}', [\App\Http\Controllers\Admin\AbuseReportController::class, 'show'])->name('abuse-reports.show');
+        Route::patch('/abuse-reports/{abuseReport}/status', [\App\Http\Controllers\Admin\AbuseReportController::class, 'updateStatus'])->name('abuse-reports.update-status');
         Route::post('/service-categories', [AdminServiceCategoryController::class, 'store'])->name('service-categories.store');
         Route::put('/service-categories/{serviceCategory}', [AdminServiceCategoryController::class, 'update'])->name('service-categories.update');
         Route::delete('/service-categories/{serviceCategory}', [AdminServiceCategoryController::class, 'destroy'])->name('service-categories.destroy');
@@ -263,6 +268,18 @@ Route::middleware('auth')->group(function () {
         });
     });
 });
+
+// Juridische pagina's
+Route::get('/algemene-voorwaarden', [\App\Http\Controllers\LegalController::class, 'terms'])->name('legal.terms');
+Route::get('/privacy', [\App\Http\Controllers\LegalController::class, 'privacy'])->name('legal.privacy');
+Route::get('/cookies', [\App\Http\Controllers\LegalController::class, 'cookies'])->name('legal.cookies');
+Route::get('/hostingvoorwaarden', [\App\Http\Controllers\LegalController::class, 'hosting'])->name('legal.hosting');
+Route::get('/acceptable-use', [\App\Http\Controllers\LegalController::class, 'acceptableUse'])->name('legal.acceptable-use');
+Route::get('/verwerkersovereenkomst', [\App\Http\Controllers\LegalController::class, 'dpa'])->name('legal.dpa');
+
+// Misbruik melden
+Route::get('/abuse', [\App\Http\Controllers\LegalController::class, 'abuse'])->name('legal.abuse');
+Route::post('/abuse', [\App\Http\Controllers\LegalController::class, 'storeAbuse'])->middleware('throttle:5,1')->name('legal.abuse.store');
 
 // Mollie webhook (no auth, POST only)
 Route::post('/mollie/webhook', MollieWebhookController::class)->name('mollie.webhook');

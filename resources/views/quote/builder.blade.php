@@ -384,7 +384,10 @@ $pageHelp = "Het aantal inbegrepen pagina's hangt af van uw pakket. Extra pagina
 
             <!-- Submit -->
             <div x-show="mode !== null" x-cloak class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-slate-200 animate-on-scroll">
-                <p class="text-sm text-slate-500">Velden met * zijn verplicht. Wij gebruiken uw gegevens alleen voor deze offerte-aanvraag.</p>
+                <div class="text-sm text-slate-500">
+                    <p class="mb-2">Velden met * zijn verplicht. Wij gebruiken uw gegevens alleen voor deze offerte-aanvraag.</p>
+                    <p>Door deze aanvraag te versturen gaat u niet automatisch een overeenkomst aan. Lees voor meer informatie onze <a href="{{ route('legal.privacy') }}" class="text-primary-600 hover:underline" target="_blank" rel="noopener noreferrer">Privacyverklaring</a>.</p>
+                </div>
                 <button type="submit" class="btn btn-primary px-8 py-3.5 shadow-lg shadow-primary-500/25 disabled:cursor-not-allowed disabled:opacity-60" :disabled="submitting || mode === null" x-text="submitting ? 'Verzenden...' : 'Offerte-aanvraag versturen'"></button>
             </div>
         </form>

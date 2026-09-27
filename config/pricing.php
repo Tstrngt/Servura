@@ -64,4 +64,13 @@ return [
         'designHelpFrom' => 250,
         'rushDeliveryFrom' => 150,
     ],
+
+    'hosting' => [
+        'included_months_with_website' => 12,
+        'packages' => [
+            'starter' => ['monthly' => 10, 'yearly' => 108],
+            'business' => ['monthly' => 20, 'yearly' => 216],
+            'pro' => ['monthly' => 35, 'yearly' => 378],
+        ],
+    ],
 ];

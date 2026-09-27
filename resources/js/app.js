@@ -247,5 +247,110 @@ Alpine.data('invoiceForm', () => ({
     }
 }));
 
+// Cookie consent manager
+Alpine.data('cookieConsent', () => ({
+    consent: null,
+    bannerOpen: false,
+    modalOpen: false,
+
+    init() {
+        this.loadConsent();
+
+        window.addEventListener('open-cookie-consent', () => {
+            this.modalOpen = true;
+        });
+    },
+
+    loadConsent() {
+        try {
+            const stored = localStorage.getItem('cookie_consent');
+            if (stored) {
+                this.consent = JSON.parse(stored);
+                this.applyScripts();
+                return;
+            }
+        } catch (e) {
+            // ignore parse errors
+        }
+        this.bannerOpen = true;
+    },
+
+    save(consent) {
+        const payload = {
+            ...consent,
+            timestamp: new Date().toISOString(),
+        };
+        this.consent = payload;
+        localStorage.setItem('cookie_consent', JSON.stringify(payload));
+        document.cookie = `cookie_consent=${encodeURIComponent(JSON.stringify(payload))}; path=/; max-age=31536000; SameSite=Lax`;
+        this.bannerOpen = false;
+        this.modalOpen = false;
+        this.applyScripts();
+    },
+
+    acceptAll() {
+        this.save({ necessary: true, analytics: true, marketing: true, version: '1.0' });
+    },
+
+    acceptNecessary() {
+        this.save({ necessary: true, analytics: false, marketing: false, version: '1.0' });
+    },
+
+    openPreferences() {
+        this.bannerOpen = false;
+        this.modalOpen = true;
+    },
+
+    savePreferences(analytics, marketing) {
+        this.save({ necessary: true, analytics, marketing, version: '1.0' });
+    },
+
+    analyticsAllowed() {
+        return this.consent?.analytics === true;
+    },
+
+    marketingAllowed() {
+        return this.consent?.marketing === true;
+    },
+
+    applyScripts() {
+        if (!this.consent) return;
+
+        // Analytics scripts: only load when allowed.
+        if (this.consent.analytics) {
+            document.querySelectorAll('script[data-cookie-category="analytics"]').forEach(script => {
+                if (script.dataset.loaded) return;
+                script.dataset.loaded = 'true';
+                const newScript = document.createElement('script');
+                if (script.src) {
+                    newScript.src = script.src;
+                } else {
+                    newScript.textContent = script.textContent;
+                }
+                document.head.appendChild(newScript);
+            });
+        }
+
+        // Marketing scripts: only load when allowed.
+        if (this.consent.marketing) {
+            document.querySelectorAll('script[data-cookie-category="marketing"]').forEach(script => {
+                if (script.dataset.loaded) return;
+                script.dataset.loaded = 'true';
+                const newScript = document.createElement('script');
+                if (script.src) {
+                    newScript.src = script.src;
+                } else {
+                    newScript.textContent = script.textContent;
+                }
+                document.head.appendChild(newScript);
+            });
+        }
+    },
+}));
+
+window.openCookieConsent = () => {
+    window.dispatchEvent(new CustomEvent('open-cookie-consent'));
+};
+
 // Initialize Alpine.js
 Alpine.start();

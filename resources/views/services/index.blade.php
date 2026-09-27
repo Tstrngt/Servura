@@ -47,11 +47,17 @@ $steps = [
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                 @foreach($webdesignServices as $index => $service)
                     @php
+                        $packageSlug = str_replace('-website', '', $service->slug);
+                        $hostingMonthly = config("pricing.hosting.packages.{$packageSlug}.monthly");
                         $serviceData = [
                             'title' => $service->title,
                             'short_description' => $service->short_description,
                             'description' => $service->description,
                             'formatted_price' => $service->formatted_price,
+                            'price_note' => 'Eenmalig, exclusief btw',
+                            'hosting_info' => $hostingMonthly
+                                ? 'Eerste jaar hosting inbegrepen. Daarna vanaf €'.number_format($hostingMonthly, 0, ',', '.').' per maand, afhankelijk van het gekozen hostingpakket.'
+                                : 'Hosting op aanvraag.',
                             'features' => $service->features ?? [],
                             'image_url' => $service->image_url,
                             'slug' => $service->slug,
@@ -152,6 +158,7 @@ $steps = [
                 <div class="absolute top-4 right-4 rounded-2xl bg-white/95 backdrop-blur px-5 py-3 shadow-xl ring-1 ring-white/20 text-center">
                     <span class="block text-xs text-slate-500 uppercase tracking-wide">Investering</span>
                     <span class="block text-2xl font-bold text-slate-900" x-text="service?.formatted_price"></span>
+                    <span class="block text-xs text-slate-500 mt-1" x-text="service?.price_note"></span>
                 </div>
             </div>
 
@@ -182,6 +189,7 @@ $steps = [
                         <span class="text-sm text-slate-300">Investering</span>
                         <div class="text-3xl font-bold" x-text="service?.formatted_price"></div>
                         <p x-show="service?.popup_price_note" class="text-sm text-slate-400 mt-1" x-text="service?.popup_price_note"></p>
+                        <p x-show="service?.hosting_info" class="text-sm text-slate-400 mt-1" x-text="service?.hosting_info"></p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3">
                         <a :href="'{{ route('contact') }}?service=' + service?.slug" class="btn btn-primary whitespace-nowrap px-6 py-3">

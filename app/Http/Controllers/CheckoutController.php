@@ -158,6 +158,11 @@ class CheckoutController extends Controller
                 'vat_amount' => $vatAmount,
                 'total' => $tax['total'],
                 'status' => 'pending_payment',
+                'terms_accepted_at' => now(),
+                'terms_version' => config('legal.versions.terms.version'),
+                'hosting_terms_version' => $service->fulfillment_type === 'directadmin'
+                    ? config('legal.versions.hosting_terms.version')
+                    : null,
             ]);
 
             return [$order, $user, $isNewUser];

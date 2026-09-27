@@ -14,6 +14,7 @@ class Order extends Model
         'invoice_id', 'billing_cycle', 'fulfillment_type', 'subtotal', 'vat_percentage',
         'billing_country', 'vat_amount', 'total',
         'status', 'paid_at',
+        'terms_accepted_at', 'terms_version', 'hosting_terms_version',
     ];
 
     protected $casts = [
@@ -22,6 +23,7 @@ class Order extends Model
         'vat_amount' => 'decimal:2',
         'total' => 'decimal:2',
         'paid_at' => 'datetime',
+        'terms_accepted_at' => 'datetime',
     ];
 
     public static function generateNumber(): string

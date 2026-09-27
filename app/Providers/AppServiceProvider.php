@@ -26,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
         $this->configureMollieKey();
         $this->configureMailSettings();
         $this->configureSiteSettings();
+        $this->configureCompanySettings();
+        $this->configureLegalSettings();
 
         View::composer('*', function ($view) {
             if (Auth::check()) {
@@ -109,6 +111,56 @@ class AppServiceProvider extends ServiceProvider
                 'tiktok' => BillingSetting::valueFor('social_tiktok', ''),
                 'x' => BillingSetting::valueFor('social_x', ''),
             ]);
+        } catch (\Throwable $e) {
+            // Database may not be available during migrations or cache warming.
+        }
+    }
+
+    /**
+     * Load company details from BillingSetting or config file defaults.
+     */
+    private function configureCompanySettings(): void
+    {
+        try {
+            $defaults = config('company');
+
+            Config::set('company', [
+                'legal_name' => BillingSetting::valueFor('company_legal_name', $defaults['legal_name'] ?? ''),
+                'trade_name' => BillingSetting::valueFor('company_trade_name', $defaults['trade_name'] ?? ''),
+                'address' => BillingSetting::valueFor('company_address', $defaults['address'] ?? ''),
+                'postal_code' => BillingSetting::valueFor('company_postal_code', $defaults['postal_code'] ?? ''),
+                'city' => BillingSetting::valueFor('company_city', $defaults['city'] ?? ''),
+                'country' => BillingSetting::valueFor('company_country', $defaults['country'] ?? ''),
+                'kvk_number' => BillingSetting::valueFor('company_kvk_number', $defaults['kvk_number'] ?? ''),
+                'vat_number' => BillingSetting::valueFor('company_vat_number', $defaults['vat_number'] ?? ''),
+                'email' => BillingSetting::valueFor('company_email', $defaults['email'] ?? ''),
+                'phone' => BillingSetting::valueFor('company_phone', $defaults['phone'] ?? ''),
+                'website' => BillingSetting::valueFor('company_website', $defaults['website'] ?? ''),
+                'privacy_email' => BillingSetting::valueFor('company_privacy_email', $defaults['privacy_email'] ?? ''),
+                'abuse_email' => BillingSetting::valueFor('company_abuse_email', $defaults['abuse_email'] ?? ''),
+            ]);
+        } catch (\Throwable $e) {
+            // Database may not be available during migrations or cache warming.
+        }
+    }
+
+    /**
+     * Load legal document versions from BillingSetting or config file defaults.
+     */
+    private function configureLegalSettings(): void
+    {
+        try {
+            $defaults = config('legal');
+
+            $versions = $defaults['versions'] ?? [];
+            foreach (array_keys($versions) as $key) {
+                $versions[$key]['version'] = BillingSetting::valueFor("legal_{$key}_version", $versions[$key]['version']);
+                $versions[$key]['effective_date'] = BillingSetting::valueFor("legal_{$key}_effective_date", $versions[$key]['effective_date']);
+            }
+
+            Config::set('legal', array_merge($defaults, [
+                'versions' => $versions,
+            ]));
         } catch (\Throwable $e) {
             // Database may not be available during migrations or cache warming.
         }

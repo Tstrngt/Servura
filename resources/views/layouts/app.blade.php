@@ -28,6 +28,8 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
     <meta name="theme-color" content="#0f172a">
 
+    <style>[x-cloak] { display: none !important; }</style>
+
     <!-- Open Graph -->
     <meta property="og:title" content="@yield('og:title', 'Servura - MKB Websites en Hosting')">
     <meta property="og:description" content="@yield('og:description', 'Servura helpt mkb-bedrijven met professionele websites en hosting')">
@@ -228,12 +230,12 @@
     @unless(request()->routeIs('admin.*'))
     <footer class="footer {{ request()->routeIs('home') || request()->routeIs('about') || request()->routeIs('services.*') || request()->routeIs('contact') || request()->routeIs('login') ? 'mt-0' : 'mt-16' }}">
         <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
                 <!-- Company Info -->
-                <div class="col-span-1 md:col-span-2">
+                <div class="col-span-1 sm:col-span-2 lg:col-span-2">
                     <h3 class="logo-text text-2xl font-bold logo-mark mb-4">Servura<span class="text-primary-400">.</span></h3>
                     <p class="text-gray-300 mb-4">
-                        Servura biedt de oplossing voor mkb-ondernemers van het opbouwen van een online omgeving en het hosten. Tot hulp bij aanpassingen.
+                        Professionele websites, webhosting en technisch beheer voor het MKB. Persoonlijk contact en duidelijke afspraken.
                     </p>
                     @php
                         $socialLinks = [
@@ -258,22 +260,51 @@
 
                 <!-- Quick Links -->
                 <div>
-                    <h4 class="text-lg font-semibold mb-4">Snelle Links</h4>
+                    <h4 class="text-lg font-semibold mb-4">Snelle links</h4>
                     <ul class="space-y-2">
                         <li><a href="{{ route('home') }}" class="text-gray-300 hover:text-white">Home</a></li>
-                        <li><a href="{{ route('about') }}" class="text-gray-300 hover:text-white">Over Ons</a></li>
+                        <li><a href="{{ route('about') }}" class="text-gray-300 hover:text-white">Over ons</a></li>
                         <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-white">Diensten</a></li>
                         <li><a href="{{ route('contact') }}" class="text-gray-300 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Services -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Diensten</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-white">Websites</a></li>
+                        <li><a href="{{ route('services.index') }}#hosting" class="text-gray-300 hover:text-white">Webhosting</a></li>
+                        <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-white">Onderhoud / beheer</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Juridisch</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{{ route('legal.terms') }}" class="text-gray-300 hover:text-white">Algemene voorwaarden</a></li>
+                        <li><a href="{{ route('legal.privacy') }}" class="text-gray-300 hover:text-white">Privacyverklaring</a></li>
+                        <li><a href="{{ route('legal.cookies') }}" class="text-gray-300 hover:text-white">Cookieverklaring</a></li>
+                        <li><a href="{{ route('legal.hosting') }}" class="text-gray-300 hover:text-white">Hostingvoorwaarden</a></li>
+                        <li><a href="{{ route('legal.acceptable-use') }}" class="text-gray-300 hover:text-white">Acceptable Use Policy</a></li>
+                        <li><a href="{{ route('legal.abuse') }}" class="text-gray-300 hover:text-white">Misbruik melden</a></li>
+                        <li><button type="button" onclick="window.openCookieConsent()" class="text-left text-gray-300 hover:text-white">Cookievoorkeuren</button></li>
                     </ul>
                 </div>
 
                 <!-- Contact Info -->
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Contact</h4>
-                    <ul class="space-y-2 text-gray-300">
-                        <li>Neem contact met ons op via het contactformulier</li>
-                        <li>We reageren binnen 48 uur</li>
-                        <li>Gratis adviesgesprek</li>
+                    <ul class="space-y-2 text-gray-300 text-sm">
+                        <li>{{ config('company.legal_name', config('company.trade_name', 'Servura')) }}</li>
+                        <li>{{ config('company.address', '[Adres]') }}</li>
+                        <li>{{ config('company.postal_code', '[Postcode]') }} {{ config('company.city', '[Plaats]') }}</li>
+                        <li>KvK: {{ config('company.kvk_number', '[KvK]') }}</li>
+                        <li class="pt-1"><a href="mailto:{{ config('company.email', '#') }}" class="hover:text-white">{{ config('company.email', '[E-mail]') }}</a></li>
+                        @if(config('company.phone'))
+                            <li><a href="tel:{{ config('company.phone') }}" class="hover:text-white">{{ config('company.phone') }}</a></li>
+                        @endif
                     </ul>
 
                     @if(config('site.newsletter_enabled'))
@@ -302,6 +333,76 @@
         </div>
     </footer>
     @endunless
+
+    <!-- Cookie consent banner & modal -->
+    <div x-data="cookieConsent" x-init="init" aria-live="polite">
+        <!-- Banner -->
+        <div x-show="bannerOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="translate-y-full opacity-0" x-transition:enter-end="translate-y-0 opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="translate-y-0 opacity-100" x-transition:leave-end="translate-y-full opacity-0" x-cloak class="fixed bottom-0 left-0 right-0 z-[70] bg-slate-900 text-white shadow-2xl" style="display: none;">
+            <div class="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="max-w-2xl">
+                        <p class="text-sm md:text-base text-slate-100">
+                            Wij gebruiken cookies. Noodzakelijke cookies zijn altijd actief. Analytische en marketingcookies gebruiken wij alleen met uw toestemming.
+                            <a href="{{ route('legal.cookies') }}" class="underline hover:text-white text-slate-300">Meer informatie</a>.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button type="button" @click="openPreferences" class="text-sm px-4 py-2 rounded-lg text-slate-200 hover:text-white hover:bg-white/10 transition">Voorkeuren</button>
+                        <button type="button" @click="acceptNecessary" class="text-sm px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition">Alleen noodzakelijk</button>
+                        <button type="button" @click="acceptAll" class="text-sm px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-medium transition">Alles accepteren</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preferences modal -->
+        <div x-show="modalOpen" x-cloak class="fixed inset-0 z-[80]" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cookie-modal-title">
+            <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity" @click="modalOpen = false"></div>
+            <div class="relative min-h-screen flex items-center justify-center p-4">
+                <div x-show="modalOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 md:p-8">
+                    <h2 id="cookie-modal-title" class="font-heading text-2xl font-bold text-slate-900 mb-2">Cookievoorkeuren</h2>
+                    <p class="text-slate-500 text-sm mb-6">Beheer hieronder uw cookievoorkeuren. U kunt deze keuze later altijd wijzigen via de footer.</p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start justify-between gap-4 rounded-xl bg-slate-50 p-4">
+                            <div>
+                                <h3 class="font-semibold text-slate-900">Noodzakelijk</h3>
+                                <p class="text-sm text-slate-500">Nodig voor de werking van de website en beveiliging.</p>
+                            </div>
+                            <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Altijd aan</span>
+                        </div>
+
+                        <div class="flex items-start justify-between gap-4 rounded-xl border border-slate-200 p-4">
+                            <div>
+                                <h3 class="font-semibold text-slate-900">Analytisch</h3>
+                                <p class="text-sm text-slate-500">Helpt ons begrijpen hoe bezoekers de website gebruiken.</p>
+                            </div>
+                            <label class="relative inline-flex cursor-pointer items-center">
+                                <input type="checkbox" x-model="consent.analytics" class="sr-only peer">
+                                <span class="h-6 w-11 rounded-full bg-slate-200 peer-focus:ring-2 peer-focus:ring-primary-500 peer-checked:bg-primary-600 after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:transition peer-checked:after:translate-x-5"></span>
+                            </label>
+                        </div>
+
+                        <div class="flex items-start justify-between gap-4 rounded-xl border border-slate-200 p-4">
+                            <div>
+                                <h3 class="font-semibold text-slate-900">Marketing</h3>
+                                <p class="text-sm text-slate-500">Wordt gebruikt voor relevante advertenties en campagnes.</p>
+                            </div>
+                            <label class="relative inline-flex cursor-pointer items-center">
+                                <input type="checkbox" x-model="consent.marketing" class="sr-only peer">
+                                <span class="h-6 w-11 rounded-full bg-slate-200 peer-focus:ring-2 peer-focus:ring-primary-500 peer-checked:bg-primary-600 after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:transition peer-checked:after:translate-x-5"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex flex-col-reverse sm:flex-row gap-3">
+                        <button type="button" @click="modalOpen = false" class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-medium">Annuleren</button>
+                        <button type="button" @click="savePreferences(consent.analytics, consent.marketing)" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-medium">Voorkeuren opslaan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Page transition script -->
     <script>

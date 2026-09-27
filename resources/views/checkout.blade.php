@@ -108,12 +108,20 @@
                     <div class="flex justify-between gap-4"><dt class="text-slate-400">BTW (<span x-text="rate().toLocaleString('nl-NL')"></span>%)</dt><dd x-text="'€ ' + Number((prices[selected] || 0) * (rate() / 100)).toLocaleString('nl-NL', {minimumFractionDigits: 2})"></dd></div>
                     <div class="flex items-end justify-between gap-4 pt-2"><dt class="font-semibold">Totaal</dt><dd class="text-2xl font-bold" x-text="'€ ' + Number((prices[selected] || 0) * (1 + rate() / 100)).toLocaleString('nl-NL', {minimumFractionDigits: 2})"></dd></div>
                 </dl>
+
+                <div class="mt-5 space-y-2 text-sm text-slate-300">
+                    <p>Prijs per {{ $service->prices->first()?->label ? strtolower($service->prices->first()->label) : 'periode' }}. Alle prijzen zijn exclusief btw, tenzij anders vermeld.</p>
+                    <p>Verlenging vindt plaats volgens de gekozen periode. U kunt opzeggen conform de <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener noreferrer" class="underline hover:text-white">algemene voorwaarden</a>.</p>
+                    @if($service->fulfillment_type === 'directadmin')
+                        <p>Hostingvoorwaarden zijn van toepassing op deze dienst.</p>
+                    @endif
+                </div>
                 <fieldset class="mt-5 space-y-2">
                     <legend class="mb-2 text-sm font-semibold text-white">Betaling bij verlenging</legend>
                     <label class="flex cursor-pointer items-start gap-3 rounded-lg bg-white/5 p-3 text-sm text-slate-300 ring-1 ring-white/10"><input type="radio" name="payment_method" value="auto_debit" {{ old('payment_method', 'auto_debit') === 'auto_debit' ? 'checked' : '' }} class="mt-1 border-slate-500 bg-slate-800 text-primary-500"><span><strong class="block text-white">Automatische incasso</strong>Na de eerste betaling verlopen toekomstige verlengingen automatisch.</span></label>
                     <label class="flex cursor-pointer items-start gap-3 rounded-lg bg-white/5 p-3 text-sm text-slate-300 ring-1 ring-white/10"><input type="radio" name="payment_method" value="payment_link" {{ old('payment_method') === 'payment_link' ? 'checked' : '' }} class="mt-1 border-slate-500 bg-slate-800 text-primary-500"><span><strong class="block text-white">Factuur met betaallink</strong>U ontvangt bij iedere verlenging een nieuwe Mollie-betaallink.</span></label>
                 </fieldset>
-                <label class="mt-5 flex items-start gap-3 text-sm text-slate-300"><input type="checkbox" name="terms" value="1" required class="mt-1 rounded border-slate-500 bg-slate-800 text-primary-500"><span>Ik ga akkoord met de algemene voorwaarden en de betalingsverplichting.</span></label>
+                <label class="mt-5 flex items-start gap-3 text-sm text-slate-300"><input type="checkbox" name="terms" value="1" required class="mt-1 rounded border-slate-500 bg-slate-800 text-primary-500"><span>Ik ga akkoord met de <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener noreferrer" class="underline hover:text-white">Algemene voorwaarden</a>@if($service->fulfillment_type === 'directadmin') en de <a href="{{ route('legal.hosting') }}" target="_blank" rel="noopener noreferrer" class="underline hover:text-white">Hostingvoorwaarden</a>@endif en de betalingsverplichting.</span></label>
                 @error('terms')<span class="mt-2 block text-sm text-red-300">{{ $message }}</span>@enderror
                 <button type="submit" :disabled="submitting || mode === null" class="btn btn-primary mt-6 w-full justify-center py-3 disabled:cursor-wait disabled:opacity-60"><span x-text="submitting ? 'Betaalpagina openen…' : 'Bestellen en betalen'"></span></button>
                 <p class="mt-4 text-center text-xs text-slate-400">Veilig betalen via Mollie. Uw dienst wordt pas na bevestigde betaling geactiveerd.</p>
