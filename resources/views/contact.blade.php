@@ -186,9 +186,12 @@
 
         @php
             $faqs = [
-                ['q' => 'Wat kost een nieuwe website?', 'a' => 'De kosten van een nieuwe website variëren afhankelijk van uw wensen. Een basis website start vanaf €1.500, terwijl een uitgebreide website met custom functionaliteiten vanaf €3.000 beschikbaar is. Vraag een vrijblijvende offerte aan.'],
-                ['q' => 'Hoe snel kan mijn website online?', 'a' => 'Afhankelijk van de complexiteit kan uw website binnen 2-4 weken online zijn. Een simpele website kan zelfs binnen 1-2 weken. Tijdens het adviesgesprek bespreken we de exacte planning.'],
-                ['q' => 'Bieden jullie ook onderhoud?', 'a' => 'Ja, wij bieden complete onderhoudspakketten aan. Dit omvat updates, security checks, backups en technische support. Prijs start vanaf €50 per maand.'],
+                ['q' => 'Wat kost een nieuwe website?', 'a' => 'Onze websitepakketten starten vanaf €749 excl. btw. Welk pakket het beste past, hangt af van het aantal pagina\'s, gewenste functionaliteiten en de mate van maatwerk. Voor aanvullende wensen ontvangt u vooraf een duidelijke prijsopgave.'],
+                ['q' => 'Hoe snel kan mijn website online?', 'a' => 'Een eenvoudige website kan vaak binnen 2 tot 4 weken worden opgeleverd. Bij uitgebreidere websites hangt de doorlooptijd af van het ontwerp, de functionaliteiten en hoe snel content wordt aangeleverd. Vooraf spreken we samen een realistische planning af.'],
+                ['q' => 'Is hosting inbegrepen?', 'a' => 'Bij onze websitepakketten is het eerste jaar hosting inbegrepen. Daarna kiest u het hostingpakket dat het beste bij uw website past.'],
+                ['q' => 'Kan ik mijn website zelf aanpassen?', 'a' => 'Ja. Waar van toepassing leveren we de website met een gebruiksvriendelijk CMS, zodat u zelf teksten, afbeeldingen en pagina\'s kunt aanpassen.'],
+                ['q' => 'Kan ik later uitbreiden?', 'a' => 'Ja. Websites kunnen later worden uitgebreid met extra pagina\'s, formulieren, meertaligheid, koppelingen of andere functionaliteiten.'],
+                ['q' => 'Bieden jullie ook onderhoud?', 'a' => 'Ja. We kunnen het technische beheer van uw website verzorgen, waaronder updates, back-ups, beveiliging en ondersteuning. De mogelijkheden hangen af van het gekozen hosting- en onderhoudspakket.'],
             ];
         @endphp
 
