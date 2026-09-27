@@ -29,7 +29,7 @@ $steps = [
 </section>
 
 <!-- Webdesign Producten -->
-<section id="pakketten" class="relative bg-slate-50 pt-24 lg:pt-32 pb-12 lg:pb-16"
+<section id="pakketten" class="relative bg-slate-50 pt-12 lg:pt-16 pb-12 lg:pb-16"
     x-data="{ open: false, service: null, show(s) { this.service = s; this.open = true; document.body.style.overflow = 'hidden'; }, hide() { this.open = false; this.service = null; document.body.style.overflow = 'auto'; } }"
     @keydown.escape.window="hide">
     <div class="max-w-7xl mx-auto px-6">
