@@ -230,9 +230,9 @@
     @unless(request()->routeIs('admin.*'))
     <footer class="footer {{ request()->routeIs('home') || request()->routeIs('about') || request()->routeIs('services.*') || request()->routeIs('contact') || request()->routeIs('login') ? 'mt-0' : 'mt-16' }}">
         <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+            <div class="grid grid-cols-1 gap-8 lg:gap-12">
                 <!-- Company Info -->
-                <div class="col-span-1 sm:col-span-2 lg:col-span-2">
+                <div class="max-w-2xl">
                     <h3 class="logo-text text-2xl font-bold logo-mark mb-4">Servura<span class="text-primary-400">.</span></h3>
                     <p class="text-gray-300 mb-4">
                         Professionele websites, webhosting en technisch beheer voor het MKB. Persoonlijk contact en duidelijke afspraken.
@@ -258,72 +258,74 @@
                     </div>
                 </div>
 
-                <!-- Quick Links -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Snelle links</h4>
-                    <ul class="space-y-2">
-                        <li><a href="{{ route('home') }}" class="text-gray-300 hover:text-white">Home</a></li>
-                        <li><a href="{{ route('about') }}" class="text-gray-300 hover:text-white">Over ons</a></li>
-                        <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-white">Diensten</a></li>
-                        <li><a href="{{ route('contact') }}" class="text-gray-300 hover:text-white">Contact</a></li>
-                    </ul>
-                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Quick Links -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">Snelle links</h4>
+                        <ul class="space-y-2">
+                            <li><a href="{{ route('home') }}" class="text-gray-300 hover:text-white">Home</a></li>
+                            <li><a href="{{ route('about') }}" class="text-gray-300 hover:text-white">Over ons</a></li>
+                            <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-white">Diensten</a></li>
+                            <li><a href="{{ route('contact') }}" class="text-gray-300 hover:text-white">Contact</a></li>
+                        </ul>
+                    </div>
 
-                <!-- Services -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Diensten</h4>
-                    <ul class="space-y-2">
-                        <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-white">Websites</a></li>
-                        <li><a href="{{ route('services.index') }}#hosting" class="text-gray-300 hover:text-white">Webhosting</a></li>
-                        <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-white">Onderhoud / beheer</a></li>
-                    </ul>
-                </div>
+                    <!-- Services -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">Diensten</h4>
+                        <ul class="space-y-2">
+                            <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-white">Websites</a></li>
+                            <li><a href="{{ route('services.index') }}#hosting" class="text-gray-300 hover:text-white">Webhosting</a></li>
+                            <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-white">Onderhoud / beheer</a></li>
+                        </ul>
+                    </div>
 
-                <!-- Legal -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Juridisch</h4>
-                    <ul class="space-y-2">
-                        <li><a href="{{ route('legal.terms') }}" class="text-gray-300 hover:text-white">Algemene voorwaarden</a></li>
-                        <li><a href="{{ route('legal.privacy') }}" class="text-gray-300 hover:text-white">Privacyverklaring</a></li>
-                        <li><a href="{{ route('legal.cookies') }}" class="text-gray-300 hover:text-white">Cookieverklaring</a></li>
-                        <li><a href="{{ route('legal.hosting') }}" class="text-gray-300 hover:text-white">Hostingvoorwaarden</a></li>
-                        <li><a href="{{ route('legal.acceptable-use') }}" class="text-gray-300 hover:text-white">Acceptable Use Policy</a></li>
-                        <li><a href="{{ route('legal.abuse') }}" class="text-gray-300 hover:text-white">Misbruik melden</a></li>
-                        <li><button type="button" onclick="window.openCookieConsent()" class="text-left text-gray-300 hover:text-white">Cookievoorkeuren</button></li>
-                    </ul>
-                </div>
+                    <!-- Legal -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">Juridisch</h4>
+                        <ul class="space-y-2">
+                            <li><a href="{{ route('legal.terms') }}" class="text-gray-300 hover:text-white">Algemene voorwaarden</a></li>
+                            <li><a href="{{ route('legal.privacy') }}" class="text-gray-300 hover:text-white">Privacyverklaring</a></li>
+                            <li><a href="{{ route('legal.cookies') }}" class="text-gray-300 hover:text-white">Cookieverklaring</a></li>
+                            <li><a href="{{ route('legal.hosting') }}" class="text-gray-300 hover:text-white">Hostingvoorwaarden</a></li>
+                            <li><a href="{{ route('legal.acceptable-use') }}" class="text-gray-300 hover:text-white">Acceptable Use Policy</a></li>
+                            <li><a href="{{ route('legal.abuse') }}" class="text-gray-300 hover:text-white">Misbruik melden</a></li>
+                            <li><button type="button" onclick="window.openCookieConsent()" class="text-left text-gray-300 hover:text-white">Cookievoorkeuren</button></li>
+                        </ul>
+                    </div>
 
-                <!-- Contact Info -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Contact</h4>
-                    <ul class="space-y-2 text-gray-300 text-sm">
-                        <li>{{ config('company.legal_name', config('company.trade_name', 'Servura')) }}</li>
-                        <li>{{ config('company.address', '[Adres]') }}</li>
-                        <li>{{ config('company.postal_code', '[Postcode]') }} {{ config('company.city', '[Plaats]') }}</li>
-                        <li>KvK: {{ config('company.kvk_number', '[KvK]') }}</li>
-                        <li class="pt-1"><a href="mailto:{{ config('company.email', '#') }}" class="hover:text-white">{{ config('company.email', '[E-mail]') }}</a></li>
-                        @if(config('company.phone'))
-                            <li><a href="tel:{{ config('company.phone') }}" class="hover:text-white">{{ config('company.phone') }}</a></li>
-                        @endif
-                    </ul>
-
-                    @if(config('site.newsletter_enabled'))
-                        <div class="mt-6">
-                            <h4 class="text-sm font-semibold mb-2 text-white">Nieuwsbrief</h4>
-                            @if(session('newsletter_success'))
-                                <p class="text-sm text-emerald-400">{{ session('newsletter_success') }}</p>
-                            @else
-                                <form action="{{ route('newsletter.subscribe') }}" method="POST" class="flex gap-2">
-                                    @csrf
-                                    <input type="email" name="email" required placeholder="jouw@email.nl" class="w-full min-w-0 rounded-lg border-0 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-400 ring-1 ring-white/10 focus:ring-2 focus:ring-primary-400">
-                                    <button type="submit" class="shrink-0 rounded-lg bg-primary-600 px-3 py-2 text-sm font-semibold text-white hover:bg-primary-500">Aanmelden</button>
-                                </form>
-                                @error('email')
-                                    <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
-                                @enderror
+                    <!-- Contact Info -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">Contact</h4>
+                        <ul class="space-y-2 text-gray-300 text-sm">
+                            <li>{{ config('company.legal_name', config('company.trade_name', 'Servura')) }}</li>
+                            <li>{{ config('company.address', '[Adres]') }}</li>
+                            <li>{{ config('company.postal_code', '[Postcode]') }} {{ config('company.city', '[Plaats]') }}</li>
+                            <li>KvK: {{ config('company.kvk_number', '[KvK]') }}</li>
+                            <li class="pt-1"><a href="mailto:{{ config('company.email', '#') }}" class="hover:text-white">{{ config('company.email', '[E-mail]') }}</a></li>
+                            @if(config('company.phone'))
+                                <li><a href="tel:{{ config('company.phone') }}" class="hover:text-white">{{ config('company.phone') }}</a></li>
                             @endif
-                        </div>
-                    @endif
+                        </ul>
+
+                        @if(config('site.newsletter_enabled'))
+                            <div class="mt-6">
+                                <h4 class="text-sm font-semibold mb-2 text-white">Nieuwsbrief</h4>
+                                @if(session('newsletter_success'))
+                                    <p class="text-sm text-emerald-400">{{ session('newsletter_success') }}</p>
+                                @else
+                                    <form action="{{ route('newsletter.subscribe') }}" method="POST" class="flex gap-2">
+                                        @csrf
+                                        <input type="email" name="email" required placeholder="jouw@email.nl" class="w-full min-w-0 rounded-lg border-0 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-400 ring-1 ring-white/10 focus:ring-2 focus:ring-primary-400">
+                                        <button type="submit" class="shrink-0 rounded-lg bg-primary-600 px-3 py-2 text-sm font-semibold text-white hover:bg-primary-500">Aanmelden</button>
+                                    </form>
+                                    @error('email')
+                                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                                    @enderror
+                                @endif
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
 
