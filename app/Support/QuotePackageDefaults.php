@@ -14,12 +14,14 @@ class QuotePackageDefaults
 {
     public static function for(Service $service): array
     {
-        return match ($service->slug) {
-            'starter', 'starter-website' => [
+        $config = config("pricing.packages.{$service->slug}", config("pricing.packages." . str_replace('-website', '', $service->slug), []));
+
+        return match (str_replace('-website', '', $service->slug)) {
+            'starter' => [
                 'goal' => 'Visitekaartje / online brochure',
-                'pages' => "1 - 5 pagina's",
+                'pages' => $config['includedPagesLabel'] ?? "tot 4 pagina's",
                 'visitors' => 'Minder dan 1.000',
-                'design' => 'Ik heb al een huisstijl / logo',
+                'design' => $config['designDefault'] ?? 'Ik heb een logo en kleuren',
                 'features' => [
                     'CMS (zelf beheren)',
                     'Contact- / leadformulieren',
@@ -28,11 +30,11 @@ class QuotePackageDefaults
                     'Ik lever teksten en beelden zelf aan',
                 ],
             ],
-            'business', 'business-website' => [
+            'business' => [
                 'goal' => 'Meer leads en aanvragen',
-                'pages' => "6 - 10 pagina's",
+                'pages' => $config['includedPagesLabel'] ?? "tot 7 pagina's",
                 'visitors' => '1.000 - 5.000',
-                'design' => 'Ik wil voorbeelden en advies',
+                'design' => $config['designDefault'] ?? 'Ik heb een complete huisstijl',
                 'features' => [
                     'CMS (zelf beheren)',
                     'Contact- / leadformulieren',
@@ -43,11 +45,11 @@ class QuotePackageDefaults
                     'Ik lever teksten en beelden zelf aan',
                 ],
             ],
-            'pro', 'pro-website' => [
+            'pro' => [
                 'goal' => 'Producten of diensten verkopen',
-                'pages' => "11 - 20 pagina's",
+                'pages' => $config['includedPagesLabel'] ?? "tot 10 pagina's",
                 'visitors' => '5.000 - 25.000',
-                'design' => 'Ik wil een nieuw logo en huisstijl',
+                'design' => $config['designDefault'] ?? 'Ik wil hulp bij de vormgeving',
                 'features' => [
                     'CMS (zelf beheren)',
                     'Contact- / leadformulieren',

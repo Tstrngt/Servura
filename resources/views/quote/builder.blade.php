@@ -20,6 +20,8 @@ $initialQuoteSelected = [
     'features' => old('features', $currentDefaults['features'] ?? []),
     'content' => old('content', $currentDefaults['content'] ?? []),
 ];
+$extraPagePrice = $pricingConfig['extras']['extraPage'] ?? 75;
+$pageHelp = "Het aantal inbegrepen pagina's hangt af van uw pakket. Extra pagina's kosten €" . $extraPagePrice . " per pagina.";
 @endphp
 
 <!-- Hero Section -->
@@ -136,7 +138,7 @@ $initialQuoteSelected = [
                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">1</span>
                     <div>
                         <h2 class="font-heading text-2xl font-bold text-slate-900">Wat is het doel van uw website?</h2>
-                        <p class="text-slate-500 mt-1">Eenvoudige brochurewebsites beginnen vaak rond € 1.500 tot € 3.000; lead-generatiesites rond € 3.000 tot € 6.000.</p>
+                        <p class="text-slate-500 mt-1">Uw keuze helpt ons bepalen welke opbouw en functionaliteiten het beste bij uw website passen.</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -159,7 +161,7 @@ $initialQuoteSelected = [
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">2</span>
                         <div>
                             <h2 class="font-heading text-xl font-bold text-slate-900">Hoeveel pagina's verwacht u?</h2>
-                            <p class="text-sm text-slate-500 mt-1">Per extra pagina rekenen veel bureaus € 150 tot € 400.</p>
+                            <p class="text-sm text-slate-500 mt-1">{{ $pageHelp }}</p>
                         </div>
                     </div>
                     <select name="pages" class="form-input mt-auto" x-model="fields.pages" required>
@@ -175,7 +177,7 @@ $initialQuoteSelected = [
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">3</span>
                         <div>
                             <h2 class="font-heading text-xl font-bold text-slate-900">Verwachte bezoekers per maand</h2>
-                            <p class="text-sm text-slate-500 mt-1">Hoge traffic vraagt meer performance en hosting.</p>
+                            <p class="text-sm text-slate-500 mt-1">Hiermee kunnen we bepalen welk hostingpakket en welke capaciteit passend zijn.</p>
                         </div>
                     </div>
                     <select name="visitors" class="form-input mt-auto" x-model="fields.visitors" required>
@@ -194,7 +196,7 @@ $initialQuoteSelected = [
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">4</span>
                         <div>
                             <h2 class="font-heading text-xl font-bold text-slate-900">Ontwerp & huisstijl</h2>
-                            <p class="text-sm text-slate-500 mt-1">Een logo of huisstijl traject loopt vaak van € 750 tot € 2.500.</p>
+                            <p class="text-sm text-slate-500 mt-1">Heeft u al een huisstijl? Dan sluiten we daarop aan. Hulp met vormgeving of huisstijl kunnen we aanvullend aanbieden.</p>
                         </div>
                     </div>
                     <select name="design" class="form-input mt-auto" x-model="fields.design" required>
@@ -223,7 +225,7 @@ $initialQuoteSelected = [
                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">6</span>
                     <div>
                         <h2 class="font-heading text-2xl font-bold text-slate-900">Welke functionaliteiten heeft u nodig?</h2>
-                        <p class="text-slate-500 mt-1">Webshops starten vaak vanaf € 5.000; maatwerk koppelingen lopen vaak vanaf € 1.000.</p>
+                        <p class="text-slate-500 mt-1">Selecteer eventuele aanvullende functionaliteiten. Onderdelen die al bij uw pakket horen zijn automatisch inbegrepen.</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -258,7 +260,7 @@ $initialQuoteSelected = [
                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">7</span>
                     <div>
                         <h2 class="font-heading text-2xl font-bold text-slate-900">Content & teksten</h2>
-                        <p class="text-slate-500 mt-1">Teksten laten schrijven kost vaak € 50 tot € 150 per pagina; fotografie begint vaak vanaf € 500.</p>
+                        <p class="text-slate-500 mt-1">U kunt teksten en beelden zelf aanleveren of gebruikmaken van onze aanvullende hulp bij content.</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -280,6 +282,7 @@ $initialQuoteSelected = [
                                     <span class="font-semibold text-slate-900 text-sm">{{ $option['label'] }}</span>
                                     <span x-show="isIncluded('content', @js($option['label']))" class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Inbegrepen</span>
                                 </div>
+                                @if($option['note'] !== '')<span class="text-xs text-slate-400">{{ $option['note'] }}</span>@endif
                             </div>
                         </label>
                     @endforeach
@@ -293,7 +296,7 @@ $initialQuoteSelected = [
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">8</span>
                         <div>
                             <h2 class="font-heading text-xl font-bold text-slate-900">Gewenste oplevering</h2>
-                            <p class="text-sm text-slate-500 mt-1">Snellere oplevering is vaak mogelijk tegen een kleine meerprijs.</p>
+                            <p class="text-sm text-slate-500 mt-1">Heeft u een deadline? Geef deze hier aan, dan beoordelen we of deze haalbaar is.</p>
                         </div>
                     </div>
                     <select name="timeline" class="form-input mt-auto" x-model="fields.timeline" required>

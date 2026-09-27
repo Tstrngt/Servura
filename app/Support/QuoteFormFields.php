@@ -23,6 +23,8 @@ class QuoteFormFields
 
     public static function defaults(): array
     {
+        $extras = config('pricing.extras', []);
+
         return [
             'goals' => [
                 ['label' => 'Visitekaartje / online brochure', 'note' => 'Informatie over uw bedrijf tonen'],
@@ -31,11 +33,10 @@ class QuoteFormFields
                 ['label' => 'Service richting klanten', 'note' => 'Klantenportaal of informatiehub'],
             ],
             'pages' => [
-                ['label' => "1 - 5 pagina's", 'note' => ''],
-                ['label' => "6 - 10 pagina's", 'note' => ''],
-                ['label' => "11 - 20 pagina's", 'note' => ''],
-                ['label' => "21 - 50 pagina's", 'note' => ''],
-                ['label' => 'Meer dan 50 pagina\'s', 'note' => ''],
+                ['label' => "tot 4 pagina's", 'note' => ''],
+                ['label' => "tot 7 pagina's", 'note' => ''],
+                ['label' => "tot 10 pagina's", 'note' => ''],
+                ['label' => "meer dan 10 pagina's", 'note' => ''],
             ],
             'visitors' => [
                 ['label' => 'Minder dan 1.000', 'note' => ''],
@@ -44,25 +45,26 @@ class QuoteFormFields
                 ['label' => 'Meer dan 25.000', 'note' => ''],
             ],
             'design' => [
-                ['label' => 'Ik heb al een huisstijl / logo', 'note' => ''],
-                ['label' => 'Ik wil een nieuw logo en huisstijl', 'note' => ''],
-                ['label' => 'Ik wil voorbeelden en advies', 'note' => ''],
+                ['label' => 'Ik heb een complete huisstijl', 'note' => ''],
+                ['label' => 'Ik heb een logo en kleuren', 'note' => ''],
+                ['label' => 'Ik wil hulp bij de vormgeving', 'note' => 'Vanaf + €'.($extras['designHelpFrom'] ?? 250).' / prijs op aanvraag'],
+                ['label' => 'Ik heb nog geen huisstijl', 'note' => ''],
             ],
             'features' => [
-                ['label' => 'CMS (zelf beheren)', 'note' => 'Inbegrepen bij de meeste websites'],
-                ['label' => 'Blog / nieuws', 'note' => 'Vaak € 300 - € 800 extra'],
-                ['label' => 'Contact- / leadformulieren', 'note' => 'Standaard bij de meeste pakketten'],
-                ['label' => 'SEO-basis', 'note' => 'Vaak € 500 - € 1.500'],
-                ['label' => 'Webshop / betalingen', 'note' => 'Vanaf € 5.000 bij de meeste bureaus'],
-                ['label' => 'Meertalig', 'note' => 'Vaak € 500 - € 1.500 per taal'],
-                ['label' => 'Koppeling CRM / ERP', 'note' => 'Vaak vanaf € 1.000'],
-                ['label' => 'Klantenportaal / login', 'note' => 'Vaak € 2.000 - € 5.000'],
-                ['label' => 'Afspraken systeem', 'note' => 'Vaak € 750 - € 2.000'],
+                ['label' => 'CMS (zelf beheren)', 'note' => 'Inbegrepen bij alle websitepakketten'],
+                ['label' => 'Blog / nieuws', 'note' => 'Vanaf + €'.($extras['blog'] ?? 100)],
+                ['label' => 'Contact- / leadformulieren', 'note' => 'Inbegrepen bij alle websitepakketten'],
+                ['label' => 'SEO-basis', 'note' => 'Inbegrepen bij alle websitepakketten'],
+                ['label' => 'Webshop / betalingen', 'note' => 'Vanaf + €'.($extras['webshopFrom'] ?? 500)],
+                ['label' => 'Meertalig', 'note' => '+ €'.($extras['multilingualPerLanguage'] ?? 150).' per taal'],
+                ['label' => 'Koppeling CRM / ERP', 'note' => 'Vanaf + €'.($extras['crmErpFrom'] ?? 300)],
+                ['label' => 'Klantenportaal / login', 'note' => 'Vanaf + €'.($extras['customerPortalFrom'] ?? 500)],
+                ['label' => 'Afspraken systeem', 'note' => 'Vanaf + €'.($extras['appointmentSystemFrom'] ?? 250)],
             ],
             'content' => [
-                ['label' => 'Ik lever teksten en beelden zelf aan', 'note' => ''],
-                ['label' => 'Ik wil hulp bij teksten', 'note' => ''],
-                ['label' => 'Ik wil fotografie / beelden', 'note' => ''],
+                ['label' => 'Ik lever teksten en beelden zelf aan', 'note' => 'Inbegrepen'],
+                ['label' => 'Ik wil hulp bij teksten', 'note' => 'Vanaf + €'.($extras['copywritingPerPageFrom'] ?? 75).' per pagina'],
+                ['label' => 'Ik wil hulp met fotografie / beelden', 'note' => 'Prijs op aanvraag'],
             ],
             'timeline' => [
                 ['label' => 'Zo snel mogelijk', 'note' => ''],
@@ -71,11 +73,12 @@ class QuoteFormFields
                 ['label' => 'Geen haast', 'note' => ''],
             ],
             'budget' => [
-                ['label' => 'Minder dan € 2.500', 'note' => ''],
-                ['label' => '€ 2.500 - € 5.000', 'note' => ''],
-                ['label' => '€ 5.000 - € 10.000', 'note' => ''],
-                ['label' => '€ 10.000 - € 25.000', 'note' => ''],
-                ['label' => 'Meer dan € 25.000', 'note' => ''],
+                ['label' => 'Tot € 1.000', 'note' => ''],
+                ['label' => '€ 1.000 - € 1.500', 'note' => ''],
+                ['label' => '€ 1.500 - € 2.000', 'note' => ''],
+                ['label' => '€ 2.000 - € 3.000', 'note' => ''],
+                ['label' => 'Meer dan € 3.000', 'note' => ''],
+                ['label' => 'Nog niet bepaald', 'note' => ''],
             ],
         ];
     }

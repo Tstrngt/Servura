@@ -49,7 +49,9 @@ class QuoteBuilderController extends Controller
         $form = \App\Support\QuoteFormFields::resolve();
         $packageDefaults = $serviceOptions->mapWithKeys(fn (Service $s) => [$s->slug => \App\Support\QuotePackageDefaults::for($s)])->all();
 
-        return view('quote.builder', compact('service', 'serviceOptions', 'form', 'packageDefaults'));
+        $pricingConfig = config('pricing');
+
+        return view('quote.builder', compact('service', 'serviceOptions', 'form', 'packageDefaults', 'pricingConfig'));
     }
 
     public function loginPrompt(Request $request)
