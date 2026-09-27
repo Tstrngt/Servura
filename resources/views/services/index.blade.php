@@ -252,13 +252,13 @@ $steps = [
         <div class="max-w-2xl mb-16 lg:mb-20 animate-on-scroll">
             <span class="inline-flex items-center gap-2 font-mono text-emerald-400 text-sm mb-4">
                 <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                &gt; webhosting --status online
+                Serverlocaties in Europa en de Verenigde Staten
             </span>
             <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-[1.05] tracking-tight">
                 Snel, veilig en <span class="text-emerald-400">altijd online</span>
             </h2>
             <p class="text-lg text-slate-400 leading-relaxed">
-                Kies het hostingpakket dat bij uw website past. Onze servers draaien in Europese datacenters, zodat uw bezoekers altijd een snelle verbinding hebben.
+                Snelle hosting, dagelijkse back-ups en SSL zijn standaard inbegrepen. Onze hosting draait in professionele datacenters in Europa en de Verenigde Staten, zodat we per website een passende serverlocatie kunnen kiezen.
             </p>
         </div>
 
@@ -268,16 +268,16 @@ $steps = [
             // Coördinaten zijn procentuele posities op de wereldkaart-afbeelding (lat/lng omgerekend naar equirectangular %).
             $datacenters = [
                 ['city' => 'Ede', 'country' => 'Nederland', 'flag' => '🇳🇱', 'badge' => 'Primair', 'left' => 49.6, 'top' => 35.1,
-                    'blurb' => 'Onze hoofdlocatie: snelle SSD-servers op een kort, direct netwerk.',
+                    'blurb' => 'Onze standaardlocatie voor Nederlandse en Europese websites, met een snelle verbinding en lage latency.',
                     'address' => 'Ede, Gelderland', 'specs' => ['Tier III+ datacenter', 'Redundante stroomvoorziening', '10 Gbps netwerkaansluiting', '24/7 bewaking ter plaatse']],
                 ['city' => 'Frankfurt', 'country' => 'Duitsland', 'flag' => '🇩🇪', 'badge' => 'Backup', 'left' => 50.4, 'top' => 36.2,
-                    'blurb' => 'Redundante back-uplocatie voor extra uitvalveiligheid en snelle failover.',
+                    'blurb' => 'Centrale Europese locatie voor websites en diensten met bezoekers verspreid over Europa.',
                     'address' => 'Frankfurt am Main', 'specs' => ['DE-CIX internetknooppunt', 'Automatische failover', 'N+1 koeling', 'ISO 27001 gecertificeerd']],
                 ['city' => 'Helsinki', 'country' => 'Finland', 'flag' => '🇫🇮', 'badge' => 'Duurzaam', 'left' => 51.9, 'top' => 30.6,
-                    'blurb' => 'Groene locatie met natuurlijke koeling voor een lage CO2-voetafdruk.',
+                    'blurb' => 'Europese locatie voor extra spreiding en specifieke hostingbehoeften.',
                     'address' => 'Helsinki', 'specs' => ['100% hernieuwbare energie', 'Natuurlijke koeling', 'Lage latency Noord-Europa', 'Duurzaamheidscertificering']],
                 ['city' => 'Ashburn', 'country' => 'Verenigde Staten', 'flag' => '🇺🇸', 'badge' => 'Noord-Amerika', 'left' => 28.9, 'top' => 38.9,
-                    'blurb' => 'Amerikaanse locatie in ‘Data Center Alley’ voor lage latency richting Noord-Amerikaanse bezoekers.',
+                    'blurb' => 'Amerikaanse locatie voor websites en diensten die dichter bij bezoekers in Noord-Amerika moeten draaien.',
                     'address' => 'Ashburn, VA', 'specs' => ['Directe transatlantische verbinding', 'Redundante uplinks', '24/7 support', 'DDoS-bescherming']],
             ];
         @endphp
@@ -368,8 +368,8 @@ $steps = [
 
         <!-- Datacenter map -->
         <div class="animate-on-scroll">
-            <h3 class="font-heading text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <span class="font-mono text-emerald-400 text-lg">&gt;_</span> Onze datacenterlocaties
+            <h3 class="font-heading text-2xl font-bold text-white mb-6">
+                Serverlocaties in Europa en de Verenigde Staten
             </h3>
 
             <div x-data="{ active: 0, dcOpen: false, dc: null, showDc(d) { this.dc = d; this.dcOpen = true; document.body.style.overflow = 'hidden'; }, hideDc() { this.dcOpen = false; this.dc = null; document.body.style.overflow = 'auto'; } }"
