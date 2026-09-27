@@ -9,6 +9,7 @@ class CaptchaService
 {
     public const PROVIDERS = [
         'recaptcha_v2' => 'Google reCAPTCHA v2',
+        'recaptcha_v3' => 'Google reCAPTCHA v3',
         'turnstile' => 'Cloudflare Turnstile',
     ];
 
@@ -60,7 +61,21 @@ class CaptchaService
                 'remoteip' => $ip,
             ]));
 
-            return (bool) ($response->json('success') ?? false);
+            $success = (bool) ($response->json('success') ?? false);
+
+            if (! $success) {
+                return false;
+            }
+
+            // reCAPTCHA v3 returns a score; require a sensible minimum.
+            if ($this->provider() === 'recaptcha_v3') {
+                $score = $response->json('score');
+                if ($score === null || $score < 0.5) {
+                    return false;
+                }
+            }
+
+            return true;
         } catch (\Throwable $e) {
             report($e);
 
