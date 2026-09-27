@@ -26,8 +26,9 @@ class QuoteBuilderController extends Controller
 
         $services = Service::where('is_active', true)->orderBy('title')->get(['id', 'slug', 'title']);
         $form = \App\Support\QuoteFormFields::resolve();
+        $packageDefaults = $services->mapWithKeys(fn (Service $s) => [$s->slug => \App\Support\QuotePackageDefaults::for($s)])->all();
 
-        return view('quote.builder', compact('service', 'services', 'form'));
+        return view('quote.builder', compact('service', 'services', 'form', 'packageDefaults'));
     }
 
     public function loginPrompt(Request $request)
@@ -104,8 +105,20 @@ class QuoteBuilderController extends Controller
             }
         }
 
-        $features = $request->input('features', []);
-        $content = $request->input('content', []);
+        $defaults = \App\Support\QuotePackageDefaults::for($service);
+
+        $submittedFeatures = array_values(array_unique($request->input('features', [])));
+        $submittedContent = array_values(array_unique($request->input('content', [])));
+
+        $includedFeatures = array_values(array_intersect($defaults['features'] ?? [], $submittedFeatures));
+        $extraFeatures = array_values(array_diff($submittedFeatures, $defaults['features'] ?? []));
+        $allFeatures = array_values(array_unique(array_merge($defaults['features'] ?? [], $submittedFeatures)));
+
+        $includedContent = array_values(array_intersect($defaults['content'] ?? [], $submittedContent));
+        $extraContent = array_values(array_diff($submittedContent, $defaults['content'] ?? []));
+        $allContent = array_values(array_unique(array_merge($defaults['content'] ?? [], $submittedContent)));
+
+        $formatList = fn (array $items, string $empty = 'Geen') => count($items) ? implode(', ', $items) : $empty;
 
         $messageText = "Offerte-aanvraag via de offerte-samensteller.\n\n";
         $messageText .= "Dienst: {$service->title}\n";
@@ -113,12 +126,16 @@ class QuoteBuilderController extends Controller
         $messageText .= "Aantal pagina's: {$request->input('pages')}\n";
         $messageText .= "Verwachte bezoekers per maand: {$request->input('visitors')}\n";
         $messageText .= "Ontwerp/huisstijl: {$request->input('design')}\n";
-        $messageText .= "Huidige website: " . ($request->input('current_website') ?: 'Niet opgegeven') . "\n";
-        $messageText .= "Gewenste functionaliteiten: " . (count($features) ? implode(', ', $features) : 'Geen') . "\n";
-        $messageText .= "Content wensen: " . (count($content) ? implode(', ', $content) : 'Zelf aanleveren') . "\n";
+        $messageText .= "Huidige website: " . ($request->input('current_website') ?: 'Niet opgegeven') . "\n\n";
+        $messageText .= "Gewenste functionaliteiten\n";
+        $messageText .= "Standaard inbegrepen: " . $formatList($includedFeatures) . "\n";
+        $messageText .= "Door klant aanvullend geselecteerd: " . $formatList($extraFeatures) . "\n\n";
+        $messageText .= "Content wensen\n";
+        $messageText .= "Standaard inbegrepen: " . $formatList($includedContent) . "\n";
+        $messageText .= "Door klant aanvullend geselecteerd: " . $formatList($extraContent) . "\n\n";
         $messageText .= "Gewenste oplevering: {$request->input('timeline')}\n";
         $messageText .= "Budgetindicatie: " . ($request->input('budget') ?: 'Niet opgegeven') . "\n\n";
-        $messageText .= "Extra informatie:\n" . ($request->input('notes') ?: '-');
+        $messageText .= "Overige vrije invoer:\n" . ($request->input('notes') ?: '-');
 
         $isNewUser = false;
         $plainPassword = null;
@@ -172,8 +189,12 @@ class QuoteBuilderController extends Controller
                     'Bezoekers/maand: '.$request->input('visitors'),
                     'Ontwerp: '.$request->input('design'),
                     'Huidige website: '.($request->input('current_website') ?: 'Niet opgegeven'),
-                    'Functionaliteiten: '.(count($features) ? implode(', ', $features) : 'Geen'),
-                    'Content: '.(count($content) ? implode(', ', $content) : 'Zelf aanleveren'),
+                    'Functionaliteiten: '.(count($allFeatures) ? implode(', ', $allFeatures) : 'Geen'),
+                    'Functionaliteiten standaard inbegrepen: '.(count($includedFeatures) ? implode(', ', $includedFeatures) : 'Geen'),
+                    'Functionaliteiten aanvullend: '.(count($extraFeatures) ? implode(', ', $extraFeatures) : 'Geen'),
+                    'Content: '.(count($allContent) ? implode(', ', $allContent) : 'Zelf aanleveren'),
+                    'Content standaard inbegrepen: '.(count($includedContent) ? implode(', ', $includedContent) : 'Geen'),
+                    'Content aanvullend: '.(count($extraContent) ? implode(', ', $extraContent) : 'Geen'),
                     'Oplevering: '.$request->input('timeline'),
                     'Budget: '.($request->input('budget') ?: 'Niet opgegeven'),
                 ]),

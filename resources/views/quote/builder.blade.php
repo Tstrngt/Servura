@@ -5,6 +5,11 @@
 @section('meta-keywords', 'offerte, website offerte, offerte samenstellen, webdesign offerte')
 
 @section('content')
+
+@php
+$currentDefaults = $service ? ($packageDefaults[$service->slug] ?? []) : [];
+@endphp
+
 <!-- Hero Section -->
 <section class="relative -mt-16 pt-16 overflow-hidden bg-slate-950 text-white" data-navbar-theme="dark">
     <div class="absolute inset-0 opacity-40 pointer-events-none" style="background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 32px 32px;"></div>
@@ -88,28 +93,29 @@
                         <p class="text-slate-500 mt-1">Uw aanvraag wordt direct gekoppeld aan deze dienst in uw klantportaal.</p>
                     </div>
                 </div>
-                @if($service)
-                    <input type="hidden" name="service" value="{{ $service->slug }}">
-                    <div class="flex items-center gap-4 rounded-2xl bg-white p-5 ring-1 ring-primary-200 shadow-sm">
-                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </span>
-                        <div>
-                            <span class="font-semibold text-slate-900 block">{{ $service->title }}</span>
-                            <a href="{{ route('quote.builder') }}" class="text-sm text-primary-600 hover:text-primary-800">Andere dienst kiezen</a>
-                        </div>
+                <input type="hidden" name="service" x-model="selectedService">
+
+                <div x-show="serviceMode === 'fixed'" x-cloak class="flex items-center gap-4 rounded-2xl bg-white p-5 ring-1 ring-primary-200 shadow-sm">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </span>
+                    <div>
+                        <span class="font-semibold text-slate-900 block">{{ $service?->title ?? 'Gekozen dienst' }}</span>
+                        <button type="button" @click="serviceMode = 'choose'" class="text-sm text-primary-600 hover:text-primary-800">Andere dienst kiezen</button>
                     </div>
-                @else
-                    <select name="service" class="form-input" required>
+                </div>
+
+                <div x-show="serviceMode === 'choose'" x-cloak>
+                    <select class="form-input" x-model="selectedService" @change="applyDefaults($event.target.value)" required>
                         <option value="">Kies een dienst</option>
                         @foreach($services as $option)
-                            <option value="{{ $option->slug }}" {{ old('service') === $option->slug ? 'selected' : '' }}>{{ $option->title }}</option>
+                            <option value="{{ $option->slug }}" {{ old('service', $service?->slug) === $option->slug ? 'selected' : '' }}>{{ $option->title }}</option>
                         @endforeach
                     </select>
                     @error('service')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
-                @endif
+                </div>
             </div>
 
             <!-- Doel -->
@@ -124,7 +130,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     @foreach($form['goals'] as $goal)
                         <label class="relative flex items-start gap-4 rounded-2xl bg-white p-5 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
-                            <input type="radio" name="goal" value="{{ $goal['label'] }}" class="mt-1 h-4 w-4 text-primary-600 border-slate-300 focus:ring-primary-500" required>
+                            <input type="radio" name="goal" value="{{ $goal['label'] }}" x-model="fields.goal" class="mt-1 h-4 w-4 text-primary-600 border-slate-300 focus:ring-primary-500" required>
                             <div>
                                 <span class="font-semibold text-slate-900 block">{{ $goal['label'] }}</span>
                                 @if($goal['note'] !== '')<span class="text-sm text-slate-500">{{ $goal['note'] }}</span>@endif
@@ -144,10 +150,10 @@
                             <p class="text-sm text-slate-500 mt-1">Per extra pagina rekenen veel bureaus € 150 tot € 400.</p>
                         </div>
                     </div>
-                    <select name="pages" class="form-input mt-auto" required>
+                    <select name="pages" class="form-input mt-auto" x-model="fields.pages" required>
                         <option value="">Kies een optie</option>
                         @foreach($form['pages'] as $option)
-                            <option value="{{ $option['label'] }}" {{ old('pages') === $option['label'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
+                            <option value="{{ $option['label'] }}">{{ $option['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -160,10 +166,10 @@
                             <p class="text-sm text-slate-500 mt-1">Hoge traffic vraagt meer performance en hosting.</p>
                         </div>
                     </div>
-                    <select name="visitors" class="form-input mt-auto" required>
+                    <select name="visitors" class="form-input mt-auto" x-model="fields.visitors" required>
                         <option value="">Kies een optie</option>
                         @foreach($form['visitors'] as $option)
-                            <option value="{{ $option['label'] }}" {{ old('visitors') === $option['label'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
+                            <option value="{{ $option['label'] }}">{{ $option['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -179,10 +185,10 @@
                             <p class="text-sm text-slate-500 mt-1">Een logo of huisstijl traject loopt vaak van € 750 tot € 2.500.</p>
                         </div>
                     </div>
-                    <select name="design" class="form-input mt-auto" required>
+                    <select name="design" class="form-input mt-auto" x-model="fields.design" required>
                         <option value="">Kies een optie</option>
                         @foreach($form['design'] as $option)
-                            <option value="{{ $option['label'] }}" {{ old('design') === $option['label'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
+                            <option value="{{ $option['label'] }}">{{ $option['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -210,10 +216,24 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach($form['features'] as $feature)
+                        @php $featureLabelJs = json_encode($feature['label']); @endphp
                         <label class="relative flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
-                            <input type="checkbox" name="features[]" value="{{ $feature['label'] }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                            <div>
-                                <span class="font-semibold text-slate-900 text-sm block">{{ $feature['label'] }}</span>
+                            <template x-if="isIncluded('features', {{ $featureLabelJs }})">
+                                <input type="hidden" name="features[]" value="{{ $feature['label'] }}">
+                            </template>
+                            <input
+                                type="checkbox"
+                                value="{{ $feature['label'] }}"
+                                class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+                                :disabled="isIncluded('features', {{ $featureLabelJs }})"
+                                :name="isIncluded('features', {{ $featureLabelJs }}) ? null : 'features[]'"
+                                x-model="selected.features"
+                            >
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-semibold text-slate-900 text-sm block">{{ $feature['label'] }}</span>
+                                    <span x-show="isIncluded('features', {{ $featureLabelJs }})" class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Inbegrepen</span>
+                                </div>
                                 @if($feature['note'] !== '')<span class="text-xs text-slate-400">{{ $feature['note'] }}</span>@endif
                             </div>
                         </label>
@@ -232,9 +252,25 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     @foreach($form['content'] as $option)
+                        @php $contentLabelJs = json_encode($option['label']); @endphp
                         <label class="relative flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
-                            <input type="checkbox" name="content[]" value="{{ $option['label'] }}" class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                            <span class="font-semibold text-slate-900 text-sm">{{ $option['label'] }}</span>
+                            <template x-if="isIncluded('content', {{ $contentLabelJs }})">
+                                <input type="hidden" name="content[]" value="{{ $option['label'] }}">
+                            </template>
+                            <input
+                                type="checkbox"
+                                value="{{ $option['label'] }}"
+                                class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+                                :disabled="isIncluded('content', {{ $contentLabelJs }})"
+                                :name="isIncluded('content', {{ $contentLabelJs }}) ? null : 'content[]'"
+                                x-model="selected.content"
+                            >
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-semibold text-slate-900 text-sm">{{ $option['label'] }}</span>
+                                    <span x-show="isIncluded('content', {{ $contentLabelJs }})" class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Inbegrepen</span>
+                                </div>
+                            </div>
                         </label>
                     @endforeach
                 </div>
@@ -250,10 +286,10 @@
                             <p class="text-sm text-slate-500 mt-1">Snellere oplevering is vaak mogelijk tegen een kleine meerprijs.</p>
                         </div>
                     </div>
-                    <select name="timeline" class="form-input mt-auto" required>
+                    <select name="timeline" class="form-input mt-auto" x-model="fields.timeline" required>
                         <option value="">Kies een optie</option>
                         @foreach($form['timeline'] as $option)
-                            <option value="{{ $option['label'] }}" {{ old('timeline') === $option['label'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
+                            <option value="{{ $option['label'] }}">{{ $option['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -266,10 +302,10 @@
                             <p class="text-sm text-slate-500 mt-1">Helpt ons een passend voorstel te doen.</p>
                         </div>
                     </div>
-                    <select name="budget" class="form-input mt-auto">
+                    <select name="budget" class="form-input mt-auto" x-model="fields.budget">
                         <option value="">Kies een budgetindicatie</option>
                         @foreach($form['budget'] as $option)
-                            <option value="{{ $option['label'] }}" {{ old('budget') === $option['label'] ? 'selected' : '' }}>{{ $option['label'] }}</option>
+                            <option value="{{ $option['label'] }}">{{ $option['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -346,6 +382,34 @@
 function quoteBuilder() {
     return {
         mode: @json(auth()->check() ? 'existing' : (old('email') ? 'new' : null)),
+        serviceMode: @json($service ? 'fixed' : 'choose'),
+        selectedService: @json(old('service', $service?->slug ?? '')),
+        packages: @json($packageDefaults),
+        fields: @json([
+            'goal' => old('goal', $currentDefaults['goal'] ?? ''),
+            'pages' => old('pages', $currentDefaults['pages'] ?? ''),
+            'visitors' => old('visitors', $currentDefaults['visitors'] ?? ''),
+            'design' => old('design', $currentDefaults['design'] ?? ''),
+            'timeline' => old('timeline', ''),
+            'budget' => old('budget', ''),
+        ]),
+        selected: @json([
+            'features' => old('features', $currentDefaults['features'] ?? []),
+            'content' => old('content', $currentDefaults['content'] ?? []),
+        ]),
+        isIncluded(group, label) {
+            const defs = this.packages[this.selectedService] || {};
+            return (defs[group] || []).includes(label);
+        },
+        applyDefaults(slug) {
+            const defs = this.packages[slug] || {};
+            this.fields.goal = defs.goal || '';
+            this.fields.pages = defs.pages || '';
+            this.fields.visitors = defs.visitors || '';
+            this.fields.design = defs.design || '';
+            this.selected.features = defs.features ? [...defs.features] : [];
+            this.selected.content = defs.content ? [...defs.content] : [];
+        },
         submitting: false,
         async submit(event) {
             this.submitting = true;
