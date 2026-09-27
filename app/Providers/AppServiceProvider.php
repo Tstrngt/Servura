@@ -124,6 +124,11 @@ class AppServiceProvider extends ServiceProvider
         try {
             $defaults = config('company');
 
+            $companyEmail = BillingSetting::valueFor('company_email');
+            if (blank($companyEmail)) {
+                $companyEmail = BillingSetting::valueFor('contact_email', $defaults['email'] ?? '');
+            }
+
             Config::set('company', [
                 'legal_name' => BillingSetting::valueFor('company_legal_name', $defaults['legal_name'] ?? ''),
                 'trade_name' => BillingSetting::valueFor('company_trade_name', $defaults['trade_name'] ?? ''),
@@ -133,7 +138,7 @@ class AppServiceProvider extends ServiceProvider
                 'country' => BillingSetting::valueFor('company_country', $defaults['country'] ?? ''),
                 'kvk_number' => BillingSetting::valueFor('company_kvk_number', $defaults['kvk_number'] ?? ''),
                 'vat_number' => BillingSetting::valueFor('company_vat_number', $defaults['vat_number'] ?? ''),
-                'email' => BillingSetting::valueFor('company_email', $defaults['email'] ?? ''),
+                'email' => $companyEmail,
                 'phone' => BillingSetting::valueFor('company_phone', $defaults['phone'] ?? ''),
                 'website' => BillingSetting::valueFor('company_website', $defaults['website'] ?? ''),
                 'privacy_email' => BillingSetting::valueFor('company_privacy_email', $defaults['privacy_email'] ?? ''),
@@ -158,8 +163,20 @@ class AppServiceProvider extends ServiceProvider
                 $versions[$key]['effective_date'] = BillingSetting::valueFor("legal_{$key}_effective_date", $versions[$key]['effective_date']);
             }
 
+            $retention = $defaults['retention'] ?? [];
+            foreach (array_keys($retention) as $key) {
+                $retention[$key] = BillingSetting::valueFor("legal_retention_{$key}", $retention[$key] ?? '');
+            }
+
+            $hosting = $defaults['hosting'] ?? [];
+            foreach (array_keys($hosting) as $key) {
+                $hosting[$key] = BillingSetting::valueFor("legal_hosting_{$key}", $hosting[$key] ?? '');
+            }
+
             Config::set('legal', array_merge($defaults, [
                 'versions' => $versions,
+                'retention' => $retention,
+                'hosting' => $hosting,
             ]));
         } catch (\Throwable $e) {
             // Database may not be available during migrations or cache warming.

@@ -26,6 +26,19 @@ class SettingController extends Controller
             'default_language' => BillingSetting::valueFor('default_language', 'nl'),
             'language_menu_enabled' => BillingSetting::boolean('language_menu_enabled'),
             'newsletter_enabled' => BillingSetting::boolean('newsletter_enabled'),
+            'company_legal_name' => BillingSetting::valueFor('company_legal_name', ''),
+            'company_trade_name' => BillingSetting::valueFor('company_trade_name', ''),
+            'company_address' => BillingSetting::valueFor('company_address', ''),
+            'company_postal_code' => BillingSetting::valueFor('company_postal_code', ''),
+            'company_city' => BillingSetting::valueFor('company_city', ''),
+            'company_country' => BillingSetting::valueFor('company_country', ''),
+            'company_kvk_number' => BillingSetting::valueFor('company_kvk_number', ''),
+            'company_vat_number' => BillingSetting::valueFor('company_vat_number', ''),
+            'company_email' => BillingSetting::valueFor('company_email', BillingSetting::valueFor('contact_email', config('mail.from.address'))),
+            'company_phone' => BillingSetting::valueFor('company_phone', ''),
+            'company_website' => BillingSetting::valueFor('company_website', ''),
+            'company_privacy_email' => BillingSetting::valueFor('company_privacy_email', ''),
+            'company_abuse_email' => BillingSetting::valueFor('company_abuse_email', ''),
             'social_instagram' => BillingSetting::valueFor('social_instagram', ''),
             'social_linkedin' => BillingSetting::valueFor('social_linkedin', ''),
             'social_facebook' => BillingSetting::valueFor('social_facebook', ''),
@@ -52,6 +65,19 @@ class SettingController extends Controller
             'default_language' => ['required', Rule::in(['nl', 'en', 'de', 'fr'])],
             'language_menu_enabled' => 'boolean',
             'newsletter_enabled' => 'boolean',
+            'company_legal_name' => 'nullable|string|max:255',
+            'company_trade_name' => 'nullable|string|max:255',
+            'company_address' => 'nullable|string|max:500',
+            'company_postal_code' => 'nullable|string|max:20',
+            'company_city' => 'nullable|string|max:100',
+            'company_country' => 'nullable|string|max:100',
+            'company_kvk_number' => 'nullable|string|max:50',
+            'company_vat_number' => 'nullable|string|max:50',
+            'company_email' => 'nullable|email|max:255',
+            'company_phone' => 'nullable|string|max:30',
+            'company_website' => 'nullable|url|max:255',
+            'company_privacy_email' => 'nullable|email|max:255',
+            'company_abuse_email' => 'nullable|email|max:255',
             'social_instagram' => 'nullable|url|max:255',
             'social_linkedin' => 'nullable|url|max:255',
             'social_facebook' => 'nullable|url|max:255',
@@ -101,6 +127,74 @@ class SettingController extends Controller
         BillingSetting::setValue('quote_form_fields', json_encode($fields));
 
         return back()->with('success', 'Offerteformulier is bijgewerkt.');
+    }
+
+    public function legal()
+    {
+        $this->authorizeOwner();
+
+        $legal = config('legal');
+
+        $settings = [
+            'legal_terms_version' => BillingSetting::valueFor('legal_terms_version', $legal['versions']['terms']['version'] ?? ''),
+            'legal_terms_effective_date' => BillingSetting::valueFor('legal_terms_effective_date', $legal['versions']['terms']['effective_date'] ?? ''),
+            'legal_privacy_version' => BillingSetting::valueFor('legal_privacy_version', $legal['versions']['privacy']['version'] ?? ''),
+            'legal_privacy_effective_date' => BillingSetting::valueFor('legal_privacy_effective_date', $legal['versions']['privacy']['effective_date'] ?? ''),
+            'legal_cookies_version' => BillingSetting::valueFor('legal_cookies_version', $legal['versions']['cookies']['version'] ?? ''),
+            'legal_cookies_effective_date' => BillingSetting::valueFor('legal_cookies_effective_date', $legal['versions']['cookies']['effective_date'] ?? ''),
+            'legal_hosting_terms_version' => BillingSetting::valueFor('legal_hosting_terms_version', $legal['versions']['hosting_terms']['version'] ?? ''),
+            'legal_hosting_terms_effective_date' => BillingSetting::valueFor('legal_hosting_terms_effective_date', $legal['versions']['hosting_terms']['effective_date'] ?? ''),
+            'legal_acceptable_use_version' => BillingSetting::valueFor('legal_acceptable_use_version', $legal['versions']['acceptable_use']['version'] ?? ''),
+            'legal_acceptable_use_effective_date' => BillingSetting::valueFor('legal_acceptable_use_effective_date', $legal['versions']['acceptable_use']['effective_date'] ?? ''),
+            'legal_retention_contact_request' => BillingSetting::valueFor('legal_retention_contact_request', $legal['retention']['contact_request'] ?? ''),
+            'legal_retention_quote_request' => BillingSetting::valueFor('legal_retention_quote_request', $legal['retention']['quote_request'] ?? ''),
+            'legal_retention_customer_account' => BillingSetting::valueFor('legal_retention_customer_account', $legal['retention']['customer_account'] ?? ''),
+            'legal_retention_analytics' => BillingSetting::valueFor('legal_retention_analytics', $legal['retention']['analytics'] ?? ''),
+            'legal_hosting_backup_retention' => BillingSetting::valueFor('legal_hosting_backup_retention', $legal['hosting']['backup_retention'] ?? ''),
+            'legal_hosting_backup_frequency' => BillingSetting::valueFor('legal_hosting_backup_frequency', $legal['hosting']['backup_frequency'] ?? ''),
+            'legal_hosting_recovery_time' => BillingSetting::valueFor('legal_hosting_recovery_time', $legal['hosting']['recovery_time'] ?? ''),
+            'legal_hosting_uptime_sla' => BillingSetting::valueFor('legal_hosting_uptime_sla', $legal['hosting']['uptime_sla'] ?? ''),
+            'legal_hosting_support_response_time' => BillingSetting::valueFor('legal_hosting_support_response_time', $legal['hosting']['support_response_time'] ?? ''),
+            'legal_hosting_fair_use_storage' => BillingSetting::valueFor('legal_hosting_fair_use_storage', $legal['hosting']['fair_use_storage'] ?? ''),
+            'legal_hosting_fair_use_traffic' => BillingSetting::valueFor('legal_hosting_fair_use_traffic', $legal['hosting']['fair_use_traffic'] ?? ''),
+        ];
+
+        return view('admin.settings.legal', compact('settings'));
+    }
+
+    public function updateLegal(Request $request)
+    {
+        $this->authorizeOwner();
+
+        $validated = $request->validate([
+            'legal_terms_version' => 'nullable|string|max:20',
+            'legal_terms_effective_date' => 'nullable|string|max:50',
+            'legal_privacy_version' => 'nullable|string|max:20',
+            'legal_privacy_effective_date' => 'nullable|string|max:50',
+            'legal_cookies_version' => 'nullable|string|max:20',
+            'legal_cookies_effective_date' => 'nullable|string|max:50',
+            'legal_hosting_terms_version' => 'nullable|string|max:20',
+            'legal_hosting_terms_effective_date' => 'nullable|string|max:50',
+            'legal_acceptable_use_version' => 'nullable|string|max:20',
+            'legal_acceptable_use_effective_date' => 'nullable|string|max:50',
+            'legal_retention_contact_request' => 'nullable|string|max:100',
+            'legal_retention_quote_request' => 'nullable|string|max:100',
+            'legal_retention_customer_account' => 'nullable|string|max:100',
+            'legal_retention_analytics' => 'nullable|string|max:100',
+            'legal_hosting_backup_retention' => 'nullable|string|max:100',
+            'legal_hosting_backup_frequency' => 'nullable|string|max:100',
+            'legal_hosting_recovery_time' => 'nullable|string|max:100',
+            'legal_hosting_uptime_sla' => 'nullable|string|max:100',
+            'legal_hosting_support_response_time' => 'nullable|string|max:100',
+            'legal_hosting_fair_use_storage' => 'nullable|string|max:100',
+            'legal_hosting_fair_use_traffic' => 'nullable|string|max:100',
+        ]);
+
+        foreach ($validated as $key => $value) {
+            BillingSetting::setValue($key, $value ?? '');
+        }
+
+        return back()->with('success', 'Juridische instellingen zijn opgeslagen.');
     }
 
     public function security()

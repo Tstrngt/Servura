@@ -257,6 +257,8 @@ Route::middleware('auth')->group(function () {
             Route::put('/facturatie', [AdminBillingSettingsController::class, 'update'])->name('billing.update');
             Route::get('/offerteformulier', [App\Http\Controllers\Admin\SettingController::class, 'formbuilder'])->name('formbuilder');
             Route::put('/offerteformulier', [App\Http\Controllers\Admin\SettingController::class, 'updateFormbuilder'])->name('formbuilder.update');
+            Route::get('/juridisch', [App\Http\Controllers\Admin\SettingController::class, 'legal'])->name('legal');
+            Route::put('/juridisch', [App\Http\Controllers\Admin\SettingController::class, 'updateLegal'])->name('legal.update');
             Route::get('/beveiliging', [App\Http\Controllers\Admin\SettingController::class, 'security'])->name('security');
             Route::put('/beveiliging', [App\Http\Controllers\Admin\SettingController::class, 'updateSecurity'])->name('security.update');
             Route::get('/nieuwsbrief', [App\Http\Controllers\Admin\SettingController::class, 'newsletter'])->name('newsletter');

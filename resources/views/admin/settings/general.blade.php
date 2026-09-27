@@ -92,6 +92,65 @@
             </div>
 
             <div class="mt-8 border-t border-slate-200 pt-6">
+                <h3 class="text-base font-semibold text-slate-900">Bedrijfsgegevens</h3>
+                <p class="mt-1 text-sm text-slate-600">Deze gegevens worden gebruikt op de footer, contactpagina en juridische pagina's.</p>
+                <div class="mt-4 grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+                    <div class="form-group">
+                        <label class="form-label" for="company_legal_name">Juridische bedrijfsnaam</label>
+                        <input class="form-input" id="company_legal_name" name="company_legal_name" type="text" value="{{ old('company_legal_name', $settings['company_legal_name']) }}" placeholder="Bijv. Servura B.V.">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="company_trade_name">Handelsnaam</label>
+                        <input class="form-input" id="company_trade_name" name="company_trade_name" type="text" value="{{ old('company_trade_name', $settings['company_trade_name']) }}" placeholder="Servura">
+                    </div>
+                    <div class="form-group sm:col-span-2">
+                        <label class="form-label" for="company_address">Adres</label>
+                        <input class="form-input" id="company_address" name="company_address" type="text" value="{{ old('company_address', $settings['company_address']) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="company_postal_code">Postcode</label>
+                        <input class="form-input" id="company_postal_code" name="company_postal_code" type="text" value="{{ old('company_postal_code', $settings['company_postal_code']) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="company_city">Plaats</label>
+                        <input class="form-input" id="company_city" name="company_city" type="text" value="{{ old('company_city', $settings['company_city']) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="company_country">Land</label>
+                        <input class="form-input" id="company_country" name="company_country" type="text" value="{{ old('company_country', $settings['company_country']) }}" placeholder="Nederland">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="company_kvk_number">KvK-nummer</label>
+                        <input class="form-input" id="company_kvk_number" name="company_kvk_number" type="text" value="{{ old('company_kvk_number', $settings['company_kvk_number']) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="company_vat_number">BTW-nummer</label>
+                        <input class="form-input" id="company_vat_number" name="company_vat_number" type="text" value="{{ old('company_vat_number', $settings['company_vat_number']) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="company_email">Zakelijk e-mailadres</label>
+                        <input class="form-input" id="company_email" name="company_email" type="email" value="{{ old('company_email', $settings['company_email']) }}" placeholder="Leeg laten om contact-e-mail te gebruiken">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="company_phone">Telefoonnummer</label>
+                        <input class="form-input" id="company_phone" name="company_phone" type="text" value="{{ old('company_phone', $settings['company_phone']) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="company_website">Website</label>
+                        <input class="form-input" id="company_website" name="company_website" type="url" value="{{ old('company_website', $settings['company_website']) }}" placeholder="https://servura.nl">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="company_privacy_email">Privacy-contact e-mail</label>
+                        <input class="form-input" id="company_privacy_email" name="company_privacy_email" type="email" value="{{ old('company_privacy_email', $settings['company_privacy_email']) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="company_abuse_email">Abuse e-mailadres</label>
+                        <input class="form-input" id="company_abuse_email" name="company_abuse_email" type="email" value="{{ old('company_abuse_email', $settings['company_abuse_email']) }}" placeholder="abuse@servura.nl">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 border-t border-slate-200 pt-6">
                 <h3 class="text-base font-semibold text-slate-900">Social media</h3>
                 <p class="mt-1 text-sm text-slate-600">Ingevulde links verschijnen automatisch met het bijbehorende icoon in de footer van de hele site.</p>
                 <div class="mt-4 grid grid-cols-1 gap-x-5 sm:grid-cols-2">
