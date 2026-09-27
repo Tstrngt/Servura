@@ -44,7 +44,6 @@ $steps = [
         @endphp
 
         @if($webdesignServices->count() > 0)
-            @php $recommendedService = null; @endphp
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                 @foreach($webdesignServices as $index => $service)
                     @php
@@ -68,7 +67,12 @@ $steps = [
                             'from-secondary-500 to-secondary-700',
                         ];
                     @endphp
-                    <div class="group relative bg-white rounded-3xl transition-all duration-300 animate-on-scroll flex flex-col {{ $isRecommended ? 'md:-translate-y-8 md:scale-110 z-20 ring-4 ring-accent-400 shadow-[0_0_0_6px_rgba(14,165,233,0.28),0_0_0_16px_rgba(20,184,166,0.20),0_30px_70px_-15px_rgba(14,165,233,0.45)]' : 'ring-1 ring-slate-200 shadow-xl shadow-slate-900/5 hover:-translate-y-2 hover:shadow-2xl' }}">
+                    <div class="group relative bg-white rounded-3xl transition-all duration-300 animate-on-scroll flex flex-col {{ $isRecommended ? 'z-10 ring-2 ring-accent-400 shadow-xl shadow-primary-900/10 md:-translate-y-3' : 'ring-1 ring-slate-200 shadow-lg shadow-slate-900/5 hover:-translate-y-1 hover:shadow-xl' }}">
+                        @if($isRecommended)
+                            <span class="absolute -top-3 right-4 z-20 inline-flex items-center rounded-full bg-gradient-to-r from-primary-500 to-accent-500 px-3 py-1 text-xs font-bold text-white shadow-md">
+                                Aanbevolen
+                            </span>
+                        @endif
                         <div class="overflow-hidden rounded-t-3xl">
                             @if($isRecommended)
                                 <div class="h-2 bg-gradient-to-r from-primary-500 to-accent-500"></div>
@@ -111,22 +115,12 @@ $steps = [
                             <button type="button" @click="show(@js($serviceData))" class="btn {{ $isRecommended ? 'btn-primary' : 'btn-outline' }} w-full" aria-haspopup="dialog" aria-controls="service-modal">
                                 Bekijk product
                             </button>
-                            @if($isRecommended)
-                                @php $recommendedService = $service; @endphp
-                            @endif
                         </div>
                     </div>
                 @endforeach
             </div>
 
-            @if($recommendedService)
-                <div class="mt-8 flex justify-center">
-                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 text-white text-sm font-bold uppercase tracking-wide shadow-lg">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                        Aanbevolen: {{ $recommendedService->title }}
-                    </span>
-                </div>
-            @endif
+
         @else
             <p class="text-slate-600">Geen webdesign pakketten gevonden.</p>
         @endif
