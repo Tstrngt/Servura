@@ -9,18 +9,18 @@
     $team = [
         [
             'name' => 'Tim van Gorkom',
-            'role' => 'Founder & Lead Developer',
-            'bio' => 'Richting, architectuur en de technische visie van Servura.',
-            'portfolio_summary' => 'Specialist in Laravel-architectuur, API-koppelingen en schaalbare backends voor bedrijven.',
+            'role' => 'Founder & Infrastructure Specialist',
+            'bio' => 'Verantwoordelijk voor hosting, servers en de technische infrastructuur achter Servura.',
+            'portfolio_summary' => 'Richt zich op hosting, serverbeheer en de technische infrastructuur achter websites en online diensten.',
             'initial' => 'T',
             'color' => 'from-primary-500 to-primary-700',
             'portfolio_url' => '#tim-portfolio',
         ],
         [
             'name' => 'Dirk van Gelderen',
-            'role' => 'Front-end & Back-end Developer',
-            'bio' => 'Bouwt solide applicaties en zorgt voor snelle, nette interfaces.',
-            'portfolio_summary' => 'Expert in Tailwind CSS, Blade-componenten en het bouwen van interactieve webervaringen.',
+            'role' => 'Full-stack Developer',
+            'bio' => 'Bouwt websites en applicaties en zorgt dat techniek en gebruiksgemak goed op elkaar aansluiten.',
+            'portfolio_summary' => 'Ontwikkelt websites en webapplicaties met aandacht voor techniek, snelheid en gebruiksgemak.',
             'initial' => 'D',
             'color' => 'from-secondary-600 to-secondary-800',
             'image' => 'images/dirk-van-gelderen.jpg',
@@ -29,9 +29,9 @@
         ],
         [
             'name' => 'Isis van Dijk',
-            'role' => 'UX/UI Specialist & Design Expert',
-            'bio' => 'Ontwerpt intuïtieve ervaringen die bezoekers converteren.',
-            'portfolio_summary' => 'Richt zich op gebruikersonderzoek, design systems en visuele hierarchie die resultaat oplevert.',
+            'role' => 'UX/UI Designer',
+            'bio' => 'Ontwerpt duidelijke en gebruiksvriendelijke interfaces die passen bij de uitstraling van uw organisatie.',
+            'portfolio_summary' => 'Ontwerpt duidelijke en gebruiksvriendelijke interfaces die aansluiten bij merk, doelgroep en doelstelling.',
             'initial' => 'I',
             'color' => 'from-accent-500 to-accent-700',
             'portfolio_url' => 'https://isisvandijk.github.io/Portfolio/',
@@ -51,10 +51,10 @@
     <div class="relative max-w-7xl mx-auto px-6 py-24 lg:py-32">
         <div class="max-w-2xl animate-slide-up">
             <h1 class="font-heading text-4xl md:text-5xl font-bold leading-[1.05] tracking-tight">
-                Uw partner voor een sterke online aanwezigheid.
+                Eén partij voor uw complete website
             </h1>
             <p class="mt-6 max-w-xl text-lg leading-relaxed text-white/90">
-                Wij helpen ondernemers en organisaties met professionele websites, betrouwbare hosting en persoonlijke ondersteuning — van het eerste gesprek tot het doorlopende onderhoud.
+                Wij verzorgen het ontwerp, de techniek, hosting en het onderhoud. Zo hoeft u niet met verschillende partijen te schakelen en weet u altijd bij wie u terechtkunt.
             </p>
         </div>
     </div>
@@ -149,7 +149,7 @@
             <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Ons team</span>
             <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 leading-[1.05] tracking-tight">De mensen achter Servura</h2>
             <p class="max-w-2xl text-lg text-slate-600 leading-relaxed">
-                Een klein team van professionals met passie voor webdevelopment, design en klantenservice.
+                Een klein team met ieder een eigen specialisme. Samen zorgen we voor ontwerp, techniek, hosting en ondersteuning.
             </p>
         </div>
 
@@ -182,10 +182,10 @@
             <div class="animate-on-scroll">
                 <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Werkwijze</span>
                 <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-[1.05] tracking-tight">
-                    Persoonlijk, van begin tot eind
+                    Persoonlijk van start tot oplevering
                 </h2>
                 <p class="text-lg text-slate-600 leading-relaxed">
-                    Wij geloven dat een goede website meer is dan alleen een mooi ontwerp. Daarom begeleiden wij u tijdens het volledige traject: van het eerste gesprek en het ontwerp tot de ontwikkeling, hosting, beveiliging en het doorlopende onderhoud.
+                    Van het eerste gesprek tot hosting en onderhoud: wij houden het proces overzichtelijk. U heeft één aanspreekpunt en weet tijdens iedere stap wat er gebeurt.
                 </p>
             </div>
 
@@ -196,7 +196,7 @@
                     </span>
                     <div>
                         <h4 class="font-heading font-semibold text-slate-900">Één vast aanspreekpunt</h4>
-                        <p class="mt-1 text-slate-600 leading-relaxed">Geen callcenters of wachtrijen. U spreekt altijd met iemand die uw project kent.</p>
+                        <p class="mt-1 text-slate-600 leading-relaxed">U spreekt rechtstreeks met iemand die uw project kent. Geen callcenter of steeds wisselende contactpersonen.</p>
                     </div>
                 </div>
 
@@ -205,8 +205,8 @@
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M20.25 8.511c0 1.281-.809 2.443-2.027 2.845-1.011.327-2.036.35-3.065.07a.75.75 0 00-.92.92c.28 1.029.257 2.054-.07 3.065C13.954 16.191 12.792 17 11.511 17H3.75a.75.75 0 01-.75-.75V6.75a.75.75 0 01.75-.75h7.761c1.281 0 2.443.809 2.845 2.027.327 1.011.35 2.036.07 3.065a.75.75 0 00.92.92c1.029-.28 2.054-.257 3.065.07C19.441 6.308 20.25 7.47 20.25 8.511z" /></svg>
                     </span>
                     <div>
-                        <h4 class="font-heading font-semibold text-slate-900">Helder en transparant</h4>
-                        <p class="mt-1 text-slate-600 leading-relaxed">Wij vertalen techniek naar gewone taal en houden u bij elke stap op de hoogte.</p>
+                        <h4 class="font-heading font-semibold text-slate-900">Duidelijke communicatie</h4>
+                        <p class="mt-1 text-slate-600 leading-relaxed">We leggen technische keuzes begrijpelijk uit en houden u op de hoogte van de voortgang.</p>
                     </div>
                 </div>
 
@@ -215,8 +215,8 @@
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>
                     </span>
                     <div>
-                        <h4 class="font-heading font-semibold text-slate-900">Veilig en betrouwbaar</h4>
-                        <p class="mt-1 text-slate-600 leading-relaxed">SSL, dagelijkse back-ups en bewaking draaien op de achtergrond — u merkt er niets van.</p>
+                        <h4 class="font-heading font-semibold text-slate-900">Veilig en goed beheerd</h4>
+                        <p class="mt-1 text-slate-600 leading-relaxed">SSL, dagelijkse back-ups en technisch beheer zijn standaard onderdeel van onze dienstverlening.</p>
                     </div>
                 </div>
 
@@ -225,8 +225,8 @@
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25M6.75 17.25 1.5 12l5.25-5.25M14.25 3.75l-4.5 16.5" /></svg>
                     </span>
                     <div>
-                        <h4 class="font-heading font-semibold text-slate-900">Op maat, geen templates</h4>
-                        <p class="mt-1 text-slate-600 leading-relaxed">Elke website sluit aan bij uw bedrijf, doelen en doelgroep.</p>
+                        <h4 class="font-heading font-semibold text-slate-900">Ontworpen voor uw bedrijf</h4>
+                        <p class="mt-1 text-slate-600 leading-relaxed">Geen standaardoplossing, maar een website die aansluit bij uw organisatie, doelen en doelgroep.</p>
                     </div>
                 </div>
             </div>
@@ -241,7 +241,7 @@
             <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Portfolio</span>
             <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 leading-[1.05] tracking-tight">Het werk van ons team</h2>
             <p class="max-w-2xl text-lg text-slate-600 leading-relaxed">
-                Ontdek het persoonlijke portfolio van elk teamlid. Hier delen we onze individuele expertise, projecten en specialisaties.
+                Bekijk het werk van ons team en ontdek waar ieder van ons zich in specialiseert.
             </p>
         </div>
 
