@@ -24,11 +24,32 @@ class QuoteBuilderController extends Controller
             ? Service::where('slug', $request->input('service'))->where('is_active', true)->first()
             : null;
 
-        $services = Service::where('is_active', true)->orderBy('title')->get(['id', 'slug', 'title']);
-        $form = \App\Support\QuoteFormFields::resolve();
-        $packageDefaults = $services->mapWithKeys(fn (Service $s) => [$s->slug => \App\Support\QuotePackageDefaults::for($s)])->all();
+        // Canonicaliseer naar het volledige *-website pakket als dat bestaat,
+        // zodat dubbele korte/lange diensten niet naast elkaar verschijnen.
+        if ($service && in_array($service->slug, ['starter', 'business', 'pro'])) {
+            $canonical = Service::where('slug', $service->slug.'-website')->where('is_active', true)->first();
+            if ($canonical) {
+                $service = $canonical;
+            }
+        }
 
-        return view('quote.builder', compact('service', 'services', 'form', 'packageDefaults'));
+        $knownSlugs = ['starter', 'starter-website', 'business', 'business-website', 'pro', 'pro-website'];
+        $services = Service::where('is_active', true)
+            ->whereIn('slug', $knownSlugs)
+            ->orderBy('title')
+            ->get(['id', 'slug', 'title']);
+
+        // Toon alleen de meest specifieke variant per pakket (bijv. business-website i.p.v. business).
+        $serviceOptions = $services
+            ->groupBy(fn (Service $s) => str_replace('-website', '', $s->slug))
+            ->map(fn ($group) => $group->first(fn (Service $s) => str_ends_with($s->slug, '-website')) ?? $group->first())
+            ->sortBy('title')
+            ->values();
+
+        $form = \App\Support\QuoteFormFields::resolve();
+        $packageDefaults = $serviceOptions->mapWithKeys(fn (Service $s) => [$s->slug => \App\Support\QuotePackageDefaults::for($s)])->all();
+
+        return view('quote.builder', compact('service', 'serviceOptions', 'form', 'packageDefaults'));
     }
 
     public function loginPrompt(Request $request)

@@ -15,7 +15,7 @@ class QuotePackageDefaults
     public static function for(Service $service): array
     {
         return match ($service->slug) {
-            'starter-website' => [
+            'starter', 'starter-website' => [
                 'goal' => 'Visitekaartje / online brochure',
                 'pages' => "1 - 5 pagina's",
                 'visitors' => 'Minder dan 1.000',
@@ -28,7 +28,7 @@ class QuotePackageDefaults
                     'Ik lever teksten en beelden zelf aan',
                 ],
             ],
-            'business-website' => [
+            'business', 'business-website' => [
                 'goal' => 'Meer leads en aanvragen',
                 'pages' => "6 - 10 pagina's",
                 'visitors' => '1.000 - 5.000',
@@ -43,7 +43,7 @@ class QuotePackageDefaults
                     'Ik lever teksten en beelden zelf aan',
                 ],
             ],
-            'pro-website' => [
+            'pro', 'pro-website' => [
                 'goal' => 'Producten of diensten verkopen',
                 'pages' => "11 - 20 pagina's",
                 'visitors' => '5.000 - 25.000',

@@ -120,7 +120,7 @@ $initialQuoteSelected = [
                 <div x-show="serviceMode === 'choose'" x-cloak>
                     <select class="form-input" x-model="selectedService" @change="applyDefaults($event.target.value)" required>
                         <option value="">Kies een dienst</option>
-                        @foreach($services as $option)
+                        @foreach($serviceOptions as $option)
                             <option value="{{ $option->slug }}" {{ old('service', $service?->slug) === $option->slug ? 'selected' : '' }}>{{ $option->title }}</option>
                         @endforeach
                     </select>
