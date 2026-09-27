@@ -27,13 +27,15 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
             <div class="lg:col-span-7 animate-on-scroll">
                 <span class="text-accent-600 font-semibold tracking-wide uppercase text-sm mb-4 block">Waarom Servura</span>
                 <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-[1.05] tracking-tight">
-                    Persoonlijk, helder<br class="hidden sm:block"> en betrouwbaar
+                    Persoonlijk contact,<br class="hidden sm:block"> duidelijke afspraken
                 </h2>
             </div>
             <div class="lg:col-span-5 animate-on-scroll">
                 <p class="text-lg text-slate-600 leading-relaxed max-w-md">
-                    Wij luisteren eerst naar wat u wilt bereiken en gaan daarna pas bouwen.
-                    Geen jargon, geen wachtrij — één team dat uw website van begin tot eind verzorgt.
+                    Een goede website begint niet bij techniek, maar bij wat u ermee wilt bereiken.
+                    Daarom bespreken we eerst uw wensen en maken we duidelijke afspraken over
+                    ontwerp, bouw en beheer. U heeft één aanspreekpunt en weet gedurende het
+                    hele traject waar u aan toe bent.
                 </p>
             </div>
         </div>
@@ -46,7 +48,9 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
                 </span>
                 <h3 class="mt-6 font-heading text-2xl font-bold text-slate-900">Persoonlijk</h3>
                 <p class="mt-3 text-slate-600 leading-relaxed">
-                    U overlegt altijd met dezelfde mensen die uw site bouwen. Eén vast aanspreekpunt — geen helpdesk, geen wachtrij.
+                    U heeft rechtstreeks contact met degene die aan uw website werkt.
+                    Geen ticketsysteem of steeds wisselende contactpersonen, maar korte lijnen
+                    en duidelijke afspraken.
                 </p>
             </div>
 
@@ -54,9 +58,10 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
                 <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-accent-50 text-accent-600 ring-1 ring-accent-100 transition-colors duration-300 group-hover:bg-accent-600 group-hover:text-white">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
                 </span>
-                <h3 class="mt-6 font-heading text-2xl font-bold text-slate-900">Helder</h3>
+                <h3 class="mt-6 font-heading text-2xl font-bold text-slate-900">Duidelijk</h3>
                 <p class="mt-3 text-slate-600 leading-relaxed">
-                    U hoeft er niets technisch van te weten. Wij vertalen de techniek naar gewone taal en houden u bij elke stap op de hoogte.
+                    Technische keuzes leggen we begrijpelijk uit. We vertellen wat nodig is,
+                    waarom we iets adviseren en wat dat betekent voor uw website.
                 </p>
             </div>
 
@@ -66,7 +71,8 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
                 </span>
                 <h3 class="mt-6 font-heading text-2xl font-bold text-slate-900">Betrouwbaar</h3>
                 <p class="mt-3 text-slate-600 leading-relaxed">
-                    Altijd online, altijd veilig. SSL, dagelijkse back-ups en bewaking draaien op de achtergrond — u merkt er niets van.
+                    Uw website moet gewoon goed werken. Daarom zorgen we voor beveiliging,
+                    back-ups en technisch beheer, zodat problemen zoveel mogelijk worden voorkomen.
                 </p>
             </div>
         </div>
@@ -78,28 +84,28 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
                     <svg class="h-5 w-5 flex-shrink-0 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
                     <div>
                         <dt class="text-sm font-semibold text-slate-900">SSL-beveiliging</dt>
-                        <dd class="text-sm text-slate-500">Standaard inbegrepen</dd>
+                        <dd class="text-sm text-slate-500">Standaard voor iedere website</dd>
                     </div>
                 </div>
                 <div class="flex items-center gap-3 px-6 py-5">
                     <svg class="h-5 w-5 flex-shrink-0 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75"/></svg>
                     <div>
                         <dt class="text-sm font-semibold text-slate-900">Dagelijkse back-ups</dt>
-                        <dd class="text-sm text-slate-500">Automatisch geregeld</dd>
+                        <dd class="text-sm text-slate-500">Automatisch opgeslagen</dd>
                     </div>
                 </div>
                 <div class="flex items-center gap-3 px-6 py-5">
                     <svg class="h-5 w-5 flex-shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
                     <div>
                         <dt class="text-sm font-semibold text-slate-900">99,9% uptime</dt>
-                        <dd class="text-sm text-slate-500">Uw site blijft online</dd>
+                        <dd class="text-sm text-slate-500">Betrouwbare hosting</dd>
                     </div>
                 </div>
                 <div class="flex items-center gap-3 px-6 py-5">
                     <svg class="h-5 w-5 flex-shrink-0 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <div>
-                        <dt class="text-sm font-semibold text-slate-900">Binnen 1 werkdag</dt>
-                        <dd class="text-sm text-slate-500">Antwoord op uw vraag</dd>
+                        <dt class="text-sm font-semibold text-slate-900">Reactie binnen 1 werkdag</dt>
+                        <dd class="text-sm text-slate-500">Direct contact bij vragen</dd>
                     </div>
                 </div>
             </dl>
@@ -118,47 +124,47 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
         <div class="text-center mb-16 animate-on-scroll">
             <span class="text-primary-600 font-semibold tracking-wide uppercase text-sm mb-3 block">Wat wij doen</span>
             <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4">
-                Een website, compleet ontzorgd
+                Alles voor een professionele website
             </h2>
             <p class="text-xl text-slate-600 max-w-2xl mx-auto">
-                Van ontwerp tot hosting, wij regelen het voor u.
+                Van ontwerp en bouw tot hosting en onderhoud. U heeft één partij voor het volledige traject.
             </p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div class="animate-on-scroll">
                 <h3 class="font-heading text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
-                    {{ $baseService->title ?? 'Professionele websites voor het MKB' }}
+                    {{ $baseService->title ?? 'Professionele website' }}
                 </h3>
                 <p class="text-slate-600 text-lg mb-8 leading-relaxed">
-                    {{ $baseService->short_description ?? 'Wij bouwen snelle, responsive websites die uw bedrijf online presenteren en meer klanten aantrekken.' }}
+                    {{ $baseService->short_description ?? 'Een website die past bij uw bedrijf, snel werkt en eenvoudig uit te breiden is wanneer dat nodig is.' }}
                 </p>
                 <ul class="space-y-4 mb-8">
                     <li class="flex items-center text-slate-700">
                         <span class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center mr-3 flex-shrink-0">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                         </span>
-                        Compleet design voor alle toestellen
+                        Ontwerp afgestemd op uw bedrijf en huisstijl
                     </li>
                     <li class="flex items-center text-slate-700">
                         <span class="w-8 h-8 rounded-full bg-accent-100 text-accent-600 flex items-center justify-center mr-3 flex-shrink-0">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                         </span>
-                        Hosting
+                        Hosting en technisch beheer inbegrepen
                     </li>
                     <li class="flex items-center text-slate-700">
                         <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mr-3 flex-shrink-0">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                         </span>
-                        Aanpasbaarheid en vertrouwen
+                        Eenvoudig uit te breiden met nieuwe pagina's en functies
                     </li>
                 </ul>
                 <div class="flex flex-col sm:flex-row gap-4">
                     <a href="{{ route('services.index') }}" class="btn btn-primary">
-                        Bekijk opties
+                        Bekijk mogelijkheden
                     </a>
-                    <a href="{{ route('contact') }}" class="btn btn-outline">
-                        Offerte aanvragen
+                    <a href="{{ route('quote.builder') }}" class="btn btn-outline">
+                        Vraag een offerte aan
                     </a>
                 </div>
             </div>
@@ -175,7 +181,7 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
                         </span>
                         <div>
                             <p class="font-heading font-bold text-slate-900 leading-tight">Ontwerp op maat</p>
-                            <p class="text-sm text-slate-500">In uw eigen huisstijl</p>
+                            <p class="text-sm text-slate-500">Geen standaard template, maar passend bij uw bedrijf</p>
                         </div>
                     </div>
                 </div>
@@ -186,8 +192,8 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
                         </span>
                         <div>
-                            <p class="font-heading font-bold text-slate-900 leading-tight">Mobiel-first</p>
-                            <p class="text-sm text-slate-500">Vlekkeloos op elk scherm</p>
+                            <p class="font-heading font-bold text-slate-900 leading-tight">Werkt op ieder scherm</p>
+                            <p class="text-sm text-slate-500">Mobiel, tablet en desktop</p>
                         </div>
                     </div>
                 </div>
@@ -198,8 +204,8 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
                         </span>
                         <div>
-                            <p class="font-heading font-bold text-slate-900 leading-tight">Vindbaar in Google</p>
-                            <p class="text-sm text-slate-500">SEO vanaf de basis</p>
+                            <p class="font-heading font-bold text-slate-900 leading-tight">Goed vindbaar</p>
+                            <p class="text-sm text-slate-500">Technisch ingericht voor zoekmachines</p>
                         </div>
                     </div>
                 </div>
@@ -210,8 +216,8 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
                         </span>
                         <div>
-                            <p class="font-heading font-bold text-slate-900 leading-tight">Supersnel geladen</p>
-                            <p class="text-sm text-slate-500">Bezoekers haken niet af</p>
+                            <p class="font-heading font-bold text-slate-900 leading-tight">Snel geladen</p>
+                            <p class="text-sm text-slate-500">Geoptimaliseerd voor korte laadtijden</p>
                         </div>
                     </div>
                 </div>
@@ -466,13 +472,6 @@ $baseService = \App\Models\Service::active()->homepage()->ordered()->first();
         <div class="mt-10 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4 animate-on-scroll">
             <a href="{{ route('contact') }}" class="btn btn-light text-base px-8 py-4">
                 Plan een vrijblijvend gesprek
-            </a>
-            {{-- TODO: vervang ‹TELEFOON› door het echte telefoonnummer vóór livegang --}}
-            <a href="tel:‹TELEFOON›" class="inline-flex items-center justify-center gap-2 font-medium text-primary-50 hover:text-white transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                </svg>
-                Of bel ons direct
             </a>
         </div>
     </div>

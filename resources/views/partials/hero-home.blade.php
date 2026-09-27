@@ -20,11 +20,11 @@
                     Nu beschikbaar voor nieuwe projecten
                 </span>
                 <h1 class="mt-6 font-heading text-4xl md:text-5xl font-bold leading-[1.05] tracking-tight">
-                    Zie hoe uw website tot leven komt.
+                    Van idee naar een website die werkt
                 </h1>
                 <p class="mt-6 max-w-xl text-lg leading-relaxed text-slate-300">
-                    Wij bouwen 'm van begin tot eind — ontwerp, techniek, hosting en onderhoud.
-                    U heeft één vast aanspreekpunt en hoeft er zelf niets technisch van te weten.
+                    Wij ontwerpen, bouwen en beheren uw website. U heeft één vast aanspreekpunt
+                    en weet vooraf wat we doen, wat het kost en waar u aan toe bent.
                 </p>
                 <div class="mt-8">
                     <a href="{{ route('contact') }}" class="btn btn-primary w-full px-7 py-3.5 text-base sm:w-auto">

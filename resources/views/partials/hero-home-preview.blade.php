@@ -8,12 +8,12 @@
                 Websites & Hosting voor het MKB
             </span>
             <h1 class="mt-6 font-display text-5xl font-bold leading-[1.1] sm:text-6xl lg:text-7xl">
-                Professionele Websites<br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-200 via-accent-200 to-white">voor het MKB</span>
+                Van idee naar een<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-200 via-accent-200 to-white">website die werkt</span>
             </h1>
             <p class="mt-7 max-w-xl text-lg font-light leading-relaxed text-white/90 sm:text-xl">
-                Servura biedt de oplossing voor mkb-ondernemers van het opbouwen van een online omgeving en het hosten.
-                Tot hulp bij aanpassingen.
+                Wij ontwerpen, bouwen en beheren uw website. U heeft één vast aanspreekpunt
+                en weet vooraf wat we doen, wat het kost en waar u aan toe bent.
             </p>
             <div class="mt-9 flex flex-col gap-4 sm:flex-row">
                 <a href="{{ route('contact') }}" class="btn bg-white px-8 py-4 text-lg font-bold text-primary-700 shadow-xl transition-transform hover:scale-105 hover:bg-primary-50">Gratis Adviesgesprek</a>
