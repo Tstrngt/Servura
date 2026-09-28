@@ -2,6 +2,7 @@
 
 namespace App\Services\Domains;
 
+use App\Models\BillingSetting;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use Transip\Api\Library\Entity\DomainCheckResult as TransipDomainCheckResult;
@@ -78,6 +79,16 @@ class TransIpProvider implements DomainProvider
         $domain = $this->normalizeDomain($domain);
         $tld = $this->extractTld($domain);
 
+        if ($this->isTestDomain($domain)) {
+            return new DomainCheckResult(
+                domain: $domain,
+                available: true,
+                status: 'free',
+                tld: $tld,
+                actions: [],
+            );
+        }
+
         try {
             $result = $this->client()->domainAvailability()->checkDomainName($domain);
 
@@ -102,12 +113,24 @@ class TransIpProvider implements DomainProvider
     {
         $domain = $this->normalizeDomain($domain);
 
+        if ($this->isTestDomain($domain)) {
+            Log::info('TransIP dummy domain registration simulated.', ['domain' => $domain]);
+
+            return;
+        }
+
         $this->client()->domain()->register($domain, $contacts, $nameservers);
     }
 
     public function transferDomain(string $domain, string $authCode, array $contacts = [], array $nameservers = []): void
     {
         $domain = $this->normalizeDomain($domain);
+
+        if ($this->isTestDomain($domain)) {
+            Log::info('TransIP dummy domain transfer simulated.', ['domain' => $domain]);
+
+            return;
+        }
 
         $this->client()->domain()->transfer($domain, $authCode, $contacts, $nameservers);
     }
@@ -155,6 +178,27 @@ class TransIpProvider implements DomainProvider
     private function client(): TransipAPI
     {
         return $this->client ??= $this->service->client();
+    }
+
+    private function testDomains(): array
+    {
+        try {
+            $raw = BillingSetting::valueFor('transip_test_domains', '');
+        } catch (\Throwable $e) {
+            // BillingSetting is not available in isolated unit tests.
+            return [];
+        }
+
+        if ($raw === '') {
+            return [];
+        }
+
+        return array_values(array_filter(array_map('trim', preg_split('/[\r\n,]+/', $raw))));
+    }
+
+    private function isTestDomain(string $domain): bool
+    {
+        return in_array($this->normalizeDomain($domain), $this->testDomains(), true);
     }
 
     private function normalizeDomain(string $domain): string

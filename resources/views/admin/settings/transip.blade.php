@@ -67,6 +67,12 @@
                         <input class="form-input font-mono" id="transip_default_nameservers" name="transip_default_nameservers" type="text" value="{{ old('transip_default_nameservers', $settings['default_nameservers']) }}" placeholder="ns1.servura.nl, ns2.servura.nl">
                         <p class="mt-1 text-xs text-slate-500">Laat leeg om de TransIP-default nameservers te gebruiken.</p>
                     </div>
+
+                    <div class="form-group sm:col-span-2">
+                        <label class="form-label" for="transip_test_domains">Dummy / test domeinen (één per regel of komma)</label>
+                        <textarea class="form-input font-mono" id="transip_test_domains" name="transip_test_domains" rows="3" placeholder="voorbeeld-servura-test.nl, testdomein.be">{{ old('transip_test_domains', $settings['test_domains']) }}</textarea>
+                        <p class="mt-1 text-xs text-slate-500">Deze domeinen worden altijd als beschikbaar getoond en bij bestelling niet écht bij TransIP geregistreerd. Handig voor testen.</p>
+                    </div>
                 </div>
 
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
