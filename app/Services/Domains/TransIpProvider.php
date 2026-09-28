@@ -5,6 +5,8 @@ namespace App\Services\Domains;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use Transip\Api\Library\Entity\DomainCheckResult as TransipDomainCheckResult;
+use Transip\Api\Library\Exception\ApiException;
+use Transip\Api\Library\Exception\HttpRequestException;
 use Transip\Api\Library\TransipAPI;
 
 class TransIpProvider implements DomainProvider
@@ -45,6 +47,17 @@ class TransIpProvider implements DomainProvider
             return [
                 'success' => $success,
                 'message' => $success ? 'Verbinding met TransIP geslaagd.' : 'TransIP verbinding mislukt.',
+            ];
+        } catch (ApiException|HttpRequestException $e) {
+            Log::warning('TransIP connection test failed', [
+                'message' => $e->getMessage(),
+            ]);
+
+            $detail = $e->getMessage();
+
+            return [
+                'success' => false,
+                'message' => 'Verbinding mislukt'.($detail !== '' ? ': '.$detail : '. Controleer je inloggegevens en whitelist-instellingen.'),
             ];
         } catch (Throwable $e) {
             Log::warning('TransIP connection test failed', [
