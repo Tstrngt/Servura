@@ -25,6 +25,10 @@
                         <dd class="mt-1 font-medium text-slate-900">{{ $domainRegistration->domain_name }}</dd>
                     </div>
                     <div>
+                        <dt class="text-slate-500">Type</dt>
+                        <dd class="mt-1 font-medium text-slate-900">{{ $domainRegistration->type === 'transfer' ? 'Verhuizing' : 'Registratie' }}</dd>
+                    </div>
+                    <div>
                         <dt class="text-slate-500">Provider</dt>
                         <dd class="mt-1 font-medium text-slate-900 uppercase">{{ $domainRegistration->provider }}</dd>
                     </div>
@@ -49,8 +53,13 @@
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-slate-500">Registratieprijs</dt>
-                        <dd class="mt-1 font-medium text-slate-900">€ {{ number_format((float) $domainRegistration->registration_price, 2, ',', '.') }}</dd>
+                        @if($domainRegistration->type === 'transfer')
+                            <dt class="text-slate-500">Verhuisprijs</dt>
+                            <dd class="mt-1 font-medium text-slate-900">{{ $domainRegistration->transfer_price ? '€ '.number_format((float) $domainRegistration->transfer_price, 2, ',', '.') : '-' }}</dd>
+                        @else
+                            <dt class="text-slate-500">Registratieprijs</dt>
+                            <dd class="mt-1 font-medium text-slate-900">€ {{ number_format((float) $domainRegistration->registration_price, 2, ',', '.') }}</dd>
+                        @endif
                     </div>
                     <div>
                         <dt class="text-slate-500">Verlengprijs</dt>

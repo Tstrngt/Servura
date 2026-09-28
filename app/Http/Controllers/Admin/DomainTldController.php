@@ -100,8 +100,9 @@ class DomainTldController extends Controller
             return;
         }
 
-        $price = $tld->is_active ? $tld->registration_price : 0;
         $enabled = $tld->is_active;
+        $registrationPrice = $tld->is_active ? $tld->registration_price : 0;
+        $transferPrice = $tld->is_active ? ($tld->transfer_price ?? 0) : 0;
 
         ServicePrice::updateOrCreate(
             [
@@ -110,16 +111,34 @@ class DomainTldController extends Controller
                 'tld' => $tld->extension,
             ],
             [
-                'price' => $price,
+                'price' => $registrationPrice,
                 'is_enabled' => $enabled,
             ]
         );
 
+        ServicePrice::updateOrCreate(
+            [
+                'service_id' => $service->id,
+                'billing_cycle' => 'one_time',
+                'tld' => $tld->extension,
+            ],
+            [
+                'price' => $transferPrice,
+                'is_enabled' => $enabled && $transferPrice > 0,
+            ]
+        );
+
         ServicePrice::where('service_id', $service->id)
-            ->where('billing_cycle', 'yearly')
+            ->whereIn('billing_cycle', ['yearly', 'one_time'])
             ->where('tld', $tld->extension)
-            ->where('price', '<>', $price)
-            ->update(['price' => $price, 'is_enabled' => $enabled]);
+            ->get()
+            ->each(function (ServicePrice $price) use ($registrationPrice, $transferPrice, $enabled) {
+                $expected = $price->billing_cycle === 'yearly' ? $registrationPrice : $transferPrice;
+                $shouldEnable = $enabled && ($price->billing_cycle === 'yearly' || $expected > 0);
+                if ((float) $price->price !== (float) $expected || $price->is_enabled !== $shouldEnable) {
+                    $price->update(['price' => $expected, 'is_enabled' => $shouldEnable]);
+                }
+            });
     }
 
     private function removeServicePrice(DomainTld $tld): void
@@ -130,7 +149,7 @@ class DomainTldController extends Controller
         }
 
         ServicePrice::where('service_id', $service->id)
-            ->where('billing_cycle', 'yearly')
+            ->whereIn('billing_cycle', ['yearly', 'one_time'])
             ->where('tld', $tld->extension)
             ->delete();
     }

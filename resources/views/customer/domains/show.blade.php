@@ -24,11 +24,15 @@
                     <dd class="mt-1 font-medium text-slate-900">{{ $domain->domain_name }}</dd>
                 </div>
                 <div>
+                    <dt class="text-slate-500">Type</dt>
+                    <dd class="mt-1 font-medium text-slate-900">{{ $domain->type === 'transfer' ? 'Verhuizing' : 'Registratie' }}</dd>
+                </div>
+                <div>
                     <dt class="text-slate-500">Provider</dt>
                     <dd class="mt-1 font-medium text-slate-900 uppercase">{{ $domain->provider }}</dd>
                 </div>
                 <div>
-                    <dt class="text-slate-500">Registratiedatum</dt>
+                    <dt class="text-slate-500">{{ $domain->type === 'transfer' ? 'Verhuisdatum' : 'Registratiedatum' }}</dt>
                     <dd class="mt-1 font-medium text-slate-900">{{ $domain->registered_at?->format('d-m-Y') ?? '-' }}</dd>
                 </div>
                 <div>

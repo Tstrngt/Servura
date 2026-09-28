@@ -21,9 +21,10 @@
                     <thead class="bg-slate-50">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Domein</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Type</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Klant</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Registratieprijs</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Prijs</th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Verlengprijs</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Geregistreerd</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Verloopt</th>
@@ -35,11 +36,18 @@
                             @php $label = $domain->statusLabel; @endphp
                             <tr class="hover:bg-slate-50">
                                 <td class="px-4 py-3 text-sm font-medium text-slate-900">{{ $domain->domain_name }}</td>
+                                <td class="px-4 py-3 text-sm text-slate-600">{{ $domain->type === 'transfer' ? 'Verhuizing' : 'Registratie' }}</td>
                                 <td class="px-4 py-3 text-sm text-slate-600">{{ $domain->user?->name ?? '-' }}</td>
                                 <td class="px-4 py-3">
                                     <span class="inline-flex items-center rounded-full bg-{{ $label['color'] }}-50 px-2 py-0.5 text-xs font-medium text-{{ $label['color'] }}-700 ring-1 ring-inset ring-{{ $label['color'] }}-600/20">{{ $label['text'] }}</span>
                                 </td>
-                                <td class="px-4 py-3 text-right text-sm text-slate-900">€ {{ number_format((float) $domain->registration_price, 2, ',', '.') }}</td>
+                                <td class="px-4 py-3 text-right text-sm text-slate-900">
+                                    @if($domain->type === 'transfer')
+                                        {{ $domain->transfer_price ? '€ '.number_format((float) $domain->transfer_price, 2, ',', '.') : '-' }}
+                                    @else
+                                        € {{ number_format((float) $domain->registration_price, 2, ',', '.') }}
+                                    @endif
+                                </td>
                                 <td class="px-4 py-3 text-right text-sm text-slate-900">{{ $domain->renewal_price ? '€ '.number_format((float) $domain->renewal_price, 2, ',', '.') : '-' }}</td>
                                 <td class="px-4 py-3 text-sm text-slate-600">{{ $domain->registered_at?->format('d-m-Y') ?? '-' }}</td>
                                 <td class="px-4 py-3 text-sm text-slate-600">{{ $domain->expires_at?->format('d-m-Y') ?? '-' }}</td>
@@ -49,7 +57,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-4 py-8 text-center text-sm text-slate-500">Nog geen domeinregistraties gevonden.</td>
+                                <td colspan="9" class="px-4 py-8 text-center text-sm text-slate-500">Nog geen domeinregistraties gevonden.</td>
                             </tr>
                         @endforelse
                     </tbody>

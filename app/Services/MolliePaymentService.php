@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Models\CustomerService;
+use App\Models\DomainRegistration;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\PaymentBatch;
 use App\Models\PaymentBatchItem;
 use App\Jobs\RegisterDomain;
+use App\Jobs\TransferDomain;
 use App\Models\Transaction;
 use App\Models\TransactionLog;
 use App\Models\User;
@@ -262,7 +264,13 @@ class MolliePaymentService
             if ($customerService->service->fulfillment_type === 'domain'
                 && in_array($customerService->provisioning_status, ['pending_payment', 'processing', 'failed'], true)
                 && $customerService->domain) {
-                RegisterDomain::dispatch($customerService->id);
+                $registration = DomainRegistration::where('customer_service_id', $customerService->id)->first();
+
+                if ($registration && $registration->type === DomainRegistration::TYPE_TRANSFER) {
+                    TransferDomain::dispatch($customerService->id);
+                } else {
+                    RegisterDomain::dispatch($customerService->id);
+                }
             }
         }
     }

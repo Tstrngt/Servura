@@ -105,6 +105,13 @@ class TransIpProvider implements DomainProvider
         $this->client()->domain()->register($domain, $contacts, $nameservers);
     }
 
+    public function transferDomain(string $domain, string $authCode, array $contacts = [], array $nameservers = []): void
+    {
+        $domain = $this->normalizeDomain($domain);
+
+        $this->client()->domain()->transfer($domain, $authCode, $contacts, $nameservers);
+    }
+
     public function suggest(string $name, array $tlds = []): array
     {
         $name = $this->normalizeDomainName($name);

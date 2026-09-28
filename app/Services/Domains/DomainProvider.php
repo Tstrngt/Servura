@@ -36,4 +36,12 @@ interface DomainProvider
      * @param  array<int, mixed>  $nameservers
      */
     public function registerDomain(string $domain, array $contacts = [], array $nameservers = []): void;
+
+    /**
+     * Transfer a domain name to the provider.
+     *
+     * @param  array<int, mixed>  $contacts
+     * @param  array<int, mixed>  $nameservers
+     */
+    public function transferDomain(string $domain, string $authCode, array $contacts = [], array $nameservers = []): void;
 }

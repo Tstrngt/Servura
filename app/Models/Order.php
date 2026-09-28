@@ -59,4 +59,9 @@ class Order extends Model
     {
         return $this->belongsTo(Invoice::class);
     }
+
+    public function lines()
+    {
+        return $this->hasMany(OrderLine::class)->orderBy('sort_order');
+    }
 }

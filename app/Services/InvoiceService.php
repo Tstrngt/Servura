@@ -12,6 +12,70 @@ use App\Models\User;
 class InvoiceService
 {
     /**
+     * Generate an invoice for one or more customer service assignments.
+     *
+     * @param  array<int, CustomerService>  $customerServices
+     */
+    public function createForCustomerServices(User $user, array $customerServices, ?int $performedBy = null, ?float $vatRate = null): Invoice
+    {
+        $primaryCustomerService = $customerServices[0] ?? null;
+
+        $invoice = Invoice::create([
+            'invoice_number' => Invoice::generateNumber(),
+            'user_id' => $user->id,
+            'invoice_date' => now(),
+            'due_date' => now()->addDays(BillingSetting::integer('invoice_due_days', 14)),
+            'vat_percentage' => $vatRate ?? BillingSetting::decimal('default_vat_rate', 21.0),
+            'customer_service_id' => $primaryCustomerService?->id,
+            'status' => 'concept',
+        ]);
+
+        foreach ($customerServices as $i => $customerService) {
+            $service = $customerService->service;
+            $price = $customerService->price ?? $service->price ?? 0;
+
+            $priceLabel = match ($customerService->price_type ?? $service->price_type) {
+                'monthly', 'maandelijks' => ' (maandelijks)',
+                'quarterly' => ' (per kwartaal)',
+                'semiannual' => ' (ieder halfjaar)',
+                'yearly', 'jaarlijks' => ' (jaarlijks)',
+                'biennial' => ' (per 2 jaar)',
+                'triennial' => ' (per 3 jaar)',
+                'one_time' => ' (eenmalig)',
+                default => '',
+            };
+
+            $description = $service->title . $priceLabel;
+            if ($customerService->domain) {
+                $description .= ' - ' . $customerService->domain;
+            }
+
+            InvoiceLine::create([
+                'invoice_id' => $invoice->id,
+                'description' => $description,
+                'quantity' => 1,
+                'unit_price' => $price,
+                'total' => $price,
+                'customer_service_id' => $customerService->id,
+                'sort_order' => $i,
+            ]);
+        }
+
+        $invoice->recalculate();
+
+        TransactionLog::create([
+            'user_id' => $user->id,
+            'loggable_type' => Invoice::class,
+            'loggable_id' => $invoice->id,
+            'action' => 'aangemaakt',
+            'description' => "Factuur {$invoice->invoice_number} aangemaakt voor bestelling",
+            'performed_by' => $performedBy,
+        ]);
+
+        return $invoice;
+    }
+
+    /**
      * Generate an invoice for a customer service assignment.
      */
     public function createFromCustomerService(CustomerService $customerService, ?int $performedBy = null, ?float $vatRate = null): Invoice

@@ -19,7 +19,10 @@ class DomainRegistrationService
     public function register(CustomerService $customerService): DomainRegistration
     {
         $domainRegistration = DomainRegistration::firstOrCreate(
-            ['customer_service_id' => $customerService->id],
+            [
+                'customer_service_id' => $customerService->id,
+                'type' => DomainRegistration::TYPE_REGISTRATION,
+            ],
             [
                 'user_id' => $customerService->user_id,
                 'order_id' => $customerService->order?->id,
@@ -30,6 +33,7 @@ class DomainRegistrationService
                 'registration_price' => $customerService->price,
                 'renewal_price' => $this->resolveRenewalPrice($customerService),
                 'auto_renew' => true,
+                'type' => DomainRegistration::TYPE_REGISTRATION,
             ]
         );
 
@@ -39,30 +43,17 @@ class DomainRegistrationService
 
         $domainRegistration->update(['status' => DomainRegistration::STATUS_REGISTERING]);
 
-        $provider = DomainProviderFactory::default();
-        if (! $provider || ! $provider->isConfigured()) {
-            return $this->fail($domainRegistration, 'Domeinprovider is niet geconfigureerd.');
+        $validation = $this->validateCustomerAndProvider($domainRegistration, $customerService);
+        if ($validation !== null) {
+            return $validation;
         }
 
-        $user = $customerService->user;
-        $missing = array_filter([
-            'naam' => $user->name,
-            'straat' => $user->street,
-            'huisnummer' => $user->house_number,
-            'postcode' => $user->postal_code,
-            'plaats' => $user->city,
-            'land' => $user->country,
-            'e-mail' => $user->email,
-        ], fn ($value) => blank($value));
-
-        if (! empty($missing)) {
-            return $this->fail($domainRegistration, 'Ontbrekende klantgegevens voor registratie: '.implode(', ', array_keys($missing)).'.');
-        }
+        [$provider, $user] = $this->prepareProvider($domainRegistration, $customerService);
 
         try {
             $availability = $provider->checkAvailability($customerService->domain);
             if (! $availability->available) {
-                return $this->fail($domainRegistration, 'Domein is inmiddels niet meer beschikbaar: '.$availability->status);
+                return $this->fail($domainRegistration, 'Domein is inmiddels niet meer beschikbaar: '.$availability->status, DomainRegistration::TYPE_REGISTRATION);
             }
 
             $contact = $this->buildRegistrantContact($user);
@@ -77,17 +68,7 @@ class DomainRegistrationService
                     'expires_at' => now()->addYear(),
                 ]);
 
-                $customerService->update([
-                    'status' => 'active',
-                    'suspension_reason' => null,
-                    'suspended_at' => null,
-                    'provisioning_status' => 'active',
-                    'provisioning_error' => null,
-                    'provisioned_at' => now(),
-                    'current_period_start' => now(),
-                    'current_period_end' => now()->addYear(),
-                    'next_invoice_date' => now()->addYear()->subDays(14),
-                ]);
+                $this->activateCustomerService($customerService);
             });
 
             Log::info('Domain registration successful', [
@@ -108,14 +89,95 @@ class DomainRegistrationService
                 'message' => $e->getMessage(),
             ]);
 
-            return $this->fail($domainRegistration, 'TransIP fout: '.$e->getMessage());
+            return $this->fail($domainRegistration, 'TransIP fout: '.$e->getMessage(), DomainRegistration::TYPE_REGISTRATION);
         }
     }
 
-    private function fail(DomainRegistration $domainRegistration, string $message): DomainRegistration
+    public function transfer(CustomerService $customerService): DomainRegistration
     {
+        $domainRegistration = DomainRegistration::firstOrCreate(
+            [
+                'customer_service_id' => $customerService->id,
+                'type' => DomainRegistration::TYPE_TRANSFER,
+            ],
+            [
+                'user_id' => $customerService->user_id,
+                'order_id' => $customerService->order?->id,
+                'domain_name' => $customerService->domain,
+                'tld' => $this->extractTld($customerService->domain),
+                'status' => DomainRegistration::STATUS_TRANSFER_PENDING,
+                'provider' => 'transip',
+                'transfer_price' => $customerService->price,
+                'auto_renew' => true,
+                'type' => DomainRegistration::TYPE_TRANSFER,
+            ]
+        );
+
+        if (in_array($domainRegistration->status, [DomainRegistration::STATUS_TRANSFER_ACTIVE, DomainRegistration::STATUS_TRANSFER_PROCESSING], true)) {
+            return $domainRegistration;
+        }
+
+        $domainRegistration->update(['status' => DomainRegistration::STATUS_TRANSFER_PROCESSING]);
+
+        $validation = $this->validateCustomerAndProvider($domainRegistration, $customerService);
+        if ($validation !== null) {
+            return $validation;
+        }
+
+        [$provider, $user] = $this->prepareProvider($domainRegistration, $customerService);
+
+        $authCode = $domainRegistration->auth_code;
+        if (empty($authCode)) {
+            return $this->fail($domainRegistration, 'Geen verhuiscode beschikbaar.', DomainRegistration::TYPE_TRANSFER);
+        }
+
+        try {
+            $contact = $this->buildRegistrantContact($user);
+            $nameservers = $this->buildNameservers();
+
+            $provider->transferDomain($customerService->domain, $authCode, [$contact], $nameservers);
+
+            DB::transaction(function () use ($domainRegistration, $customerService) {
+                $domainRegistration->update([
+                    'status' => DomainRegistration::STATUS_TRANSFER_ACTIVE,
+                    'registered_at' => now(),
+                    'expires_at' => now()->addYear(),
+                    'auth_code' => null,
+                ]);
+
+                $this->activateCustomerService($customerService);
+            });
+
+            Log::info('Domain transfer started', [
+                'domain' => $customerService->domain,
+                'customer_service_id' => $customerService->id,
+                'user_id' => $user->id,
+                'provider' => 'transip',
+            ]);
+
+            return $domainRegistration;
+        } catch (Throwable $e) {
+            Log::warning('Domain transfer failed', [
+                'domain' => $customerService->domain,
+                'customer_service_id' => $customerService->id,
+                'user_id' => $user->id,
+                'provider' => 'transip',
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
+
+            return $this->fail($domainRegistration, 'TransIP fout: '.$e->getMessage(), DomainRegistration::TYPE_TRANSFER);
+        }
+    }
+
+    private function fail(DomainRegistration $domainRegistration, string $message, string $type = DomainRegistration::TYPE_REGISTRATION): DomainRegistration
+    {
+        $status = $type === DomainRegistration::TYPE_TRANSFER
+            ? DomainRegistration::STATUS_TRANSFER_FAILED
+            : DomainRegistration::STATUS_REGISTRATION_FAILED;
+
         $domainRegistration->update([
-            'status' => DomainRegistration::STATUS_REGISTRATION_FAILED,
+            'status' => $status,
             'error_message' => $message,
         ]);
 
@@ -123,19 +185,65 @@ class DomainRegistrationService
         if ($customerService) {
             $customerService->update([
                 'status' => 'suspended',
-                'suspension_reason' => 'registration_failed',
+                'suspension_reason' => $type === DomainRegistration::TYPE_TRANSFER ? 'transfer_failed' : 'registration_failed',
                 'provisioning_status' => 'failed',
                 'provisioning_error' => $message,
             ]);
         }
 
-        Log::info('Domain registration failed status set', [
+        Log::info('Domain operation failed status set', [
             'domain' => $domainRegistration->domain_name,
+            'type' => $type,
             'customer_service_id' => $customerService?->id,
             'message' => $message,
         ]);
 
         return $domainRegistration;
+    }
+
+    private function validateCustomerAndProvider(DomainRegistration $domainRegistration, CustomerService $customerService): ?DomainRegistration
+    {
+        $provider = DomainProviderFactory::default();
+        if (! $provider || ! $provider->isConfigured()) {
+            return $this->fail($domainRegistration, 'Domeinprovider is niet geconfigureerd.', $domainRegistration->type);
+        }
+
+        $user = $customerService->user;
+        $missing = array_filter([
+            'naam' => $user->name,
+            'straat' => $user->street,
+            'huisnummer' => $user->house_number,
+            'postcode' => $user->postal_code,
+            'plaats' => $user->city,
+            'land' => $user->country,
+            'e-mail' => $user->email,
+        ], fn ($value) => blank($value));
+
+        if (! empty($missing)) {
+            return $this->fail($domainRegistration, 'Ontbrekende klantgegevens: '.implode(', ', array_keys($missing)).'.', $domainRegistration->type);
+        }
+
+        return null;
+    }
+
+    private function prepareProvider(DomainRegistration $domainRegistration, CustomerService $customerService): array
+    {
+        return [DomainProviderFactory::default(), $customerService->user];
+    }
+
+    private function activateCustomerService(CustomerService $customerService): void
+    {
+        $customerService->update([
+            'status' => 'active',
+            'suspension_reason' => null,
+            'suspended_at' => null,
+            'provisioning_status' => 'active',
+            'provisioning_error' => null,
+            'provisioned_at' => now(),
+            'current_period_start' => now(),
+            'current_period_end' => now()->addYear(),
+            'next_invoice_date' => now()->addYear()->subDays(14),
+        ]);
     }
 
     private function extractTld(?string $domain): string

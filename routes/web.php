@@ -64,6 +64,9 @@ Route::get('/diensten/{service}', [ServiceController::class, 'show'])->name('ser
 Route::get('/bestellen/{service}', [CheckoutController::class, 'show'])->name('checkout.show');
 Route::get('/bestellen/{service}/inloggen', [CheckoutController::class, 'loginPrompt'])->name('checkout.login');
 Route::post('/bestellen/{service}', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/bestellen/cart/hosting', [CheckoutController::class, 'addHosting'])->name('checkout.cart.add-hosting');
+Route::post('/bestellen/cart/domain', [CheckoutController::class, 'setDomain'])->name('checkout.cart.set-domain');
+Route::post('/bestellen/cart/remove', [CheckoutController::class, 'removeItem'])->name('checkout.cart.remove');
 
 // Contact
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');

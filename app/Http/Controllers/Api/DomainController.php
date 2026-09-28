@@ -57,7 +57,7 @@ class DomainController extends Controller
                     'price_raw' => (float) $tld->registration_price,
                     'service_price_id' => $servicePrice?->id,
                     'checkout_url' => $servicePrice
-                        ? route('checkout.show', ['service' => $domainService->slug]).'?tld='.urlencode($tld->extension).'&domain='.urlencode($name)
+                        ? route('checkout.show', ['service' => $domainService->slug]).'?domain='.urlencode($availability['domain']).'&tld='.urlencode($tld->extension)
                         : null,
                 ];
             }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('tld');
             $table->string('status')->default('pending');
             $table->string('provider')->default('transip');
-            $table->decimal('registration_price', 10, 2);
+            $table->decimal('registration_price', 10, 2)->nullable();
             $table->decimal('renewal_price', 10, 2)->nullable();
             $table->date('registered_at')->nullable();
             $table->date('expires_at')->nullable();

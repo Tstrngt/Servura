@@ -53,6 +53,31 @@ class DomainRegistrationFlowTest extends TestCase
         return [$service, $tld, $price];
     }
 
+    private function setupHostingService(): array
+    {
+        $service = Service::create([
+            'title' => 'Hosting Start',
+            'slug' => 'hosting-start',
+            'service_type' => 'hosting',
+            'fulfillment_type' => 'directadmin',
+            'short_description' => 'Test hosting pakket',
+            'description' => 'Test',
+            'price' => 9.95,
+            'price_type' => 'monthly',
+            'is_active' => true,
+            'sort_order' => 10,
+        ]);
+
+        $price = ServicePrice::create([
+            'service_id' => $service->id,
+            'billing_cycle' => 'monthly',
+            'price' => 9.95,
+            'is_enabled' => true,
+        ]);
+
+        return [$service, $price];
+    }
+
     public function test_customer_can_order_domain_through_checkout(): void
     {
         [$service] = $this->setupDomainServiceAndTld();
@@ -342,5 +367,158 @@ class DomainRegistrationFlowTest extends TestCase
         $registration = DomainRegistration::firstOrFail();
         $this->assertSame(DomainRegistration::STATUS_REGISTRATION_FAILED, $registration->status);
         $this->assertStringContainsString('TransIP timeout', $registration->error_message);
+    }
+
+    public function test_customer_can_order_hosting_with_existing_domain(): void
+    {
+        [$hosting] = $this->setupHostingService();
+
+        $user = User::factory()->create([
+            'role' => 'customer',
+            'country' => 'NL',
+            'street' => 'Teststraat',
+            'house_number' => '1',
+            'postal_code' => '1234AB',
+            'city' => 'Amsterdam',
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->withSession(['_token' => 'test-token'])
+            ->post(route('checkout.store', $hosting), [
+                '_token' => 'test-token',
+                'service_price_id' => ServicePrice::where('service_id', $hosting->id)->first()->id,
+                'domain' => 'bestaand.nl',
+                'domain_mode' => 'existing',
+                'name' => $user->name,
+                'street' => 'Teststraat',
+                'house_number' => '1',
+                'postal_code' => '1234AB',
+                'city' => 'Amsterdam',
+                'country' => 'NL',
+                'payment_method' => 'payment_link',
+                'terms' => '1',
+            ]);
+
+        $response->assertRedirect();
+
+        $this->assertCount(1, CustomerService::where('user_id', $user->id)->get());
+        $customerService = CustomerService::where('user_id', $user->id)->first();
+        $this->assertSame('bestaand.nl', $customerService->domain);
+        $this->assertSame($hosting->id, $customerService->service_id);
+        $this->assertSame('pending_payment', $customerService->provisioning_status);
+    }
+
+    public function test_customer_can_order_hosting_with_new_domain(): void
+    {
+        [$hosting] = $this->setupHostingService();
+        [$domainService] = $this->setupDomainServiceAndTld();
+
+        $user = User::factory()->create([
+            'role' => 'customer',
+            'country' => 'NL',
+            'street' => 'Teststraat',
+            'house_number' => '1',
+            'postal_code' => '1234AB',
+            'city' => 'Amsterdam',
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->withSession(['_token' => 'test-token'])
+            ->post(route('checkout.store', $hosting), [
+                '_token' => 'test-token',
+                'service_price_id' => ServicePrice::where('service_id', $hosting->id)->first()->id,
+                'domain' => 'nieuwdomein.nl',
+                'domain_mode' => 'register',
+                'name' => $user->name,
+                'street' => 'Teststraat',
+                'house_number' => '1',
+                'postal_code' => '1234AB',
+                'city' => 'Amsterdam',
+                'country' => 'NL',
+                'payment_method' => 'payment_link',
+                'terms' => '1',
+            ]);
+
+        $response->assertRedirect();
+
+        $services = CustomerService::where('user_id', $user->id)->get();
+        $this->assertCount(2, $services);
+
+        $hostingService = $services->first(fn ($s) => $s->service_id === $hosting->id);
+        $domainServiceInstance = $services->first(fn ($s) => $s->service_id === $domainService->id);
+
+        $this->assertNotNull($hostingService);
+        $this->assertNotNull($domainServiceInstance);
+        $this->assertSame('nieuwdomein.nl', $hostingService->domain);
+        $this->assertSame('nieuwdomein.nl', $domainServiceInstance->domain);
+
+        $registration = DomainRegistration::where('customer_service_id', $domainServiceInstance->id)->firstOrFail();
+        $this->assertSame(DomainRegistration::TYPE_REGISTRATION, $registration->type);
+        $this->assertSame(DomainRegistration::STATUS_AWAITING_PAYMENT, $registration->status);
+
+        $order = Order::where('user_id', $user->id)->firstOrFail();
+        $this->assertCount(2, $order->lines);
+        $this->assertEqualsWithDelta(9.95 + 9.99, (float) $order->subtotal, 0.01);
+    }
+
+    public function test_customer_can_order_domain_transfer_with_hosting(): void
+    {
+        [$hosting] = $this->setupHostingService();
+        [$domainService, $tld] = $this->setupDomainServiceAndTld();
+        $tld->update(['transfer_price' => 5.99]);
+
+        // TLD sync happens on DomainTldController update, but we can create it manually.
+        ServicePrice::updateOrCreate(
+            [
+                'service_id' => $domainService->id,
+                'billing_cycle' => 'one_time',
+                'tld' => '.nl',
+            ],
+            ['price' => 5.99, 'is_enabled' => true]
+        );
+
+        $user = User::factory()->create([
+            'role' => 'customer',
+            'country' => 'NL',
+            'street' => 'Teststraat',
+            'house_number' => '1',
+            'postal_code' => '1234AB',
+            'city' => 'Amsterdam',
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->withSession(['_token' => 'test-token'])
+            ->post(route('checkout.store', $hosting), [
+                '_token' => 'test-token',
+                'service_price_id' => ServicePrice::where('service_id', $hosting->id)->first()->id,
+                'domain' => 'teverhuizen.nl',
+                'domain_mode' => 'transfer',
+                'auth_code' => 'ABC123',
+                'name' => $user->name,
+                'street' => 'Teststraat',
+                'house_number' => '1',
+                'postal_code' => '1234AB',
+                'city' => 'Amsterdam',
+                'country' => 'NL',
+                'payment_method' => 'payment_link',
+                'terms' => '1',
+            ]);
+
+        $response->assertRedirect();
+
+        $services = CustomerService::where('user_id', $user->id)->get();
+        $this->assertCount(2, $services);
+
+        $domainServiceInstance = $services->first(fn ($s) => $s->service_id === $domainService->id);
+        $this->assertNotNull($domainServiceInstance);
+        $this->assertSame(5.99, (float) $domainServiceInstance->price);
+
+        $registration = DomainRegistration::where('customer_service_id', $domainServiceInstance->id)->firstOrFail();
+        $this->assertSame(DomainRegistration::TYPE_TRANSFER, $registration->type);
+        $this->assertSame(DomainRegistration::STATUS_TRANSFER_PENDING, $registration->status);
+        $this->assertSame('ABC123', $registration->auth_code);
     }
 }
