@@ -13,7 +13,7 @@
 <style>[x-cloak] { display: none !important; }</style>
 <div class="min-h-screen bg-slate-50 py-12 lg:py-16">
     <div class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:px-8">
-        <div class="space-y-6">
+        <div class="space-y-4">
             <div>
                 <a href="{{ route('services.index') }}" class="text-sm font-semibold text-primary-700 hover:text-primary-900">← Terug naar diensten</a>
                 <h1 class="mt-4 font-heading text-3xl font-bold text-slate-900 sm:text-4xl">Uw bestelling afronden</h1>
