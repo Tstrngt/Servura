@@ -22,7 +22,7 @@
                     <h3 class="font-heading font-bold text-slate-900">{{ $selectedHostingItem['service']->title }}</h3>
                     <p class="text-sm text-slate-600">€ {{ number_format($selectedHostingItem['price'], 2, ',', '.') }}<span class="text-xs font-normal text-slate-500">/{{ $selectedHostingItem['price_model']?->label }}</span></p>
                 </div>
-                <form action="{{ route('checkout.cart.remove-item') }}" method="POST">
+                <form action="{{ route('checkout.cart.remove') }}" method="POST">
                     @csrf
                     <input type="hidden" name="index" value="{{ $selectedHostingIndex }}">
                     <button type="submit" class="btn btn-outline btn-sm whitespace-nowrap">Toch een ander pakket?</button>
