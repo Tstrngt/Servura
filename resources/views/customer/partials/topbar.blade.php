@@ -45,14 +45,27 @@ $unreadNotifications = Auth::user()->notifications()->unread()->limit(6)->get();
                             </div>
                             <div class="max-h-80 overflow-y-auto">
                                 @forelse($unreadNotifications as $notification)
-                                    <form action="{{ route('notifications.read', $notification) }}" method="POST" class="border-b border-slate-100 last:border-0">
-                                        @csrf
-                                        <button class="w-full px-4 py-3 text-left transition hover:bg-slate-50">
-                                            <span class="block text-sm font-semibold text-slate-900">{{ $notification->title }}</span>
-                                            <span class="mt-1 block text-xs leading-relaxed text-slate-500">{{ $notification->message }}</span>
-                                            <span class="mt-2 block text-[11px] text-slate-400">{{ $notification->created_at->diffForHumans() }}</span>
-                                        </button>
-                                    </form>
+                                    <div class="group relative border-b border-slate-100 last:border-0">
+                                        <form action="{{ route('notifications.read', $notification) }}" method="POST">
+                                            @csrf
+                                            <button class="w-full px-4 py-3 pr-10 text-left transition hover:bg-slate-50">
+                                                @if($notification->created_at->gt(now()->subDay()))
+                                                    <span class="block text-sm font-semibold text-slate-900">{{ $notification->title }}</span>
+                                                @endif
+                                                <span class="block text-xs leading-relaxed text-slate-500 @if($notification->created_at->gt(now()->subDay())) mt-1 @endif">{{ $notification->message }}</span>
+                                                <span class="mt-2 block text-[11px] text-slate-400">{{ $notification->created_at->diffForHumans() }}</span>
+                                            </button>
+                                        </form>
+
+                                        <form action="{{ route('notifications.read', $notification) }}?redirect=back" method="POST" class="absolute right-2 top-2 hidden group-hover:block">
+                                            @csrf
+                                            <button type="submit" class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors" aria-label="Melding sluiten">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
                                 @empty
                                     <div class="px-5 py-10 text-center text-sm text-slate-500">Je hebt geen nieuwe meldingen.</div>
                                 @endforelse
