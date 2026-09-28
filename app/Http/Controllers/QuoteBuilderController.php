@@ -246,11 +246,11 @@ class QuoteBuilderController extends Controller
             Auth::login($user);
             $request->session()->regenerate();
 
-            return redirect()->route('customer.services.show', $customerService)
+            return redirect()->route('customer.dashboard')
                 ->with('success', 'Uw aanvraag is ontvangen en gekoppeld aan uw nieuwe account. Bevestig uw e-mailadres via de link die u heeft ontvangen. Ticket '.$ticket->ticket_number.' is geopend voor verdere afstemming.');
         }
 
-        return redirect()->route('customer.services.show', $customerService)
+        return redirect()->route('customer.dashboard')
             ->with('success', 'Uw aanvraag is ontvangen. Ticket '.$ticket->ticket_number.' is geopend zodat we samen het pakket kunnen afstemmen.');
     }
 }

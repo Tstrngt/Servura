@@ -432,6 +432,7 @@ function quoteBuilder() {
                 const response = await fetch(event.target.action, {
                     method: 'POST',
                     body: new FormData(event.target),
+                    credentials: 'same-origin',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                         'Accept': 'text/html',
