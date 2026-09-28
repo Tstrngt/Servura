@@ -9,7 +9,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE tickets MODIFY COLUMN category ENUM('technical', 'billing', 'general', 'feature_request', 'bug_report', 'offerte') DEFAULT 'general'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE tickets MODIFY COLUMN category ENUM('technical', 'billing', 'general', 'feature_request', 'bug_report', 'offerte') DEFAULT 'general'");
+        }
 
         Schema::table('quotes', function (Blueprint $table) {
             $table->foreignId('ticket_id')->nullable()->after('user_id')->constrained()->nullOnDelete();
@@ -22,6 +24,8 @@ return new class extends Migration
             $table->dropConstrainedForeignId('ticket_id');
         });
 
-        DB::statement("ALTER TABLE tickets MODIFY COLUMN category ENUM('technical', 'billing', 'general', 'feature_request', 'bug_report') DEFAULT 'general'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE tickets MODIFY COLUMN category ENUM('technical', 'billing', 'general', 'feature_request', 'bug_report') DEFAULT 'general'");
+        }
     }
 };

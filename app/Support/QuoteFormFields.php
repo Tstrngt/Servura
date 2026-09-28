@@ -75,11 +75,13 @@ class QuoteFormFields
                 ['label' => 'Geen haast', 'note' => ''],
             ],
             'budget' => [
-                ['label' => 'Tot € 1.000', 'note' => ''],
+                ['label' => 'Tot € 250', 'note' => ''],
+                ['label' => '€ 250 - € 500', 'note' => ''],
+                ['label' => '€ 500 - € 750', 'note' => ''],
+                ['label' => '€ 750 - € 1.000', 'note' => ''],
                 ['label' => '€ 1.000 - € 1.500', 'note' => ''],
-                ['label' => '€ 1.500 - € 2.000', 'note' => ''],
-                ['label' => '€ 2.000 - € 3.000', 'note' => ''],
-                ['label' => 'Meer dan € 3.000', 'note' => ''],
+                ['label' => '€ 1.500 - € 2.500', 'note' => ''],
+                ['label' => 'Meer dan € 2.500', 'note' => ''],
                 ['label' => 'Nog niet bepaald', 'note' => ''],
             ],
         ];
