@@ -34,6 +34,15 @@ class InvoiceController extends Controller
 
         $invoice->load('lines');
 
+        // Mark related notifications as read when the customer views the invoice.
+        Auth::user()->notifications()
+            ->unread()
+            ->where('link', 'like', '%'.parse_url(route('customer.invoices.show', $invoice), PHP_URL_PATH).'%')
+            ->update([
+                'is_read' => true,
+                'read_at' => now(),
+            ]);
+
         return view('customer.invoices.show', compact('invoice'));
     }
 

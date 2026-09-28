@@ -27,6 +27,16 @@ class QuoteController extends Controller
         }
 
         $quote->load('lines.service');
+
+        // Mark related notifications as read when the customer views the quote.
+        Auth::user()->notifications()
+            ->unread()
+            ->where('link', 'like', '%'.parse_url(route('customer.quotes.show', $quote), PHP_URL_PATH).'%')
+            ->update([
+                'is_read' => true,
+                'read_at' => now(),
+            ]);
+
         return view('customer.quotes.show', compact('quote'));
     }
 

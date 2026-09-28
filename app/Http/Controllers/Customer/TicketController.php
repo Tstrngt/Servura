@@ -113,6 +113,15 @@ class TicketController extends Controller
             'attachments.uploadedBy',
         ]);
 
+        // Mark related notifications as read when the customer views the ticket.
+        Auth::user()->notifications()
+            ->unread()
+            ->where('link', 'like', '%'.parse_url(route('customer.tickets.show', $ticket), PHP_URL_PATH).'%')
+            ->update([
+                'is_read' => true,
+                'read_at' => now(),
+            ]);
+
         return view('customer.tickets.show', compact('ticket'));
     }
 
