@@ -41,18 +41,26 @@
 
                         <div class="space-y-3">
                             <template x-for="item in result.results" :key="item.domain">
-                                <div class="flex items-center justify-between gap-4 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-100">
-                                    <span class="font-bold font-heading break-all" x-text="item.domain"></span>
-                                    <span class="shrink-0 inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold"
-                                          :class="item.available ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20' : 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20'">
-                                        <span x-text="item.available ? 'Beschikbaar' : 'Niet beschikbaar'"></span>
-                                    </span>
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                                    <div>
+                                        <span class="font-bold font-heading break-all block" x-text="item.domain"></span>
+                                        <span class="text-sm text-slate-500" x-show="item.available && item.price">€ <span x-text="item.price"></span> per jaar</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="shrink-0 inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold"
+                                              :class="item.available ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20' : 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20'">
+                                            <span x-text="item.available ? 'Beschikbaar' : 'Niet beschikbaar'"></span>
+                                        </span>
+                                        <a x-show="item.available && item.checkout_url" :href="item.checkout_url" class="btn btn-primary btn-sm px-4 py-2 text-sm">
+                                            Bestellen
+                                        </a>
+                                    </div>
                                 </div>
                             </template>
                         </div>
 
                         <p class="mt-4 text-sm text-slate-600">
-                            Deze check is een indicatie. Er wordt in deze fase nog niets geregistreerd of besteld.
+                            Deze check is een indicatie. Er wordt pas besteld en geregistreerd na een succesvolle betaling.
                         </p>
                     </div>
                 </template>

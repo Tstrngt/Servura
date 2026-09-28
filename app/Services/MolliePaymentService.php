@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\PaymentBatch;
 use App\Models\PaymentBatchItem;
+use App\Jobs\RegisterDomain;
 use App\Models\Transaction;
 use App\Models\TransactionLog;
 use App\Models\User;
@@ -256,6 +257,12 @@ class MolliePaymentService
                     'provisioning_status' => 'not_required',
                     'provisioning_error' => null,
                 ]);
+            }
+
+            if ($customerService->service->fulfillment_type === 'domain'
+                && in_array($customerService->provisioning_status, ['pending_payment', 'processing', 'failed'], true)
+                && $customerService->domain) {
+                RegisterDomain::dispatch($customerService->id);
             }
         }
     }

@@ -30,7 +30,7 @@ class TransIpProvider implements DomainProvider
 
     public function isReadOnly(): bool
     {
-        return true;
+        return false;
     }
 
     public function testConnection(): array
@@ -96,6 +96,13 @@ class TransIpProvider implements DomainProvider
                 tld: $tld,
             );
         }
+    }
+
+    public function registerDomain(string $domain, array $contacts = [], array $nameservers = []): void
+    {
+        $domain = $this->normalizeDomain($domain);
+
+        $this->client()->domain()->register($domain, $contacts, $nameservers);
     }
 
     public function suggest(string $name, array $tlds = []): array

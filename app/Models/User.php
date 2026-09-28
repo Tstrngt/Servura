@@ -79,6 +79,11 @@ class User extends Authenticatable
         return $this->hasMany(CustomerService::class);
     }
 
+    public function domainRegistrations()
+    {
+        return $this->hasMany(DomainRegistration::class);
+    }
+
     // Get active services for customer
     public function activeServices()
     {

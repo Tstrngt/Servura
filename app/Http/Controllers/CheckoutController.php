@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomerService;
+use App\Models\DomainTld;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\ServicePrice;
@@ -26,7 +27,7 @@ class CheckoutController extends Controller
             ->with('success', 'Log in om verder te gaan met uw bestelling.');
     }
 
-    public function show(Service $service, TaxService $taxService)
+    public function show(Service $service, TaxService $taxService, Request $request)
     {
         abort_unless($service->is_active, 404);
         abort_if(Auth::check() && Auth::user()->canAccessAdmin(), 403);
@@ -37,7 +38,16 @@ class CheckoutController extends Controller
         $countries = TaxService::COUNTRIES;
         $countryRates = $taxService->ratesForCheckout();
 
-        return view('checkout', compact('service', 'countries', 'countryRates'));
+        $prefillName = $request->input('domain');
+        $prefillTld = $request->input('tld');
+        $prefillPriceId = null;
+
+        if ($service->fulfillment_type === 'domain' && $prefillTld) {
+            $price = $service->prices->first(fn ($p) => $p->tld === $prefillTld);
+            $prefillPriceId = $price?->id;
+        }
+
+        return view('checkout', compact('service', 'countries', 'countryRates', 'prefillName', 'prefillTld', 'prefillPriceId'));
     }
 
     public function store(
@@ -73,6 +83,13 @@ class CheckoutController extends Controller
 
         if ($service->fulfillment_type === 'directadmin') {
             $rules['domain'] = ['required', 'string', 'max:253', 'regex:/^(?!-)(?:[a-z0-9-]{1,63}\.)+[a-z]{2,63}$/i'];
+        } elseif ($service->fulfillment_type === 'domain') {
+            $rules['domain_name'] = ['required', 'string', 'max:63', 'regex:/^[a-zA-Z0-9-]+$/'];
+            $rules['domain_tld'] = ['required', 'string', function ($attribute, $value, $fail) use ($service) {
+                if (! $service->prices->contains(fn ($p) => $p->tld === $value)) {
+                    $fail('De gekozen extensie is niet beschikbaar.');
+                }
+            }];
         }
 
         if (! Auth::check()) {
@@ -100,9 +117,18 @@ class CheckoutController extends Controller
             ->where('service_id', $service->id)
             ->where('is_enabled', true)
             ->firstOrFail();
+
+        if ($service->fulfillment_type === 'domain' && $price->tld !== $validated['domain_tld']) {
+            abort(422, 'De gekozen extensie komt niet overeen met het geselecteerde tarief.');
+        }
+
+        $domain = $service->fulfillment_type === 'domain'
+            ? strtolower($validated['domain_name']).strtolower($validated['domain_tld'])
+            : ($validated['domain'] ?? null);
+
         $tax = $taxService->calculate((float) $price->price, $validated['country']);
 
-        [$order, $user, $isNewUser] = DB::transaction(function () use ($validated, $service, $price, $tax, $invoiceService) {
+        [$order, $user, $isNewUser] = DB::transaction(function () use ($validated, $service, $price, $tax, $invoiceService, $domain) {
             $user = Auth::user();
             $userData = collect($validated)->only([
                 'name', 'company', 'phone', 'street', 'house_number', 'postal_code', 'city',
@@ -127,8 +153,8 @@ class CheckoutController extends Controller
                 'user_id' => $user->id,
                 'service_id' => $service->id,
                 'service_price_id' => $price->id,
-                'domain' => isset($validated['domain']) ? strtolower($validated['domain']) : null,
-                'provisioning_status' => $service->fulfillment_type === 'directadmin' ? 'pending_payment' : 'not_required',
+                'domain' => $domain,
+                'provisioning_status' => in_array($service->fulfillment_type, ['directadmin', 'domain'], true) ? 'pending_payment' : 'not_required',
                 'status' => 'suspended',
                 'suspension_reason' => 'pending_payment',
                 'price' => $price->price,

@@ -19,7 +19,7 @@ class ServicePrice extends Model
         'triennial' => 'Per 3 jaar',
     ];
 
-    protected $fillable = ['service_id', 'billing_cycle', 'price', 'is_enabled'];
+    protected $fillable = ['service_id', 'billing_cycle', 'tld', 'price', 'is_enabled'];
 
     protected $casts = ['price' => 'decimal:2', 'is_enabled' => 'boolean'];
 

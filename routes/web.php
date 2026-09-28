@@ -18,7 +18,10 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Admin\DomainTldController as AdminDomainTldController;
+use App\Http\Controllers\Admin\DomainRegistrationController as AdminDomainRegistrationController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboard;
+use App\Http\Controllers\Customer\DomainController as CustomerDomainController;
 use App\Http\Controllers\Customer\InvoiceController as CustomerInvoiceController;
 use App\Http\Controllers\Customer\ProfileController;
 use App\Http\Controllers\Customer\QuoteController as CustomerQuoteController;
@@ -118,6 +121,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/diensten/{customerService}/reset-wachtwoord', [App\Http\Controllers\Customer\ServiceController::class, 'resetPassword'])->name('services.reset-password');
         Route::match(['get', 'post'], '/diensten/{customerService}/directadmin-login', [App\Http\Controllers\Customer\ServiceController::class, 'directAdminLogin'])->name('services.directadmin-login');
 
+        // Domeinen
+        Route::get('/domeinen', [CustomerDomainController::class, 'index'])->name('domains.index');
+        Route::get('/domeinen/{domain}', [CustomerDomainController::class, 'show'])->name('domains.show');
+
         // Tickets
         Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
         Route::get('/tickets/aanmaken', [TicketController::class, 'create'])->name('tickets.create');
@@ -190,6 +197,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/customers/{customer}/services/{service}/provision', [AdminCustomerController::class, 'provisionService'])->name('customers.services.provision');
         Route::delete('/customers/{customer}/services/{service}', [AdminCustomerController::class, 'destroyService'])->name('customers.services.destroy');
         Route::get('/customers/{customer}/tickets', [AdminCustomerController::class, 'tickets'])->name('customers.tickets');
+
+        // Domeinregistraties
+        Route::get('/domeinen', [AdminDomainRegistrationController::class, 'index'])->name('domains.index');
+        Route::get('/domeinen/{domainRegistration}', [AdminDomainRegistrationController::class, 'show'])->name('domains.show');
 
         Route::get('/mijn-profiel', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/mijn-profiel', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
@@ -270,6 +281,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/integraties/transip', [App\Http\Controllers\Admin\TransIpSettingController::class, 'index'])->name('transip');
             Route::put('/integraties/transip', [App\Http\Controllers\Admin\TransIpSettingController::class, 'update'])->name('transip.update');
             Route::get('/integraties/transip/test', [App\Http\Controllers\Admin\TransIpSettingController::class, 'test'])->name('transip.test');
+            Route::get('/domein-tlds', [AdminDomainTldController::class, 'index'])->name('domains.tlds.index');
+            Route::post('/domein-tlds', [AdminDomainTldController::class, 'store'])->name('domains.tlds.store');
+            Route::put('/domein-tlds/{tld}', [AdminDomainTldController::class, 'update'])->name('domains.tlds.update');
+            Route::delete('/domein-tlds/{tld}', [AdminDomainTldController::class, 'destroy'])->name('domains.tlds.destroy');
             Route::get('/nieuwsbrief', [App\Http\Controllers\Admin\SettingController::class, 'newsletter'])->name('newsletter');
             Route::post('/klanten-resetten', [App\Http\Controllers\Admin\SettingController::class, 'resetCustomers'])->name('reset-customers');
             Route::get('/medewerkers', [App\Http\Controllers\Admin\StaffController::class, 'index'])->name('staff');

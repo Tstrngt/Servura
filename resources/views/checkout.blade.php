@@ -4,8 +4,8 @@
 
 @section('content')
 @php
-    $initialPrice = $service->prices->first();
     $user = auth()->user();
+    $initialPrice = $service->prices->first(fn ($p) => $p->id == old('service_price_id', $prefillPriceId)) ?? $service->prices->first();
     $initialCountry = old('country', array_key_exists((string) $user?->country, $countries) ? $user->country : 'NL');
 @endphp
 <style>[x-cloak] { display: none !important; }</style>
@@ -20,13 +20,18 @@
             </div>
 
             <section class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-                <h2 class="text-lg font-semibold text-slate-900">1. Kies uw betaalperiode</h2>
-                <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <h2 class="text-lg font-semibold text-slate-900">1. @if($service->fulfillment_type === 'domain')Kies uw extensie@else Kies uw betaalperiode@endif</h2>
+                <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3" x-ref="priceOptions">
                     @foreach($service->prices as $price)
-                        <label class="relative cursor-pointer rounded-xl border p-4 transition-colors" :class="selected === '{{ $price->id }}' ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500/10' : 'border-slate-200 hover:border-slate-300'">
+                        <label class="relative cursor-pointer rounded-xl border p-4 transition-colors" :class="selected === '{{ $price->id }}' ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500/10' : 'border-slate-200 hover:border-slate-300'" data-tld="{{ $price->tld }}">
                             <input type="radio" name="service_price_id" value="{{ $price->id }}" x-model="selected" class="sr-only">
-                            <span class="block text-sm font-semibold text-slate-900">{{ $price->label }}</span>
-                            <span class="mt-2 block text-xl font-bold text-slate-900">€ {{ number_format($price->price, 2, ',', '.') }}</span>
+                            @if($service->fulfillment_type === 'domain' && $price->tld)
+                                <span class="block text-sm font-semibold text-slate-900">{{ strtoupper($price->tld) }}</span>
+                                <span class="mt-2 block text-xl font-bold text-slate-900">€ {{ number_format($price->price, 2, ',', '.') }}<span class="text-sm font-normal text-slate-500"> /jaar</span></span>
+                            @else
+                                <span class="block text-sm font-semibold text-slate-900">{{ $price->label }}</span>
+                                <span class="mt-2 block text-xl font-bold text-slate-900">€ {{ number_format($price->price, 2, ',', '.') }}</span>
+                            @endif
                             <span class="mt-1 block text-xs text-slate-500"><span x-text="'€ ' + Number({{ (float) $price->price }} * (1 + rate() / 100)).toLocaleString('nl-NL', {minimumFractionDigits: 2})"></span> inclusief BTW</span>
                         </label>
                     @endforeach
@@ -58,6 +63,21 @@
                     <div class="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
                         @if($service->fulfillment_type === 'directadmin')
                             <div class="form-group sm:col-span-2"><label class="form-label" for="domain">Hoofddomein *</label><input class="form-input" id="domain" name="domain" required value="{{ old('domain') }}" placeholder="voorbeeld.nl"><p class="mt-1 text-xs text-slate-500">Voer alleen de domeinnaam in, zonder https:// of www.</p>@error('domain')<span class="form-error">{{ $message }}</span>@enderror</div>
+                        @elseif($service->fulfillment_type === 'domain')
+                            <div class="form-group sm:col-span-2">
+                                <label class="form-label" for="domain_name">Domeinnaam *</label>
+                                <div class="flex items-stretch rounded-xl ring-1 ring-slate-200 focus-within:ring-2 focus-within:ring-primary-500 overflow-hidden">
+                                    <input type="text" id="domain_name" name="domain_name" required value="{{ old('domain_name', $prefillName) }}" placeholder="jouwbedrijf" class="flex-1 border-0 px-4 py-2.5 text-slate-900 focus:ring-0">
+                                    <select name="domain_tld" class="border-0 border-l border-slate-200 bg-slate-50 px-3 py-2.5 text-slate-700 focus:ring-0" x-data x-init="$el.addEventListener('change', () => { const price = $refs.priceOptions.querySelector('[data-tld=\"' + $el.value + '\"]'); if (price) price.click(); })">
+                                        @foreach($service->prices as $price)
+                                            @if($price->tld)
+                                                <option value="{{ $price->tld }}" {{ old('domain_tld', $prefillTld) === $price->tld ? 'selected' : '' }}>{{ strtoupper($price->tld) }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @error('domain')<span class="form-error">{{ $message }}</span>@enderror
+                            </div>
                         @endif
                         <div class="form-group"><label class="form-label" for="name">Naam *</label><input class="form-input" id="name" name="name" required value="{{ old('name', $user?->name) }}"></div>
                         <div class="form-group"><label class="form-label" for="company">Bedrijfsnaam</label><input class="form-input" id="company" name="company" value="{{ old('company', $user?->company) }}"></div>
