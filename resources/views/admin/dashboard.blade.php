@@ -319,13 +319,18 @@
                             <h3 class="text-lg leading-6 font-medium text-gray-900">
                                 Ongelezen Berichten
                             </h3>
-                            <span class="text-sm text-gray-400">Overzicht niet beschikbaar</span>
+                            @if($unreadMessages->count() > 0)
+                                <form action="{{ route('admin.contact-messages.read-all') }}" method="POST" class="inline m-0">
+                                    @csrf
+                                    <button type="submit" class="text-sm text-primary-600 hover:text-primary-500">Alles gelezen</button>
+                                </form>
+                            @endif
                         </div>
                         @if($unreadMessages->count() > 0)
                             <div class="space-y-3">
                                 @foreach($unreadMessages as $message)
-                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                                        <div class="flex-1">
+                                    <div class="group flex items-start justify-between p-3 bg-gray-50 rounded-md">
+                                        <div class="flex-1 min-w-0">
                                             <div class="text-sm font-medium text-gray-900">
                                                 {{ $message->name }}
                                             </div>
@@ -336,11 +341,14 @@
                                                 {{ $message->email }} • {{ $message->created_at->diffForHumans() }}
                                             </div>
                                         </div>
-                                        <div class="ml-4">
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                Nieuw
-                                            </span>
-                                        </div>
+                                        <form action="{{ route('admin.contact-messages.read', $message) }}" method="POST" class="ml-3 hidden group-hover:block">
+                                            @csrf
+                                            <button type="submit" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-white hover:text-gray-600 transition-colors" aria-label="Bericht verwijderen">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                                </svg>
+                                            </button>
+                                        </form>
                                     </div>
                                 @endforeach
                             </div>

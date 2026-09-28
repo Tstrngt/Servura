@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\Admin\AbuseReportController;
 use App\Http\Controllers\Admin\BillingSettingsController as AdminBillingSettingsController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Admin\DomainRegistrationController as AdminDomainRegistrationController;
+use App\Http\Controllers\Admin\DomainTldController as AdminDomainTldController;
 use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Admin\QuoteController as AdminQuoteController;
@@ -11,15 +14,17 @@ use App\Http\Controllers\Admin\ServerConnectionController as AdminServerConnecti
 use App\Http\Controllers\Admin\ServiceCancellationController;
 use App\Http\Controllers\Admin\ServiceCategoryController as AdminServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
+use App\Http\Controllers\Admin\TransIpSettingController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\Admin\DomainTldController as AdminDomainTldController;
-use App\Http\Controllers\Admin\DomainRegistrationController as AdminDomainRegistrationController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboard;
 use App\Http\Controllers\Customer\DomainController as CustomerDomainController;
 use App\Http\Controllers\Customer\InvoiceController as CustomerInvoiceController;
@@ -27,10 +32,13 @@ use App\Http\Controllers\Customer\ProfileController;
 use App\Http\Controllers\Customer\QuoteController as CustomerQuoteController;
 use App\Http\Controllers\Customer\TicketController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\MollieWebhookController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\QuoteBuilderController;
 use App\Http\Controllers\ServiceController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -67,16 +75,16 @@ Route::get('/offerte-samenstellen/inloggen', [QuoteBuilderController::class, 'lo
 Route::post('/offerte-samenstellen', [QuoteBuilderController::class, 'store'])->middleware('throttle:10,1')->name('quote.builder.store');
 
 // Nieuwsbrief
-Route::post('/nieuwsbrief', [App\Http\Controllers\NewsletterController::class, 'subscribe'])->middleware('throttle:10,1')->name('newsletter.subscribe');
+Route::post('/nieuwsbrief', [NewsletterController::class, 'subscribe'])->middleware('throttle:10,1')->name('newsletter.subscribe');
 
 // Domeinchecker
 Route::get('/domeinchecker', function () {
     return view('domains.checker');
 })->name('domains.checker');
-Route::get('/nieuwsbrief/afmelden/{token}', [App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+Route::get('/nieuwsbrief/afmelden/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
 // Taalwissel (voorbereiding meertaligheid)
-Route::post('/taal', function (\Illuminate\Http\Request $request) {
+Route::post('/taal', function (Request $request) {
     $locale = $request->input('locale', 'nl');
     if (in_array($locale, ['nl', 'en', 'de', 'fr'], true)) {
         $request->session()->put('locale', $locale);
@@ -97,12 +105,12 @@ Route::middleware('guest')->group(function () {
     Route::post('/wachtwoord-reset', [NewPasswordController::class, 'store'])->name('password.update');
 });
 
-Route::get('/email/verificatie/{token}', [\App\Http\Controllers\Auth\VerifyEmailController::class, 'verify'])->name('verification.verify');
+Route::get('/email/verificatie/{token}', [VerifyEmailController::class, 'verify'])->name('verification.verify');
 
 // Authenticated routes
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-    Route::post('/email/verificatie/opnieuw', [\App\Http\Controllers\Auth\VerifyEmailController::class, 'resend'])->name('verification.send');
+    Route::post('/email/verificatie/opnieuw', [VerifyEmailController::class, 'resend'])->name('verification.send');
 
     // Customer routes
     Route::middleware('customer')->prefix('klant')->name('customer.')->group(function () {
@@ -161,6 +169,8 @@ Route::middleware('auth')->group(function () {
     // Admin routes
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
+        Route::post('/contact-messages/{contactMessage}/read', [AdminDashboard::class, 'markContactMessageAsRead'])->name('contact-messages.read');
+        Route::post('/contact-messages/read-all', [AdminDashboard::class, 'markAllContactMessagesAsRead'])->name('contact-messages.read-all');
         Route::get('/tickets', [AdminTicketController::class, 'index'])->name('tickets.index');
         Route::get('/tickets/attachments/{attachment}/download', [AdminTicketController::class, 'downloadAttachment'])->name('tickets.attachments.download');
         Route::post('/tickets/{ticket}/offerte', [AdminTicketController::class, 'createQuote'])->name('tickets.create-quote');
@@ -215,9 +225,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/service-categories', [AdminServiceCategoryController::class, 'index'])->name('service-categories.index');
 
         // Abuse reports
-        Route::get('/abuse-reports', [\App\Http\Controllers\Admin\AbuseReportController::class, 'index'])->name('abuse-reports.index');
-        Route::get('/abuse-reports/{abuseReport}', [\App\Http\Controllers\Admin\AbuseReportController::class, 'show'])->name('abuse-reports.show');
-        Route::patch('/abuse-reports/{abuseReport}/status', [\App\Http\Controllers\Admin\AbuseReportController::class, 'updateStatus'])->name('abuse-reports.update-status');
+        Route::get('/abuse-reports', [AbuseReportController::class, 'index'])->name('abuse-reports.index');
+        Route::get('/abuse-reports/{abuseReport}', [AbuseReportController::class, 'show'])->name('abuse-reports.show');
+        Route::patch('/abuse-reports/{abuseReport}/status', [AbuseReportController::class, 'updateStatus'])->name('abuse-reports.update-status');
         Route::post('/service-categories', [AdminServiceCategoryController::class, 'store'])->name('service-categories.store');
         Route::put('/service-categories/{serviceCategory}', [AdminServiceCategoryController::class, 'update'])->name('service-categories.update');
         Route::delete('/service-categories/{serviceCategory}', [AdminServiceCategoryController::class, 'destroy'])->name('service-categories.destroy');
@@ -260,52 +270,52 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::prefix('settings')->name('settings.')->group(function () {
-            Route::get('/', [App\Http\Controllers\Admin\SettingController::class, 'general'])->name('general');
-            Route::put('/algemeen', [App\Http\Controllers\Admin\SettingController::class, 'updateGeneral'])->name('general.update');
-            Route::get('/mail', [App\Http\Controllers\Admin\SettingController::class, 'mail'])->name('mail');
-            Route::put('/mail', [App\Http\Controllers\Admin\SettingController::class, 'updateMail'])->name('mail.update');
-            Route::post('/mail/test', [App\Http\Controllers\Admin\SettingController::class, 'sendTestMail'])->name('mail.test');
-            Route::get('/emailtemplates', [App\Http\Controllers\Admin\SettingController::class, 'emailTemplates'])->name('email-templates');
-            Route::put('/emailtemplates', [App\Http\Controllers\Admin\SettingController::class, 'updateEmailTemplates'])->name('email-templates.update');
-            Route::get('/betalingen', [App\Http\Controllers\Admin\SettingController::class, 'payments'])->name('payments');
-            Route::put('/betalingen', [App\Http\Controllers\Admin\SettingController::class, 'updatePayments'])->name('payments.update');
+            Route::get('/', [SettingController::class, 'general'])->name('general');
+            Route::put('/algemeen', [SettingController::class, 'updateGeneral'])->name('general.update');
+            Route::get('/mail', [SettingController::class, 'mail'])->name('mail');
+            Route::put('/mail', [SettingController::class, 'updateMail'])->name('mail.update');
+            Route::post('/mail/test', [SettingController::class, 'sendTestMail'])->name('mail.test');
+            Route::get('/emailtemplates', [SettingController::class, 'emailTemplates'])->name('email-templates');
+            Route::put('/emailtemplates', [SettingController::class, 'updateEmailTemplates'])->name('email-templates.update');
+            Route::get('/betalingen', [SettingController::class, 'payments'])->name('payments');
+            Route::put('/betalingen', [SettingController::class, 'updatePayments'])->name('payments.update');
             Route::get('/facturatie', [AdminBillingSettingsController::class, 'edit'])->name('billing');
             Route::put('/facturatie', [AdminBillingSettingsController::class, 'update'])->name('billing.update');
-            Route::get('/offerteformulier', [App\Http\Controllers\Admin\SettingController::class, 'formbuilder'])->name('formbuilder');
-            Route::put('/offerteformulier', [App\Http\Controllers\Admin\SettingController::class, 'updateFormbuilder'])->name('formbuilder.update');
-            Route::get('/juridisch', [App\Http\Controllers\Admin\SettingController::class, 'legal'])->name('legal');
-            Route::put('/juridisch', [App\Http\Controllers\Admin\SettingController::class, 'updateLegal'])->name('legal.update');
-            Route::get('/beveiliging', [App\Http\Controllers\Admin\SettingController::class, 'security'])->name('security');
-            Route::put('/beveiliging', [App\Http\Controllers\Admin\SettingController::class, 'updateSecurity'])->name('security.update');
-            Route::get('/integraties', [App\Http\Controllers\Admin\SettingController::class, 'integrations'])->name('integrations');
-            Route::get('/integraties/transip', [App\Http\Controllers\Admin\TransIpSettingController::class, 'index'])->name('transip');
-            Route::put('/integraties/transip', [App\Http\Controllers\Admin\TransIpSettingController::class, 'update'])->name('transip.update');
-            Route::get('/integraties/transip/test', [App\Http\Controllers\Admin\TransIpSettingController::class, 'test'])->name('transip.test');
+            Route::get('/offerteformulier', [SettingController::class, 'formbuilder'])->name('formbuilder');
+            Route::put('/offerteformulier', [SettingController::class, 'updateFormbuilder'])->name('formbuilder.update');
+            Route::get('/juridisch', [SettingController::class, 'legal'])->name('legal');
+            Route::put('/juridisch', [SettingController::class, 'updateLegal'])->name('legal.update');
+            Route::get('/beveiliging', [SettingController::class, 'security'])->name('security');
+            Route::put('/beveiliging', [SettingController::class, 'updateSecurity'])->name('security.update');
+            Route::get('/integraties', [SettingController::class, 'integrations'])->name('integrations');
+            Route::get('/integraties/transip', [TransIpSettingController::class, 'index'])->name('transip');
+            Route::put('/integraties/transip', [TransIpSettingController::class, 'update'])->name('transip.update');
+            Route::get('/integraties/transip/test', [TransIpSettingController::class, 'test'])->name('transip.test');
             Route::get('/domein-tlds', [AdminDomainTldController::class, 'index'])->name('domains.tlds.index');
             Route::post('/domein-tlds', [AdminDomainTldController::class, 'store'])->name('domains.tlds.store');
             Route::put('/domein-tlds/{tld}', [AdminDomainTldController::class, 'update'])->name('domains.tlds.update');
             Route::delete('/domein-tlds/{tld}', [AdminDomainTldController::class, 'destroy'])->name('domains.tlds.destroy');
-            Route::get('/nieuwsbrief', [App\Http\Controllers\Admin\SettingController::class, 'newsletter'])->name('newsletter');
-            Route::post('/klanten-resetten', [App\Http\Controllers\Admin\SettingController::class, 'resetCustomers'])->name('reset-customers');
-            Route::get('/medewerkers', [App\Http\Controllers\Admin\StaffController::class, 'index'])->name('staff');
-            Route::post('/medewerkers', [App\Http\Controllers\Admin\StaffController::class, 'store'])->name('staff.store');
-            Route::put('/medewerkers/{staff}', [App\Http\Controllers\Admin\StaffController::class, 'update'])->name('staff.update');
-            Route::delete('/medewerkers/{staff}', [App\Http\Controllers\Admin\StaffController::class, 'destroy'])->name('staff.destroy');
+            Route::get('/nieuwsbrief', [SettingController::class, 'newsletter'])->name('newsletter');
+            Route::post('/klanten-resetten', [SettingController::class, 'resetCustomers'])->name('reset-customers');
+            Route::get('/medewerkers', [StaffController::class, 'index'])->name('staff');
+            Route::post('/medewerkers', [StaffController::class, 'store'])->name('staff.store');
+            Route::put('/medewerkers/{staff}', [StaffController::class, 'update'])->name('staff.update');
+            Route::delete('/medewerkers/{staff}', [StaffController::class, 'destroy'])->name('staff.destroy');
         });
     });
 });
 
 // Juridische pagina's
-Route::get('/algemene-voorwaarden', [\App\Http\Controllers\LegalController::class, 'terms'])->name('legal.terms');
-Route::get('/privacy', [\App\Http\Controllers\LegalController::class, 'privacy'])->name('legal.privacy');
-Route::get('/cookies', [\App\Http\Controllers\LegalController::class, 'cookies'])->name('legal.cookies');
-Route::get('/hostingvoorwaarden', [\App\Http\Controllers\LegalController::class, 'hosting'])->name('legal.hosting');
-Route::get('/acceptable-use', [\App\Http\Controllers\LegalController::class, 'acceptableUse'])->name('legal.acceptable-use');
-Route::get('/verwerkersovereenkomst', [\App\Http\Controllers\LegalController::class, 'dpa'])->name('legal.dpa');
+Route::get('/algemene-voorwaarden', [LegalController::class, 'terms'])->name('legal.terms');
+Route::get('/privacy', [LegalController::class, 'privacy'])->name('legal.privacy');
+Route::get('/cookies', [LegalController::class, 'cookies'])->name('legal.cookies');
+Route::get('/hostingvoorwaarden', [LegalController::class, 'hosting'])->name('legal.hosting');
+Route::get('/acceptable-use', [LegalController::class, 'acceptableUse'])->name('legal.acceptable-use');
+Route::get('/verwerkersovereenkomst', [LegalController::class, 'dpa'])->name('legal.dpa');
 
 // Misbruik melden
-Route::get('/abuse', [\App\Http\Controllers\LegalController::class, 'abuse'])->name('legal.abuse');
-Route::post('/abuse', [\App\Http\Controllers\LegalController::class, 'storeAbuse'])->middleware('throttle:5,1')->name('legal.abuse.store');
+Route::get('/abuse', [LegalController::class, 'abuse'])->name('legal.abuse');
+Route::post('/abuse', [LegalController::class, 'storeAbuse'])->middleware('throttle:5,1')->name('legal.abuse.store');
 
 // Mollie webhook (no auth, POST only)
 Route::post('/mollie/webhook', MollieWebhookController::class)->name('mollie.webhook');
