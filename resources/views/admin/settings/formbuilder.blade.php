@@ -32,8 +32,8 @@
             <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
                 <h2 class="text-lg font-semibold text-slate-900">Antwoordopties</h2>
                 <p class="mt-1 text-sm text-slate-600">
-                    Per groep één optie per regel. Voeg optioneel een toelichting toe na een sluisteken:
-                    <code class="rounded bg-slate-100 px-1">Label | Toelichting</code>.
+                    Per groep één optie per regel. Voeg optioneel een toelichting en/of infobol-uitleg toe na sluistekens:
+                    <code class="rounded bg-slate-100 px-1">Label | Toelichting | Uitleg</code>.
                     Laat een groep leeg om de standaardopties te gebruiken.
                 </p>
 

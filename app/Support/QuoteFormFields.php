@@ -106,11 +106,18 @@ class QuoteFormFields
 
         foreach (self::GROUPS as $key => $label) {
             if (isset($stored[$key]) && is_array($stored[$key]) && count($stored[$key]) > 0) {
-                $defaults[$key] = array_values(array_map(fn ($o) => [
-                    'label' => (string) ($o['label'] ?? ''),
-                    'note' => (string) ($o['note'] ?? ''),
-                    'info' => (string) ($o['info'] ?? ''),
-                ], array_filter($stored[$key], fn ($o) => ($o['label'] ?? '') !== '')));
+                $defaultOptions = collect($defaults[$key] ?? [])->keyBy('label');
+
+                $defaults[$key] = array_values(array_map(function ($o) use ($defaultOptions) {
+                    $label = (string) ($o['label'] ?? '');
+                    $default = $defaultOptions->get($label);
+
+                    return [
+                        'label' => $label,
+                        'note' => (string) ($o['note'] ?? $default['note'] ?? ''),
+                        'info' => (string) ($o['info'] ?? $default['info'] ?? ''),
+                    ];
+                }, array_filter($stored[$key], fn ($o) => ($o['label'] ?? '') !== '')));
             }
         }
 
@@ -128,8 +135,12 @@ class QuoteFormFields
             if ($line === '') {
                 continue;
             }
-            [$label, $note] = array_pad(explode('|', $line, 2), 2, '');
-            $options[] = ['label' => trim($label), 'note' => trim($note)];
+            $parts = array_pad(explode('|', $line, 3), 3, '');
+            $options[] = [
+                'label' => trim($parts[0]),
+                'note' => trim($parts[1]),
+                'info' => trim($parts[2]),
+            ];
         }
 
         return $options;
@@ -141,7 +152,17 @@ class QuoteFormFields
     public static function toLines(array $options): string
     {
         return collect($options)
-            ->map(fn ($o) => $o['label'].($o['note'] !== '' ? ' | '.$o['note'] : ''))
+            ->map(function ($o) {
+                $line = $o['label'];
+                if (($o['note'] ?? '') !== '') {
+                    $line .= ' | '.$o['note'];
+                }
+                if (($o['info'] ?? '') !== '') {
+                    $line .= ' | '.$o['info'];
+                }
+
+                return $line;
+            })
             ->implode("\n");
     }
 }
