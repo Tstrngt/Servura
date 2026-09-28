@@ -23,6 +23,35 @@
     </div>
 </section>
 
+<!-- Success Message -->
+<section
+    x-data="{ show: @json((bool) (session('success') || request()->has('success'))), message: @json(session('success') ?: 'Bedankt voor uw bericht. We nemen zo snel mogelijk contact met u op.') }"
+    x-init="show && setTimeout(() => show = false, 5000)"
+    x-show="show"
+    x-cloak
+    x-transition.opacity.duration.500ms
+    class="relative bg-slate-50 pt-6 pb-2"
+>
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 shadow-lg shadow-emerald-900/5 flex items-start gap-4">
+            <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+            </span>
+            <div class="flex-1">
+                <h3 class="font-heading font-semibold text-emerald-900">Bericht verstuurd</h3>
+                <p class="text-emerald-700 text-sm mt-0.5" x-text="message"></p>
+            </div>
+            <button type="button" @click="show = false" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-full text-emerald-600 hover:bg-emerald-100 transition-colors" aria-label="Melding sluiten">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</section>
+
 <!-- Contact Form + Info -->
 <section id="contact-form" class="relative py-24 lg:py-32 bg-slate-50 overflow-hidden">
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[40rem] h-[20rem] bg-primary-400/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -39,21 +68,6 @@
                         <span class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-primary-700 mb-4">Direct contact</span>
                         <h2 class="font-heading text-3xl font-bold text-slate-900 mb-2">Stuur ons een bericht</h2>
                         <p class="text-slate-500 mb-8">Vul het formulier in en we nemen binnen 48 uur contact op.</p>
-
-                        @if(session('success'))
-                            <div class="bg-emerald-50 border-l-4 border-emerald-400 p-4 mb-6 rounded-r-lg">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <svg class="h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm text-emerald-700">{{ session('success') }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
 
                         <form action="{{ route('contact.store') }}" method="POST">
                             @csrf
@@ -170,6 +184,45 @@
                     <p class="text-sm text-slate-300 leading-relaxed">Werkzaam door heel Nederland. Altijd een vast aanspreekpunt voor uw project.</p>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="relative py-24 lg:py-28 bg-white overflow-hidden">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[36rem] h-[16rem] bg-accent-400/5 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative max-w-3xl mx-auto px-6">
+        <div class="text-center mb-12 animate-on-scroll">
+            <h2 class="font-heading text-3xl md:text-4xl font-bold text-slate-900 mb-4">Veelgestelde vragen</h2>
+            <p class="text-lg text-slate-600">Staat uw vraag er niet bij? Neem gerust contact op.</p>
+        </div>
+
+        @php
+            $faqs = [
+                ['q' => 'Wat kost een nieuwe website?', 'a' => 'Onze websitepakketten starten vanaf €749 excl. btw. Welk pakket het beste past, hangt af van het aantal pagina\'s, gewenste functionaliteiten en de mate van maatwerk. Voor aanvullende wensen ontvangt u vooraf een duidelijke prijsopgave.'],
+                ['q' => 'Hoe snel kan mijn website online?', 'a' => 'Een eenvoudige website kan vaak binnen 2 tot 4 weken worden opgeleverd. Bij uitgebreidere websites hangt de doorlooptijd af van het ontwerp, de functionaliteiten en hoe snel content wordt aangeleverd. Vooraf spreken we samen een realistische planning af.'],
+                ['q' => 'Is hosting inbegrepen?', 'a' => 'Bij onze websitepakketten is het eerste jaar hosting inbegrepen. Daarna kiest u het hostingpakket dat het beste bij uw website past.'],
+                ['q' => 'Kan ik mijn website zelf aanpassen?', 'a' => 'Ja. Waar van toepassing leveren we de website met een gebruiksvriendelijk CMS, zodat u zelf teksten, afbeeldingen en pagina\'s kunt aanpassen.'],
+                ['q' => 'Kan ik later uitbreiden?', 'a' => 'Ja. Websites kunnen later worden uitgebreid met extra pagina\'s, formulieren, meertaligheid, koppelingen of andere functionaliteiten.'],
+                ['q' => 'Bieden jullie ook onderhoud?', 'a' => 'Ja. We kunnen het technische beheer van uw website verzorgen, waaronder updates, back-ups, beveiliging en ondersteuning. De mogelijkheden hangen af van het gekozen hosting- en onderhoudspakket.'],
+            ];
+        @endphp
+
+        <div class="space-y-4">
+            @foreach($faqs as $faq)
+                <details class="group rounded-2xl bg-slate-50 ring-1 ring-slate-200 overflow-hidden transition-all duration-300 hover:shadow-md hover:bg-white open:bg-white open:shadow-lg open:shadow-primary-500/5 open:ring-primary-500/30">
+                    <summary class="w-full cursor-pointer text-left px-6 py-5 flex justify-between items-center gap-4 focus:outline-none transition-colors">
+                        <span class="font-heading font-semibold text-lg text-slate-900 leading-snug">{{ $faq['q'] }}</span>
+                        <span class="w-9 h-9 rounded-full bg-white ring-1 ring-slate-200 text-primary-600 flex items-center justify-center flex-shrink-0 transition-all duration-300 group-open:bg-primary-600 group-open:text-white group-open:rotate-180">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </span>
+                    </summary>
+                    <div class="px-6 pb-6 pt-2 text-slate-600 leading-relaxed border-t border-slate-100">
+                        {{ $faq['a'] }}
+                    </div>
+                </details>
+            @endforeach
         </div>
     </div>
 </section>
