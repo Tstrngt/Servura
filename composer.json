@@ -15,6 +15,7 @@
         "laravel/ui": "^4.5",
         "mollie/laravel-mollie": "^3.0",
         "spatie/laravel-permission": "^6.9",
+        "symfony/cache": "^7.4",
         "transip/transip-api-php": "^6.54"
     },
     "require-dev": {
