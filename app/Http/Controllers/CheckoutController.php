@@ -100,6 +100,29 @@ class CheckoutController extends Controller
         return back();
     }
 
+    public function setPrice(Request $request)
+    {
+        $validated = $request->validate([
+            'index' => 'required|integer|min:0',
+            'service_price_id' => 'required|integer|exists:service_prices,id',
+        ]);
+
+        $cart = CheckoutCart::get($request);
+        if (! isset($cart[$validated['index']])) {
+            return back();
+        }
+
+        $price = ServicePrice::find($validated['service_price_id']);
+        if (! $price || ! $price->is_enabled) {
+            return back()->with('error', 'Het gekozen tarief is niet beschikbaar.');
+        }
+
+        $cart[$validated['index']]['service_price_id'] = $price->id;
+        CheckoutCart::set($cart, $request);
+
+        return back();
+    }
+
     public function store(
         Request $request,
         Service $service,

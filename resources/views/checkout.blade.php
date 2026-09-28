@@ -15,36 +15,19 @@
 @endphp
 <style>[x-cloak] { display: none !important; }</style>
 <div class="min-h-screen bg-slate-50 py-12 lg:py-16">
-    <div class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:px-8"
+    <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <a href="{{ route('services.index') }}" class="text-sm font-semibold text-primary-700 hover:text-primary-900">← Terug naar diensten</a>
+        <h1 class="mt-4 font-heading text-3xl font-bold text-slate-900 sm:text-4xl">Uw bestelling afronden</h1>
+        <p class="mt-2 max-w-2xl text-slate-600">Controleer uw gekozen producten en vul uw factuur- en betaalgegevens in.</p>
+    </div>
+
+    <div class="mx-auto mt-8 grid w-full max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:px-8"
          x-data="{ country: @js($initialCountry), rates: @js($countryRates), rate() { return Number(this.rates[this.country] ?? 0) }, submitting: false }">
 
-        <div class="space-y-12">
-            <div>
-                <a href="{{ route('services.index') }}" class="text-sm font-semibold text-primary-700 hover:text-primary-900">← Terug naar diensten</a>
-                <h1 class="mt-4 font-heading text-3xl font-bold text-slate-900 sm:text-4xl">Uw bestelling afronden</h1>
-                <p class="mt-2 max-w-2xl text-slate-600">Controleer uw gekozen producten en vul uw factuur- en betaalgegevens in.</p>
-            </div>
-
+        <div class="space-y-8">
             @include('checkout.partials.cart-items')
 
-            @if($primaryPriceOptions->count() > 1)
-                <section class="rounded-2xl bg-slate-900 p-6 text-white shadow-xl">
-                    <h2 class="text-lg font-semibold text-white">Betaalperiode</h2>
-                    <p class="mt-1 text-sm text-slate-400">Kies de gewenste betaaltermijn voor {{ $primaryItem['service']->title }}.</p>
-                    <div class="mt-4">
-                        <label class="sr-only" for="service_price_id">Betaalperiode</label>
-                        <select name="service_price_id" id="service_price_id" form="checkout-form" class="form-input w-full border-slate-600 bg-slate-800 text-white focus:border-primary-500 focus:ring-primary-500">
-                            @foreach($primaryPriceOptions as $price)
-                                <option value="{{ $price->id }}" {{ old('service_price_id', $primaryItem['price_model']->id ?? null) == $price->id ? 'selected' : '' }}>
-                                    {{ $price->label }} — € {{ number_format($price->price, 2, ',', '.') }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </section>
-            @elseif($primaryPriceOptions->count() === 1)
-                <input type="hidden" name="service_price_id" form="checkout-form" value="{{ $primaryPriceOptions->first()->id }}">
-            @endif
+            @include('checkout.partials.billing-period')
 
             @if($isDomainOrder)
                 @include('checkout.partials.hosting-upsell')
@@ -99,7 +82,6 @@
                                 </div>
                             </div>
                         @endguest
-
                     </div>
                 </section>
             </form>
