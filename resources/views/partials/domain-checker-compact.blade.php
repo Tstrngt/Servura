@@ -23,7 +23,10 @@
 
     <div class="mt-5">
         <template x-if="result && result.results">
-            <div class="rounded-2xl bg-white p-5 text-slate-900 shadow-xl ring-1 ring-white/20">
+            <div x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 class="rounded-2xl bg-white p-5 text-slate-900 shadow-xl ring-1 ring-white/20">
                 <p class="text-sm text-slate-500 mb-3">Resultaten voor <span class="font-semibold text-slate-700" x-text="result.name"></span></p>
 
                 <div class="space-y-2">
@@ -53,7 +56,10 @@
         </template>
 
         <template x-if="error">
-            <div class="rounded-2xl bg-red-50 p-4 text-red-800 ring-1 ring-red-200">
+            <div x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 class="rounded-2xl bg-red-50 p-4 text-red-800 ring-1 ring-red-200">
                 <p x-text="error"></p>
             </div>
         </template>
