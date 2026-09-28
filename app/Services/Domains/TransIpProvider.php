@@ -98,6 +98,19 @@ class TransIpProvider implements DomainProvider
         }
     }
 
+    public function suggest(string $name, array $tlds = []): array
+    {
+        $name = $this->normalizeDomainName($name);
+        $tlds = $tlds === [] ? config('domains.default_tlds', ['nl']) : $tlds;
+
+        $results = [];
+        foreach ($tlds as $tld) {
+            $results[] = $this->checkAvailability($name.'.'.ltrim($tld, '.'));
+        }
+
+        return $results;
+    }
+
     public function tlds(): array
     {
         if (! $this->isConfigured()) {
@@ -137,6 +150,16 @@ class TransIpProvider implements DomainProvider
         $domain = preg_replace('#^(www\.)?([^/]+).*#', '$2', $domain) ?? $domain;
 
         return $domain;
+    }
+
+    private function normalizeDomainName(string $name): string
+    {
+        $name = mb_strtolower(trim($name));
+        $name = preg_replace('#^https?://#', '', $name) ?? $name;
+        $name = preg_replace('#^(www\.)?([^/]+).*#', '$2', $name) ?? $name;
+        $name = preg_replace('/\.\w+$/', '', $name) ?? $name;
+
+        return $name;
     }
 
     private function extractTld(string $domain): ?string
