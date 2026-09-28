@@ -160,7 +160,11 @@ class QuoteBuilderController extends Controller
         $isNewUser = false;
         $plainPassword = null;
 
-        [$customerService, $ticket, $user] = DB::transaction(function () use ($request, $service, $messageText, $ticketService, &$isNewUser, &$plainPassword) {
+        [$customerService, $ticket, $user] = DB::transaction(function () use (
+            $request, $service, $messageText, $ticketService,
+            $allFeatures, $includedFeatures, $extraFeatures, $submittedContent,
+            &$isNewUser, &$plainPassword
+        ) {
             $user = Auth::user();
 
             if (! $user) {
