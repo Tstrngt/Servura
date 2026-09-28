@@ -16,7 +16,7 @@ class QuoteFormFields
         'visitors' => 'Verwachte bezoekers per maand (dropdown, verplicht)',
         'design' => 'Ontwerp & huisstijl (dropdown, verplicht)',
         'features' => 'Functionaliteiten (checkboxen)',
-        'content' => 'Content & teksten (checkboxen)',
+        'content' => 'Content & teksten (radioknoppen, 1 keuze)',
         'timeline' => 'Gewenste oplevering (dropdown, verplicht)',
         'budget' => 'Budgetindicatie (dropdown, optioneel)',
     ];

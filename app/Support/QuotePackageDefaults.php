@@ -14,7 +14,7 @@ class QuotePackageDefaults
 {
     public static function for(Service $service): array
     {
-        $config = config("pricing.packages.{$service->slug}", config("pricing.packages." . str_replace('-website', '', $service->slug), []));
+        $config = config("pricing.packages.{$service->slug}", config('pricing.packages.'.str_replace('-website', '', $service->slug), []));
 
         return match (str_replace('-website', '', $service->slug)) {
             'starter' => [
@@ -27,7 +27,7 @@ class QuotePackageDefaults
                     'Contact- / leadformulieren',
                     'SEO-basis',
                 ],
-                'content' => [],
+                'content' => '',
             ],
             'business' => [
                 'goal' => null,
@@ -40,7 +40,7 @@ class QuotePackageDefaults
                     'Contact- / leadformulieren',
                     'SEO-basis',
                 ],
-                'content' => [],
+                'content' => '',
             ],
             'pro' => [
                 'goal' => null,
@@ -55,7 +55,7 @@ class QuotePackageDefaults
                     'Analytics',
                     'Portfolio / projectenmodule',
                 ],
-                'content' => [],
+                'content' => '',
             ],
             default => [
                 'goal' => null,
@@ -63,7 +63,7 @@ class QuotePackageDefaults
                 'visitors' => null,
                 'design' => null,
                 'features' => [],
-                'content' => [],
+                'content' => '',
             ],
         };
     }

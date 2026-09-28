@@ -18,7 +18,7 @@ $initialQuoteFields = [
 ];
 $initialQuoteSelected = [
     'features' => old('features', $currentDefaults['features'] ?? []),
-    'content' => old('content', $currentDefaults['content'] ?? []),
+    'content' => old('content', $currentDefaults['content'] ?? ($form['content'][0]['label'] ?? '')),
 ];
 $extraPagePrice = $pricingConfig['extras']['extraPage'] ?? 75;
 $pageHelp = "Het aantal inbegrepen pagina's hangt af van uw pakket. Extra pagina's kosten €" . $extraPagePrice . " per pagina.";
@@ -273,29 +273,22 @@ $pageHelp = "Het aantal inbegrepen pagina's hangt af van uw pakket. Extra pagina
                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">7</span>
                     <div>
                         <h2 class="font-heading text-2xl font-bold text-slate-900">Content & teksten</h2>
-                        <p class="text-slate-500 mt-1">U kunt teksten en beelden zelf aanleveren of gebruikmaken van onze aanvullende hulp bij content.</p>
+                        <p class="text-slate-500 mt-1">Kies één optie die het beste past. Zelf aanleveren is standaard inbegrepen.</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     @foreach($form['content'] as $option)
                         <label class="relative flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
-                            <template x-if="isIncluded('content', @js($option['label']))">
-                                <input type="hidden" name="content[]" value="{{ $option['label'] }}">
-                            </template>
                             <input
-                                type="checkbox"
+                                type="radio"
+                                name="content"
                                 value="{{ $option['label'] }}"
-                                class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
-                                :disabled="isIncluded('content', @js($option['label']))"
-                                :name="isIncluded('content', @js($option['label'])) ? null : 'content[]'"
+                                class="mt-1 h-4 w-4 border-slate-300 text-primary-600 focus:ring-primary-500"
                                 x-model="selected.content"
                             >
                             <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-semibold text-slate-900 text-sm">{{ $option['label'] }}</span>
-                                    <span x-show="isIncluded('content', @js($option['label']))" class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Inbegrepen</span>
-                                </div>
-                                @if($option['note'] !== '')<span class="text-xs text-slate-400">{{ $option['note'] }}</span>@endif
+                                <span class="font-semibold text-slate-900 text-sm">{{ $option['label'] }}</span>
+                                @if($option['note'] !== '')<span class="block text-xs text-slate-400">{{ $option['note'] }}</span>@endif
                             </div>
                         </label>
                     @endforeach
@@ -427,7 +420,7 @@ function quoteBuilder() {
             this.fields.visitors = defs.visitors || '';
             this.fields.design = defs.design || '';
             this.selected.features = defs.features ? [...defs.features] : [];
-            this.selected.content = defs.content ? [...defs.content] : [];
+            this.selected.content = defs.content ? String(defs.content) : '';
         },
         submitting: false,
         async submit(event) {

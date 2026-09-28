@@ -6,12 +6,15 @@ use App\Models\ContactMessage;
 use App\Models\CustomerService;
 use App\Models\Service;
 use App\Models\User;
+use App\Services\CaptchaService;
+use App\Services\CustomerNotificationService;
 use App\Services\PortalTicketService;
+use App\Support\QuoteFormFields;
+use App\Support\QuotePackageDefaults;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -46,8 +49,8 @@ class QuoteBuilderController extends Controller
             ->sortBy('title')
             ->values();
 
-        $form = \App\Support\QuoteFormFields::resolve();
-        $packageDefaults = $serviceOptions->mapWithKeys(fn (Service $s) => [$s->slug => \App\Support\QuotePackageDefaults::for($s)])->all();
+        $form = QuoteFormFields::resolve();
+        $packageDefaults = $serviceOptions->mapWithKeys(fn (Service $s) => [$s->slug => QuotePackageDefaults::for($s)])->all();
 
         $pricingConfig = config('pricing');
 
@@ -73,8 +76,7 @@ class QuoteBuilderController extends Controller
             'current_website' => 'nullable|string|max:255',
             'features' => 'nullable|array',
             'features.*' => 'string|max:255',
-            'content' => 'nullable|array',
-            'content.*' => 'string|max:255',
+            'content' => 'nullable|string|max:255',
             'timeline' => 'required|string|max:255',
             'budget' => 'nullable|string|max:255',
             'notes' => 'nullable|string|max:5000',
@@ -102,7 +104,7 @@ class QuoteBuilderController extends Controller
                 ->withInput();
         }
 
-        $captcha = app(\App\Services\CaptchaService::class);
+        $captcha = app(CaptchaService::class);
         if (! $captcha->verify($request->input($captcha->tokenField()), $request->ip())) {
             return redirect()->route('quote.builder', ['service' => $request->input('service')])
                 ->withErrors(['captcha' => 'Bevestig dat u geen robot bent.'])
@@ -128,18 +130,14 @@ class QuoteBuilderController extends Controller
             }
         }
 
-        $defaults = \App\Support\QuotePackageDefaults::for($service);
+        $defaults = QuotePackageDefaults::for($service);
 
         $submittedFeatures = array_values(array_unique($request->input('features', [])));
-        $submittedContent = array_values(array_unique($request->input('content', [])));
+        $submittedContent = (string) $request->input('content', '');
 
         $includedFeatures = array_values(array_intersect($defaults['features'] ?? [], $submittedFeatures));
         $extraFeatures = array_values(array_diff($submittedFeatures, $defaults['features'] ?? []));
         $allFeatures = array_values(array_unique(array_merge($defaults['features'] ?? [], $submittedFeatures)));
-
-        $includedContent = array_values(array_intersect($defaults['content'] ?? [], $submittedContent));
-        $extraContent = array_values(array_diff($submittedContent, $defaults['content'] ?? []));
-        $allContent = array_values(array_unique(array_merge($defaults['content'] ?? [], $submittedContent)));
 
         $formatList = fn (array $items, string $empty = 'Geen') => count($items) ? implode(', ', $items) : $empty;
 
@@ -149,21 +147,20 @@ class QuoteBuilderController extends Controller
         $messageText .= "Aantal pagina's: {$request->input('pages')}\n";
         $messageText .= "Verwachte bezoekers per maand: {$request->input('visitors')}\n";
         $messageText .= "Ontwerp/huisstijl: {$request->input('design')}\n";
-        $messageText .= "Huidige website: " . ($request->input('current_website') ?: 'Niet opgegeven') . "\n\n";
+        $messageText .= 'Huidige website: '.($request->input('current_website') ?: 'Niet opgegeven')."\n\n";
         $messageText .= "Gewenste functionaliteiten\n";
-        $messageText .= "Standaard inbegrepen: " . $formatList($includedFeatures) . "\n";
-        $messageText .= "Door klant aanvullend geselecteerd: " . $formatList($extraFeatures) . "\n\n";
+        $messageText .= 'Standaard inbegrepen: '.$formatList($includedFeatures)."\n";
+        $messageText .= 'Door klant aanvullend geselecteerd: '.$formatList($extraFeatures)."\n\n";
         $messageText .= "Content wensen\n";
-        $messageText .= "Standaard inbegrepen: " . $formatList($includedContent) . "\n";
-        $messageText .= "Door klant aanvullend geselecteerd: " . $formatList($extraContent) . "\n\n";
+        $messageText .= 'Keuze: '.($submittedContent ?: 'Geen keuze gemaakt')."\n\n";
         $messageText .= "Gewenste oplevering: {$request->input('timeline')}\n";
-        $messageText .= "Budgetindicatie: " . ($request->input('budget') ?: 'Niet opgegeven') . "\n\n";
-        $messageText .= "Overige vrije invoer:\n" . ($request->input('notes') ?: '-');
+        $messageText .= 'Budgetindicatie: '.($request->input('budget') ?: 'Niet opgegeven')."\n\n";
+        $messageText .= "Overige vrije invoer:\n".($request->input('notes') ?: '-');
 
         $isNewUser = false;
         $plainPassword = null;
 
-        [$customerService, $ticket, $user] = DB::transaction(function () use ($request, $service, $messageText, $features, $content, $ticketService, &$isNewUser, &$plainPassword) {
+        [$customerService, $ticket, $user] = DB::transaction(function () use ($request, $service, $messageText, $ticketService, &$isNewUser, &$plainPassword) {
             $user = Auth::user();
 
             if (! $user) {
@@ -215,9 +212,7 @@ class QuoteBuilderController extends Controller
                     'Functionaliteiten: '.(count($allFeatures) ? implode(', ', $allFeatures) : 'Geen'),
                     'Functionaliteiten standaard inbegrepen: '.(count($includedFeatures) ? implode(', ', $includedFeatures) : 'Geen'),
                     'Functionaliteiten aanvullend: '.(count($extraFeatures) ? implode(', ', $extraFeatures) : 'Geen'),
-                    'Content: '.(count($allContent) ? implode(', ', $allContent) : 'Zelf aanleveren'),
-                    'Content standaard inbegrepen: '.(count($includedContent) ? implode(', ', $includedContent) : 'Geen'),
-                    'Content aanvullend: '.(count($extraContent) ? implode(', ', $extraContent) : 'Geen'),
+                    'Content keuze: '.($submittedContent ?: 'Geen keuze gemaakt'),
                     'Oplevering: '.$request->input('timeline'),
                     'Budget: '.($request->input('budget') ?: 'Niet opgegeven'),
                 ]),
@@ -242,8 +237,8 @@ class QuoteBuilderController extends Controller
         ]);
 
         if ($isNewUser) {
-            app(\App\Services\CustomerNotificationService::class)->accountCreated($user);
-            app(\App\Services\CustomerNotificationService::class)->ticketCreated($user, $ticket);
+            app(CustomerNotificationService::class)->accountCreated($user);
+            app(CustomerNotificationService::class)->ticketCreated($user, $ticket);
             Auth::login($user);
             $request->session()->regenerate();
 
