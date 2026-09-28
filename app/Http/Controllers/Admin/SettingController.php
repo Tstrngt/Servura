@@ -392,6 +392,21 @@ class SettingController extends Controller
         return back()->with('success', 'E-mailtemplate is opgeslagen.');
     }
 
+    public function integrations()
+    {
+        $this->authorizeOwner();
+
+        $transip = [
+            'enabled' => BillingSetting::boolean('transip_enabled'),
+            'configured' => BillingSetting::valueFor('transip_username', '') !== ''
+                && BillingSetting::encryptedValueFor('transip_private_key', '') !== '',
+            'last_status' => BillingSetting::valueFor('transip_last_status', 'Nog niet getest'),
+            'last_checked_at' => BillingSetting::valueFor('transip_last_checked_at', ''),
+        ];
+
+        return view('admin.settings.integrations', compact('transip'));
+    }
+
     private function authorizeOwner(): void
     {
         if (! auth()->user()->isOwner()) {
