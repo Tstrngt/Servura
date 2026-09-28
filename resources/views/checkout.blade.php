@@ -27,6 +27,25 @@
 
             @include('checkout.partials.cart-items')
 
+            @if($primaryPriceOptions->count() > 1)
+                <section class="rounded-2xl bg-slate-900 p-6 text-white shadow-xl">
+                    <h2 class="text-lg font-semibold text-white">Betaalperiode</h2>
+                    <p class="mt-1 text-sm text-slate-400">Kies de gewenste betaaltermijn voor {{ $primaryItem['service']->title }}.</p>
+                    <div class="mt-4">
+                        <label class="sr-only" for="service_price_id">Betaalperiode</label>
+                        <select name="service_price_id" id="service_price_id" form="checkout-form" class="form-input w-full border-slate-600 bg-slate-800 text-white focus:border-primary-500 focus:ring-primary-500">
+                            @foreach($primaryPriceOptions as $price)
+                                <option value="{{ $price->id }}" {{ old('service_price_id', $primaryItem['price_model']->id ?? null) == $price->id ? 'selected' : '' }}>
+                                    {{ $price->label }} — € {{ number_format($price->price, 2, ',', '.') }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </section>
+            @elseif($primaryPriceOptions->count() === 1)
+                <input type="hidden" name="service_price_id" form="checkout-form" value="{{ $primaryPriceOptions->first()->id }}">
+            @endif
+
             @if($isDomainOrder)
                 @include('checkout.partials.hosting-upsell')
             @else
@@ -81,26 +100,12 @@
                             </div>
                         @endguest
 
-                        @if($primaryPriceOptions->count() > 1)
-                            <div>
-                                <label class="form-label" for="service_price_id">Betaalperiode</label>
-                                <select name="service_price_id" id="service_price_id" class="form-input">
-                                    @foreach($primaryPriceOptions as $price)
-                                        <option value="{{ $price->id }}" {{ old('service_price_id', $primaryItem['price_model']->id ?? null) == $price->id ? 'selected' : '' }}>
-                                            {{ $price->label }} — € {{ number_format($price->price, 2, ',', '.') }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        @elseif($primaryPriceOptions->count() === 1)
-                            <input type="hidden" name="service_price_id" value="{{ $primaryPriceOptions->first()->id }}">
-                        @endif
                     </div>
                 </section>
             </form>
         </div>
 
-        <aside class="lg:sticky lg:top-24 lg:h-fit">
+        <aside class="self-start lg:sticky lg:top-12 lg:h-fit">
             <div class="rounded-2xl bg-slate-900 p-6 text-white shadow-xl">
                 <span class="text-sm font-medium text-slate-400">Besteloverzicht</span>
                 <div class="mt-4 space-y-3">
