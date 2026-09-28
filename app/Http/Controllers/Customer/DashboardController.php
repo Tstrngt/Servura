@@ -26,6 +26,9 @@ class DashboardController extends Controller
         // Get recent tickets / requests for the dashboard
         $recentRequests = $user->tickets()->latest()->take(5)->get();
 
+        // Get unread notifications for the dashboard overview
+        $unreadNotifications = $user->notifications()->unread()->latest()->take(10)->get();
+
         $hasActiveService = $activeServices->isNotEmpty();
 
         $primaryWebsite = $activeServices->first(fn ($customerService) => filled($customerService->domain));
@@ -36,7 +39,8 @@ class DashboardController extends Controller
             'activeServices',
             'hasActiveService',
             'primaryWebsite',
-            'websiteUrl'
+            'websiteUrl',
+            'unreadNotifications'
         ));
     }
 }
