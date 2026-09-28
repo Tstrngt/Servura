@@ -251,6 +251,8 @@ $steps = [
     </div>
 </section>
 
+@include('partials.domain-checker')
+
 <!-- Webhosting -->
 <section class="relative py-24 lg:py-32 bg-slate-950 text-white overflow-hidden" data-navbar-theme="dark">
     <div class="absolute top-0 left-1/4 w-[30rem] h-[30rem] bg-emerald-500/10 rounded-full blur-3xl" aria-hidden="true"></div>
