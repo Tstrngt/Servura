@@ -5,6 +5,8 @@
 @section('meta-keywords', 'contact, contactformulier, adviesgesprek, offerte, servura')
 
 @section('content')
+<div x-data="contactForm()" x-init="init()">
+
 <!-- Hero Section -->
 <section class="relative -mt-16 pt-16 overflow-hidden bg-slate-950 text-white" data-navbar-theme="dark">
     <div class="absolute inset-0 opacity-40 pointer-events-none" style="background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 32px 32px;"></div>
@@ -19,6 +21,28 @@
             <p class="text-lg md:text-xl text-white/80 leading-relaxed max-w-xl">
                 Vertel ons waar u naar op zoek bent. We nemen binnen 48 uur contact op voor een vrijblijvend gesprek.
             </p>
+        </div>
+    </div>
+</section>
+
+<!-- Success Message -->
+<section x-show="success" x-cloak x-transition.opacity.duration.500ms class="relative bg-slate-50 pt-6 pb-2">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 shadow-lg shadow-emerald-900/5 flex items-start gap-4">
+            <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+            </span>
+            <div class="flex-1">
+                <h3 class="font-heading font-semibold text-emerald-900">Bericht verstuurd</h3>
+                <p class="text-emerald-700 text-sm mt-0.5" x-text="successMessage"></p>
+            </div>
+            <button type="button" @click="success = false" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-full text-emerald-600 hover:bg-emerald-100 transition-colors" aria-label="Melding sluiten">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
         </div>
     </div>
 </section>
@@ -40,22 +64,7 @@
                         <h2 class="font-heading text-3xl font-bold text-slate-900 mb-2">Stuur ons een bericht</h2>
                         <p class="text-slate-500 mb-8">Vul het formulier in en we nemen binnen 48 uur contact op.</p>
 
-                        @if(session('success'))
-                            <div class="bg-emerald-50 border-l-4 border-emerald-400 p-4 mb-6 rounded-r-lg">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <svg class="h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm text-emerald-700">{{ session('success') }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
-                        <form x-data="contactForm()" @submit.prevent="submit($event)">
+                        <form @submit.prevent="submit($event)">
                             @csrf
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -217,7 +226,8 @@
 function contactForm() {
     return {
         submitting: false,
-        success: false,
+        success: {{ json_encode((bool) (session('success') || request()->has('success'))) }},
+        successMessage: {{ json_encode(session('success') ?: 'Bedankt voor uw bericht. We nemen zo snel mogelijk contact met u op.') }},
         formData: {
             name: '',
             email: '',
@@ -227,6 +237,29 @@ function contactForm() {
             subject: '',
             looking_for: '',
             message: ''
+        },
+
+        init() {
+            if (this.success) {
+                this.scheduleFade();
+            }
+        },
+
+        scheduleFade() {
+            setTimeout(() => this.success = false, 5000);
+        },
+
+        resetForm() {
+            this.formData = {
+                name: '',
+                email: '',
+                company: '',
+                phone: '',
+                current_website: '',
+                subject: '',
+                looking_for: '',
+                message: ''
+            };
         },
 
         async submit(event) {
@@ -244,18 +277,10 @@ function contactForm() {
 
                 if (response.ok) {
                     this.success = true;
-                    this.formData = {
-                        name: '',
-                        email: '',
-                        company: '',
-                        phone: '',
-                        current_website: '',
-                        subject: '',
-                        looking_for: '',
-                        message: ''
-                    };
-
-                    window.location.href = '/contact?success=1';
+                    this.successMessage = 'Bedankt voor uw bericht. We nemen zo snel mogelijk contact met u op.';
+                    this.scheduleFade();
+                    this.resetForm();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     const html = await response.text();
                     const parser = new DOMParser();
@@ -271,4 +296,6 @@ function contactForm() {
     }
 }
 </script>
+
+</div>
 @endsection
