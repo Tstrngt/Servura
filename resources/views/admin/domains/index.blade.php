@@ -12,7 +12,7 @@
                 <h1 class="text-2xl font-bold text-gray-900">Domeinregistraties</h1>
                 <p class="mt-1 text-sm text-gray-600">Overzicht van alle geregistreerde en geboekte domeinen.</p>
             </div>
-            <a href="{{ route('admin.domains.tlds.index') }}" class="btn btn-outline">Domein TLD's</a>
+            <a href="{{ route('admin.settings.domains.tlds.index') }}" class="btn btn-outline">Domein TLD's</a>
         </div>
 
         <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 overflow-hidden">

@@ -29,7 +29,7 @@
             <div class="lg:col-span-1">
                 <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
                     <h2 class="text-lg font-semibold text-slate-900 mb-4">TLD toevoegen</h2>
-                    <form action="{{ route('admin.domains.tlds.store') }}" method="POST">
+                    <form action="{{ route('admin.settings.domains.tlds.store') }}" method="POST">
                         @csrf
                         <div class="space-y-4">
                             <div>
@@ -86,7 +86,7 @@
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 @forelse($tlds as $tld)
                                     <tr>
-                                        <form action="{{ route('admin.domains.tlds.update', $tld) }}" method="POST">
+                                        <form action="{{ route('admin.settings.domains.tlds.update', $tld) }}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             <td class="px-4 py-3 align-top">
@@ -116,7 +116,7 @@
                                                 </div>
                                             </td>
                                         </form>
-                                        <form id="delete-tld-{{ $tld->id }}" action="{{ route('admin.domains.tlds.destroy', $tld) }}" method="POST" class="hidden">
+                                        <form id="delete-tld-{{ $tld->id }}" action="{{ route('admin.settings.domains.tlds.destroy', $tld) }}" method="POST" class="hidden">
                                             @csrf
                                             @method('DELETE')
                                         </form>
