@@ -45,6 +45,7 @@ class TransIpTestConnection extends Command
             return self::FAILURE;
         } catch (ApiException|HttpRequestException|HttpBadResponseException $e) {
             $this->error('Fout van TransIP API:');
+            $this->line('Exception: '.get_class($e));
             $this->line($e->getMessage());
 
             if ($e instanceof ApiException) {

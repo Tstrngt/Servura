@@ -7,7 +7,7 @@ use App\Services\Domains\DomainProviderFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class DomainController extends Controller
 {
@@ -32,26 +32,27 @@ class DomainController extends Controller
 
         $cacheKey = 'domain_check_'.preg_replace('/[^a-z0-9.-]/', '', $domain);
 
-        $result = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($provider, $domain) {
-            try {
+        try {
+            $result = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($provider, $domain) {
                 return $provider->checkAvailability($domain)->toArray();
-            } catch (\Throwable $e) {
-                Log::warning('Domain check failed', [
-                    'domain' => $domain,
-                    'provider' => $provider->name(),
-                    'message' => $e->getMessage(),
-                ]);
+            });
 
-                return [
-                    'domain' => $domain,
-                    'available' => false,
-                    'status' => 'error',
-                    'tld' => null,
-                    'actions' => [],
-                ];
-            }
-        });
+            return response()->json($result);
+        } catch (Throwable $e) {
+            Log::warning('Domain check controller error', [
+                'domain' => $domain,
+                'provider' => $provider?->name(),
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
 
-        return response()->json($result);
+            return response()->json([
+                'domain' => $domain,
+                'available' => false,
+                'status' => 'error',
+                'tld' => null,
+                'message' => 'Er ging iets mis. Probeer het later opnieuw.',
+            ], 500);
+        }
     }
 }

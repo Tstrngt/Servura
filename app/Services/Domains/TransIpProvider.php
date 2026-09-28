@@ -51,6 +51,7 @@ class TransIpProvider implements DomainProvider
             ];
         } catch (ApiException|HttpRequestException|HttpBadResponseException $e) {
             Log::warning('TransIP connection test failed', [
+                'exception' => get_class($e),
                 'message' => $e->getMessage(),
             ]);
 
@@ -84,6 +85,7 @@ class TransIpProvider implements DomainProvider
         } catch (Throwable $e) {
             Log::warning('TransIP domain availability check failed', [
                 'domain' => $domain,
+                'exception' => get_class($e),
                 'message' => $e->getMessage(),
             ]);
 
