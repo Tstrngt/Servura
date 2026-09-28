@@ -73,6 +73,16 @@ class CustomerService extends Model
         return $this->belongsTo(ServicePrice::class);
     }
 
+    public function order()
+    {
+        return $this->hasOne(Order::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function invoices()
     {
         return $this->hasMany(Invoice::class);

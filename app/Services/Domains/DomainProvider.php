@@ -28,4 +28,12 @@ interface DomainProvider
      * @return array<int, array<string, mixed>>
      */
     public function tlds(): array;
+
+    /**
+     * Register a domain name with the provider.
+     *
+     * @param  array<int, mixed>  $contacts
+     * @param  array<int, mixed>  $nameservers
+     */
+    public function registerDomain(string $domain, array $contacts = [], array $nameservers = []): void;
 }

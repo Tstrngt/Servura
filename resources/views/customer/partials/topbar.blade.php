@@ -3,6 +3,7 @@ $navItems = [
     ['route' => 'customer.dashboard', 'label' => 'Overzicht', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'],
     ['route' => 'customer.tickets.index', 'label' => 'Mijn aanvragen', 'icon' => 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z'],
     ['route' => 'customer.services.index', 'label' => 'Mijn diensten', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'],
+    ['route' => 'customer.domains.index', 'label' => 'Mijn domeinen', 'icon' => 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9'],
     ['route' => 'customer.financial.index', 'label' => 'Financieel', 'icon' => 'M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.75A.75.75 0 013 4.5h.75m0 0H21m-17.25 0h16.5m0 0v.75A.75.75 0 0021 6h.75m0 0v-.75A.75.75 0 0021 4.5h-.75m1.5 1.5v9m0 0v.75a.75.75 0 01-.75.75h-.75m1.5-1.5H2.25m0 0v.75c0 .414.336.75.75.75h.75m-1.5-1.5v-9m0 0h1.5m16.5 0h1.5m-1.5 0v.75c0 .414.336.75.75.75h.75M3.75 6v.75A.75.75 0 013 7.5h-.75m9.75 6a3 3 0 100-6 3 3 0 000 6z'],
 
     ['route' => 'customer.profile.edit', 'label' => 'Profiel', 'icon' => 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.118a7.5 7.5 0 0115 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.5-1.632z'],

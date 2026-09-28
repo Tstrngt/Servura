@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\BillingSetting;
+use App\Models\DomainTld;
 use App\Services\Domains\DomainCheckResult;
 use App\Services\Domains\DomainProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -46,13 +47,19 @@ class DomainCheckTest extends TestCase
         BillingSetting::setValue('transip_username', 'testuser');
         Cache::flush();
 
+        DomainTld::factory()->create(['extension' => '.nl', 'registration_price' => 9.99, 'is_active' => true, 'sort_order' => 1]);
+        DomainTld::factory()->create(['extension' => '.com', 'registration_price' => 14.99, 'is_active' => true, 'sort_order' => 2]);
+        DomainTld::factory()->create(['extension' => '.eu', 'registration_price' => 7.99, 'is_active' => true, 'sort_order' => 3]);
+        DomainTld::factory()->create(['extension' => '.net', 'registration_price' => 12.99, 'is_active' => false, 'sort_order' => 4]);
+        DomainTld::factory()->create(['extension' => '.be', 'registration_price' => 8.99, 'is_active' => true, 'sort_order' => 5]);
+
         $provider = Mockery::mock(DomainProvider::class);
         $provider->shouldReceive('isConfigured')->andReturn(true);
         $provider->shouldReceive('checkAvailability')
             ->andReturnUsing(function (string $domain) {
-                $available = $domain === 'voorbeeld.nl';
+                $available = str_ends_with($domain, '.nl');
 
-                return new DomainCheckResult($domain, $available, $available ? 'free' : 'notfree', 'nl');
+                return new DomainCheckResult($domain, $available, $available ? 'free' : 'notfree', '');
             });
 
         $this->app->instance(\App\Services\Domains\TransIpProvider::class, $provider);
@@ -62,8 +69,9 @@ class DomainCheckTest extends TestCase
         $response->assertOk();
         $response->assertJsonPath('status', 'ok');
         $response->assertJsonPath('name', 'voorbeeld');
-        $response->assertJsonCount(5, 'results');
+        $response->assertJsonCount(4, 'results');
         $response->assertJsonPath('results.0.domain', 'voorbeeld.nl');
         $response->assertJsonPath('results.0.available', true);
+        $response->assertJsonPath('results.0.price', '9,99');
     }
 }

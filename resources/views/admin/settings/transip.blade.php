@@ -61,6 +61,12 @@
                         <textarea class="form-input font-mono" id="transip_private_key" name="transip_private_key" rows="6" placeholder="{{ $settings['has_private_key'] ? 'Opgeslagen — vul in om te vervangen' : 'Plak hier je private key' }}">{{ $settings['has_private_key'] ? '' : old('transip_private_key', '') }}</textarea>
                         <p class="mt-1 text-xs text-slate-500">Wordt versleuteld opgeslagen en nooit volledig getoond.</p>
                     </div>
+
+                    <div class="form-group sm:col-span-2">
+                        <label class="form-label" for="transip_default_nameservers">Standaard nameservers (gescheiden door komma)</label>
+                        <input class="form-input font-mono" id="transip_default_nameservers" name="transip_default_nameservers" type="text" value="{{ old('transip_default_nameservers', $settings['default_nameservers']) }}" placeholder="ns1.servura.nl, ns2.servura.nl">
+                        <p class="mt-1 text-xs text-slate-500">Laat leeg om de TransIP-default nameservers te gebruiken.</p>
+                    </div>
                 </div>
 
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -89,7 +95,7 @@
                     </div>
                 </div>
                 <div class="mt-6 rounded-xl bg-white/5 p-4 text-xs text-slate-300 ring-1 ring-white/10">
-                    <p>Deze koppeling draait in read-only modus. Registratie, transfers, DNS-wijzigingen en betalingen worden in een latere fase toegevoegd.</p>
+                    <p>De koppeling gebruikt nu read-only domeinchecks en TransIP-registratie na bevestigde betaling. Transfers en DNS-wijzigingen volgen in een latere fase.</p>
                 </div>
             </div>
         </div>

@@ -25,6 +25,7 @@ class TransIpSettingController extends Controller
             'has_private_key' => BillingSetting::encryptedValueFor('transip_private_key', '') !== '',
             'last_status' => BillingSetting::valueFor('transip_last_status', 'Nog niet getest'),
             'last_checked_at' => BillingSetting::valueFor('transip_last_checked_at', ''),
+            'default_nameservers' => BillingSetting::valueFor('transip_default_nameservers', ''),
         ];
 
         return view('admin.settings.transip', compact('settings'));
@@ -39,11 +40,13 @@ class TransIpSettingController extends Controller
             'transip_username' => 'nullable|string|max:255',
             'transip_private_key' => 'nullable|string',
             'transip_whitelist_only' => 'boolean',
+            'transip_default_nameservers' => 'nullable|string|max:1000',
         ]);
 
         BillingSetting::setValue('transip_enabled', $request->boolean('transip_enabled') ? '1' : '0');
         BillingSetting::setValue('transip_username', $validated['transip_username'] ?? '');
         BillingSetting::setValue('transip_whitelist_only', $request->boolean('transip_whitelist_only') ? '1' : '0');
+        BillingSetting::setValue('transip_default_nameservers', $validated['transip_default_nameservers'] ?? '');
 
         if (filled($validated['transip_private_key'] ?? null)) {
             BillingSetting::setEncryptedValue('transip_private_key', $validated['transip_private_key']);

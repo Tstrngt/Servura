@@ -53,6 +53,10 @@ class CustomerProfileTest extends TestCase
 
     public function test_customer_can_upload_and_remove_logo(): void
     {
+        if (! extension_loaded('gd')) {
+            $this->markTestSkipped('GD extension is not installed.');
+        }
+
         Storage::fake('public');
         $customer = $this->customer();
 
