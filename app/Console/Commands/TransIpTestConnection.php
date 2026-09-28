@@ -7,6 +7,7 @@ use App\Services\Domains\TransIpService;
 use Illuminate\Console\Command;
 use Throwable;
 use Transip\Api\Library\Exception\ApiException;
+use Transip\Api\Library\Exception\HttpBadResponseException;
 use Transip\Api\Library\Exception\HttpRequestException;
 
 class TransIpTestConnection extends Command
@@ -42,17 +43,22 @@ class TransIpTestConnection extends Command
             $this->error('TransIP verbinding mislukt (test() gaf geen true terug).');
 
             return self::FAILURE;
-        } catch (ApiException|HttpRequestException $e) {
+        } catch (ApiException|HttpRequestException|HttpBadResponseException $e) {
             $this->error('Fout van TransIP API:');
             $this->line($e->getMessage());
 
             if ($e instanceof ApiException) {
                 $this->newLine();
                 $this->warn('HTTP status: '.$e->response()->getStatusCode());
+            } elseif ($e instanceof HttpBadResponseException) {
+                $this->newLine();
+                $this->warn('HTTP status: '.$e->getResponse()->getStatusCode());
             }
         } catch (Throwable $e) {
-            $this->error('Onverwachte fout:');
-            $this->line($e->getMessage());
+            $message = $e->getMessage();
+            $this->error($this->classifyError($message));
+            $this->newLine();
+            $this->line('Originele fout: '.$message);
         }
 
         $this->newLine();
@@ -68,5 +74,22 @@ class TransIpTestConnection extends Command
     private function bullet(string $text): void
     {
         $this->line('  - '.$text);
+    }
+
+    private function classifyError(string $message): string
+    {
+        if (str_contains($message, 'Remote IP is not authorized') || str_contains($message, 'not authorized')) {
+            return 'Het server-IP is niet geautoriseerd bij TransIP. Voeg het IP toe aan de whitelist in je TransIP Controlpanel.';
+        }
+
+        if (str_contains($message, 'Invalid signature') || str_contains($message, 'private key')) {
+            return 'De private key lijkt ongeldig of niet correct gekopieerd.';
+        }
+
+        if (str_contains($message, 'Invalid login')) {
+            return 'De TransIP gebruikersnaam is ongeldig.';
+        }
+
+        return 'Onverwachte fout:';
     }
 }

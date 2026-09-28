@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 use Transip\Api\Library\Entity\DomainCheckResult as TransipDomainCheckResult;
 use Transip\Api\Library\Exception\ApiException;
+use Transip\Api\Library\Exception\HttpBadResponseException;
 use Transip\Api\Library\Exception\HttpRequestException;
 use Transip\Api\Library\TransipAPI;
 
@@ -48,7 +49,7 @@ class TransIpProvider implements DomainProvider
                 'success' => $success,
                 'message' => $success ? 'Verbinding met TransIP geslaagd.' : 'TransIP verbinding mislukt.',
             ];
-        } catch (ApiException|HttpRequestException $e) {
+        } catch (ApiException|HttpRequestException|HttpBadResponseException $e) {
             Log::warning('TransIP connection test failed', [
                 'message' => $e->getMessage(),
             ]);
