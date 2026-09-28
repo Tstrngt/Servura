@@ -285,42 +285,6 @@
 
             <!-- Website Status + Quick Support -->
             <div class="lg:col-span-1 space-y-6">
-                <!-- Unread notifications -->
-                <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 p-6">
-                    <div class="flex items-center justify-between mb-5">
-                        <h2 class="font-heading text-lg font-bold text-slate-900">Ongelezen berichten</h2>
-                        @if($unreadNotifications->isNotEmpty())
-                            <form action="{{ route('notifications.read-all') }}" method="POST">@csrf<button class="text-xs font-semibold text-primary-600 hover:text-primary-800">Alles gelezen</button></form>
-                        @endif
-                    </div>
-
-                    @if($unreadNotifications->isEmpty())
-                        <div class="text-center py-4 text-sm text-slate-500">Je hebt geen ongelezen berichten.</div>
-                    @else
-                        <div class="space-y-3">
-                            @foreach($unreadNotifications as $notification)
-                                <div class="group flex items-start gap-3 p-3 rounded-xl bg-slate-50 hover:bg-white hover:shadow-sm ring-1 ring-transparent hover:ring-slate-200 transition-all">
-                                    <a href="{{ $notification->link ?: '#' }}" class="flex-1 min-w-0 {{ $notification->link ? '' : 'pointer-events-none' }}">
-                                        @if($notification->created_at->gt(now()->subDay()))
-                                            <p class="text-sm font-semibold text-slate-900">{{ $notification->title }}</p>
-                                        @endif
-                                        <p class="text-xs text-slate-500 leading-relaxed">{{ $notification->message }}</p>
-                                        <p class="mt-1 text-[11px] text-slate-400">{{ $notification->created_at->diffForHumans() }}</p>
-                                    </a>
-                                    <form action="{{ route('notifications.read', $notification) }}?redirect=back" method="POST">
-                                        @csrf
-                                        <button type="submit" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors" aria-label="Bericht verwijderen">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-
                 <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/70 p-6">
                     <h2 class="font-heading text-lg font-bold text-slate-900 mb-5">Mijn website</h2>
                     @if($primaryWebsite)
