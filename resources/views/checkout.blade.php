@@ -20,7 +20,7 @@
             </div>
 
             <section class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-                <h2 class="text-lg font-semibold text-slate-900">1. @if($service->fulfillment_type === 'domain')Kies uw extensie@else Kies uw betaalperiode@endif</h2>
+                <h2 class="text-lg font-semibold text-slate-900">1. @if($service->fulfillment_type === 'domain') Kies uw extensie @else Kies uw betaalperiode @endif </h2>
                 <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3" x-ref="priceOptions">
                     @foreach($service->prices as $price)
                         <label class="relative cursor-pointer rounded-xl border p-4 transition-colors" :class="selected === '{{ $price->id }}' ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500/10' : 'border-slate-200 hover:border-slate-300'" data-tld="{{ $price->tld }}">
