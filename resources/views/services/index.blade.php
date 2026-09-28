@@ -488,7 +488,7 @@ $steps = [
     </div>
 </section>
 
-@include('partials.domain-checker')
+@include('partials.domain-checker-inline')
 
 <!-- CTA -->
 <section class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900" data-navbar-theme="dark">
