@@ -230,15 +230,15 @@ $pageHelp = "Het aantal inbegrepen pagina's hangt af van uw pakket. Extra pagina
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach($form['features'] as $feature)
-                        <label class="relative block rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
+                        <label class="relative block rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 hover:z-10 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
                             @if(($feature['info'] ?? '') !== '')
-                                <div class="absolute top-3 right-3 z-10" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                                <div class="absolute top-3 right-3 z-10 group">
                                     <button type="button" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-primary-100 hover:text-primary-600 transition-colors" aria-label="Meer informatie over {{ $feature['label'] }}" @click.prevent>
                                         <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm-.75 3a.75.75 0 00-.75.75v3a.75.75 0 001.5 0v-3a.75.75 0 00-.75-.75z"/>
                                         </svg>
                                     </button>
-                                    <div x-show="open" x-cloak x-transition class="absolute right-0 top-full mt-2 w-56 sm:w-64 rounded-xl bg-slate-900 px-3 py-2 text-xs text-white shadow-xl z-20">
+                                    <div class="pointer-events-none absolute right-0 top-full mt-2 w-56 sm:w-64 rounded-xl bg-slate-900 px-3 py-2 text-xs text-white shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50">
                                         <p>{{ $feature['info'] }}</p>
                                         <div class="absolute right-3 -top-2 border-4 border-transparent border-b-slate-900"></div>
                                     </div>
