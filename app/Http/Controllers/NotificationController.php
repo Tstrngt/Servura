@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
@@ -39,7 +38,11 @@ class NotificationController extends Controller
             return response()->json(['ok' => true]);
         }
 
-        return $notification->link ? redirect()->to($notification->link) : redirect()->back();
+        if (request()->input('redirect') === 'back' || ! $notification->link) {
+            return redirect()->back();
+        }
+
+        return redirect()->to($notification->link);
     }
 
     /**
