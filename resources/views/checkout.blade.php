@@ -9,6 +9,9 @@
     $primaryItem = $resolved['items'][0] ?? null;
     $isDomainOrder = $primaryItem && $primaryItem['service']->fulfillment_type === 'domain';
     $requiresHostingTerms = collect($resolved['items'])->contains(fn ($i) => $i['service']->fulfillment_type === 'directadmin');
+    $primaryPriceOptions = $primaryItem && ! $isDomainOrder
+        ? $primaryItem['service']->prices->where('is_enabled', true)->sortBy('price')->values()
+        : collect();
 @endphp
 <style>[x-cloak] { display: none !important; }</style>
 <div class="min-h-screen bg-slate-50 py-12 lg:py-16">
@@ -77,6 +80,21 @@
                                 </div>
                             </div>
                         @endguest
+
+                        @if($primaryPriceOptions->count() > 1)
+                            <div>
+                                <label class="form-label" for="service_price_id">Betaalperiode</label>
+                                <select name="service_price_id" id="service_price_id" class="form-input">
+                                    @foreach($primaryPriceOptions as $price)
+                                        <option value="{{ $price->id }}" {{ old('service_price_id', $primaryItem['price_model']->id ?? null) == $price->id ? 'selected' : '' }}>
+                                            {{ $price->label }} — € {{ number_format($price->price, 2, ',', '.') }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @elseif($primaryPriceOptions->count() === 1)
+                            <input type="hidden" name="service_price_id" value="{{ $primaryPriceOptions->first()->id }}">
+                        @endif
                     </div>
                 </section>
             </form>
