@@ -488,42 +488,32 @@ $steps = [
     </div>
 </section>
 
+@include('partials.domain-checker')
+
 <!-- CTA -->
 <section class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900" data-navbar-theme="dark">
     <div class="absolute -top-24 -right-16 h-96 w-96 rounded-full bg-accent-400/20 blur-3xl"></div>
     <div class="absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-primary-400/20 blur-3xl"></div>
     <div class="absolute inset-0 opacity-[0.15] cta-grid" aria-hidden="true"></div>
 
-    <div class="relative z-10 max-w-7xl mx-auto px-6 py-24 lg:py-28">
-        <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
-            <div class="text-center lg:text-left">
-                <span class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-sm font-medium text-primary-50 backdrop-blur animate-on-scroll">
-                    <span class="relative flex h-2 w-2">
-                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-300 opacity-75"></span>
-                        <span class="relative inline-flex h-2 w-2 rounded-full bg-accent-300"></span>
-                    </span>
-                    Nu beschikbaar voor nieuwe projecten
-                </span>
-                <h2 class="mt-7 font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.05] tracking-tight animate-on-scroll">
-                    Klaar om uw nieuwe website te starten?
-                </h2>
-                <p class="mt-6 mx-auto max-w-xl lg:mx-0 text-lg text-primary-100 leading-relaxed animate-on-scroll">
-                    Plan een vrijblijvend gesprek. Wij denken met u mee, u zit nergens aan vast en binnen 1 werkdag hoort u van ons.
-                </p>
-                <div class="mt-10 flex flex-col sm:flex-row sm:items-center justify-center lg:justify-start gap-4 animate-on-scroll">
-                    <a href="{{ route('contact') }}" class="btn btn-light text-base px-8 py-4">
-                        Plan een vrijblijvend gesprek
-                    </a>
-                </div>
-            </div>
-
-            <div class="animate-on-scroll">
-                <div class="rounded-3xl bg-white/10 p-6 sm:p-8 ring-1 ring-white/20 backdrop-blur-sm">
-                    <h3 class="text-2xl font-bold text-white mb-2">Check uw domeinnaam</h3>
-                    <p class="text-primary-100 mb-6">Vul een naam in en zie direct welke extensies beschikbaar zijn.</p>
-                    @include('partials.domain-checker-compact')
-                </div>
-            </div>
+    <div class="relative z-10 max-w-4xl mx-auto px-6 py-24 lg:py-28 text-center">
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-sm font-medium text-primary-50 backdrop-blur animate-on-scroll">
+            <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-300 opacity-75"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-accent-300"></span>
+            </span>
+            Nu beschikbaar voor nieuwe projecten
+        </span>
+        <h2 class="mt-7 font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.05] tracking-tight animate-on-scroll">
+            Klaar om uw nieuwe website te starten?
+        </h2>
+        <p class="mt-6 mx-auto max-w-xl text-lg text-primary-100 leading-relaxed animate-on-scroll">
+            Plan een vrijblijvend gesprek. Wij denken met u mee, u zit nergens aan vast en binnen 1 werkdag hoort u van ons.
+        </p>
+        <div class="mt-10 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4 animate-on-scroll">
+            <a href="{{ route('contact') }}" class="btn btn-light text-base px-8 py-4">
+                Plan een vrijblijvend gesprek
+            </a>
         </div>
     </div>
 </section>

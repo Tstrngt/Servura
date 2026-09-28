@@ -1,4 +1,4 @@
-<div x-data="{ query: '', loading: false, result: null, error: '' }">
+<div class="relative" x-data="{ query: '', loading: false, result: null, error: '' }">
     <form @submit.prevent="
         if (!query.trim()) return;
         loading = true;
@@ -21,45 +21,47 @@
         </button>
     </form>
 
-    <div class="mt-5">
+    <div class="absolute left-0 right-0 top-full z-20 mt-3">
         <template x-if="result && result.results">
             <div x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-2"
-                 x-transition:enter-end="opacity-100 translate-y-0"
-                 class="rounded-2xl bg-white p-5 text-slate-900 shadow-xl ring-1 ring-white/20">
-                <p class="text-sm text-slate-500 mb-3">Resultaten voor <span class="font-semibold text-slate-700" x-text="result.name"></span></p>
+                 x-transition:enter-start="opacity-0 -translate-y-2 scale-[0.98]"
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                 x-cloak
+                 class="max-h-72 overflow-y-auto rounded-2xl bg-white p-4 text-slate-900 shadow-2xl ring-1 ring-white/20">
+                <p class="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">Resultaten voor <span class="text-slate-700" x-text="result.name"></span></p>
 
-                <div class="space-y-2">
+                <ul class="divide-y divide-slate-100">
                     <template x-for="item in result.results" :key="item.domain">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl bg-slate-50 p-3 ring-1 ring-slate-100">
-                            <div>
-                                <span class="font-bold font-heading break-all block" x-text="item.domain"></span>
-                                <span class="text-sm text-slate-500" x-show="item.available && item.price">€ <span x-text="item.price"></span> per jaar</span>
+                        <li class="flex items-center justify-between gap-3 py-2.5">
+                            <div class="min-w-0">
+                                <span class="block text-sm font-semibold text-slate-900 truncate" x-text="item.domain"></span>
+                                <span class="text-xs text-slate-500" x-show="item.available && item.price" x-text="'€ ' + item.price + ' /jaar'"></span>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <span class="shrink-0 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
-                                      :class="item.available ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20' : 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20'">
-                                    <span x-text="item.available ? 'Beschikbaar' : 'Niet beschikbaar'"></span>
+                            <div class="flex shrink-0 items-center gap-2">
+                                <span class="inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                                      :class="item.available ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'"
+                                      x-text="item.available ? 'Beschikbaar' : 'Bezet'">
                                 </span>
-                                <a x-show="item.available && item.checkout_url" :href="item.checkout_url" class="btn btn-primary btn-sm px-3 py-1.5 text-xs">
-                                    Bestellen
+                                <a x-show="item.available && item.checkout_url" :href="item.checkout_url" class="btn btn-primary btn-sm px-2 py-1 text-[10px]">
+                                    Bestel
                                 </a>
                             </div>
-                        </div>
+                        </li>
                     </template>
-                </div>
+                </ul>
 
-                <p class="mt-3 text-xs text-slate-500">
-                    Deze check is een indicatie. Er wordt pas besteld en geregistreerd na een succesvolle betaling.
+                <p class="mt-3 text-[10px] text-slate-400 leading-snug">
+                    Indicatie. Er wordt pas besteld na een succesvolle betaling.
                 </p>
             </div>
         </template>
 
         <template x-if="error">
             <div x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-2"
-                 x-transition:enter-end="opacity-100 translate-y-0"
-                 class="rounded-2xl bg-red-50 p-4 text-red-800 ring-1 ring-red-200">
+                 x-transition:enter-start="opacity-0 -translate-y-2 scale-[0.98]"
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                 x-cloak
+                 class="rounded-2xl bg-red-50 p-4 text-sm text-red-800 shadow-2xl ring-1 ring-red-200">
                 <p x-text="error"></p>
             </div>
         </template>
