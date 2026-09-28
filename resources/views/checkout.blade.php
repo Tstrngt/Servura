@@ -41,6 +41,7 @@
                     <h2 class="text-lg font-semibold text-slate-900">Factuurgegevens</h2>
 
                     @guest
+                        @php session(['url.intended' => request()->fullUrl()]); @endphp
                         <div class="mt-5 rounded-xl bg-primary-50/40 p-5 ring-1 ring-primary-200">
                             <p class="text-sm text-slate-600">U maakt direct een account aan, zodat u uw bestelling en diensten kunt volgen.</p>
                             <p class="mt-2 text-sm text-slate-600">Heeft u al een account? <a href="{{ route('login') }}" class="font-semibold text-primary-700 hover:text-primary-900">Log hier in</a>.</p>
