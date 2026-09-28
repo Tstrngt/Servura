@@ -65,6 +65,11 @@ Route::post('/offerte-samenstellen', [QuoteBuilderController::class, 'store'])->
 
 // Nieuwsbrief
 Route::post('/nieuwsbrief', [App\Http\Controllers\NewsletterController::class, 'subscribe'])->middleware('throttle:10,1')->name('newsletter.subscribe');
+
+// Domeinchecker
+Route::get('/domeinchecker', function () {
+    return view('domains.checker');
+})->name('domains.checker');
 Route::get('/nieuwsbrief/afmelden/{token}', [App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
 // Taalwissel (voorbereiding meertaligheid)
@@ -261,6 +266,10 @@ Route::middleware('auth')->group(function () {
             Route::put('/juridisch', [App\Http\Controllers\Admin\SettingController::class, 'updateLegal'])->name('legal.update');
             Route::get('/beveiliging', [App\Http\Controllers\Admin\SettingController::class, 'security'])->name('security');
             Route::put('/beveiliging', [App\Http\Controllers\Admin\SettingController::class, 'updateSecurity'])->name('security.update');
+            Route::get('/integraties', [App\Http\Controllers\Admin\SettingController::class, 'integrations'])->name('integrations');
+            Route::get('/integraties/transip', [App\Http\Controllers\Admin\TransIpSettingController::class, 'index'])->name('transip');
+            Route::put('/integraties/transip', [App\Http\Controllers\Admin\TransIpSettingController::class, 'update'])->name('transip.update');
+            Route::get('/integraties/transip/test', [App\Http\Controllers\Admin\TransIpSettingController::class, 'test'])->name('transip.test');
             Route::get('/nieuwsbrief', [App\Http\Controllers\Admin\SettingController::class, 'newsletter'])->name('newsletter');
             Route::post('/klanten-resetten', [App\Http\Controllers\Admin\SettingController::class, 'resetCustomers'])->name('reset-customers');
             Route::get('/medewerkers', [App\Http\Controllers\Admin\StaffController::class, 'index'])->name('staff');
