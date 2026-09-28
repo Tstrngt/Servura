@@ -224,43 +224,46 @@ $pageHelp = "Het aantal inbegrepen pagina's hangt af van uw pakket. Extra pagina
                 <div class="flex items-start gap-4 mb-6">
                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-600 font-heading font-bold text-sm shrink-0">6</span>
                     <div class="flex-1">
-                        <div class="flex items-center gap-3 flex-wrap">
-                            <h2 class="font-heading text-2xl font-bold text-slate-900">Welke functionaliteiten heeft u nodig?</h2>
-                            <div class="relative group" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-                                <button type="button" class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-primary-100 hover:text-primary-600 transition-colors" aria-label="Meer informatie over functionaliteiten">
-                                    <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm-.75 3a.75.75 0 00-.75.75v3a.75.75 0 001.5 0v-3a.75.75 0 00-.75-.75z"/>
-                                    </svg>
-                                </button>
-                                <div x-show="open" x-cloak x-transition class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 sm:w-72 rounded-xl bg-slate-900 px-4 py-3 text-sm text-white shadow-xl z-10">
-                                    <p>Selecteer alle functionaliteiten die u nodig heeft. Opties die al in uw gekozen pakket zitten, worden automatisch aangevinkt als "Inbegrepen". De overige opties zijn aanvullingen die wij in de offerte meenemen.</p>
-                                    <div class="absolute left-1/2 -translate-x-1/2 top-full -mt-1 border-4 border-transparent border-t-slate-900"></div>
-                                </div>
-                            </div>
-                        </div>
+                        <h2 class="font-heading text-2xl font-bold text-slate-900">Welke functionaliteiten heeft u nodig?</h2>
                         <p class="text-slate-500 mt-1">Selecteer alle aanvullende functionaliteiten die u wilt. Inbegrepen onderdelen worden automatisch aangevinkt.</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach($form['features'] as $feature)
-                        <label class="relative flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
-                            <template x-if="isIncluded('features', @js($feature['label']))">
-                                <input type="hidden" name="features[]" value="{{ $feature['label'] }}">
-                            </template>
-                            <input
-                                type="checkbox"
-                                value="{{ $feature['label'] }}"
-                                class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
-                                :disabled="isIncluded('features', @js($feature['label']))"
-                                :name="isIncluded('features', @js($feature['label'])) ? null : 'features[]'"
-                                x-model="selected.features"
-                            >
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-semibold text-slate-900 text-sm block">{{ $feature['label'] }}</span>
-                                    <span x-show="isIncluded('features', @js($feature['label']))" class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Inbegrepen</span>
+                        <label class="relative block rounded-2xl bg-white p-4 ring-1 ring-slate-200 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 hover:z-10 transition-all has-[:checked]:ring-primary-500 has-[:checked]:bg-primary-50/30">
+                            @if(($feature['info'] ?? '') !== '')
+                                <div class="absolute top-3 right-3 z-10 group">
+                                    <button type="button" class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-primary-100 hover:text-primary-600 transition-colors" aria-label="Meer informatie over {{ $feature['label'] }}" @click.prevent>
+                                        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm-.75 3a.75.75 0 00-.75.75v3a.75.75 0 001.5 0v-3a.75.75 0 00-.75-.75z"/>
+                                        </svg>
+                                    </button>
+                                    <div class="pointer-events-none absolute right-0 top-full mt-2 w-56 sm:w-64 rounded-xl bg-slate-900 px-3 py-2 text-xs text-white shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50">
+                                        <p>{{ $feature['info'] }}</p>
+                                        <div class="absolute right-3 -top-2 border-4 border-transparent border-b-slate-900"></div>
+                                    </div>
                                 </div>
-                                @if($feature['note'] !== '')<span class="text-xs text-slate-400">{{ $feature['note'] }}</span>@endif
+                            @endif
+
+                            <div class="flex items-start gap-3 pr-8">
+                                <template x-if="isIncluded('features', @js($feature['label']))">
+                                    <input type="hidden" name="features[]" value="{{ $feature['label'] }}">
+                                </template>
+                                <input
+                                    type="checkbox"
+                                    value="{{ $feature['label'] }}"
+                                    class="mt-1 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+                                    :disabled="isIncluded('features', @js($feature['label']))"
+                                    :name="isIncluded('features', @js($feature['label'])) ? null : 'features[]'"
+                                    x-model="selected.features"
+                                >
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-semibold text-slate-900 text-sm block">{{ $feature['label'] }}</span>
+                                        <span x-show="isIncluded('features', @js($feature['label']))" class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Inbegrepen</span>
+                                    </div>
+                                    @if($feature['note'] !== '')<span class="text-xs text-slate-400">{{ $feature['note'] }}</span>@endif
+                                </div>
                             </div>
                         </label>
                     @endforeach
@@ -384,7 +387,7 @@ $pageHelp = "Het aantal inbegrepen pagina's hangt af van uw pakket. Extra pagina
                 </div>
             </div>
 
-                @include('partials.captcha')
+                @include('partials.captcha', ['action' => 'quote'])
 
             </div>
 

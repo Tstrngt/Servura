@@ -1,4 +1,5 @@
 @php($captcha = app(\App\Services\CaptchaService::class))
+@php($captchaAction = $action ?? 'submit')
 @if($captcha->enabled())
     @once
         @if($captcha->provider() === 'turnstile')
@@ -28,7 +29,7 @@
                             }
 
                             grecaptcha.ready(function () {
-                                grecaptcha.execute('{{ $captcha->siteKey() }}', { action: 'submit' }).then(function (token) {
+                                grecaptcha.execute('{{ $captcha->siteKey() }}', { action: '{{ $captchaAction }}' }).then(function (token) {
                                     responseInput.value = token;
                                     form.submit();
                                 });

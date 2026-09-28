@@ -5,8 +5,6 @@
 @section('meta-keywords', 'contact, contactformulier, adviesgesprek, offerte, servura')
 
 @section('content')
-<div x-data="contactForm()" x-init="init()">
-
 <!-- Hero Section -->
 <section class="relative -mt-16 pt-16 overflow-hidden bg-slate-950 text-white" data-navbar-theme="dark">
     <div class="absolute inset-0 opacity-40 pointer-events-none" style="background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 32px 32px;"></div>
@@ -26,7 +24,14 @@
 </section>
 
 <!-- Success Message -->
-<section x-show="success" x-cloak x-transition.opacity.duration.500ms class="relative bg-slate-50 pt-6 pb-2">
+<section
+    x-data="{ show: @json((bool) (session('success') || request()->has('success'))), message: @json(session('success') ?: 'Bedankt voor uw bericht. We nemen zo snel mogelijk contact met u op.') }"
+    x-init="show && setTimeout(() => show = false, 5000)"
+    x-show="show"
+    x-cloak
+    x-transition.opacity.duration.500ms
+    class="relative bg-slate-50 pt-6 pb-2"
+>
     <div class="max-w-7xl mx-auto px-6">
         <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 shadow-lg shadow-emerald-900/5 flex items-start gap-4">
             <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
@@ -36,9 +41,9 @@
             </span>
             <div class="flex-1">
                 <h3 class="font-heading font-semibold text-emerald-900">Bericht verstuurd</h3>
-                <p class="text-emerald-700 text-sm mt-0.5" x-text="successMessage"></p>
+                <p class="text-emerald-700 text-sm mt-0.5" x-text="message"></p>
             </div>
-            <button type="button" @click="success = false" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-full text-emerald-600 hover:bg-emerald-100 transition-colors" aria-label="Melding sluiten">
+            <button type="button" @click="show = false" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-full text-emerald-600 hover:bg-emerald-100 transition-colors" aria-label="Melding sluiten">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -64,19 +69,19 @@
                         <h2 class="font-heading text-3xl font-bold text-slate-900 mb-2">Stuur ons een bericht</h2>
                         <p class="text-slate-500 mb-8">Vul het formulier in en we nemen binnen 48 uur contact op.</p>
 
-                        <form @submit.prevent="submit($event)">
+                        <form action="{{ route('contact.store') }}" method="POST">
                             @csrf
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div class="form-group">
                                     <label for="name" class="form-label">Naam *</label>
-                                    <input type="text" id="name" name="name" class="form-input" required x-model="formData.name">
+                                    <input type="text" id="name" name="name" class="form-input" required value="{{ old('name') }}">
                                     @error('name')<span class="form-error">{{ $message }}</span>@enderror
                                 </div>
 
                                 <div class="form-group">
                                     <label for="email" class="form-label">E-mailadres *</label>
-                                    <input type="email" id="email" name="email" class="form-input" required x-model="formData.email">
+                                    <input type="email" id="email" name="email" class="form-input" required value="{{ old('email') }}">
                                     @error('email')<span class="form-error">{{ $message }}</span>@enderror
                                 </div>
                             </div>
@@ -84,43 +89,43 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div class="form-group">
                                     <label for="company" class="form-label">Bedrijfsnaam</label>
-                                    <input type="text" id="company" name="company" class="form-input" x-model="formData.company">
+                                    <input type="text" id="company" name="company" class="form-input" value="{{ old('company') }}">
                                 </div>
 
                                 <div class="form-group">
                                     <label for="phone" class="form-label">Telefoonnummer</label>
-                                    <input type="tel" id="phone" name="phone" class="form-input" x-model="formData.phone">
+                                    <input type="tel" id="phone" name="phone" class="form-input" value="{{ old('phone') }}">
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label for="current_website" class="form-label">Huidige website of online aanwezigheid</label>
-                                <input type="text" id="current_website" name="current_website" class="form-input" x-model="formData.current_website" placeholder="www.voorbeeld.nl of 'nog geen website'">
+                                <input type="text" id="current_website" name="current_website" class="form-input" value="{{ old('current_website') }}" placeholder="www.voorbeeld.nl of 'nog geen website'">
                             </div>
 
                             <div class="form-group">
                                 <label for="looking_for" class="form-label">Waar bent u naar op zoek?</label>
-                                <textarea id="looking_for" name="looking_for" rows="4" class="form-textarea" x-model="formData.looking_for" placeholder="Bijvoorbeeld: een nieuwe website, meer leads, betere vindbaarheid, hosting, onderhoud..."></textarea>
+                                <textarea id="looking_for" name="looking_for" rows="4" class="form-textarea" placeholder="Bijvoorbeeld: een nieuwe website, meer leads, betere vindbaarheid, hosting, onderhoud...">{{ old('looking_for') }}</textarea>
                                 @error('looking_for')<span class="form-error">{{ $message }}</span>@enderror
                             </div>
 
                             <div class="form-group">
                                 <label for="subject" class="form-label">Onderwerp *</label>
-                                <select id="subject" name="subject" class="form-input" required x-model="formData.subject">
-                                    <option value="">Kies een onderwerp</option>
-                                    <option value="Adviesgesprek">Gratis adviesgesprek</option>
-                                    <option value="Offerte">Offerte aanvragen</option>
-                                    <option value="Website">Nieuwe website</option>
-                                    <option value="Hosting">Hosting vraag</option>
-                                    <option value="Onderhoud">Website onderhoud</option>
-                                    <option value="Overig">Overige vraag</option>
+                                <select id="subject" name="subject" class="form-input" required>
+                                    <option value="" {{ old('subject') ? '' : 'selected' }}>Kies een onderwerp</option>
+                                    <option value="Adviesgesprek" {{ old('subject') === 'Adviesgesprek' ? 'selected' : '' }}>Gratis adviesgesprek</option>
+                                    <option value="Offerte" {{ old('subject') === 'Offerte' ? 'selected' : '' }}>Offerte aanvragen</option>
+                                    <option value="Website" {{ old('subject') === 'Website' ? 'selected' : '' }}>Nieuwe website</option>
+                                    <option value="Hosting" {{ old('subject') === 'Hosting' ? 'selected' : '' }}>Hosting vraag</option>
+                                    <option value="Onderhoud" {{ old('subject') === 'Onderhoud' ? 'selected' : '' }}>Website onderhoud</option>
+                                    <option value="Overig" {{ old('subject') === 'Overig' ? 'selected' : '' }}>Overige vraag</option>
                                 </select>
                                 @error('subject')<span class="form-error">{{ $message }}</span>@enderror
                             </div>
 
                             <div class="form-group">
                                 <label for="message" class="form-label">Bericht *</label>
-                                <textarea id="message" name="message" rows="5" class="form-textarea" required x-model="formData.message" placeholder="Beschrijf uw vraag of wensen..."></textarea>
+                                <textarea id="message" name="message" rows="5" class="form-textarea" required placeholder="Beschrijf uw vraag of wensen...">{{ old('message') }}</textarea>
                                 @error('message')<span class="form-error">{{ $message }}</span>@enderror
                             </div>
 
@@ -130,11 +135,11 @@
                                 <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
                             </div>
 
-                            @include('partials.captcha')
+                            @include('partials.captcha', ['action' => 'contact'])
 
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
                                 <p class="text-sm text-slate-500">Velden met * zijn verplicht</p>
-                                <button type="submit" class="btn btn-primary px-7 py-3.5 shadow-lg shadow-primary-500/25 disabled:cursor-not-allowed disabled:opacity-60" :disabled="submitting" x-text="submitting ? 'Verzenden...' : 'Verstuur Bericht'"></button>
+                                <button type="submit" class="btn btn-primary px-7 py-3.5 shadow-lg shadow-primary-500/25">Verstuur Bericht</button>
                             </div>
                         </form>
                     </div>
@@ -221,81 +226,4 @@
         </div>
     </div>
 </section>
-
-<script>
-function contactForm() {
-    return {
-        submitting: false,
-        success: {{ json_encode((bool) (session('success') || request()->has('success'))) }},
-        successMessage: {{ json_encode(session('success') ?: 'Bedankt voor uw bericht. We nemen zo snel mogelijk contact met u op.') }},
-        formData: {
-            name: '',
-            email: '',
-            company: '',
-            phone: '',
-            current_website: '',
-            subject: '',
-            looking_for: '',
-            message: ''
-        },
-
-        init() {
-            if (this.success) {
-                this.scheduleFade();
-            }
-        },
-
-        scheduleFade() {
-            setTimeout(() => this.success = false, 5000);
-        },
-
-        resetForm() {
-            this.formData = {
-                name: '',
-                email: '',
-                company: '',
-                phone: '',
-                current_website: '',
-                subject: '',
-                looking_for: '',
-                message: ''
-            };
-        },
-
-        async submit(event) {
-            this.submitting = true;
-
-            try {
-                const response = await fetch(event.target.action, {
-                    method: 'POST',
-                    body: new FormData(event.target),
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').getAttribute('content'),
-                        'Accept': 'text/html',
-                    }
-                });
-
-                if (response.ok) {
-                    this.success = true;
-                    this.successMessage = 'Bedankt voor uw bericht. We nemen zo snel mogelijk contact met u op.';
-                    this.scheduleFade();
-                    this.resetForm();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                    const html = await response.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    document.documentElement.innerHTML = doc.documentElement.innerHTML;
-                }
-            } catch (error) {
-                console.error('Form submission error:', error);
-            } finally {
-                this.submitting = false;
-            }
-        }
-    }
-}
-</script>
-
-</div>
 @endsection

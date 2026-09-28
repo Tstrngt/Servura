@@ -20,6 +20,11 @@ interface DomainProvider
     public function checkAvailability(string $domain): DomainCheckResult;
 
     /**
+     * @return DomainCheckResult[]
+     */
+    public function suggest(string $name, array $tlds = []): array;
+
+    /**
      * @return array<int, array<string, mixed>>
      */
     public function tlds(): array;

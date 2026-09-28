@@ -51,17 +51,17 @@ class QuoteFormFields
                 ['label' => 'Ik heb nog geen huisstijl', 'note' => ''],
             ],
             'features' => [
-                ['label' => 'CMS (zelf beheren)', 'note' => 'Inbegrepen bij alle websitepakketten'],
-                ['label' => 'Blog / nieuws', 'note' => 'Vanaf + €'.($extras['blog'] ?? 100)],
-                ['label' => 'Contact- / leadformulieren', 'note' => 'Inbegrepen bij alle websitepakketten'],
-                ['label' => 'SEO-basis', 'note' => 'Inbegrepen bij alle websitepakketten'],
-                ['label' => 'Analytics', 'note' => 'Inbegrepen bij Pro'],
-                ['label' => 'Portfolio / projectenmodule', 'note' => 'Inbegrepen bij Pro'],
-                ['label' => 'Webshop / betalingen', 'note' => 'Vanaf + €'.($extras['webshopFrom'] ?? 500)],
-                ['label' => 'Meertalig', 'note' => '+ €'.($extras['multilingualPerLanguage'] ?? 150).' per taal'],
-                ['label' => 'Koppeling CRM / ERP', 'note' => 'Vanaf + €'.($extras['crmErpFrom'] ?? 300)],
-                ['label' => 'Klantenportaal / login', 'note' => 'Vanaf + €'.($extras['customerPortalFrom'] ?? 500)],
-                ['label' => 'Afspraken systeem', 'note' => 'Vanaf + €'.($extras['appointmentSystemFrom'] ?? 250)],
+                ['label' => 'CMS (zelf beheren)', 'note' => 'Inbegrepen bij alle websitepakketten', 'info' => 'Een gebruiksvriendelijk systeem waarmee u zelf pagina\'s, teksten en afbeeldingen kunt beheren.'],
+                ['label' => 'Blog / nieuws', 'note' => 'Vanaf + €'.($extras['blog'] ?? 100), 'info' => 'Een nieuwssectie om regelmatig artikelen, updates en kennisberichten te publiceren.'],
+                ['label' => 'Contact- / leadformulieren', 'note' => 'Inbegrepen bij alle websitepakketten', 'info' => 'Formulieren voor aanvragen en contact, gekoppeld aan uw mailbox en/of klantsysteem.'],
+                ['label' => 'SEO-basis', 'note' => 'Inbegrepen bij alle websitepakketten', 'info' => 'Technische en inhoudelijke basisoptimalisatie voor betere vindbaarheid in zoekmachines.'],
+                ['label' => 'Analytics', 'note' => 'Inbegrepen bij Pro', 'info' => 'Inzicht in bezoekersgedrag via privacyvriendelijke analytics.'],
+                ['label' => 'Portfolio / projectenmodule', 'note' => 'Inbegrepen bij Pro', 'info' => 'Toon projecten, portfolio-items of referenties op een overzichtelijke manier.'],
+                ['label' => 'Webshop / betalingen', 'note' => 'Vanaf + €'.($extras['webshopFrom'] ?? 500), 'info' => 'Productcatalogus, winkelwagen en betalingen via Mollie.'],
+                ['label' => 'Meertalig', 'note' => '+ €'.($extras['multilingualPerLanguage'] ?? 150).' per taal', 'info' => 'Website beschikbaar in meerdere talen, inclusief taalwisselaar.'],
+                ['label' => 'Koppeling CRM / ERP', 'note' => 'Vanaf + €'.($extras['crmErpFrom'] ?? 300), 'info' => 'Gegevensuitwisseling met uw bestaande klant- of bedrijfssysteem.'],
+                ['label' => 'Klantenportaal / login', 'note' => 'Vanaf + €'.($extras['customerPortalFrom'] ?? 500), 'info' => 'Afgeschermde omgeving waarin klanten documenten of gegevens kunnen inzien.'],
+                ['label' => 'Afspraken systeem', 'note' => 'Vanaf + €'.($extras['appointmentSystemFrom'] ?? 250), 'info' => 'Online afspraken inplannen, bevestigen en herinneringen versturen.'],
             ],
             'content' => [
                 ['label' => 'Ik lever teksten en beelden zelf aan', 'note' => 'Geen meerprijs'],
@@ -106,10 +106,18 @@ class QuoteFormFields
 
         foreach (self::GROUPS as $key => $label) {
             if (isset($stored[$key]) && is_array($stored[$key]) && count($stored[$key]) > 0) {
-                $defaults[$key] = array_values(array_map(fn ($o) => [
-                    'label' => (string) ($o['label'] ?? ''),
-                    'note' => (string) ($o['note'] ?? ''),
-                ], array_filter($stored[$key], fn ($o) => ($o['label'] ?? '') !== '')));
+                $defaultOptions = collect($defaults[$key] ?? [])->keyBy('label');
+
+                $defaults[$key] = array_values(array_map(function ($o) use ($defaultOptions) {
+                    $label = (string) ($o['label'] ?? '');
+                    $default = $defaultOptions->get($label);
+
+                    return [
+                        'label' => $label,
+                        'note' => (string) ($o['note'] ?? $default['note'] ?? ''),
+                        'info' => (string) ($o['info'] ?? $default['info'] ?? ''),
+                    ];
+                }, array_filter($stored[$key], fn ($o) => ($o['label'] ?? '') !== '')));
             }
         }
 
@@ -127,8 +135,12 @@ class QuoteFormFields
             if ($line === '') {
                 continue;
             }
-            [$label, $note] = array_pad(explode('|', $line, 2), 2, '');
-            $options[] = ['label' => trim($label), 'note' => trim($note)];
+            $parts = array_pad(explode('|', $line, 3), 3, '');
+            $options[] = [
+                'label' => trim($parts[0]),
+                'note' => trim($parts[1]),
+                'info' => trim($parts[2]),
+            ];
         }
 
         return $options;
@@ -140,7 +152,17 @@ class QuoteFormFields
     public static function toLines(array $options): string
     {
         return collect($options)
-            ->map(fn ($o) => $o['label'].($o['note'] !== '' ? ' | '.$o['note'] : ''))
+            ->map(function ($o) {
+                $line = $o['label'];
+                if (($o['note'] ?? '') !== '') {
+                    $line .= ' | '.$o['note'];
+                }
+                if (($o['info'] ?? '') !== '') {
+                    $line .= ' | '.$o['info'];
+                }
+
+                return $line;
+            })
             ->implode("\n");
     }
 }
