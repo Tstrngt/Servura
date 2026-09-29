@@ -16,8 +16,10 @@
             <h1 class="mt-3 font-heading text-3xl font-bold text-slate-900">{{ $domain->domain_name }}</h1>
         </div>
 
-        <!-- Overview Card -->
-        <div class="rounded-2xl bg-slate-900 p-6 sm:p-8 text-white shadow-xl shadow-slate-900/10 ring-1 ring-white/10 mb-6" x-data="{ settingsOpen: false, modal: null, toast: null }" @keydown.escape.window="settingsOpen = false; modal = null">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Overview Card (sticky on desktop, top on mobile) -->
+            <div class="order-1 lg:order-2 lg:col-span-1">
+                <div class="self-start lg:sticky lg:top-12 lg:h-fit rounded-2xl bg-slate-900 p-6 sm:p-8 text-white shadow-xl shadow-slate-900/10 ring-1 ring-white/10" x-data="{ settingsOpen: false, modal: null, toast: null }" @keydown.escape.window="settingsOpen = false; modal = null">
             <div class="flex items-start justify-between gap-4 mb-8">
                 <div>
                     <div class="flex items-center gap-3">
@@ -150,10 +152,14 @@
                     </div>
                 </div>
             </template>
-        </div>
+                </div>
+            </div>
 
-        <!-- Accordion: Holder -->
-        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-4" x-data="{ open: false, modal: false }">
+            <!-- Accordion sections -->
+            <div class="order-2 lg:order-1 lg:col-span-2 space-y-4">
+
+                <!-- Accordion: Holder -->
+                <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70" x-data="{ open: false, modal: false }">
             <button type="button" @click="open = !open" class="flex w-full items-center justify-between">
                 <div class="flex items-center gap-4">
                     <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-600 ring-1 ring-primary-100">
@@ -439,6 +445,8 @@
                     <button type="button" @click="navigator.clipboard.writeText('{{ $transferToken['token'] }}'); copied=true; setTimeout(() => copied=false, 2000)" class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Kopiëren</button>
                 </div>
                 <p x-show="copied" x-cloak x-transition class="mt-2 text-sm font-medium text-emerald-600">Token gekopieerd naar klembord.</p>
+            </div>
+        </div>
             </div>
         </div>
     </div>
