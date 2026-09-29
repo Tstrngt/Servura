@@ -349,7 +349,7 @@
                     <div class="mt-5 flex flex-wrap gap-3">
                         <button type="button" class="btn btn-primary">Open DirectAdmin</button>
                         <button type="button" @click="modal='change'" class="btn btn-secondary">Hostingpakket wijzigen</button>
-                        <button type="button" @click="modal='unlink'" class="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-rose-600 ring-1 ring-rose-200 hover:bg-rose-50">Hosting ontkoppelen</button>
+                        <button type="button" @click="modal='unlink'" class="btn btn-secondary !text-rose-600 !border-rose-600 hover:!bg-rose-50 hover:!text-rose-700 focus:!ring-rose-500">Hosting ontkoppelen</button>
                     </div>
                 @else
                     <p class="text-sm text-slate-500 mb-4">Er is nog geen hostingpakket gekoppeld aan dit domein.</p>
