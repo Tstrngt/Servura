@@ -8,6 +8,7 @@ use App\Jobs\UpdateDomainDnsRecords;
 use App\Jobs\UpdateDomainHolderContacts;
 use App\Jobs\UpdateDomainNameservers;
 use App\Models\DomainRegistration;
+use App\Services\DomainMockData;
 use App\Services\DomainSelfService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,28 +36,26 @@ class DomainController extends Controller
 
         $domain->load(['customerService', 'hostedCustomerService', 'auditLogs']);
 
-        // Sync if the cached data is stale or missing.
-        if (
-            $domain->provider_info_synced_at === null
-            || $domain->provider_info_synced_at->lt(now()->subMinutes(5))
-        ) {
-            SyncDomainInfoFromProvider::dispatch($domain->id);
-        }
-
-        $tldCapabilities = $service->tldCapabilities($domain);
-        $contacts = $domain->status === DomainRegistration::STATUS_ACTIVE
-            ? $this->fetchContacts($domain)
-            : [];
-
-        $dnsManaged = $domain->is_dns_managed_by_servura;
-        $dnsEntries = $dnsManaged ? $service->dnsEntries($domain) : [];
+        // NOTE: this page currently uses mock data so the full UI can be
+        // reviewed before every backend integration is finished. Replace
+        // DomainMockData calls below with real provider calls when ready.
+        $overview = DomainMockData::overview($domain->domain_name);
+        $holder = DomainMockData::holder();
+        $nameservers = DomainMockData::nameservers();
+        $dnsRecords = DomainMockData::dnsRecords();
+        $hosting = DomainMockData::hosting();
+        $forwarding = DomainMockData::forwarding();
+        $transferToken = DomainMockData::transferToken();
 
         return view('customer.domains.show', compact(
             'domain',
-            'tldCapabilities',
-            'contacts',
-            'dnsManaged',
-            'dnsEntries',
+            'overview',
+            'holder',
+            'nameservers',
+            'dnsRecords',
+            'hosting',
+            'forwarding',
+            'transferToken',
         ));
     }
 

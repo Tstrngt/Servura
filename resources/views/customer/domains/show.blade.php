@@ -5,310 +5,441 @@
 @section('content')
 @include('customer.partials.topbar')
 
-@php
-    $canSetNameservers = in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETNAMESERVERS, $tldCapabilities['capabilities'] ?? []);
-    $canSetContacts = in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETCONTACTS, $tldCapabilities['capabilities'] ?? []);
-    $requiresAuthCode = in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_REQUIRESAUTHCODE, $tldCapabilities['capabilities'] ?? []);
-@endphp
-
-<div class="bg-slate-50 min-h-screen pt-32">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24">
-        <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-            <div>
-                <a href="{{ route('customer.domains.index') }}" class="text-sm font-medium text-primary-600 hover:text-primary-800">&larr; Terug naar domeinen</a>
-                <h1 class="mt-3 font-heading text-3xl font-bold text-slate-900">{{ $domain->domain_name }}</h1>
-            </div>
-            <div class="shrink-0 flex items-center gap-3">
-                <form action="{{ route('customer.domains.sync', $domain) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-secondary">Vernieuwen</button>
-                </form>
-            </div>
+<div class="bg-slate-50 min-h-screen pt-28">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24">
+        <!-- Page Header -->
+        <div class="mb-6">
+            <a href="{{ route('customer.domains.index') }}" class="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-800">
+                <svg class="mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5m7 7-7-7 7-7"/></svg>
+                Terug naar domeinen
+            </a>
+            <h1 class="mt-3 font-heading text-3xl font-bold text-slate-900">{{ $domain->domain_name }}</h1>
         </div>
 
-        <!-- Overview -->
-        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-8">
-            <h2 class="font-heading text-xl font-bold text-slate-900 mb-5">Overzicht</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+        <!-- Overview Card -->
+        <div class="rounded-2xl bg-slate-900 p-6 sm:p-8 text-white shadow-xl shadow-slate-900/10 ring-1 ring-white/10 mb-6" x-data="{ settingsOpen: false, modal: null, toast: null }" @keydown.escape.window="settingsOpen = false; modal = null">
+            <div class="flex items-start justify-between gap-4 mb-8">
                 <div>
-                    <dt class="text-slate-500">Status</dt>
-                    @php $label = $domain->statusLabel; @endphp
-                    <dd class="mt-1"><span class="inline-flex items-center rounded-full bg-{{ $label['color'] }}-50 px-2.5 py-0.5 text-xs font-medium text-{{ $label['color'] }}-700 ring-1 ring-inset ring-{{ $label['color'] }}-600/20">{{ $label['text'] }}</span></dd>
+                    <div class="flex items-center gap-3">
+                        <h2 class="font-heading text-2xl font-bold text-white">{{ $overview['domain_name'] }}</h2>
+                        <span class="inline-flex items-center rounded-full bg-{{ $overview['status_color'] }}-100 px-3 py-1 text-xs font-semibold text-{{ $overview['status_color'] }}-800">{{ $overview['status'] }}</span>
+                    </div>
+                    <p class="mt-1 text-sm text-slate-300">{{ $overview['provider'] }} &middot; {{ $overview['registration_date'] }} tot {{ $overview['expiry_date'] }}</p>
                 </div>
-                <div>
-                    <dt class="text-slate-500">Type</dt>
-                    <dd class="mt-1 font-medium text-slate-900">{{ $domain->type === 'transfer' ? 'Verhuizing' : 'Registratie' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-slate-500">Provider</dt>
-                    <dd class="mt-1 font-medium text-slate-900 uppercase">{{ $domain->provider }}</dd>
-                </div>
-                <div>
-                    <dt class="text-slate-500">{{ $domain->type === 'transfer' ? 'Verhuisdatum' : 'Registratiedatum' }}</dt>
-                    <dd class="mt-1 font-medium text-slate-900">{{ $domain->registered_at?->format('d-m-Y') ?? '-' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-slate-500">Verloopt</dt>
-                    <dd class="mt-1 font-medium text-slate-900">{{ $domain->expires_at?->format('d-m-Y') ?? '-' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-slate-500">Automatische verlenging</dt>
-                    <dd class="mt-1 font-medium text-slate-900">{{ $domain->auto_renew ? 'Ja' : 'Nee' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-slate-500">Registrar lock</dt>
-                    <dd class="mt-1 font-medium text-slate-900">{{ $domain->registrar_lock ? 'Actief' : 'Niet actief' }}</dd>
-                </div>
-                <div class="sm:col-span-2 lg:col-span-1">
-                    <dt class="text-slate-500">Laatste synchronisatie</dt>
-                    <dd class="mt-1 font-medium text-slate-900">{{ $domain->provider_info_synced_at?->diffForHumans() ?? 'Nog niet gesynchroniseerd' }}</dd>
-                </div>
-            </div>
-
-            @if($domain->error_message)
-                <div class="mt-6 rounded-lg bg-red-50 p-4 text-sm text-red-800">
-                    <strong>Melding:</strong> {{ $domain->error_message }}
-                </div>
-            @endif
-        </div>
-
-        <!-- Holder details -->
-        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-8" x-data="{ edit: false }">
-            <div class="flex items-center justify-between mb-5">
-                <h2 class="font-heading text-xl font-bold text-slate-900">Houdergegevens</h2>
-                @if($canSetContacts && count($contacts) > 0)
-                    <button type="button" @click="edit = !edit" class="text-sm font-semibold text-primary-600 hover:text-primary-800" x-text="edit ? 'Annuleren' : 'Wijzigen'"></button>
-                @endif
-            </div>
-
-            @if(! $canSetContacts)
-                <p class="text-sm text-slate-500">Voor deze extensie kunnen houdergegevens niet via het klantportaal worden gewijzigd. Neem contact op met support.</p>
-            @elseif(count($contacts) === 0)
-                <p class="text-sm text-slate-500">Houdergegevens worden opgehaald uit TransIP.</p>
-            @else
-                <div x-show="!edit">
-                    <div class="space-y-4">
-                        @foreach($contacts as $contact)
-                            <div class="rounded-xl bg-slate-50 p-4 text-sm">
-                                <p class="font-semibold text-slate-900 mb-1">{{ ucfirst($contact['type'] ?? 'contact') }}</p>
-                                <p class="text-slate-700">{{ $contact['first_name'] ?? '' }} {{ $contact['last_name'] ?? '' }}</p>
-                                @if(($contact['company_name'] ?? '') !== '')
-                                    <p class="text-slate-500">{{ $contact['company_name'] }}</p>
-                                @endif
-                                <p class="text-slate-500">{{ $contact['street'] ?? '' }} {{ $contact['number'] ?? '' }}</p>
-                                <p class="text-slate-500">{{ $contact['postal_code'] ?? '' }} {{ $contact['city'] ?? '' }}</p>
-                                <p class="text-slate-500">{{ $contact['country'] ?? '' }}</p>
-                                <p class="text-slate-500">{{ $contact['email'] ?? '' }}</p>
-                            </div>
-                        @endforeach
+                <div class="relative">
+                    <button type="button" @click="settingsOpen = !settingsOpen" class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/15" aria-label="Instellingen">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.483l-1.034.712c-.312.216-.472.61-.427.995.008.075.012.151.012.226 0 .075-.004.15-.012.225-.045.386.115.78.427.996l1.034.712a1.125 1.125 0 0 1 .26 1.483l-1.296 2.247a1.125 1.125 0 0 1-1.37.49l-1.217-.456c-.355-.133-.75-.072-1.075.124-.073.044-.146.087-.22.127-.332.184-.582.496-.645.87l-.213 1.28c-.09.543-.56.941-1.11.941h-2.593c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.063-.374-.313-.686-.645-.87a3.75 3.75 0 0 1-.22-.127c-.324-.196-.72-.257-1.075-.124l-1.217.456a1.125 1.125 0 0 1-1.37-.49l-1.296-2.247a1.125 1.125 0 0 1 .26-1.483l1.034-.712c.312-.216.472-.61.427-.995a3.75 3.75 0 0 1-.012-.226c0-.075.004-.15.012-.225.045-.386-.115-.78-.427-.996l-1.034-.712a1.125 1.125 0 0 1-.26-1.483l1.296-2.247a1.125 1.125 0 0 1 1.37-.49l1.217.456c.355.133.75.072 1.075-.124.073-.044.146-.087.22-.127.332-.184.582-.496.645-.87l.213-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                    </button>
+                    <div x-show="settingsOpen" x-cloak @click.outside="settingsOpen = false" class="absolute right-0 z-20 mt-2 w-72 origin-top-right rounded-2xl bg-white p-2 shadow-xl ring-1 ring-slate-200">
+                        <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Domeininstellingen</div>
+                        <button type="button" @click="settingsOpen=false; modal='autorenew'" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+                            <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+                            Automatische verlenging
+                        </button>
+                        <button type="button" @click="settingsOpen=false; modal='transfer-user'" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+                            <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+                            Overdragen naar gebruiker
+                        </button>
+                        <button type="button" @click="settingsOpen=false; modal='link-hosting'" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+                            <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>
+                            Hostingpakket koppelen
+                        </button>
+                        <button type="button" @click="settingsOpen=false; modal='unlink-hosting'" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+                            <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
+                            Hosting ontkoppelen
+                        </button>
+                        <div class="my-1 h-px bg-slate-100"></div>
+                        <button type="button" @click="settingsOpen=false; modal='cancel'" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-rose-600 hover:bg-rose-50">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+                            Product opzeggen
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                <form x-show="edit" x-cloak method="POST" action="{{ route('customer.domains.holder.update', $domain) }}" class="space-y-6">
-                    @csrf
-                    @foreach($contacts as $index => $contact)
-                        <div class="rounded-xl bg-slate-50 p-4">
-                            <input type="hidden" name="contacts[{{ $index }}][type]" value="{{ $contact['type'] ?? 'registrant' }}">
-                            <p class="text-sm font-semibold text-slate-900 mb-3">{{ ucfirst($contact['type'] ?? 'contact') }}</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div><label class="block text-xs font-medium text-slate-600">Voornaam</label><input type="text" name="contacts[{{ $index }}][first_name]" value="{{ $contact['first_name'] ?? '' }}" class="form-input mt-1" required></div>
-                                <div><label class="block text-xs font-medium text-slate-600">Achternaam</label><input type="text" name="contacts[{{ $index }}][last_name]" value="{{ $contact['last_name'] ?? '' }}" class="form-input mt-1" required></div>
-                                <div><label class="block text-xs font-medium text-slate-600">Bedrijf</label><input type="text" name="contacts[{{ $index }}][company_name]" value="{{ $contact['company_name'] ?? '' }}" class="form-input mt-1"></div>
-                                <div><label class="block text-xs font-medium text-slate-600">KVK-nummer</label><input type="text" name="contacts[{{ $index }}][company_kvk]" value="{{ $contact['company_kvk'] ?? '' }}" class="form-input mt-1"></div>
-                                <div><label class="block text-xs font-medium text-slate-600">Straat</label><input type="text" name="contacts[{{ $index }}][street]" value="{{ $contact['street'] ?? '' }}" class="form-input mt-1" required></div>
-                                <div><label class="block text-xs font-medium text-slate-600">Huisnummer</label><input type="text" name="contacts[{{ $index }}][number]" value="{{ $contact['number'] ?? '' }}" class="form-input mt-1" required></div>
-                                <div><label class="block text-xs font-medium text-slate-600">Postcode</label><input type="text" name="contacts[{{ $index }}][postal_code]" value="{{ $contact['postal_code'] ?? '' }}" class="form-input mt-1" required></div>
-                                <div><label class="block text-xs font-medium text-slate-600">Plaats</label><input type="text" name="contacts[{{ $index }}][city]" value="{{ $contact['city'] ?? '' }}" class="form-input mt-1" required></div>
-                                <div><label class="block text-xs font-medium text-slate-600">Land (2-letterig)</label><input type="text" name="contacts[{{ $index }}][country]" value="{{ $contact['country'] ?? '' }}" maxlength="2" class="form-input mt-1" required></div>
-                                <div><label class="block text-xs font-medium text-slate-600">E-mail</label><input type="email" name="contacts[{{ $index }}][email]" value="{{ $contact['email'] ?? '' }}" class="form-input mt-1" required></div>
-                                <div><label class="block text-xs font-medium text-slate-600">Telefoon</label><input type="text" name="contacts[{{ $index }}][phone_number]" value="{{ $contact['phone_number'] ?? '' }}" class="form-input mt-1"></div>
+            <div class="grid grid-cols-2 gap-y-6 gap-x-4 sm:grid-cols-3 lg:grid-cols-4">
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Provider</p>
+                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['provider'] }}</p>
+                </div>
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Registratiedatum</p>
+                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['registration_date'] }}</p>
+                </div>
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Verloopt</p>
+                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['expiry_date'] }}</p>
+                </div>
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Automatisch verlengen</p>
+                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['auto_renew'] ? 'Aan' : 'Uit' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Registrar lock</p>
+                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['registrar_lock'] ? 'Actief' : 'Niet actief' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Hosting</p>
+                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['hosting_package'] }}</p>
+                </div>
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Nameservers</p>
+                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['nameserver_status'] }}</p>
+                </div>
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">DNS</p>
+                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['dns_status'] }}</p>
+                </div>
+            </div>
+
+            <!-- Toast -->
+            <div x-show="toast" x-cloak x-transition class="mt-6 rounded-lg bg-emerald-500/20 p-3 text-sm font-medium text-emerald-100 ring-1 ring-emerald-500/30" x-text="toast"></div>
+
+            <!-- Settings Modals -->
+            <template x-if="modal">
+                <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(2,6,23,0.6)">
+                    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200" @click.away="modal=null">
+                        <h3 class="font-heading text-lg font-bold text-slate-900" x-text="{
+                            'autorenew': 'Automatische verlenging',
+                            'transfer-user': 'Overdragen naar andere Servura-gebruiker',
+                            'link-hosting': 'Hostingpakket koppelen',
+                            'unlink-hosting': 'Hosting ontkoppelen',
+                            'cancel': 'Product opzeggen'
+                        }[modal]"></h3>
+
+                        <!-- Auto renew -->
+                        <div x-show="modal === 'autorenew'" class="mt-4">
+                            <label class="flex items-center gap-3">
+                                <input type="checkbox" checked class="h-5 w-5 rounded border-slate-300 text-primary-600" x-ref="autoRenewCheck">
+                                <span class="text-sm text-slate-700">Automatische verlenging inschakelen</span>
+                            </label>
+                        </div>
+
+                        <!-- Transfer user -->
+                        <div x-show="modal === 'transfer-user'" class="mt-4 space-y-3">
+                            <p class="text-sm text-slate-500">Vul het e-mailadres in van de bestaande Servura-gebruiker die dit domein moet overnemen.</p>
+                            <input type="email" class="form-input w-full" placeholder="e-mailadres@domein.nl">
+                        </div>
+
+                        <!-- Link hosting -->
+                        <div x-show="modal === 'link-hosting'" class="mt-4 space-y-3">
+                            <label class="block text-sm font-medium text-slate-700">Bestaand hostingpakket</label>
+                            <select class="form-select w-full">
+                                <option>Webhosting Start</option>
+                                <option>Webhosting Plus</option>
+                                <option>Webhosting Pro</option>
+                            </select>
+                        </div>
+
+                        <!-- Unlink hosting -->
+                        <div x-show="modal === 'unlink-hosting'" class="mt-4">
+                            <p class="text-sm text-slate-500">De koppeling wordt verwijderd. Website- en e-maildata blijven op de server staan.</p>
+                        </div>
+
+                        <!-- Cancel -->
+                        <div x-show="modal === 'cancel'" class="mt-4 space-y-3">
+                            <p class="text-sm text-rose-700">Dit zet het domein op niet-verlengen. Deze actie is deels destructief.</p>
+                            <label class="block text-sm font-medium text-slate-700">Typ <span class="font-mono font-semibold">{{ $domain->domain_name }}</span> ter bevestiging</label>
+                            <input type="text" class="form-input w-full" placeholder="{{ $domain->domain_name }}">
+                        </div>
+
+                        <div class="mt-6 flex items-center justify-end gap-3">
+                            <button type="button" @click="modal=null" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
+                            <button type="button" @click="toast='Actie opgeslagen (dummy)'; modal=null" class="rounded-xl px-4 py-2 text-sm font-semibold text-white" :class="modal === 'cancel' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700'">Bevestigen</button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Accordion: Holder -->
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-4" x-data="{ open: false, modal: false }">
+            <button type="button" @click="open = !open" class="flex w-full items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-600 ring-1 ring-primary-100">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.5-1.632Z"/></svg>
+                    </span>
+                    <div class="text-left">
+                        <h3 class="font-heading text-lg font-bold text-slate-900">Houdergegevens</h3>
+                        <p class="text-sm text-slate-500">{{ $holder['first_name'] }} {{ $holder['last_name'] }} &middot; {{ $holder['company_name'] }}</p>
+                    </div>
+                </div>
+                <svg class="h-5 w-5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+            </button>
+            <div x-show="open" class="pt-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Type houder</p><p class="mt-1 font-semibold text-slate-900">{{ $holder['type'] }}</p></div>
+                    <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Naam</p><p class="mt-1 font-semibold text-slate-900">{{ $holder['first_name'] }} {{ $holder['last_name'] }}</p></div>
+                    <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Bedrijfsnaam</p><p class="mt-1 font-semibold text-slate-900">{{ $holder['company_name'] }}</p></div>
+                    <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Adres</p><p class="mt-1 font-semibold text-slate-900">{{ $holder['street'] }} {{ $holder['number'] }}</p></div>
+                    <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Postcode &amp; plaats</p><p class="mt-1 font-semibold text-slate-900">{{ $holder['postal_code'] }} {{ $holder['city'] }}</p></div>
+                    <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Land</p><p class="mt-1 font-semibold text-slate-900">{{ $holder['country'] }}</p></div>
+                    <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">E-mail</p><p class="mt-1 font-semibold text-slate-900">{{ $holder['email'] }}</p></div>
+                    <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Telefoonnummer</p><p class="mt-1 font-semibold text-slate-900">{{ $holder['phone_number'] }}</p></div>
+                </div>
+                <button type="button" @click="modal=true" class="mt-5 btn btn-primary">Houdergegevens wijzigen</button>
+
+                <template x-if="modal">
+                    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(2,6,23,0.6)">
+                        <div class="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200" @click.away="modal=false">
+                            <h4 class="font-heading text-lg font-bold text-slate-900">Houdergegevens wijzigen</h4>
+                            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div><label class="block text-xs font-medium text-slate-600">Voornaam</label><input type="text" value="{{ $holder['first_name'] }}" class="form-input mt-1 w-full"></div>
+                                <div><label class="block text-xs font-medium text-slate-600">Achternaam</label><input type="text" value="{{ $holder['last_name'] }}" class="form-input mt-1 w-full"></div>
+                                <div><label class="block text-xs font-medium text-slate-600">Bedrijfsnaam</label><input type="text" value="{{ $holder['company_name'] }}" class="form-input mt-1 w-full"></div>
+                                <div><label class="block text-xs font-medium text-slate-600">Straat</label><input type="text" value="{{ $holder['street'] }}" class="form-input mt-1 w-full"></div>
+                                <div><label class="block text-xs font-medium text-slate-600">Huisnummer</label><input type="text" value="{{ $holder['number'] }}" class="form-input mt-1 w-full"></div>
+                                <div><label class="block text-xs font-medium text-slate-600">Postcode</label><input type="text" value="{{ $holder['postal_code'] }}" class="form-input mt-1 w-full"></div>
+                                <div><label class="block text-xs font-medium text-slate-600">Plaats</label><input type="text" value="{{ $holder['city'] }}" class="form-input mt-1 w-full"></div>
+                                <div><label class="block text-xs font-medium text-slate-600">Land</label><input type="text" value="{{ $holder['country'] }}" class="form-input mt-1 w-full"></div>
+                                <div><label class="block text-xs font-medium text-slate-600">E-mail</label><input type="email" value="{{ $holder['email'] }}" class="form-input mt-1 w-full"></div>
+                                <div><label class="block text-xs font-medium text-slate-600">Telefoon</label><input type="text" value="{{ $holder['phone_number'] }}" class="form-input mt-1 w-full"></div>
+                            </div>
+                            <div class="mt-6 flex justify-end gap-3">
+                                <button type="button" @click="modal=false" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
+                                <button type="button" @click="modal=false; open=false; alert('Houdergegevens opgeslagen (dummy)')" class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Opslaan</button>
                             </div>
                         </div>
-                    @endforeach
-                    <div class="flex items-center gap-3">
-                        <button type="submit" class="btn btn-primary">Wijzigingen doorvoeren</button>
-                        <button type="button" @click="edit = false" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
                     </div>
-                    <p class="text-xs text-slate-500">Wijzigingen worden eerst naar TransIP verstuurd; de status wordt bijgewerkt zodra TransIP de wijziging bevestigt.</p>
-                </form>
-            @endif
+                </template>
+            </div>
         </div>
 
-        <!-- Nameservers -->
-        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-8" x-data="{ edit: false }">
-            <div class="flex items-center justify-between mb-5">
-                <h2 class="font-heading text-xl font-bold text-slate-900">Nameservers</h2>
-                @if($canSetNameservers)
-                    <button type="button" @click="edit = !edit" class="text-sm font-semibold text-primary-600 hover:text-primary-800" x-text="edit ? 'Annuleren' : 'Wijzigen'"></button>
-                @endif
-            </div>
-
-            @if(! $canSetNameservers)
-                <p class="text-sm text-slate-500">Voor deze extensie kunnen nameservers niet via het klantportaal worden gewijzigd. Neem contact op met support.</p>
-            @else
-                <div x-show="!edit" class="space-y-3">
-                    @forelse($domain->current_nameservers ?? [] as $ns)
+        <!-- Accordion: Nameservers -->
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-4" x-data="{ open: false, modal: false }">
+            <button type="button" @click="open = !open" class="flex w-full items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.984 0-7.546-1.21-9.79-3.168m0 0A8.961 8.961 0 0 1 3 12c0-.778.099-1.533.284-2.253m0 0A17.919 17.919 0 0 1 12 7.5c3.984 0 7.546 1.21 9.79 3.168Z"/></svg>
+                    </span>
+                    <div class="text-left">
+                        <h3 class="font-heading text-lg font-bold text-slate-900">Nameservers</h3>
+                        <p class="text-sm text-slate-500">{{ collect($nameservers)->pluck('hostname')->implode(', ') }}</p>
+                    </div>
+                </div>
+                <svg class="h-5 w-5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+            </button>
+            <div x-show="open" class="pt-5">
+                <div class="space-y-2">
+                    @foreach($nameservers as $ns)
                         <div class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm">
-                            <span class="font-medium text-slate-900">{{ $ns['hostname'] ?? '-' }}</span>
+                            <span class="font-medium text-slate-900">{{ $ns['hostname'] }}</span>
                             <span class="text-slate-500">{{ $ns['ipv4'] ?? '' }} {{ $ns['ipv6'] ?? '' }}</span>
                         </div>
-                    @empty
-                        <p class="text-sm text-slate-500">Geen nameservers gesynchroniseerd. Klik op "Vernieuwen" om deze op te halen.</p>
-                    @endforelse
+                    @endforeach
                 </div>
+                <button type="button" @click="modal=true" class="mt-5 btn btn-secondary">Nameservers wijzigen</button>
 
-                <form x-show="edit" x-cloak method="POST" action="{{ route('customer.domains.nameservers.update', $domain) }}" class="space-y-4">
-                    @csrf
-                    <div class="space-y-3" x-data="{ nameservers: {{ json_encode(array_values($domain->current_nameservers ?? [['hostname' => '', 'ipv4' => '', 'ipv6' => '']])) }} }">
-                        <template x-for="(ns, index) in nameservers" :key="index">
-                            <div class="rounded-xl bg-slate-50 p-4">
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div><label class="block text-xs font-medium text-slate-600">Hostname</label><input type="text" :name="`nameservers[${index}][hostname]`" x-model="ns.hostname" class="form-input mt-1" required></div>
-                                    <div><label class="block text-xs font-medium text-slate-600">IPv4</label><input type="text" :name="`nameservers[${index}][ipv4]`" x-model="ns.ipv4" class="form-input mt-1"></div>
-                                    <div><label class="block text-xs font-medium text-slate-600">IPv6</label><input type="text" :name="`nameservers[${index}][ipv6]`" x-model="ns.ipv6" class="form-input mt-1"></div>
-                                </div>
-                                <button type="button" @click="nameservers.splice(index, 1)" class="mt-3 text-xs font-semibold text-rose-600 hover:text-rose-800">Verwijderen</button>
+                <template x-if="modal">
+                    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(2,6,23,0.6)">
+                        <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200" @click.away="modal=false" x-data="{ ns: {{ json_encode($nameservers) }} }">
+                            <h4 class="font-heading text-lg font-bold text-slate-900">Nameservers wijzigen</h4>
+                            <div class="mt-4 space-y-3">
+                                <template x-for="(n, index) in ns" :key="index">
+                                    <div class="flex gap-2">
+                                        <input type="text" x-model="n.hostname" class="form-input flex-1" placeholder="Hostname">
+                                        <button type="button" @click="ns.splice(index,1)" class="text-rose-600 hover:text-rose-800 text-sm">Verwijder</button>
+                                    </div>
+                                </template>
+                                <button type="button" @click="ns.push({hostname:'', ipv4:null, ipv6:null})" class="text-sm font-semibold text-primary-600 hover:text-primary-800">+ Nameserver toevoegen</button>
                             </div>
-                        </template>
-                        <button type="button" @click="nameservers.push({hostname:'', ipv4:'', ipv6:''})" class="text-sm font-semibold text-primary-600 hover:text-primary-800">+ Nameserver toevoegen</button>
+                            <div class="mt-6 flex justify-end gap-3">
+                                <button type="button" @click="modal=false" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
+                                <button type="button" @click="modal=false; open=false; alert('Nameservers opgeslagen (dummy)')" class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Opslaan</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-3 pt-2">
-                        <button type="submit" class="btn btn-primary">Nameservers opslaan</button>
-                        <button type="button" @click="edit = false" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
-                    </div>
-                    <p class="text-xs text-slate-500">Wijzigingen worden eerst naar TransIP verstuurd; de status wordt bijgewerkt zodra TransIP de wijziging bevestigt.</p>
-                </form>
-            @endif
+                </template>
+            </div>
         </div>
 
-        <!-- DNS -->
-        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-8" x-data="{ edit: false }">
-            <div class="flex items-center justify-between mb-5">
-                <h2 class="font-heading text-xl font-bold text-slate-900">DNS-records</h2>
-                @if($dnsManaged)
-                    <button type="button" @click="edit = !edit" class="text-sm font-semibold text-primary-600 hover:text-primary-800" x-text="edit ? 'Annuleren' : 'Wijzigen'"></button>
-                @endif
-            </div>
-
-            @if(! $dnsManaged)
-                <p class="text-sm text-slate-500">Dit domein gebruikt externe nameservers. DNS wordt daarom niet via Servura beheerd. Wijzigingen moeten bij de partij worden doorgevoerd die de nameservers beheert.</p>
-            @else
-                <div x-show="!edit" class="overflow-x-auto -mx-6 sm:mx-0">
+        <!-- Accordion: DNS Records -->
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-4" x-data="{ open: false, modal: false }">
+            <button type="button" @click="open = !open" class="flex w-full items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5 10.25 7l4.5 6 6-7.5M3.75 7l6.75 6 4.5-6 6 7.5"/></svg>
+                    </span>
+                    <div class="text-left">
+                        <h3 class="font-heading text-lg font-bold text-slate-900">DNS-records</h3>
+                        <p class="text-sm text-slate-500">{{ count($dnsRecords) }} records &middot; {{ $overview['dns_status'] }}</p>
+                    </div>
+                </div>
+                <svg class="h-5 w-5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+            </button>
+            <div x-show="open" class="pt-5">
+                <div class="overflow-x-auto -mx-6 sm:mx-0 rounded-xl ring-1 ring-slate-200">
                     <table class="min-w-full divide-y divide-slate-100">
                         <thead class="bg-slate-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Naam</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">TTL</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Waarde</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Type</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Naam</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Waarde</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">TTL</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Actie</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-slate-100">
-                            @forelse($dnsEntries as $entry)
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            @foreach($dnsRecords as $i => $record)
                                 <tr class="text-sm">
-                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-slate-900">{{ $entry['name'] }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-slate-600">{{ $entry['type'] }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-slate-600">{{ $entry['expire'] }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-slate-900 font-mono">{{ $entry['content'] }}</td>
+                                    <td class="px-4 py-3 font-medium text-slate-900">{{ $record['type'] }}</td>
+                                    <td class="px-4 py-3 text-slate-600">{{ $record['name'] }}</td>
+                                    <td class="px-4 py-3 font-mono text-slate-900">{{ $record['content'] }}</td>
+                                    <td class="px-4 py-3 text-slate-600">{{ $record['expire'] }}</td>
+                                    <td class="px-4 py-3 text-right">
+                                        <button type="button" @click="modal='edit-{{ $i }}'" class="text-xs font-semibold text-primary-600 hover:text-primary-800">Wijzigen</button>
+                                        <button type="button" @click="confirm('Record verwijderen (dummy)')" class="ml-3 text-xs font-semibold text-rose-600 hover:text-rose-800">Verwijderen</button>
+                                    </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-6 py-8 text-center text-sm text-slate-500">Geen DNS-records gevonden.</td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
+                <button type="button" @click="modal='add'" class="mt-5 btn btn-primary">+ Record toevoegen</button>
 
-                <form x-show="edit" x-cloak method="POST" action="{{ route('customer.domains.dns.update', $domain) }}" class="space-y-4">
-                    @csrf
-                    <div class="space-y-3" x-data="{ records: {{ json_encode(array_values($dnsEntries)) }} }">
-                        <template x-for="(record, index) in records" :key="index">
-                            <div class="rounded-xl bg-slate-50 p-4">
-                                <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
-                                    <div class="sm:col-span-2"><label class="block text-xs font-medium text-slate-600">Naam</label><input type="text" :name="`records[${index}][name]`" x-model="record.name" class="form-input mt-1" placeholder="@ of www" required></div>
-                                    <div><label class="block text-xs font-medium text-slate-600">Type</label><select :name="`records[${index}][type]`" x-model="record.type" class="form-select mt-1 w-full" required>
-                                        <option value="A">A</option>
-                                        <option value="AAAA">AAAA</option>
-                                        <option value="CNAME">CNAME</option>
-                                        <option value="MX">MX</option>
-                                        <option value="TXT">TXT</option>
-                                        <option value="SRV">SRV</option>
-                                        <option value="CAA">CAA</option>
-                                        <option value="NS">NS</option>
-                                    </select></div>
-                                    <div><label class="block text-xs font-medium text-slate-600">TTL</label><input type="number" :name="`records[${index}][expire]`" x-model="record.expire" class="form-input mt-1" min="60" required></div>
-                                    <div class="sm:col-span-5"><label class="block text-xs font-medium text-slate-600">Waarde</label><input type="text" :name="`records[${index}][content]`" x-model="record.content" class="form-input mt-1" required></div>
-                                </div>
-                                <button type="button" @click="records.splice(index, 1)" class="mt-3 text-xs font-semibold text-rose-600 hover:text-rose-800">Record verwijderen</button>
+                <!-- Add/Edit modals (simplified: one generic modal controlled by string) -->
+                <template x-if="modal === 'add' || modal && modal.startsWith('edit-')">
+                    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(2,6,23,0.6)">
+                        <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200" @click.away="modal=false">
+                            <h4 class="font-heading text-lg font-bold text-slate-900" x-text="modal === 'add' ? 'DNS-record toevoegen' : 'DNS-record wijzigen'"></h4>
+                            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div><label class="block text-xs font-medium text-slate-600">Type</label><select class="form-select mt-1 w-full"><option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>TXT</option><option>SRV</option><option>CAA</option><option>NS</option></select></div>
+                                <div><label class="block text-xs font-medium text-slate-600">Naam</label><input type="text" class="form-input mt-1 w-full" placeholder="@ of www"></div>
+                                <div><label class="block text-xs font-medium text-slate-600">TTL</label><input type="number" class="form-input mt-1 w-full" value="300"></div>
+                                <div class="sm:col-span-2"><label class="block text-xs font-medium text-slate-600">Waarde</label><input type="text" class="form-input mt-1 w-full" placeholder="IP, doel of tekst"></div>
                             </div>
-                        </template>
-                        <button type="button" @click="records.push({name:'', type:'A', expire:3600, content:''})" class="text-sm font-semibold text-primary-600 hover:text-primary-800">+ Record toevoegen</button>
+                            <div class="mt-6 flex justify-end gap-3">
+                                <button type="button" @click="modal=false" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
+                                <button type="button" @click="modal=false; alert('DNS-record opgeslagen (dummy)')" class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Opslaan</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-3 pt-2">
-                        <button type="submit" class="btn btn-primary">DNS-records opslaan</button>
-                        <button type="button" @click="edit = false" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
-                    </div>
-                    <p class="text-xs text-slate-500">De volledige set records wordt naar TransIP verstuurd. Na verwerking worden de actuele records opnieuw opgehaald.</p>
-                </form>
-            @endif
+                </template>
+            </div>
         </div>
 
-        <!-- Hosting -->
-        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-8">
-            <h2 class="font-heading text-xl font-bold text-slate-900 mb-3">Hosting</h2>
-            @if($domain->hostedCustomerService)
-                <p class="text-sm text-slate-500">Gekoppeld aan <span class="font-semibold text-slate-900">{{ $domain->hostedCustomerService->service->title }}</span>.</p>
-            @else
-                <p class="text-sm text-slate-500">Er is nog geen Servura-hostingpakket aan dit domein gekoppeld. Deze koppeling komt in een volgende fase beschikbaar.</p>
-            @endif
-        </div>
-
-        <!-- Forwarding -->
-        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-8">
-            <h2 class="font-heading text-xl font-bold text-slate-900 mb-3">Doorsturen</h2>
-            <p class="text-sm text-slate-500">URL-doorsturing is voorbereid in het model maar nog niet actief. De redirect-infrastructuur wordt pas ingeschakeld wanneer deze technisch beschikbaar is.</p>
-        </div>
-
-        <!-- Transfer -->
-        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-8">
-            <h2 class="font-heading text-xl font-bold text-slate-900 mb-3">Verhuizen</h2>
-            @if($requiresAuthCode)
-                <p class="text-sm text-slate-500 mb-4">Voor deze extensie is een verhuiscode vereist om het domein naar een andere provider te verhuizen.</p>
-                <form method="POST" action="{{ route('customer.domains.authcode', $domain) }}" class="max-w-md">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-slate-700">Bevestig je wachtwoord om de verhuiscode te tonen</label>
-                        <input type="password" name="password" class="form-input mt-1" required>
+        <!-- Accordion: Hosting -->
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-4" x-data="{ open: false, modal: false }">
+            <button type="button" @click="open = !open" class="flex w-full items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-100">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.636m-13.636 0-2.1 2.1m2.1-2.1 2.1-2.1m13.636 2.1 2.1 2.1m-2.1-2.1-2.1-2.1M6.75 18.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-10.5a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v10.5a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
+                    </span>
+                    <div class="text-left">
+                        <h3 class="font-heading text-lg font-bold text-slate-900">Hosting</h3>
+                        <p class="text-sm text-slate-500">{{ $hosting['linked'] ? $hosting['package'] . ' &middot; ' . $hosting['status'] : 'Geen hosting gekoppeld' }}</p>
                     </div>
-                    <button type="submit" class="btn btn-secondary">Verhuiscode tonen</button>
-                </form>
-                @if(session('auth_code'))
-                    <div class="mt-4 rounded-lg bg-slate-100 p-4">
-                        <p class="text-xs text-slate-500 uppercase tracking-wide">Verhuiscode</p>
-                        <p class="mt-1 select-all font-mono text-sm font-semibold text-slate-900">{{ session('auth_code') }}</p>
+                </div>
+                <svg class="h-5 w-5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+            </button>
+            <div x-show="open" class="pt-5">
+                @if($hosting['linked'])
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Pakket</p><p class="mt-1 font-semibold text-slate-900">{{ $hosting['package'] }}</p></div>
+                        <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Status</p><p class="mt-1 font-semibold text-slate-900">{{ $hosting['status'] }}</p></div>
+                        <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Server</p><p class="mt-1 font-semibold text-slate-900">{{ $hosting['server'] }}</p></div>
+                        <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Hoofddomein</p><p class="mt-1 font-semibold text-slate-900">{{ $hosting['main_domain'] }}</p></div>
+                    </div>
+                    <div class="mt-5 flex flex-wrap gap-3">
+                        <button type="button" class="btn btn-primary">Open DirectAdmin</button>
+                        <button type="button" @click="modal='change'" class="btn btn-secondary">Hostingpakket wijzigen</button>
+                        <button type="button" @click="modal='unlink'" class="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-rose-600 ring-1 ring-rose-200 hover:bg-rose-50">Hosting ontkoppelen</button>
+                    </div>
+                @else
+                    <p class="text-sm text-slate-500 mb-4">Er is nog geen hostingpakket gekoppeld aan dit domein.</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button type="button" @click="modal='link-existing'" class="btn btn-secondary">Bestaand hostingpakket koppelen</button>
+                        <a href="{{ route('services.index') }}" class="btn btn-primary">Nieuw hostingpakket bestellen</a>
                     </div>
                 @endif
-            @else
-                <p class="text-sm text-slate-500">Voor deze extensie is geen verhuiscode nodig. Neem contact op voor een externe verhuizing.</p>
-            @endif
+
+                <template x-if="modal">
+                    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(2,6,23,0.6)">
+                        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200" @click.away="modal=false">
+                            <h4 class="font-heading text-lg font-bold text-slate-900" x-text="modal === 'unlink' ? 'Hosting ontkoppelen' : 'Hosting wijzigen'"></h4>
+                            <p class="mt-2 text-sm text-slate-500" x-text="modal === 'unlink' ? 'De koppeling wordt verwijderd. Website- en e-maildata blijven bestaan.' : 'Kies het gewenste hostingpakket.'"></p>
+                            <div x-show="modal !== 'unlink'" class="mt-4">
+                                <select class="form-select w-full">
+                                    <option>Webhosting Start</option>
+                                    <option>Webhosting Plus</option>
+                                    <option>Webhosting Pro</option>
+                                </select>
+                            </div>
+                            <div class="mt-6 flex justify-end gap-3">
+                                <button type="button" @click="modal=false" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
+                                <button type="button" @click="modal=false; alert('Hostingactie opgeslagen (dummy)')" class="rounded-xl px-4 py-2 text-sm font-semibold text-white" :class="modal === 'unlink' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700'">Bevestigen</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
 
-        <!-- Product settings -->
-        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70">
-            <h2 class="font-heading text-xl font-bold text-slate-900 mb-3">Productinstellingen</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
-                <div>
-                    <dt class="text-slate-500">Automatische verlenging</dt>
-                    <dd class="mt-1 font-medium text-slate-900">{{ $domain->auto_renew ? 'Ingeschakeld' : 'Uitgeschakeld' }}</dd>
+        <!-- Accordion: Forwarding -->
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-4" x-data="{ open: false, modal: false }">
+            <button type="button" @click="open = !open" class="flex w-full items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-rose-100">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                    </span>
+                    <div class="text-left">
+                        <h3 class="font-heading text-lg font-bold text-slate-900">Doorsturen</h3>
+                        <p class="text-sm text-slate-500">{{ $forwarding['enabled'] ? $forwarding['type'] . ' &rarr; ' . $forwarding['target'] : 'Niet ingesteld' }}</p>
+                    </div>
                 </div>
-                <div>
-                    <dt class="text-slate-500">Registrar lock</dt>
-                    <dd class="mt-1 font-medium text-slate-900">{{ $domain->registrar_lock ? 'Actief' : 'Niet actief' }}</dd>
+                <svg class="h-5 w-5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+            </button>
+            <div x-show="open" class="pt-5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                    <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Status</p><p class="mt-1 font-semibold text-slate-900">{{ $forwarding['enabled'] ? 'Aan' : 'Uit' }}</p></div>
+                    <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Type</p><p class="mt-1 font-semibold text-slate-900">{{ $forwarding['type'] }}</p></div>
+                    <div class="rounded-xl bg-slate-50 p-4"><p class="text-xs font-medium uppercase tracking-wider text-slate-500">Doel</p><p class="mt-1 font-semibold text-slate-900">{{ $forwarding['target'] }}</p></div>
                 </div>
+                <button type="button" @click="modal=true" class="mt-5 btn btn-secondary">Doorsturen instellen</button>
+
+                <template x-if="modal">
+                    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(2,6,23,0.6)">
+                        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200" @click.away="modal=false">
+                            <h4 class="font-heading text-lg font-bold text-slate-900">Doorsturen instellen</h4>
+                            <div class="mt-4 space-y-4">
+                                <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-primary-600"> <span class="text-sm text-slate-700">Doorsturing inschakelen</span></label>
+                                <div><label class="block text-xs font-medium text-slate-600">Type</label><select class="form-select mt-1 w-full"><option value="301">301 (permanent)</option><option value="302">302 (tijdelijk)</option></select></div>
+                                <div><label class="block text-xs font-medium text-slate-600">Doel-URL</label><input type="url" class="form-input mt-1 w-full" placeholder="https://..." value="{{ $forwarding['target'] }}"></div>
+                            </div>
+                            <div class="mt-6 flex justify-end gap-3">
+                                <button type="button" @click="modal=false" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
+                                <button type="button" @click="modal=false; alert('Doorsturing opgeslagen (dummy)')" class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Opslaan</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
-            <p class="mt-4 text-sm text-slate-500">Opzeggen en verdere productinstellingen worden in een volgende fase toegevoegd.</p>
+        </div>
+
+        <!-- Accordion: Transfer -->
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-4" x-data="{ open: false, visible: false, copied: false }">
+            <button type="button" @click="open = !open" class="flex w-full items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 ring-1 ring-cyan-100">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+                    </span>
+                    <div class="text-left">
+                        <h3 class="font-heading text-lg font-bold text-slate-900">Verhuizen</h3>
+                        <p class="text-sm text-slate-500">Verhuistoken naar andere registrar</p>
+                    </div>
+                </div>
+                <svg class="h-5 w-5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+            </button>
+            <div x-show="open" class="pt-5">
+                <p class="text-sm text-slate-500 mb-4">Gebruik dit token om het domein vanuit Servura naar een andere registrar te verhuizen.</p>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div class="relative flex-1 rounded-xl bg-slate-900 px-4 py-3 font-mono text-sm text-white tracking-widest select-all" x-text="visible ? '{{ $transferToken['token'] }}' : '••••••••••••'">
+                    </div>
+                    <button type="button" @click="visible = !visible" class="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200" x-text="visible ? 'Verbergen' : 'Verhuistoken tonen'"></button>
+                    <button type="button" @click="navigator.clipboard.writeText('{{ $transferToken['token'] }}'); copied=true; setTimeout(() => copied=false, 2000)" class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Kopiëren</button>
+                </div>
+                <p x-show="copied" x-cloak x-transition class="mt-2 text-sm font-medium text-emerald-600">Token gekopieerd naar klembord.</p>
+            </div>
         </div>
     </div>
 </div>
