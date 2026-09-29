@@ -68,15 +68,15 @@
                     @endforeach
                 </div>
                 <div class="-mx-6 hidden sm:mx-0 sm:block sm:rounded-b-2xl">
-                    <table class="w-full table-fixed min-w-full divide-y divide-slate-100">
+                    <table class="min-w-full divide-y divide-slate-100">
                         <thead class="bg-slate-50">
                             <tr>
-                                <th class="w-[28%] px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Domein</th>
-                                <th class="w-[18%] px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
-                                <th class="w-[16%] px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Geregistreerd</th>
-                                <th class="w-[16%] px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Verloopt</th>
-                                <th class="w-[17%] px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Autom. verlenging</th>
-                                <th class="w-[5%] px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actie</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Domein</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Geregistreerd</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Verloopt</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Autom. verlenging</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actie</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-100">
@@ -84,8 +84,8 @@
                                 @php $label = $domain->statusLabel; @endphp
                                 <tr role="link" tabindex="0" aria-label="Bekijk domein {{ $domain->domain_name }}" data-href="{{ route('customer.domains.show', $domain) }}" onclick="window.location.href = this.dataset.href" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.location.href = this.dataset.href; }" class="cursor-pointer transition-colors duration-150 hover:bg-slate-50 focus:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500">
                                     <td class="px-6 py-4">
-                                        <div class="truncate text-sm font-medium text-slate-900" title="{{ $domain->domain_name }}">{{ $domain->domain_name }}</div>
-                                        <div class="truncate text-sm text-slate-500">{{ $domain->type === \App\Models\DomainRegistration::TYPE_TRANSFER ? 'Verhuizing' : 'Registratie' }}</div>
+                                        <div class="truncate pr-4 text-sm font-medium text-slate-900" title="{{ $domain->domain_name }}">{{ $domain->domain_name }}</div>
+                                        <div class="truncate pr-4 text-sm text-slate-500">{{ $domain->type === \App\Models\DomainRegistration::TYPE_TRANSFER ? 'Verhuizing' : 'Registratie' }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $label['color'] }}-100 text-{{ $label['color'] }}-800">
