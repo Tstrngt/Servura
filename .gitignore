@@ -43,3 +43,7 @@ Thumbs.db
 # Agent skill installer duplicates (canonical copies live in .claude/skills/)
 /.agents/
 /.codex/
+
+# Machine-local Impeccable files
+/.claude/settings.local.json
+/.claude/skills/impeccable/scripts/bin/
