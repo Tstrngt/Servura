@@ -19,7 +19,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- Overview Card (sticky on desktop, top on mobile) -->
             <div class="order-1 lg:order-2 lg:col-span-4">
-                <div class="self-start lg:sticky lg:top-12 lg:h-fit rounded-2xl bg-slate-900 p-6 sm:p-8 text-white shadow-xl shadow-slate-900/10 ring-1 ring-white/10" x-data="{ settingsOpen: false, modal: null, toast: null }" @keydown.escape.window="settingsOpen = false; modal = null">
+                <div class="self-start lg:sticky lg:top-32 lg:z-10 lg:h-fit rounded-2xl bg-slate-900 p-6 sm:p-8 text-white shadow-xl shadow-slate-900/10 ring-1 ring-white/10" x-data="{ settingsOpen: false, modal: null, toast: null }" @keydown.escape.window="settingsOpen = false; modal = null">
             <div class="flex items-start justify-between gap-4 mb-8">
                 <div>
                     <div class="flex items-center gap-3">
