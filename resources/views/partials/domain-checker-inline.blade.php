@@ -48,19 +48,19 @@
                      class="mt-6 rounded-2xl bg-white p-4 text-slate-900 shadow-lg ring-1 ring-slate-200 lg:absolute lg:right-0 lg:top-1/2 lg:mt-0 lg:w-[29rem] lg:-translate-y-1/2">
                     <p class="mb-2 text-sm text-slate-500">Resultaten voor <span class="font-semibold text-slate-700" x-text="result.name"></span></p>
 
-                    <ul class="max-h-72 divide-y divide-slate-100 overflow-y-auto pr-1">
+                    <ul class="divide-y divide-slate-100">
                         <template x-for="item in result.results" :key="item.domain">
-                            <li class="flex items-center justify-between gap-3 py-2">
-                                <div class="min-w-0">
-                                    <span class="block truncate text-sm font-semibold text-slate-900" x-text="item.domain"></span>
-                                    <span class="text-xs text-slate-500" x-show="item.available && item.price" x-text="'€ ' + item.price + ' /jaar'"></span>
+                            <li class="flex items-center justify-between gap-3 py-1.5">
+                                <div class="flex min-w-0 items-baseline gap-1.5">
+                                    <span class="truncate text-sm font-semibold text-slate-900" x-text="item.domain"></span>
+                                    <span class="shrink-0 text-[10px] text-slate-500" x-show="item.available && item.price" x-text="'€ ' + item.price + '/jr'"></span>
                                 </div>
-                                <div class="flex shrink-0 items-center gap-2">
-                                    <span class="inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                                <div class="flex shrink-0 items-center gap-1.5">
+                                    <span class="inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"
                                           :class="item.available ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'"
                                           x-text="item.available ? 'Beschikbaar' : 'Bezet'">
                                     </span>
-                                    <a x-show="item.available && item.checkout_url" :href="item.checkout_url" class="btn btn-primary btn-sm px-2 py-1 text-[10px] transition-transform duration-150 active:scale-[0.97]">
+                                    <a x-show="item.available && item.checkout_url" :href="item.checkout_url" class="inline-flex items-center justify-center rounded-full bg-primary-600 px-2.5 py-1.5 text-[10px] font-semibold leading-none text-white shadow-sm transition-[background-color,transform] duration-150 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:scale-[0.97]">
                                         Bestel
                                     </a>
                                 </div>
