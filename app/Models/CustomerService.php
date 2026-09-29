@@ -98,6 +98,11 @@ class CustomerService extends Model
         return $this->hasMany(ServiceCancellationRequest::class);
     }
 
+    public function hostedDomainRegistrations()
+    {
+        return $this->hasMany(DomainRegistration::class, 'hosted_customer_service_id');
+    }
+
     // Status checking methods
     public function isActive(): bool
     {

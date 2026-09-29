@@ -6,16 +6,22 @@ use App\Models\BillingSetting;
 use App\Models\DomainAuditLog;
 use App\Models\DomainRegistration;
 use App\Models\User;
+use App\Services\Domains\DemoDomain;
 use App\Services\Domains\DomainProviderFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class DomainSelfService
+/**
+ * Central service for domain operations. It delegates provider-specific work
+ * to TransIpProvider or DemoDomainProvider, but the UI never talks to those
+ * providers directly.
+ */
+class DomainService
 {
     public function syncInfo(DomainRegistration $domain): DomainRegistration
     {
-        $provider = DomainProviderFactory::default();
+        $provider = DomainProviderFactory::forDomain($domain->domain_name);
 
         if (! $provider || ! $provider->isConfigured()) {
             $this->logAudit($domain, action: 'sync_info', status: 'failed', note: 'Provider not configured.');
@@ -36,17 +42,10 @@ class DomainSelfService
             return $domain;
         }
 
-        $before = [
-            'nameservers' => $domain->current_nameservers,
-            'status' => $domain->status,
-            'expires_at' => $domain->expires_at?->toDateString(),
-            'registered_at' => $domain->registered_at?->toDateString(),
-            'registrar_lock' => $domain->registrar_lock,
-            'is_dns_managed_by_servura' => $domain->is_dns_managed_by_servura,
-        ];
+        $before = $this->snapshot($domain);
 
         $nameservers = $info['nameservers'] ?? [];
-        $isManaged = $this->isDnsManagedByServura($nameservers);
+        $isManaged = $this->isDnsManagedByServura($nameservers) || ($info['can_edit_dns'] ?? false);
 
         $domain->update([
             'status' => $this->mapProviderStatus($info['status'] ?? 'active'),
@@ -58,37 +57,30 @@ class DomainSelfService
             'provider_info_synced_at' => now(),
         ]);
 
-        $this->logAudit($domain, action: 'sync_info', status: 'completed', before: $before, after: [
-            'nameservers' => $nameservers,
-            'status' => $domain->status,
-            'expires_at' => $domain->expires_at?->toDateString(),
-            'registered_at' => $domain->registered_at?->toDateString(),
-            'registrar_lock' => $domain->registrar_lock,
-            'is_dns_managed_by_servura' => $domain->is_dns_managed_by_servura,
-        ]);
+        $this->logAudit($domain, action: 'sync_info', status: 'completed', before: $before, after: $this->snapshot($domain));
 
         return $domain;
     }
 
     public function updateNameservers(DomainRegistration $domain, array $nameservers, ?User $user = null): array
     {
-        $provider = DomainProviderFactory::default();
+        $provider = DomainProviderFactory::forDomain($domain->domain_name);
 
         if (! $provider || ! $provider->isConfigured()) {
             return ['success' => false, 'message' => 'Domeinprovider is niet geconfigureerd.'];
         }
 
-        $capabilities = $provider->getTldCapabilities($domain->tld);
-        if (! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETNAMESERVERS, $capabilities['capabilities'] ?? [], true)) {
-            return ['success' => false, 'message' => 'Deze extensie ondersteunt geen nameserverwijzigingen via de API.'];
+        if (! DemoDomain::is($domain->domain_name)) {
+            $capabilities = $provider->getTldCapabilities($domain->tld);
+            if (! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETNAMESERVERS, $capabilities['capabilities'] ?? [], true)) {
+                return ['success' => false, 'message' => 'Deze extensie ondersteunt geen nameserverwijzigingen via de API.'];
+            }
         }
 
-        $before = [
-            'nameservers' => $domain->current_nameservers,
-        ];
+        $before = ['nameservers' => $domain->current_nameservers];
 
         try {
-            DB::transaction(function () use ($domain, $nameservers, $provider, $user) {
+            DB::transaction(function () use ($domain, $nameservers, $provider, $user, $before) {
                 $provider->setNameservers($domain->domain_name, $nameservers);
 
                 $domain->update([
@@ -101,9 +93,9 @@ class DomainSelfService
                     $domain,
                     action: 'nameservers_updated',
                     status: 'completed',
-                    before: ['nameservers' => $before['nameservers']],
+                    before: $before,
                     after: ['nameservers' => $nameservers],
-                    note: 'Nameservers gewijzigd via TransIP.',
+                    note: 'Nameservers gewijzigd via provider.',
                     user: $user
                 );
             });
@@ -123,18 +115,20 @@ class DomainSelfService
 
     public function updateHolderContacts(DomainRegistration $domain, array $contacts, ?User $user = null): array
     {
-        $provider = DomainProviderFactory::default();
+        $provider = DomainProviderFactory::forDomain($domain->domain_name);
 
         if (! $provider || ! $provider->isConfigured()) {
             return ['success' => false, 'message' => 'Domeinprovider is niet geconfigureerd.'];
         }
 
-        $capabilities = $provider->getTldCapabilities($domain->tld);
-        if (! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETCONTACTS, $capabilities['capabilities'] ?? [], true)) {
-            return ['success' => false, 'message' => 'Deze extensie ondersteunt geen contactwijzigingen via de API.'];
+        if (! DemoDomain::is($domain->domain_name)) {
+            $capabilities = $provider->getTldCapabilities($domain->tld);
+            if (! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETCONTACTS, $capabilities['capabilities'] ?? [], true)) {
+                return ['success' => false, 'message' => 'Deze extensie ondersteunt geen contactwijzigingen via de API.'];
+            }
         }
 
-        $before = ['contacts' => $provider->getContacts($domain->domain_name)];
+        $before = ['contacts' => $this->contacts($domain)];
 
         try {
             DB::transaction(function () use ($domain, $contacts, $provider, $user, $before) {
@@ -146,7 +140,7 @@ class DomainSelfService
                     status: 'completed',
                     before: $before,
                     after: ['contacts' => $contacts],
-                    note: 'Houdergegevens gewijzigd via TransIP.',
+                    note: 'Houdergegevens gewijzigd via provider.',
                     user: $user
                 );
             });
@@ -166,7 +160,7 @@ class DomainSelfService
 
     public function getAuthCode(DomainRegistration $domain, ?User $user = null): ?string
     {
-        $provider = DomainProviderFactory::default();
+        $provider = DomainProviderFactory::forDomain($domain->domain_name);
 
         if (! $provider || ! $provider->isConfigured()) {
             return null;
@@ -183,7 +177,7 @@ class DomainSelfService
 
     public function tldCapabilities(DomainRegistration $domain): array
     {
-        $provider = DomainProviderFactory::default();
+        $provider = DomainProviderFactory::forDomain($domain->domain_name);
 
         if (! $provider || ! $provider->isConfigured()) {
             return [];
@@ -192,18 +186,21 @@ class DomainSelfService
         return $provider->getTldCapabilities($domain->tld);
     }
 
-    public function dnsEntries(DomainRegistration $domain): array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function contacts(DomainRegistration $domain): array
     {
-        $provider = DomainProviderFactory::default();
+        $provider = DomainProviderFactory::forDomain($domain->domain_name);
 
         if (! $provider || ! $provider->isConfigured()) {
             return [];
         }
 
         try {
-            return $provider->getDnsEntries($domain->domain_name);
+            return $provider->getContacts($domain->domain_name);
         } catch (Throwable $e) {
-            Log::warning('Domain DNS entries fetch failed', [
+            Log::warning('Domain contacts fetch failed', [
                 'domain_registration_id' => $domain->id,
                 'domain' => $domain->domain_name,
                 'error' => $e->getMessage(),
@@ -211,48 +208,6 @@ class DomainSelfService
 
             return [];
         }
-    }
-
-    public function updateDnsRecords(DomainRegistration $domain, array $records, ?User $user = null): array
-    {
-        $provider = DomainProviderFactory::default();
-
-        if (! $provider || ! $provider->isConfigured()) {
-            return ['success' => false, 'message' => 'Domeinprovider is niet geconfigureerd.'];
-        }
-
-        if (! $this->isDnsManagedByServura($domain->current_nameservers ?? [])) {
-            return ['success' => false, 'message' => 'DNS kan alleen worden beheerd wanneer het domein Servura/TransIP nameservers gebruikt.'];
-        }
-
-        $before = ['dns_entries' => $this->dnsEntries($domain)];
-
-        try {
-            DB::transaction(function () use ($domain, $records, $provider, $user, $before) {
-                $provider->setDnsEntries($domain->domain_name, $records);
-
-                $this->logAudit(
-                    $domain,
-                    action: 'dns_records_updated',
-                    status: 'completed',
-                    before: $before,
-                    after: ['dns_entries' => $this->dnsEntries($domain)],
-                    note: 'DNS-records gewijzigd via TransIP.',
-                    user: $user
-                );
-            });
-        } catch (Throwable $e) {
-            Log::warning('Domain DNS records update failed', [
-                'domain_registration_id' => $domain->id,
-                'domain' => $domain->domain_name,
-                'error' => $e->getMessage(),
-            ]);
-            $this->logAudit($domain, action: 'dns_records_updated', status: 'failed', before: $before, after: ['dns_entries' => $records], note: $e->getMessage(), user: $user);
-
-            return ['success' => false, 'message' => 'DNS-wijziging mislukt: '.$e->getMessage()];
-        }
-
-        return ['success' => true, 'message' => 'DNS-records bijgewerkt.'];
     }
 
     public function logAudit(
@@ -274,6 +229,18 @@ class DomainSelfService
             'ip_address' => request()?->ip(),
             'status' => $status,
         ]);
+    }
+
+    private function snapshot(DomainRegistration $domain): array
+    {
+        return [
+            'nameservers' => $domain->current_nameservers,
+            'status' => $domain->status,
+            'expires_at' => $domain->expires_at?->toDateString(),
+            'registered_at' => $domain->registered_at?->toDateString(),
+            'registrar_lock' => $domain->registrar_lock,
+            'is_dns_managed_by_servura' => $domain->is_dns_managed_by_servura,
+        ];
     }
 
     private function isDnsManagedByServura(array $nameservers): bool
@@ -302,7 +269,6 @@ class DomainSelfService
             $nameservers
         );
 
-        // Consider DNS managed by Servura when all current nameservers are in the configured list.
         return ! empty(array_intersect($current, $configured)) && empty(array_diff($current, $configured));
     }
 

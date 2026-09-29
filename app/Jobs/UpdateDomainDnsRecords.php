@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Models\DomainRegistration;
 use App\Models\User;
-use App\Services\DomainSelfService;
+use App\Services\DomainDnsService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -26,7 +26,7 @@ class UpdateDomainDnsRecords implements ShouldQueue
     ) {
     }
 
-    public function handle(DomainSelfService $service): void
+    public function handle(DomainDnsService $service): void
     {
         $domain = DomainRegistration::find($this->domainRegistrationId);
         if (! $domain) {
@@ -34,7 +34,7 @@ class UpdateDomainDnsRecords implements ShouldQueue
         }
 
         $user = $this->userId ? User::find($this->userId) : null;
-        $result = $service->updateDnsRecords($domain, $this->records, $user);
+        $result = $service->updateRecords($domain, $this->records, $user);
 
         if (! ($result['success'] ?? false)) {
             throw new \RuntimeException($result['message'] ?? 'DNS update failed.');

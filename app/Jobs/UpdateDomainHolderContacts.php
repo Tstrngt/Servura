@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Models\DomainRegistration;
 use App\Models\User;
-use App\Services\DomainSelfService;
+use App\Services\DomainService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -26,7 +26,7 @@ class UpdateDomainHolderContacts implements ShouldQueue
     ) {
     }
 
-    public function handle(DomainSelfService $service): void
+    public function handle(DomainService $service): void
     {
         $domain = DomainRegistration::find($this->domainRegistrationId);
         if (! $domain) {

@@ -141,6 +141,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/domeinen/{domain}/dns', [CustomerDomainController::class, 'updateDns'])->name('domains.dns.update');
         Route::post('/domeinen/{domain}/holder', [CustomerDomainController::class, 'updateHolder'])->name('domains.holder.update');
         Route::post('/domeinen/{domain}/authcode', [CustomerDomainController::class, 'authCode'])->name('domains.authcode');
+        Route::post('/domeinen/{domain}/automatisch-verlengen', [CustomerDomainController::class, 'autoRenew'])->name('domains.auto-renew');
+        Route::post('/domeinen/{domain}/overdragen', [CustomerDomainController::class, 'requestInternalTransfer'])->name('domains.transfer.request');
+        Route::post('/domeinen/{domain}/opzeggen', [CustomerDomainController::class, 'cancel'])->name('domains.cancel');
+        Route::post('/domeinen/{domain}/hosting/koppelen', [CustomerDomainController::class, 'linkHosting'])->name('domains.hosting.link');
+        Route::post('/domeinen/{domain}/hosting/ontkoppelen', [CustomerDomainController::class, 'unlinkHosting'])->name('domains.hosting.unlink');
+        Route::get('/domeinen/overdracht/{token}/accepteren', [CustomerDomainController::class, 'acceptInternalTransfer'])->name('domains.transfer.accept');
 
         // Tickets
         Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
