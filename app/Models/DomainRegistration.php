@@ -45,6 +45,7 @@ class DomainRegistration extends Model
         'user_id',
         'order_id',
         'customer_service_id',
+        'hosted_customer_service_id',
         'type',
         'domain_name',
         'tld',
@@ -59,6 +60,12 @@ class DomainRegistration extends Model
         'external_id',
         'error_message',
         'auth_code',
+        'current_nameservers',
+        'is_dns_managed_by_servura',
+        'registrar_lock',
+        'owner_change_pending',
+        'owner_change_token',
+        'provider_info_synced_at',
     ];
 
     protected $casts = [
@@ -69,6 +76,11 @@ class DomainRegistration extends Model
         'expires_at' => 'date',
         'auto_renew' => 'boolean',
         'auth_code' => 'encrypted',
+        'current_nameservers' => 'array',
+        'is_dns_managed_by_servura' => 'boolean',
+        'registrar_lock' => 'boolean',
+        'owner_change_pending' => 'boolean',
+        'provider_info_synced_at' => 'datetime',
     ];
 
     public function user()
@@ -84,6 +96,21 @@ class DomainRegistration extends Model
     public function customerService()
     {
         return $this->belongsTo(CustomerService::class);
+    }
+
+    public function hostedCustomerService()
+    {
+        return $this->belongsTo(CustomerService::class, 'hosted_customer_service_id');
+    }
+
+    public function auditLogs()
+    {
+        return $this->hasMany(DomainAuditLog::class)->latest();
+    }
+
+    public function redirects()
+    {
+        return $this->hasMany(DomainRedirect::class);
     }
 
     public function getStatusLabelAttribute(): array
