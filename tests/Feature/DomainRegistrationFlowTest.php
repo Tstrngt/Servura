@@ -521,4 +521,52 @@ class DomainRegistrationFlowTest extends TestCase
         $this->assertSame(DomainRegistration::STATUS_TRANSFER_PENDING, $registration->status);
         $this->assertSame('ABC123', $registration->auth_code);
     }
+
+    public function test_domain_registration_is_not_listed_on_customer_services_index(): void
+    {
+        [$domainService] = $this->setupDomainServiceAndTld();
+        [$hostingService, $hostingPrice] = $this->setupHostingService();
+
+        $user = User::factory()->create([
+            'role' => 'customer',
+            'country' => 'NL',
+            'street' => 'Teststraat',
+            'house_number' => '1',
+            'postal_code' => '1234AB',
+            'city' => 'Amsterdam',
+        ]);
+
+        $this->actingAs($user);
+
+        $domainPrice = ServicePrice::where('service_id', $domainService->id)->where('tld', '.nl')->first();
+
+        CustomerService::create([
+            'user_id' => $user->id,
+            'service_id' => $domainService->id,
+            'service_price_id' => $domainPrice->id,
+            'domain' => 'voorbeeld.nl',
+            'status' => 'active',
+            'price' => 9.99,
+            'price_type' => 'jaarlijks',
+            'billing_cycle' => 'yearly',
+            'start_date' => now(),
+        ]);
+
+        CustomerService::create([
+            'user_id' => $user->id,
+            'service_id' => $hostingService->id,
+            'service_price_id' => $hostingPrice->id,
+            'status' => 'active',
+            'price' => 9.95,
+            'price_type' => 'maandelijks',
+            'billing_cycle' => 'monthly',
+            'start_date' => now(),
+        ]);
+
+        $response = $this->get(route('customer.services.index'));
+
+        $response->assertStatus(200);
+        $response->assertSeeText('Hosting Start');
+        $response->assertDontSeeText('Domeinregistratie');
+    }
 }

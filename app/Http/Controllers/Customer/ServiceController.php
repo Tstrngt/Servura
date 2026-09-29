@@ -27,11 +27,11 @@ class ServiceController extends Controller
     {
         $user = Auth::user();
 
-        $activeServices = $user->activeServices()->get();
-        $allServices = $user->allServices()->paginate(10);
+        $activeServices = $user->activeServices()->notDomain()->get();
+        $allServices = $user->allServices()->notDomain()->paginate(10);
 
         $stats = [
-            'total_services' => $user->customerServices()->count(),
+            'total_services' => $user->customerServices()->notDomain()->count(),
             'active_services' => $activeServices->count(),
             'monthly_cost' => $activeServices->where('price_type', 'maandelijks')->sum('price'),
             'yearly_cost' => $activeServices->where('price_type', 'jaarlijks')->sum('price'),
@@ -41,6 +41,7 @@ class ServiceController extends Controller
 
         $expiringSoon = $user->customerServices()
             ->with('service')
+            ->notDomain()
             ->expiringSoon()
             ->get();
 

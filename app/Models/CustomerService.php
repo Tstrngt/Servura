@@ -215,4 +215,10 @@ class CustomerService extends Model
                 });
         });
     }
+
+    // Scope to exclude domain-only registrations (shown under "My domains")
+    public function scopeNotDomain($query)
+    {
+        return $query->whereHas('service', fn ($q) => $q->where('fulfillment_type', '!=', 'domain'));
+    }
 }
