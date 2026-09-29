@@ -136,6 +136,10 @@ Route::middleware('auth')->group(function () {
         // Domeinen
         Route::get('/domeinen', [CustomerDomainController::class, 'index'])->name('domains.index');
         Route::get('/domeinen/{domain}', [CustomerDomainController::class, 'show'])->name('domains.show');
+        Route::post('/domeinen/{domain}/sync', [CustomerDomainController::class, 'sync'])->name('domains.sync');
+        Route::post('/domeinen/{domain}/nameservers', [CustomerDomainController::class, 'updateNameservers'])->name('domains.nameservers.update');
+        Route::post('/domeinen/{domain}/holder', [CustomerDomainController::class, 'updateHolder'])->name('domains.holder.update');
+        Route::post('/domeinen/{domain}/authcode', [CustomerDomainController::class, 'authCode'])->name('domains.authcode');
 
         // Tickets
         Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
