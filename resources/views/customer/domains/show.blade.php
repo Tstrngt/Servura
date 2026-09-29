@@ -6,7 +6,7 @@
 @include('customer.partials.topbar')
 
 <div class="bg-slate-50 min-h-screen pt-28">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24">
         <!-- Page Header -->
         <div class="mb-6">
             <a href="{{ route('customer.domains.index') }}" class="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-800">
@@ -16,9 +16,9 @@
             <h1 class="mt-3 font-heading text-3xl font-bold text-slate-900">{{ $domain->domain_name }}</h1>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- Overview Card (sticky on desktop, top on mobile) -->
-            <div class="order-1 lg:order-2 lg:col-span-1">
+            <div class="order-1 lg:order-2 lg:col-span-4">
                 <div class="self-start lg:sticky lg:top-12 lg:h-fit rounded-2xl bg-slate-900 p-6 sm:p-8 text-white shadow-xl shadow-slate-900/10 ring-1 ring-white/10" x-data="{ settingsOpen: false, modal: null, toast: null }" @keydown.escape.window="settingsOpen = false; modal = null">
             <div class="flex items-start justify-between gap-4 mb-8">
                 <div>
@@ -59,38 +59,38 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-y-6 gap-x-4 sm:grid-cols-3 lg:grid-cols-4">
-                <div>
-                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Provider</p>
-                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['provider'] }}</p>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
+                    <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Provider</span>
+                    <span class="text-sm font-semibold text-white">{{ $overview['provider'] }}</span>
                 </div>
-                <div>
-                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Registratiedatum</p>
-                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['registration_date'] }}</p>
+                <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
+                    <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Registratiedatum</span>
+                    <span class="text-sm font-semibold text-white">{{ $overview['registration_date'] }}</span>
                 </div>
-                <div>
-                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Verloopt</p>
-                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['expiry_date'] }}</p>
+                <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
+                    <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Verloopt</span>
+                    <span class="text-sm font-semibold text-white">{{ $overview['expiry_date'] }}</span>
                 </div>
-                <div>
-                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Automatisch verlengen</p>
-                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['auto_renew'] ? 'Aan' : 'Uit' }}</p>
+                <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
+                    <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Automatisch verlengen</span>
+                    <span class="text-sm font-semibold text-white">{{ $overview['auto_renew'] ? 'Aan' : 'Uit' }}</span>
                 </div>
-                <div>
-                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Registrar lock</p>
-                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['registrar_lock'] ? 'Actief' : 'Niet actief' }}</p>
+                <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
+                    <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Registrar lock</span>
+                    <span class="text-sm font-semibold text-white">{{ $overview['registrar_lock'] ? 'Actief' : 'Niet actief' }}</span>
                 </div>
-                <div>
-                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Hosting</p>
-                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['hosting_package'] }}</p>
+                <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
+                    <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Hosting</span>
+                    <span class="text-sm font-semibold text-white">{{ $overview['hosting_package'] }}</span>
                 </div>
-                <div>
-                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">Nameservers</p>
-                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['nameserver_status'] }}</p>
+                <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
+                    <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Nameservers</span>
+                    <span class="text-sm font-semibold text-white">{{ $overview['nameserver_status'] }}</span>
                 </div>
-                <div>
-                    <p class="text-xs font-medium uppercase tracking-wider text-slate-400">DNS</p>
-                    <p class="mt-1 text-sm font-semibold text-white">{{ $overview['dns_status'] }}</p>
+                <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
+                    <span class="text-xs font-medium uppercase tracking-wider text-slate-400">DNS</span>
+                    <span class="text-sm font-semibold text-white">{{ $overview['dns_status'] }}</span>
                 </div>
             </div>
 
@@ -156,7 +156,7 @@
             </div>
 
             <!-- Accordion sections -->
-            <div class="order-2 lg:order-1 lg:col-span-2 space-y-4">
+            <div class="order-2 lg:order-1 lg:col-span-8 space-y-4">
 
                 <!-- Accordion: Holder -->
                 <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70" x-data="{ open: false, modal: false }">
