@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\SyncDomainInfoFromProvider;
+use App\Jobs\UpdateDomainDnsRecords;
 use App\Jobs\UpdateDomainHolderContacts;
 use App\Jobs\UpdateDomainNameservers;
 use App\Models\DomainRegistration;
@@ -47,10 +48,15 @@ class DomainController extends Controller
             ? $this->fetchContacts($domain)
             : [];
 
+        $dnsManaged = $domain->is_dns_managed_by_servura;
+        $dnsEntries = $dnsManaged ? $service->dnsEntries($domain) : [];
+
         return view('customer.domains.show', compact(
             'domain',
             'tldCapabilities',
             'contacts',
+            'dnsManaged',
+            'dnsEntries',
         ));
     }
 
@@ -107,6 +113,25 @@ class DomainController extends Controller
         UpdateDomainHolderContacts::dispatch($domain->id, $contacts, Auth::id());
 
         return back()->with('info', 'Houderwijziging is ingepland. De status wordt bijgewerkt zodra TransIP de wijziging heeft verwerkt.');
+    }
+
+    public function updateDns(Request $request, DomainRegistration $domain)
+    {
+        $this->authorizeView($domain);
+
+        $validated = $request->validate([
+            'records' => ['required', 'array'],
+            'records.*.name' => ['required', 'string', 'max:255'],
+            'records.*.type' => ['required', 'in:A,AAAA,CNAME,MX,TXT,SRV,CAA,NS'],
+            'records.*.expire' => ['required', 'integer', 'min:60'],
+            'records.*.content' => ['required', 'string', 'max:255'],
+        ]);
+
+        $records = array_values(array_filter($validated['records'], fn ($record) => filled($record['name']) && filled($record['content'])));
+
+        UpdateDomainDnsRecords::dispatch($domain->id, $records, Auth::id());
+
+        return back()->with('info', 'DNS-wijziging is ingepland. De records worden verwerkt via TransIP.');
     }
 
     public function authCode(Request $request, DomainRegistration $domain, DomainSelfService $service)

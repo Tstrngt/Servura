@@ -138,6 +138,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/domeinen/{domain}', [CustomerDomainController::class, 'show'])->name('domains.show');
         Route::post('/domeinen/{domain}/sync', [CustomerDomainController::class, 'sync'])->name('domains.sync');
         Route::post('/domeinen/{domain}/nameservers', [CustomerDomainController::class, 'updateNameservers'])->name('domains.nameservers.update');
+        Route::post('/domeinen/{domain}/dns', [CustomerDomainController::class, 'updateDns'])->name('domains.dns.update');
         Route::post('/domeinen/{domain}/holder', [CustomerDomainController::class, 'updateHolder'])->name('domains.holder.update');
         Route::post('/domeinen/{domain}/authcode', [CustomerDomainController::class, 'authCode'])->name('domains.authcode');
 

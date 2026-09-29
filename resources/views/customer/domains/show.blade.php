@@ -183,12 +183,75 @@
         </div>
 
         <!-- DNS -->
-        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-8">
-            <h2 class="font-heading text-xl font-bold text-slate-900 mb-3">DNS &amp; nameservers</h2>
-            @if($domain->is_dns_managed_by_servura)
-                <p class="text-sm text-slate-500 mb-4">Domein gebruikt Servura-nameservers. DNS-records worden hier in een volgende fase beheerbaar.</p>
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70 mb-8" x-data="{ edit: false }">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="font-heading text-xl font-bold text-slate-900">DNS-records</h2>
+                @if($dnsManaged)
+                    <button type="button" @click="edit = !edit" class="text-sm font-semibold text-primary-600 hover:text-primary-800" x-text="edit ? 'Annuleren' : 'Wijzigen'"></button>
+                @endif
+            </div>
+
+            @if(! $dnsManaged)
+                <p class="text-sm text-slate-500">Dit domein gebruikt externe nameservers. DNS wordt daarom niet via Servura beheerd. Wijzigingen moeten bij de partij worden doorgevoerd die de nameservers beheert.</p>
             @else
-                <p class="text-sm text-slate-500 mb-4">Domein gebruikt externe nameservers. DNS-beheer vindt plaats bij de partij die de nameservers beheert.</p>
+                <div x-show="!edit" class="overflow-x-auto -mx-6 sm:mx-0">
+                    <table class="min-w-full divide-y divide-slate-100">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Naam</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">TTL</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Waarde</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-slate-100">
+                            @forelse($dnsEntries as $entry)
+                                <tr class="text-sm">
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-slate-900">{{ $entry['name'] }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-slate-600">{{ $entry['type'] }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-slate-600">{{ $entry['expire'] }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-slate-900 font-mono">{{ $entry['content'] }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-6 py-8 text-center text-sm text-slate-500">Geen DNS-records gevonden.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <form x-show="edit" x-cloak method="POST" action="{{ route('customer.domains.dns.update', $domain) }}" class="space-y-4">
+                    @csrf
+                    <div class="space-y-3" x-data="{ records: {{ json_encode(array_values($dnsEntries)) }} }">
+                        <template x-for="(record, index) in records" :key="index">
+                            <div class="rounded-xl bg-slate-50 p-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
+                                    <div class="sm:col-span-2"><label class="block text-xs font-medium text-slate-600">Naam</label><input type="text" :name="`records[${index}][name]`" x-model="record.name" class="form-input mt-1" placeholder="@ of www" required></div>
+                                    <div><label class="block text-xs font-medium text-slate-600">Type</label><select :name="`records[${index}][type]`" x-model="record.type" class="form-select mt-1 w-full" required>
+                                        <option value="A">A</option>
+                                        <option value="AAAA">AAAA</option>
+                                        <option value="CNAME">CNAME</option>
+                                        <option value="MX">MX</option>
+                                        <option value="TXT">TXT</option>
+                                        <option value="SRV">SRV</option>
+                                        <option value="CAA">CAA</option>
+                                        <option value="NS">NS</option>
+                                    </select></div>
+                                    <div><label class="block text-xs font-medium text-slate-600">TTL</label><input type="number" :name="`records[${index}][expire]`" x-model="record.expire" class="form-input mt-1" min="60" required></div>
+                                    <div class="sm:col-span-5"><label class="block text-xs font-medium text-slate-600">Waarde</label><input type="text" :name="`records[${index}][content]`" x-model="record.content" class="form-input mt-1" required></div>
+                                </div>
+                                <button type="button" @click="records.splice(index, 1)" class="mt-3 text-xs font-semibold text-rose-600 hover:text-rose-800">Record verwijderen</button>
+                            </div>
+                        </template>
+                        <button type="button" @click="records.push({name:'', type:'A', expire:3600, content:''})" class="text-sm font-semibold text-primary-600 hover:text-primary-800">+ Record toevoegen</button>
+                    </div>
+                    <div class="flex items-center gap-3 pt-2">
+                        <button type="submit" class="btn btn-primary">DNS-records opslaan</button>
+                        <button type="button" @click="edit = false" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
+                    </div>
+                    <p class="text-xs text-slate-500">De volledige set records wordt naar TransIP verstuurd. Na verwerking worden de actuele records opnieuw opgehaald.</p>
+                </form>
             @endif
         </div>
 

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\BillingSetting;
 use App\Models\DomainAuditLog;
 use App\Models\DomainRegistration;
 use App\Models\User;
@@ -191,6 +192,69 @@ class DomainSelfService
         return $provider->getTldCapabilities($domain->tld);
     }
 
+    public function dnsEntries(DomainRegistration $domain): array
+    {
+        $provider = DomainProviderFactory::default();
+
+        if (! $provider || ! $provider->isConfigured()) {
+            return [];
+        }
+
+        try {
+            return $provider->getDnsEntries($domain->domain_name);
+        } catch (Throwable $e) {
+            Log::warning('Domain DNS entries fetch failed', [
+                'domain_registration_id' => $domain->id,
+                'domain' => $domain->domain_name,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
+    }
+
+    public function updateDnsRecords(DomainRegistration $domain, array $records, ?User $user = null): array
+    {
+        $provider = DomainProviderFactory::default();
+
+        if (! $provider || ! $provider->isConfigured()) {
+            return ['success' => false, 'message' => 'Domeinprovider is niet geconfigureerd.'];
+        }
+
+        if (! $this->isDnsManagedByServura($domain->current_nameservers ?? [])) {
+            return ['success' => false, 'message' => 'DNS kan alleen worden beheerd wanneer het domein Servura/TransIP nameservers gebruikt.'];
+        }
+
+        $before = ['dns_entries' => $this->dnsEntries($domain)];
+
+        try {
+            DB::transaction(function () use ($domain, $records, $provider, $user, $before) {
+                $provider->setDnsEntries($domain->domain_name, $records);
+
+                $this->logAudit(
+                    $domain,
+                    action: 'dns_records_updated',
+                    status: 'completed',
+                    before: $before,
+                    after: ['dns_entries' => $this->dnsEntries($domain)],
+                    note: 'DNS-records gewijzigd via TransIP.',
+                    user: $user
+                );
+            });
+        } catch (Throwable $e) {
+            Log::warning('Domain DNS records update failed', [
+                'domain_registration_id' => $domain->id,
+                'domain' => $domain->domain_name,
+                'error' => $e->getMessage(),
+            ]);
+            $this->logAudit($domain, action: 'dns_records_updated', status: 'failed', before: $before, after: ['dns_entries' => $records], note: $e->getMessage(), user: $user);
+
+            return ['success' => false, 'message' => 'DNS-wijziging mislukt: '.$e->getMessage()];
+        }
+
+        return ['success' => true, 'message' => 'DNS-records bijgewerkt.'];
+    }
+
     public function logAudit(
         DomainRegistration $domain,
         string $action,
@@ -214,8 +278,32 @@ class DomainSelfService
 
     private function isDnsManagedByServura(array $nameservers): bool
     {
-        // TODO: compare against the configured Servura/TransIP nameserver hostnames.
-        return false;
+        if (empty($nameservers)) {
+            return false;
+        }
+
+        try {
+            $raw = BillingSetting::valueFor('transip_default_nameservers', '');
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        $configured = array_map(
+            fn ($host) => mb_strtolower(trim($host)),
+            array_filter(preg_split('/[\r\n,]+/', $raw))
+        );
+
+        if (empty($configured)) {
+            return false;
+        }
+
+        $current = array_map(
+            fn ($ns) => mb_strtolower(trim($ns['hostname'] ?? '')),
+            $nameservers
+        );
+
+        // Consider DNS managed by Servura when all current nameservers are in the configured list.
+        return ! empty(array_intersect($current, $configured)) && empty(array_diff($current, $configured));
     }
 
     private function mapProviderStatus(string $status): string
