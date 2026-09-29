@@ -67,8 +67,8 @@
                         </a>
                     @endforeach
                 </div>
-                <div class="-mx-6 hidden overflow-x-auto sm:mx-0 sm:block sm:rounded-b-2xl">
-                    <table class="w-full table-fixed min-w-[640px] divide-y divide-slate-100">
+                <div class="-mx-6 hidden sm:mx-0 sm:block sm:rounded-b-2xl">
+                    <table class="w-full table-fixed min-w-full divide-y divide-slate-100">
                         <thead class="bg-slate-50">
                             <tr>
                                 <th class="w-[28%] px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Domein</th>
