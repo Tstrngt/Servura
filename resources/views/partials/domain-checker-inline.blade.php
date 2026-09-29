@@ -60,7 +60,7 @@
                                           :class="item.available ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'"
                                           x-text="item.available ? 'Beschikbaar' : 'Bezet'">
                                     </span>
-                                    <a x-show="item.available && item.checkout_url" :href="item.checkout_url" class="inline-flex items-center justify-center rounded-full bg-primary-600 px-2 py-1 text-[9px] font-semibold leading-none text-white shadow-sm transition-[background-color,transform] duration-150 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:scale-[0.97]">
+                                    <a x-show="item.available && item.checkout_url" :href="item.checkout_url" class="inline-flex items-center justify-center rounded-full bg-primary-600 px-2.5 py-1.5 text-[10px] font-semibold leading-none text-white shadow-sm transition-[background-color,transform] duration-150 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:scale-[0.97]">
                                         Bestel
                                     </a>
                                 </div>
