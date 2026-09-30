@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
             ServicesSeeder::class,
             PortfolioSeeder::class,
             UsersSeeder::class,
+            RolesAndPermissionsSeeder::class,
+            LegalDocumentSeeder::class,
             TicketsSeeder::class,
         ]);
     }

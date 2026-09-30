@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\CustomerService;
 use App\Models\DomainRegistration;
 use App\Models\DomainTld;
+use App\Models\LegalAcceptance;
+use App\Models\LegalDocument;
 use App\Models\Order;
 use App\Models\OrderLine;
 use App\Models\Service;
@@ -243,9 +245,9 @@ class CheckoutController extends Controller
                 'total' => $tax['total'],
                 'status' => 'pending_payment',
                 'terms_accepted_at' => now(),
-                'terms_version' => config('legal.versions.terms.version'),
+                'terms_version' => $this->currentLegalVersion('terms') ?? config('legal.versions.terms.version'),
                 'hosting_terms_version' => $this->requiresHostingTerms($customerServices)
-                    ? config('legal.versions.hosting_terms.version')
+                    ? ($this->currentLegalVersion('hosting_terms') ?? config('legal.versions.hosting_terms.version'))
                     : null,
             ]);
 
@@ -261,6 +263,11 @@ class CheckoutController extends Controller
                     'total' => $customerService->price,
                     'sort_order' => $i,
                 ]);
+            }
+
+            $this->recordLegalAcceptance($order, 'terms');
+            if ($this->requiresHostingTerms($customerServices)) {
+                $this->recordLegalAcceptance($order, 'hosting_terms');
             }
 
             return [$order, $user, $isNewUser];
@@ -623,6 +630,27 @@ class CheckoutController extends Controller
         $domainTld = DomainTld::where('extension', '.'.$tld)->first();
 
         return $domainTld ? (float) $domainTld->renewal_price : null;
+    }
+
+    private function currentLegalVersion(string $slug): ?string
+    {
+        return LegalDocument::published()->slug($slug)->value('version');
+    }
+
+    private function recordLegalAcceptance(Order $order, string $slug): void
+    {
+        $document = LegalDocument::published()->slug($slug)->first();
+
+        if (! $document) {
+            return;
+        }
+
+        LegalAcceptance::create([
+            'order_id' => $order->id,
+            'legal_document_id' => $document->id,
+            'version' => $document->version,
+            'accepted_at' => now(),
+        ]);
     }
 
     private function requiresHostingTerms(array $customerServices): bool

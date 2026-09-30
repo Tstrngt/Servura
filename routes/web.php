@@ -301,6 +301,11 @@ Route::middleware('auth')->group(function () {
             Route::put('/offerteformulier', [SettingController::class, 'updateFormbuilder'])->name('formbuilder.update');
             Route::get('/juridisch', [SettingController::class, 'legal'])->name('legal');
             Route::put('/juridisch', [SettingController::class, 'updateLegal'])->name('legal.update');
+            Route::get('/juridische-documenten', [\App\Http\Controllers\Admin\LegalDocumentController::class, 'index'])->name('legal-documents.index');
+            Route::get('/juridische-documenten/{document}/bewerken', [\App\Http\Controllers\Admin\LegalDocumentController::class, 'edit'])->name('legal-documents.edit');
+            Route::post('/juridische-documenten/{document}', [\App\Http\Controllers\Admin\LegalDocumentController::class, 'update'])->name('legal-documents.update');
+            Route::post('/juridische-documenten/{document}/voorbeeld', [\App\Http\Controllers\Admin\LegalDocumentController::class, 'preview'])->name('legal-documents.preview');
+            Route::post('/juridische-documenten/{document}/publiceren', [\App\Http\Controllers\Admin\LegalDocumentController::class, 'publish'])->name('legal-documents.publish');
             Route::get('/beveiliging', [SettingController::class, 'security'])->name('security');
             Route::put('/beveiliging', [SettingController::class, 'updateSecurity'])->name('security.update');
             Route::get('/integraties', [SettingController::class, 'integrations'])->name('integrations');
@@ -315,7 +320,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/klanten-resetten', [SettingController::class, 'resetCustomers'])->name('reset-customers');
             Route::get('/medewerkers', [StaffController::class, 'index'])->name('staff');
             Route::post('/medewerkers', [StaffController::class, 'store'])->name('staff.store');
-            Route::put('/medewerkers/{staff}', [StaffController::class, 'update'])->name('staff.update');
+            Route::post('/medewerkers/{staff}', [StaffController::class, 'update'])->name('staff.update');
             Route::delete('/medewerkers/{staff}', [StaffController::class, 'destroy'])->name('staff.destroy');
         });
     });

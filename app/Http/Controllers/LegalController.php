@@ -3,39 +3,51 @@
 namespace App\Http\Controllers;
 
 use App\Models\AbuseReport;
+use App\Models\LegalDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class LegalController extends Controller
 {
+    private function showDocument(string $slug, string $fallbackView)
+    {
+        $document = LegalDocument::published()->slug($slug)->first();
+
+        if ($document && filled($document->content)) {
+            return view('legal.show', compact('document'));
+        }
+
+        return view($fallbackView, ['document' => $document]);
+    }
+
     public function terms()
     {
-        return view('legal.terms');
+        return $this->showDocument('terms', 'legal.terms');
     }
 
     public function privacy()
     {
-        return view('legal.privacy');
+        return $this->showDocument('privacy', 'legal.privacy');
     }
 
     public function cookies()
     {
-        return view('legal.cookies');
+        return $this->showDocument('cookies', 'legal.cookies');
     }
 
     public function hosting()
     {
-        return view('legal.hosting');
+        return $this->showDocument('hosting_terms', 'legal.hosting');
     }
 
     public function acceptableUse()
     {
-        return view('legal.acceptable-use');
+        return $this->showDocument('acceptable_use', 'legal.acceptable-use');
     }
 
     public function dpa()
     {
-        return view('legal.dpa');
+        return $this->showDocument('dpa', 'legal.dpa');
     }
 
     public function abuse()

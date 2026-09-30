@@ -64,4 +64,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderLine::class)->orderBy('sort_order');
     }
+
+    public function legalAcceptances()
+    {
+        return $this->hasMany(LegalAcceptance::class);
+    }
 }
