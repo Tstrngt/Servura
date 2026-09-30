@@ -22,7 +22,44 @@
     </div>
 
     <div class="mx-auto mt-8 grid w-full max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:px-8"
-         x-data="{ country: @js($initialCountry), rates: @js($countryRates), rate() { return Number(this.rates[this.country] ?? 0) }, submitting: false }">
+         x-data="{
+             country: @js($initialCountry),
+             rates: @js($countryRates),
+             rate() { return Number(this.rates[this.country] ?? 0) },
+             submitting: false,
+             cardError: '',
+             selectedMethod: @js(old('mollie_method', $paymentMethods[0]['id'] ?? 'ideal')),
+             profileId: @js($mollieProfileId),
+             async submitCheckout(e) {
+                 this.cardError = '';
+                 if (this.selectedMethod !== 'creditcard' || ! this.profileId) {
+                     this.submitting = true;
+                     return;
+                 }
+                 e.preventDefault();
+                 if (! window.mollie) {
+                     this.cardError = 'Creditcard-betaling kan nu niet worden gestart. Probeer het opnieuw of kies een andere betaalmethode.';
+                     return;
+                 }
+                 try {
+                     const { token, error } = await window.mollie.createToken();
+                     if (error || ! token) {
+                         this.cardError = error?.message || 'Controleer de creditcard-gegevens.';
+                         return;
+                     }
+                     const form = this.$refs.checkoutForm;
+                     const input = document.createElement('input');
+                     input.type = 'hidden';
+                     input.name = 'card_token';
+                     input.value = token;
+                     form.appendChild(input);
+                     this.submitting = true;
+                     form.submit();
+                 } catch (err) {
+                     this.cardError = 'Er ging iets mis bij het verwerken van de creditcard-gegevens.';
+                 }
+             }
+         }">
 
         <div class="space-y-8">
             @include('checkout.partials.cart-items')
@@ -35,7 +72,7 @@
                 @include('checkout.partials.domain-choice')
             @endif
 
-            <form id="checkout-form" action="{{ route('checkout.store', $service) }}" method="POST" data-turbo="false" @submit="submitting = true">
+            <form id="checkout-form" x-ref="checkoutForm" action="{{ route('checkout.store', $service) }}" method="POST" data-turbo="false" @submit="submitCheckout($event)">
                 @csrf
                 <section class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
                     <h2 class="text-lg font-semibold text-slate-900">Factuurgegevens</h2>
@@ -112,6 +149,8 @@
                 </dl>
 
                 @include('checkout.partials.payment-methods')
+
+                @include('checkout.partials.creditcard-components')
 
                 <fieldset class="mt-5 space-y-2">
                     <legend class="mb-2 text-sm font-semibold text-white">Betaling bij verlenging</legend>

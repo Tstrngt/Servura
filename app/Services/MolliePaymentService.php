@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\BillingSetting;
 use App\Models\CustomerService;
 use App\Models\DomainRegistration;
 use App\Models\Invoice;
@@ -26,7 +27,7 @@ class MolliePaymentService
     /**
      * Create a Mollie payment for an invoice.
      */
-    public function createPayment(Invoice $invoice, ?string $method = null, bool $establishMandate = false): string
+    public function createPayment(Invoice $invoice, ?string $method = null, bool $establishMandate = false, ?string $cardToken = null): string
     {
         $payload = [
             'amount' => [
@@ -44,6 +45,10 @@ class MolliePaymentService
 
         if ($method) {
             $payload['method'] = $method;
+        }
+
+        if ($cardToken && $method === 'creditcard') {
+            $payload['cardToken'] = $cardToken;
         }
 
         if ($establishMandate) {
@@ -69,7 +74,63 @@ class MolliePaymentService
             'performed_by' => $invoice->user_id,
         ]);
 
-        return $payment->getCheckoutUrl();
+        return $this->resolvePaymentUrl($payment, $invoice);
+    }
+
+    /**
+     * Return the correct next step per payment method.
+     * - Redirect methods: use Mollie's checkout URL (bank/app specific, no method selector).
+     * - Bank transfer: show payment details inline in Servura.
+     * - Credit card without redirect: return the Servura return route.
+     */
+    private function resolvePaymentUrl(object $payment, Invoice $invoice): string
+    {
+        $checkoutUrl = $payment->getCheckoutUrl();
+        if ($checkoutUrl) {
+            return $checkoutUrl;
+        }
+
+        if ($payment->method === 'banktransfer') {
+            return route('payment.bank-transfer', ['paymentId' => $payment->id]);
+        }
+
+        return route('customer.invoices.payment.return', $invoice);
+    }
+
+    /**
+     * Retrieve a payment from Mollie by its transaction id.
+     */
+    public function fetchPayment(string $paymentId): object
+    {
+        return Mollie::api()->payments->get($paymentId);
+    }
+
+    /**
+     * Determine the Mollie profile ID to use for Mollie Components.
+     */
+    public function profileId(): ?string
+    {
+        try {
+            return cache()->remember('mollie_profile_id', now()->addHour(), function () {
+                $profile = Mollie::api()->profiles->getCurrent();
+
+                return $profile->id ?? null;
+            });
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return null;
+        }
+    }
+
+    /**
+     * Whether Components should run in test mode based on the configured key.
+     */
+    public function isTestMode(): bool
+    {
+        $key = BillingSetting::encryptedValueFor('mollie_key') ?? '';
+
+        return str_starts_with($key, 'test_');
     }
 
     /**

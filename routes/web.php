@@ -334,3 +334,8 @@ Route::post('/abuse', [LegalController::class, 'storeAbuse'])->middleware('throt
 
 // Mollie webhook (no auth, POST only)
 Route::post('/mollie/webhook', MollieWebhookController::class)->name('mollie.webhook');
+
+// Inline bank transfer instructions
+Route::get('/betaling/bankoverschrijving/{paymentId}', [App\Http\Controllers\PaymentController::class, 'bankTransfer'])
+    ->middleware(['auth', 'customer'])
+    ->name('payment.bank-transfer');

@@ -55,8 +55,10 @@ class CheckoutController extends Controller
             ->get();
 
         $paymentMethods = $molliePaymentService->availableMethods((float) $resolved['subtotal']);
+        $mollieProfileId = $molliePaymentService->profileId();
+        $mollieTestMode = $molliePaymentService->isTestMode();
 
-        return view('checkout', compact('service', 'countries', 'countryRates', 'cart', 'resolved', 'hostingServices', 'paymentMethods'));
+        return view('checkout', compact('service', 'countries', 'countryRates', 'cart', 'resolved', 'hostingServices', 'paymentMethods', 'mollieProfileId', 'mollieTestMode'));
     }
 
     public function addHosting(Request $request)
@@ -148,6 +150,7 @@ class CheckoutController extends Controller
         $paymentMethods = $molliePaymentService->availableMethods((float) $resolved['subtotal']);
         $request->validate([
             'mollie_method' => ['required', 'string', Rule::in(collect($paymentMethods)->pluck('id')->all())],
+            'card_token' => ['nullable', 'string'],
         ]);
 
         $validated = $request->all();
@@ -282,7 +285,8 @@ class CheckoutController extends Controller
             return redirect($molliePaymentService->createPayment(
                 $order->invoice,
                 $request->input('mollie_method'),
-                $establishMandate
+                $establishMandate,
+                $request->input('card_token')
             ));
         } catch (\Throwable $exception) {
             report($exception);
