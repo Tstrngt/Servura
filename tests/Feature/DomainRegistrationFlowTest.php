@@ -108,6 +108,7 @@ class DomainRegistrationFlowTest extends TestCase
                 'city' => 'Amsterdam',
                 'country' => 'NL',
                 'payment_method' => 'payment_link',
+                'mollie_method' => 'ideal',
                 'terms' => '1',
             ]);
 
@@ -397,6 +398,7 @@ class DomainRegistrationFlowTest extends TestCase
                 'city' => 'Amsterdam',
                 'country' => 'NL',
                 'payment_method' => 'payment_link',
+                'mollie_method' => 'ideal',
                 'terms' => '1',
             ]);
 
@@ -438,6 +440,7 @@ class DomainRegistrationFlowTest extends TestCase
                 'city' => 'Amsterdam',
                 'country' => 'NL',
                 'payment_method' => 'payment_link',
+                'mollie_method' => 'ideal',
                 'terms' => '1',
             ]);
 
@@ -504,6 +507,7 @@ class DomainRegistrationFlowTest extends TestCase
                 'city' => 'Amsterdam',
                 'country' => 'NL',
                 'payment_method' => 'payment_link',
+                'mollie_method' => 'ideal',
                 'terms' => '1',
             ]);
 

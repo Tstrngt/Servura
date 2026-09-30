@@ -32,7 +32,7 @@ class CheckoutController extends Controller
             ->with('success', 'Log in om verder te gaan met uw bestelling.');
     }
 
-    public function show(Service $service, TaxService $taxService, Request $request)
+    public function show(Service $service, TaxService $taxService, Request $request, MolliePaymentService $molliePaymentService)
     {
         abort_unless($service->is_active, 404);
         abort_if(Auth::check() && Auth::user()->canAccessAdmin(), 403);
@@ -54,7 +54,9 @@ class CheckoutController extends Controller
             ->ordered()
             ->get();
 
-        return view('checkout', compact('service', 'countries', 'countryRates', 'cart', 'resolved', 'hostingServices'));
+        $paymentMethods = $molliePaymentService->availableMethods((float) $resolved['subtotal']);
+
+        return view('checkout', compact('service', 'countries', 'countryRates', 'cart', 'resolved', 'hostingServices', 'paymentMethods'));
     }
 
     public function addHosting(Request $request)
@@ -142,6 +144,11 @@ class CheckoutController extends Controller
         if (! empty($resolved['errors'])) {
             throw ValidationException::withMessages($resolved['errors']);
         }
+
+        $paymentMethods = $molliePaymentService->availableMethods((float) $resolved['subtotal']);
+        $request->validate([
+            'mollie_method' => ['required', 'string', Rule::in(collect($paymentMethods)->pluck('id')->all())],
+        ]);
 
         $validated = $request->all();
         $tax = $taxService->calculate((float) $resolved['subtotal'], $request->input('country'));
@@ -272,7 +279,11 @@ class CheckoutController extends Controller
         $establishMandate = $request->input('payment_method') === 'auto_debit' && ($order->billing_cycle ?? null) !== 'one_time';
 
         try {
-            return redirect($molliePaymentService->createPayment($order->invoice, $establishMandate));
+            return redirect($molliePaymentService->createPayment(
+                $order->invoice,
+                $request->input('mollie_method'),
+                $establishMandate
+            ));
         } catch (\Throwable $exception) {
             report($exception);
 

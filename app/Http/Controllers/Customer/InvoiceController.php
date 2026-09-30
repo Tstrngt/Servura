@@ -95,12 +95,12 @@ class InvoiceController extends Controller
 
         $invoice->refresh();
 
-        if ($invoice->status === 'betaald') {
-            return redirect()->route('customer.invoices.show', $invoice)
-                ->with('success', 'Betaling succesvol ontvangen!');
-        }
+        $status = match (true) {
+            $invoice->status === 'betaald' => 'success',
+            in_array($invoice->status, ['verzonden', 'openstaand', 'in_behandeling'], true) => 'processing',
+            default => 'failed',
+        };
 
-        return redirect()->route('customer.invoices.show', $invoice)
-            ->with('info', 'Uw betaling wordt verwerkt. Dit kan enkele minuten duren.');
+        return view('payment.return', compact('invoice', 'status'));
     }
 }

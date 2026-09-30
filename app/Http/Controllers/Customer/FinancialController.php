@@ -76,12 +76,12 @@ class FinancialController extends Controller
         abort_unless($paymentBatch->user_id === Auth::id(), 403);
         $paymentBatch->refresh();
 
-        if ($paymentBatch->status === 'paid') {
-            return redirect()->route('customer.financial.index', ['tab' => 'paid'])
-                ->with('success', 'De geselecteerde facturen zijn betaald.');
-        }
+        $status = match (true) {
+            $paymentBatch->status === 'paid' => 'success',
+            in_array($paymentBatch->status, ['pending', 'processing'], true) => 'processing',
+            default => 'failed',
+        };
 
-        return redirect()->route('customer.financial.index')
-            ->with('info', 'De betaling wordt verwerkt. Dit kan enkele minuten duren.');
+        return view('payment.return', compact('paymentBatch', 'status'));
     }
 }

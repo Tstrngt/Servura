@@ -26,7 +26,7 @@ class MolliePaymentService
     /**
      * Create a Mollie payment for an invoice.
      */
-    public function createPayment(Invoice $invoice, bool $establishMandate = false): string
+    public function createPayment(Invoice $invoice, ?string $method = null, bool $establishMandate = false): string
     {
         $payload = [
             'amount' => [
@@ -41,6 +41,10 @@ class MolliePaymentService
                 'invoice_number' => $invoice->invoice_number,
             ],
         ];
+
+        if ($method) {
+            $payload['method'] = $method;
+        }
 
         if ($establishMandate) {
             $payload['customerId'] = $this->ensureCustomer($invoice->user);
@@ -61,11 +65,67 @@ class MolliePaymentService
             'loggable_id' => $invoice->id,
             'action' => 'betaling_gestart',
             'description' => "Mollie betaling gestart voor factuur {$invoice->invoice_number}",
-            'metadata' => ['mollie_payment_id' => $payment->id],
+            'metadata' => ['mollie_payment_id' => $payment->id, 'method' => $method],
             'performed_by' => $invoice->user_id,
         ]);
 
         return $payment->getCheckoutUrl();
+    }
+
+    /**
+     * Fetch active payment methods from Mollie for the given amount.
+     * Falls back to a default set when the API is unavailable.
+     */
+    public function availableMethods(?float $amount = null, ?string $currency = 'EUR'): array
+    {
+        try {
+            $filters = [];
+            if ($amount !== null) {
+                $filters['amount'] = [
+                    'currency' => $currency,
+                    'value' => number_format($amount, 2, '.', ''),
+                ];
+            }
+
+            $methods = Mollie::api()->methods->allActive($filters);
+
+            return collect($methods)
+                ->map(fn ($method) => [
+                    'id' => $method->id,
+                    'name' => $method->description ?: $this->methodLabel($method->id),
+                    'image' => $method->image->svg ?? $method->image->size1x ?? null,
+                ])
+                ->values()
+                ->all();
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return $this->fallbackMethods();
+        }
+    }
+
+    private function fallbackMethods(): array
+    {
+        return [
+            ['id' => 'ideal', 'name' => $this->methodLabel('ideal'), 'image' => null],
+            ['id' => 'creditcard', 'name' => $this->methodLabel('creditcard'), 'image' => null],
+            ['id' => 'paypal', 'name' => $this->methodLabel('paypal'), 'image' => null],
+            ['id' => 'bancontact', 'name' => $this->methodLabel('bancontact'), 'image' => null],
+        ];
+    }
+
+    public function methodLabel(string $id): string
+    {
+        return match ($id) {
+            'ideal' => 'iDEAL',
+            'creditcard' => 'Creditcard',
+            'paypal' => 'PayPal',
+            'bancontact' => 'Bancontact',
+            'sofort' => 'SOFORT',
+            'banktransfer' => 'Bankoverschrijving',
+            'directdebit' => 'Automatische incasso',
+            default => ucfirst($id),
+        };
     }
 
     public function createBatchPayment(User $user, array $invoiceIds): PaymentBatch
@@ -309,7 +369,7 @@ class MolliePaymentService
                 'invoice_id' => $invoice->id,
                 'amount' => $invoice->total,
                 'type' => 'inkomst',
-                'payment_method' => 'ideal',
+                'payment_method' => $payment->method ?? 'mollie',
                 'status' => 'voltooid',
                 'description' => "Betaling factuur {$invoice->invoice_number}",
                 'transaction_date' => now(),
@@ -427,7 +487,7 @@ class MolliePaymentService
                             'invoice_id' => $invoice->id,
                             'amount' => $item->amount,
                             'type' => 'inkomst',
-                            'payment_method' => 'ideal',
+                            'payment_method' => $payment->method ?? 'mollie',
                             'status' => 'voltooid',
                             'description' => "Batchbetaling factuur {$invoice->invoice_number}",
                             'transaction_date' => now(),

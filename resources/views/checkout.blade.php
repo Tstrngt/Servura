@@ -111,6 +111,8 @@
                     <div class="flex items-end justify-between gap-4 pt-2"><dt class="font-semibold">Totaal</dt><dd class="text-2xl font-bold" x-text="'€ ' + Number({{ (float) $resolved['subtotal'] }} * (1 + rate() / 100)).toLocaleString('nl-NL', {minimumFractionDigits: 2})"></dd></div>
                 </dl>
 
+                @include('checkout.partials.payment-methods')
+
                 <fieldset class="mt-5 space-y-2">
                     <legend class="mb-2 text-sm font-semibold text-white">Betaling bij verlenging</legend>
                     <label class="flex cursor-pointer items-start gap-3 rounded-lg bg-white/5 p-3 text-sm text-slate-300 ring-1 ring-white/10"><input type="radio" name="payment_method" value="auto_debit" form="checkout-form" {{ old('payment_method', 'auto_debit') === 'auto_debit' ? 'checked' : '' }} class="mt-1 border-slate-500 bg-slate-800 text-primary-500"><span><strong class="block text-white">Automatische incasso</strong>Na de eerste betaling verlopen toekomstige verlengingen automatisch.</span></label>
