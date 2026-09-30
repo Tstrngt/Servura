@@ -13,121 +13,157 @@
 @endsection
 
 @section('legal-content')
-    <p><em>Let op: dit is een concepttekst en nog niet juridisch gecontroleerd.</em></p>
+    <p><em>Let op: vul alle placeholder-gegevens aan met de werkelijke bedrijfsgegevens en bewaartermijnen voordat u deze pagina publiceert.</em></p>
 
-    <h2>1. Wie is Servura?</h2>
+    <h2>1. Wie is verantwoordelijk?</h2>
+    <p>Servura is verantwoordelijk voor de verwerking van persoonsgegevens zoals beschreven in deze privacyverklaring.</p>
     <p>
-        {{ config('company.legal_name', '[Juridische bedrijfsnaam nog in te vullen]') }}, handelend onder de naam {{ config('company.trade_name', 'Servura') }},
-        gevestigd te {{ config('company.city', '[Plaats]') }}.
+        {{ config('company.legal_name', '[volledige handelsnaam/rechtsvorm]') }}<br>
+        {{ config('company.address', '[adres]') }}<br>
+        {{ config('company.postal_code', '[postcode]') }} {{ config('company.city', '[vestigingsplaats]') }}<br>
+        KvK: {{ config('company.kvk_number', '[KvK-nummer]') }}<br>
+        E-mail: {{ config('company.email', '[privacy e-mailadres]') }}<br>
+        Website: <a href="https://servura.nl" target="_blank" rel="noopener noreferrer">https://servura.nl</a>
     </p>
-    <ul>
-        <li>Adres: {{ config('company.address', '[Adres]') }}, {{ config('company.postal_code', '[Postcode]') }} {{ config('company.city', '[Plaats]') }}</li>
-        <li>KvK-nummer: {{ config('company.kvk_number', '[KvK-nummer]') }}</li>
-        <li>Btw-identificatienummer: {{ config('company.vat_number', '[Btw-nummer]') }}</li>
-        <li>E-mail: {{ config('company.email', '[E-mail]') }}</li>
-        <li>Privacycontact: {{ config('company.privacy_email', config('company.email', '[E-mail]')) }}</li>
-    </ul>
 
     <h2>2. Welke persoonsgegevens verwerken wij?</h2>
-    <p>Afhankelijk van de dienst kunnen wij de volgende gegevens verwerken:</p>
+    <p>Afhankelijk van uw relatie met Servura kunnen wij onder meer verwerken:</p>
     <ul>
-        <li>Naam en contactgegevens (e-mailadres, telefoonnummer);</li>
-        <li>Bedrijfsgegevens en functie;</li>
-        <li>Adresgegevens voor facturering;</li>
-        <li>Gegevens over gebruik van onze website en diensten;</li>
-        <li>Accountgegevens voor het klantportaal;</li>
-        <li>Technische gegevens zoals IP-adres, browser en apparaatinformatie (logbestanden);</li>
-        <li>Betaalgegevens via onze betaalprovider.</li>
+        <li>naam;</li>
+        <li>bedrijfsnaam;</li>
+        <li>adresgegevens;</li>
+        <li>e-mailadres;</li>
+        <li>telefoonnummer;</li>
+        <li>factuurgegevens;</li>
+        <li>KvK- en btw-gegevens;</li>
+        <li>inhoud van correspondentie;</li>
+        <li>offerte- en contractgegevens;</li>
+        <li>betaalinformatie;</li>
+        <li>accountgegevens;</li>
+        <li>technische logs;</li>
+        <li>IP-adressen;</li>
+        <li>beveiligingsinformatie;</li>
+        <li>supportverzoeken;</li>
+        <li>gegevens die u zelf via formulieren of andere communicatie verstrekt.</li>
+    </ul>
+    <p>Wij verwerken niet méér persoonsgegevens dan redelijkerwijs nodig is voor het betreffende doel.</p>
+
+    <h2>3. Waarom verwerken wij persoonsgegevens?</h2>
+
+    <h3>Contact en communicatie</h3>
+    <p>Wij verwerken contactgegevens en correspondentie om vragen te beantwoorden en contact met u te onderhouden.</p>
+    <p><strong>Grondslag:</strong> gerechtvaardigd belang of, wanneer de communicatie betrekking heeft op het aangaan of uitvoeren van een overeenkomst, noodzakelijkheid voor de overeenkomst.</p>
+
+    <h3>Offertes en overeenkomsten</h3>
+    <p>Wij verwerken gegevens om offertes op te stellen, afspraken te maken en overeenkomsten uit te voeren.</p>
+    <p><strong>Grondslag:</strong> noodzakelijk voor het aangaan of uitvoeren van een overeenkomst.</p>
+
+    <h3>Facturatie en administratie</h3>
+    <p>Wij verwerken gegevens om facturen op te stellen, betalingen te administreren en aan fiscale en administratieve verplichtingen te voldoen.</p>
+    <p><strong>Grondslag:</strong> uitvoering van de overeenkomst en wettelijke verplichting.</p>
+
+    <h3>Hosting, beheer en beveiliging</h3>
+    <p>Wij kunnen technische gegevens, logs en IP-adressen verwerken voor beveiliging, fraudepreventie, storingsonderzoek en bescherming van onze systemen.</p>
+    <p><strong>Grondslag:</strong> gerechtvaardigd belang bij veilige en betrouwbare dienstverlening en, waar van toepassing, uitvoering van de overeenkomst.</p>
+
+    <h3>Wettelijke verplichtingen</h3>
+    <p>Wanneer wij wettelijk verplicht zijn gegevens te verstrekken of te bewaren, verwerken wij deze op grond van de betreffende wettelijke verplichting.</p>
+
+    <h3>Marketing</h3>
+    <p>Wij gebruiken persoonsgegevens voor direct marketing alleen wanneer daarvoor een geldige rechtsgrond bestaat. Waar toestemming is vereist, vragen wij die vooraf.</p>
+    <p>U kunt zich altijd afmelden voor elektronische marketing waarvoor een afmeldmogelijkheid moet worden aangeboden.</p>
+
+    <h2>4. Persoonsgegevens die wij namens klanten verwerken</h2>
+    <ul>
+        <li>Bij hosting, beheer en ontwikkeling kunnen wij persoonsgegevens verwerken die door een klant in diens website, applicatie of systeem zijn opgeslagen.</li>
+        <li>In die situatie kan de klant verwerkingsverantwoordelijke zijn en Servura verwerker.</li>
+        <li>Op die verwerking is de <a href="{{ route('legal.dpa') }}">Verwerkersovereenkomst</a> van Servura of een afzonderlijk overeengekomen verwerkersovereenkomst van toepassing.</li>
     </ul>
 
-    <h2>3. Waarvoor verwerken wij persoonsgegevens?</h2>
+    <h2>5. Bewaartermijnen</h2>
+    <p>Wij bewaren persoonsgegevens niet langer dan noodzakelijk voor het doel waarvoor zij zijn verzameld, tenzij een wettelijke bewaarplicht een langere termijn vereist.</p>
+    <p>Wij hanteren in beginsel:</p>
     <ul>
-        <li>Het uitvoeren van overeenkomsten (offertes, projecten, hosting);</li>
-        <li>Facturering en betaling;</li>
-        <li>Klantcommunicatie en support;</li>
-        <li>Beheer van het klantportaal;</li>
-        <li>Verbetering van onze website en diensten;</li>
-        <li>Naleving van wettelijke verplichtingen.</li>
+        <li>Contactaanvragen: maximaal 6 maanden na afronding van het contact, tenzij de gegevens nodig blijven voor een overeenkomst, geschil of andere gerechtvaardigde reden.</li>
+        <li>Niet-geaccepteerde offertes: maximaal 2 jaar nadat duidelijk is geworden dat de offerte niet wordt geaccepteerd, tenzij een kortere termijn passend is.</li>
+        <li>Klant- en contractgegevens: gedurende de overeenkomst en daarna zolang dit redelijkerwijs noodzakelijk is voor administratie, rechtsvorderingen en naleving van wettelijke verplichtingen.</li>
+        <li>Facturen en fiscale basisadministratie: in beginsel 7 jaar, of langer wanneer een bijzondere wettelijke bewaartermijn geldt.</li>
+        <li>Supportinformatie: in beginsel maximaal 2 jaar na afhandeling, tenzij langere bewaring noodzakelijk is.</li>
+        <li>Beveiligings- en serverlogs: [werkelijke termijn invullen, bijvoorbeeld 30/90/180 dagen], tenzij een concreet beveiligingsincident langere bewaring noodzakelijk maakt.</li>
+        <li>Back-ups: volgens de in de Hostingvoorwaarden en interne back-upregeling genoemde retentietermijnen.</li>
     </ul>
 
-    <h2>4. Rechtsgronden</h2>
-    <p>Wij verwerken persoonsgegevens op basis van:</p>
+    <h2>6. Met wie delen wij persoonsgegevens?</h2>
+    <p>Wij delen persoonsgegevens alleen wanneer dit noodzakelijk is voor onze dienstverlening, bedrijfsvoering of wettelijke verplichtingen.</p>
+    <p>Categorieën ontvangers kunnen zijn:</p>
     <ul>
-        <li>uitvoering van de overeenkomst;</li>
-        <li>wettelijke verplichting;</li>
-        <li>gerechtvaardigd belang, zoals beveiliging en kwaliteitsverbetering;</li>
-        <li>toestemming, bijvoorbeeld voor nieuwsbrieven en niet-noodzakelijke cookies.</li>
+        <li>hosting- en datacenterleveranciers;</li>
+        <li>domeinregistrars;</li>
+        <li>e-mailproviders;</li>
+        <li>boekhoud- en administratiedienstverleners;</li>
+        <li>betaalproviders;</li>
+        <li>IT- en beveiligingsleveranciers;</li>
+        <li>juridisch of financieel adviseurs;</li>
+        <li>bevoegde overheidsinstanties wanneer wij wettelijk verplicht zijn gegevens te verstrekken.</li>
+    </ul>
+    <p>Wij verkopen persoonsgegevens niet.</p>
+
+    <h2>7. Verwerkers en subverwerkers</h2>
+    <ul>
+        <li>Wanneer een externe dienstverlener namens ons persoonsgegevens verwerkt, sluiten wij waar vereist passende afspraken over gegevensbescherming.</li>
+        <li>Voor diensten waarbij Servura zelf als verwerker optreedt, kan Servura subverwerkers inschakelen overeenkomstig de toepasselijke <a href="{{ route('legal.dpa') }}">Verwerkersovereenkomst</a>.</li>
+        <li>Actuele belangrijke subverwerkers:
+            <ul>
+                <li>[naam hosting/datacenter] — [doel] — [land];</li>
+                <li>[naam e-mailprovider] — [doel] — [land];</li>
+                <li>[naam back-upprovider] — [doel] — [land];</li>
+                <li>[naam monitoringprovider] — [doel] — [land].</li>
+            </ul>
+        </li>
+    </ul>
+    <p><em>Deze lijst moet vóór publicatie worden aangepast aan de werkelijk gebruikte leveranciers.</em></p>
+
+    <h2>8. Doorgifte buiten de EER</h2>
+    <ul>
+        <li>Indien persoonsgegevens buiten de Europese Economische Ruimte worden verwerkt, zorgen wij voor een rechtsgeldige grondslag voor de doorgifte, bijvoorbeeld een adequaatheidsbesluit of toepasselijke passende waarborgen.</li>
+        <li>Meer informatie hierover kan worden opgevraagd via {{ config('company.email', '[privacy e-mailadres]') }}.</li>
     </ul>
 
-    <h2>5. Contact- en offerteaanvragen</h2>
-    <p>Gegevens uit contact- en offerteformulieren gebruiken wij om uw vraag te beantwoorden en, indien gewenst, een offerte op te stellen. Deze gegevens bewaren wij gedurende
-        <strong>{{ config('legal.retention.contact_request') ?? '[bewaartermijn nog in te vullen]' }}</strong>
-        na afhandeling van de aanvraag, tenzij u klant wordt.</p>
-
-    <h2>6. Klantaccounts / klantportaal</h2>
-    <p>Voor het klantportaal verwerken wij accountgegevens, contactgegevens en gegevens over uw diensten en facturen. Deze gegevens bewaren wij gedurende de looptijd van de overeenkomst en daarna gedurende
-        <strong>{{ config('legal.retention.customer_account') ?? '[bewaartermijn nog in te vullen]' }}</strong>
-        op basis van wettelijke bewaarplichten.</p>
-
-    <h2>7. Hosting en technisch beheer</h2>
-    <p>Voor hosting en technisch beheer verwerken wij technische gegevens zoals logbestanden, domeinnamen en gebruiksdata. Deze gegevens gebruiken wij voor beveiliging, onderhoud en het oplossen van storingen.</p>
-
-    <h2>8. E-mailverkeer</h2>
-    <p>Wij gebruiken uw e-mailadres voor communicatie over onze diensten, facturen en technische meldingen. Voor commerciële e-mails vragen wij aparte toestemming.</p>
-
-    <h2>9. Analytics en cookies</h2>
-    <p>Wij gebruiken alleen analytische of marketingcookies na uw toestemming. Noodzakelijke cookies zijn altijd actief. Zie onze <a href="{{ route('legal.cookies') }}">Cookieverklaring</a> voor meer informatie.</p>
-
-    <h2>10. Externe dienstverleners / verwerkers</h2>
-    <p>Voor bepaalde diensten maken wij gebruik van externe partijen. Een actuele lijst vindt u onderaan deze verklaring.</p>
-    @if(count(config('legal.subprocessors', [])) > 0)
-        <ul>
-            @foreach(config('legal.subprocessors', []) as $subprocessor)
-                <li>
-                    <strong>{{ $subprocessor['name'] }}</strong> – {{ $subprocessor['purpose'] }}
-                    ({{ $subprocessor['country'] }})
-                    @if(!empty($subprocessor['privacy_url']))
-                        – <a href="{{ $subprocessor['privacy_url'] }}" target="_blank" rel="noopener noreferrer">privacyverklaring</a>
-                    @endif
-                </li>
-            @endforeach
-        </ul>
-    @else
-        <p><em>Er zijn nog geen subprocessors geconfigureerd. Voeg deze toe zodra partijen daadwerkelijk worden ingeschakeld.</em></p>
-    @endif
-
-    <h2>11. Eventuele doorgifte buiten de EER</h2>
-    <p>Persoonsgegevens worden in principe binnen de Europese Economische Ruimte (EER) verwerkt. Indien gegevens toch buiten de EER worden doorgegeven, zorgen wij voor passende waarborgen.</p>
-
-    <h2>12. Bewaartermijnen</h2>
+    <h2>9. Beveiliging</h2>
     <ul>
-        <li>Contactaanvragen: {{ config('legal.retention.contact_request') ?? '[nog in te vullen]' }}</li>
-        <li>Offerteaanvragen: {{ config('legal.retention.quote_request') ?? '[nog in te vullen]' }}</li>
-        <li>Klantaccounts en facturatie: {{ config('legal.retention.customer_account') ?? '[nog in te vullen]' }}</li>
-        <li>Analytics: {{ config('legal.retention.analytics') ?? '[nog in te vullen]' }}</li>
+        <li>Wij treffen passende technische en organisatorische maatregelen om persoonsgegevens te beschermen tegen verlies, onbevoegde toegang, misbruik en andere ongeoorloofde verwerking.</li>
+        <li>De maatregelen worden afgestemd op de aard van de gegevens, risico's, stand van de techniek en uitvoeringskosten.</li>
     </ul>
 
-    <h2>13. Beveiliging</h2>
-    <p>Wij treffen passende technische en organisatorische maatregelen om uw persoonsgegevens te beveiligen, zoals versleutelde verbindingen en toegangsbeheer.</p>
+    <h2>10. Uw privacyrechten</h2>
+    <p>Afhankelijk van de omstandigheden heeft u onder de AVG onder meer het recht om:</p>
+    <ul>
+        <li>uw persoonsgegevens in te zien;</li>
+        <li>onjuiste gegevens te laten corrigeren;</li>
+        <li>gegevens te laten verwijderen;</li>
+        <li>verwerking te laten beperken;</li>
+        <li>bezwaar te maken tegen bepaalde verwerkingen;</li>
+        <li>gegevens over te laten dragen wanneer het recht op dataportabiliteit van toepassing is;</li>
+        <li>gegeven toestemming in te trekken.</li>
+    </ul>
+    <p>Een verzoek kan worden gestuurd naar {{ config('company.email', '[privacy e-mailadres]') }}.</p>
+    <p>Wij kunnen aanvullende informatie vragen wanneer dit redelijkerwijs nodig is om uw identiteit vast te stellen.</p>
 
-    <h2>14. Rechten van betrokkenen</h2>
-    <p>U heeft recht op inzage, rectificatie, verwijdering, beperking van verwerking en dataportabiliteit. Ook kunt u bezwaar maken tegen verwerking op basis van gerechtvaardigd belang.</p>
+    <h2>11. Klacht indienen</h2>
+    <ul>
+        <li>Heeft u een klacht over onze verwerking van persoonsgegevens, neem dan bij voorkeur eerst contact met ons op.</li>
+        <li>U heeft daarnaast het recht een klacht in te dienen bij de Autoriteit Persoonsgegevens.</li>
+    </ul>
 
-    <h2>15. Intrekken van toestemming</h2>
-    <p>Toestemming voor bijvoorbeeld nieuwsbrieven of cookies kunt u te allen tijde intrekken via het klantportaal, de afmeldlink in e-mails of door contact op te nemen met het privacycontact.</p>
+    <h2>12. Geautomatiseerde besluitvorming</h2>
+    <ul>
+        <li>Servura neemt [geen] besluiten die uitsluitend zijn gebaseerd op geautomatiseerde verwerking en die voor betrokkenen rechtsgevolgen hebben of hen anderszins in aanmerkelijke mate treffen.</li>
+        <li>Indien dit in de toekomst verandert, wordt deze privacyverklaring daarop aangepast.</li>
+    </ul>
 
-    <h2>16. Klacht indienen bij de Autoriteit Persoonsgegevens</h2>
-    <p>U heeft het recht een klacht in te dienen bij de Autoriteit Persoonsgegevens als u van mening bent dat wij niet zorgvuldig met uw gegevens omgaan.</p>
-
-    <h2>17. Wijzigingen in de privacyverklaring</h2>
-    <p>Wij kunnen deze privacyverklaring wijzigen. Belangrijke wijzigingen communiceren wij actief.</p>
-
-    <h2>18. Contact</h2>
-    <p>Vragen over deze privacyverklaring kunt u sturen aan:</p>
-    <p>
-        {{ config('company.trade_name', 'Servura') }}<br>
-        T.a.v. privacy<br>
-        {{ config('company.email', '[E-mail]') }}<br>
-        {{ config('company.privacy_email', config('company.email', '[E-mail]')) }}
-    </p>
+    <h2>13. Wijzigingen</h2>
+    <ul>
+        <li>Servura kan deze privacyverklaring aanpassen wanneer dienstverlening, wetgeving of gegevensverwerkingen wijzigen.</li>
+        <li>De meest recente versie is beschikbaar via <a href="https://servura.nl/privacy" target="_blank" rel="noopener noreferrer">https://servura.nl/privacy</a>.</li>
+    </ul>
 @endsection

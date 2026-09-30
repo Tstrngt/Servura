@@ -13,80 +13,115 @@
 @endsection
 
 @section('legal-content')
-    <p><em>Let op: dit is een concepttekst en nog niet juridisch gecontroleerd.</em></p>
+    <p><em>Let op: deze Hostingvoorwaarden gelden aanvullend op de <a href="{{ route('legal.terms') }}">Algemene Voorwaarden</a> van Servura. Vul de specifieke waarden voor uw pakketten in voordat u deze pagina publiceert.</em></p>
 
-    <h2>1. Dienstomschrijving</h2>
-    <p>Servura biedt hostingdiensten aan, waaronder opslag van websitebestanden, databases, e-maildiensten en technisch beheer.</p>
+    <h2>Artikel 1 — Hostingdienst</h2>
+    <ul>
+        <li>Servura stelt aan Klant servercapaciteit, opslag, dataverkeer en/of aanverwante hostingdiensten beschikbaar zoals omschreven in de overeenkomst.</li>
+        <li>De exacte specificaties van het hostingpakket blijken uit de offerte, bestelbevestiging of het klantportaal.</li>
+        <li>Hosting betreft een inspanningsverplichting, tenzij in een afzonderlijke SLA uitdrukkelijk concrete serviceniveaus zijn gegarandeerd.</li>
+    </ul>
 
-    <h2>2. Hostingpakketten</h2>
-    <p>De specificaties van hostingpakketten staan vermeld in de offerte, het klantportaal of op de website. Aanpassingen zijn mogelijk na overleg.</p>
+    <h2>Artikel 2 — Beschikbaarheid</h2>
+    <ul>
+        <li>Servura streeft naar een zo hoog mogelijke beschikbaarheid.</li>
+        <li>Er geldt geen gegarandeerd uptimepercentage tenzij uitdrukkelijk een SLA van toepassing is verklaard.</li>
+        <li>Indien een SLA geldt, wordt beschikbaarheid uitsluitend berekend volgens de daarin opgenomen meetmethode.</li>
+        <li>Gepland onderhoud, overmacht en omstandigheden die volgens de SLA buiten de berekening vallen, worden niet als downtime meegerekend voor zover dit in de SLA is bepaald.</li>
+    </ul>
 
-    <h2>3. Opslag</h2>
-    <p>Elk hostingpakket heeft een maximale opslagruimte. Bij overschrijding nemen wij contact op om een passende oplossing te bespreken.</p>
+    <h2>Artikel 3 — Onderhoud</h2>
+    <ul>
+        <li>Servura mag onderhoud uitvoeren wanneer dit noodzakelijk is voor beveiliging, stabiliteit, prestaties of technische ontwikkeling.</li>
+        <li>Gepland onderhoud wordt waar redelijkerwijs mogelijk vooraf aangekondigd.</li>
+        <li>Spoedeisend beveiligingsonderhoud kan zonder voorafgaande aankondiging plaatsvinden.</li>
+        <li>Servura probeert verstoring voor Klant zoveel mogelijk te beperken.</li>
+    </ul>
 
-    <h2>4. Dataverkeer</h2>
-    <p>Dataverkeer is onderworpen aan fair-use. Bij structureel excessief gebruik kan een upgrade of maatregel worden voorgesteld.</p>
+    <h2>Artikel 4 — Fair use en capaciteit</h2>
+    <ul>
+        <li>Klant gebruikt de hostingdienst overeenkomstig het overeengekomen pakket en de <a href="{{ route('legal.acceptable-use') }}">Acceptable Use Policy</a>.</li>
+        <li>Gebruik dat structureel buitensporige belasting veroorzaakt en andere klanten of infrastructuur wezenlijk benadeelt, kan aanleiding zijn voor overleg over technische aanpassingen of een ander pakket.</li>
+        <li>Servura zal, behoudens urgente beveiligings- of stabiliteitsproblemen, Klant eerst waarschuwen voordat structurele beperkingen worden toegepast.</li>
+    </ul>
 
-    <h2>5. Fair use</h2>
-    <p>Gebruik moet redelijk zijn ten opzichte van het gekozen pakket en andere klanten. Bij twijfel nemen wij contact op.</p>
+    <h2>Artikel 5 — Beveiliging</h2>
+    <ul>
+        <li>Servura treft passende technische en organisatorische maatregelen voor haar hostinginfrastructuur.</li>
+        <li>Klant blijft verantwoordelijk voor de beveiliging van eigen applicaties, accounts en inhoud voor zover deze onder beheer van Klant vallen.</li>
+        <li>Klant installeert geen bewust kwetsbare of niet-ondersteunde software wanneer dit de infrastructuur in gevaar kan brengen.</li>
+        <li>Servura mag een systeem tijdelijk isoleren wanneer dit redelijkerwijs noodzakelijk is om een acute beveiligingsdreiging te beperken.</li>
+    </ul>
 
-    <h2>6. Serverlocaties</h2>
-    <p>Hosting vindt plaats in Europese datacenters, tenzij anders is overeengekomen. De actuele locaties staan vermeld op de website.</p>
+    <h2>Artikel 6 — Back-ups</h2>
+    <ul>
+        <li>Back-ups worden uitgevoerd volgens het voor het betreffende pakket overeengekomen back-upbeleid.</li>
+        <li>Voor het standaardpakket geldt, indien van toepassing:
+            <ul>
+                <li>back-upfrequentie: [invullen];</li>
+                <li>bewaartermijn: [invullen];</li>
+                <li>geografische opslaglocatie: [invullen].</li>
+            </ul>
+        </li>
+        <li>Back-ups zijn bedoeld als noodvoorziening en vormen geen vervanging voor een eigen back-upstrategie van Klant.</li>
+        <li>Klant wordt geadviseerd zelfstandig kopieën te bewaren van bedrijfskritische gegevens.</li>
+        <li>Servura garandeert niet dat iedere individuele back-up onder alle omstandigheden volledig of herstelbaar is.</li>
+        <li>Indien een gegarandeerde RPO of RTO geldt, moet deze uitdrukkelijk in een SLA worden opgenomen.</li>
+    </ul>
 
-    <h2>7. Serveronderhoud</h2>
-    <p>Onderhoud wordt waar mogelijk buiten kantooruren gepland. Wij proberen storingen door onderhoud te beperken.</p>
+    <h2>Artikel 7 — Herstel</h2>
+    <ul>
+        <li>Herstel uit een beschikbare back-up wordt uitgevoerd binnen een redelijke termijn.</li>
+        <li>Een specifieke hersteltijd geldt uitsluitend indien deze in een SLA is gegarandeerd.</li>
+        <li>Herstel op verzoek van Klant kan aanvullend in rekening worden gebracht indien de oorzaak niet aan Servura kan worden toegerekend.</li>
+    </ul>
 
-    <h2>8. Beschikbaarheid</h2>
-    <p>Servura streeft naar een hoge beschikbaarheid. Een concrete uptime-garantie geldt alleen indien deze schriftelijk als SLA is overeengekomen. Huidige SLA: <strong>{{ config('legal.hosting.uptime_sla') ?? '[nog in te vullen]' }}</strong>.</p>
+    <h2>Artikel 8 — Dataverkeer en opslag</h2>
+    <ul>
+        <li>Limieten voor opslag, dataverkeer, CPU, geheugen, processen of overige resources worden in het hostingpakket vermeld.</li>
+        <li>Indien Klant structureel boven de overeengekomen capaciteit uitkomt, neemt Servura contact op over uitbreiding of aanpassing.</li>
+        <li>Bij een acute bedreiging voor de stabiliteit van de infrastructuur mag Servura tijdelijk technische maatregelen nemen.</li>
+    </ul>
 
-    <h2>9. Storingen</h2>
-    <p>Bij storingen meldt de Klant dit via het klantportaal of per e-mail. Wij lossen storingen zo spoedig mogelijk op.</p>
+    <h2>Artikel 9 — Misbruik</h2>
+    <ul>
+        <li>Gebruik van hostingdiensten is onderworpen aan de <a href="{{ route('legal.acceptable-use') }}">Acceptable Use Policy</a>.</li>
+        <li>Bij vermoedelijk misbruik kan Servura onderzoek doen voor zover dit noodzakelijk en wettelijk toegestaan is.</li>
+        <li>Maatregelen worden zoveel mogelijk beperkt tot hetgeen noodzakelijk is om het risico of de overtreding te beëindigen.</li>
+    </ul>
 
-    <h2>10. Back-ups</h2>
-    <p>Servura maakt back-ups volgens het gekozen pakket. Frequentie: <strong>{{ config('legal.hosting.backup_frequency') ?? '[nog in te vullen]' }}</strong>. Retentie: <strong>{{ config('legal.hosting.backup_retention') ?? '[nog in te vullen]' }}</strong>.</p>
+    <h2>Artikel 10 — Datalocatie</h2>
+    <ul>
+        <li>Hostinggegevens worden primair verwerkt in [Nederland/EER/land invullen].</li>
+        <li>Indien gegevens buiten de Europese Economische Ruimte worden verwerkt, zorgt Servura voor zover vereist voor een geldige doorgiftegrondslag onder de AVG.</li>
+        <li>Nadere informatie over subverwerkers wordt verstrekt in de <a href="{{ route('legal.privacy') }}">privacyverklaring</a> of <a href="{{ route('legal.dpa') }}">verwerkersovereenkomst</a>.</li>
+    </ul>
 
-    <h2>11. Herstel van back-ups</h2>
-    <p>Herstel op aanvraag wordt uitgevoerd binnen een redelijke termijn. Hersteltermijn: <strong>{{ config('legal.hosting.recovery_time') ?? '[nog in te vullen]' }}</strong>.</p>
+    <h2>Artikel 11 — Migratie en beëindiging</h2>
+    <ul>
+        <li>Na beëindiging krijgt Klant gedurende [bijvoorbeeld 14 of 30] dagen gelegenheid om beschikbare klantgegevens te exporteren, tenzij onmiddellijk verwijderen wettelijk noodzakelijk is.</li>
+        <li>Na afloop van deze termijn mag Servura actieve productiegegevens verwijderen.</li>
+        <li>Gegevens kunnen daarna nog tijdelijk aanwezig zijn in back-ups totdat de toepasselijke back-upretentie afloopt.</li>
+        <li>Back-ups worden niet opnieuw in productie gebracht uitsluitend om verwijderde gegevens beschikbaar te stellen, tenzij dit technisch mogelijk is en afzonderlijk wordt overeengekomen.</li>
+        <li>Servura zal waar redelijkerwijs mogelijk medewerking verlenen aan migratie naar een andere aanbieder.</li>
+        <li>Voor migratiewerkzaamheden kan Servura haar gebruikelijke tarief rekenen.</li>
+    </ul>
 
-    <h2>12. Beveiliging</h2>
-    <p>Servura treft passende technische en organisatorische maatregelen. De Klant blijft verantwoordelijk voor de beveiliging van eigen toepassingen, wachtwoorden en content.</p>
-
-    <h2>13. E-maildiensten</h2>
-    <p>E-maildiensten worden geleverd conform het gekozen pakket. De Klant mag de e-maildiensten niet gebruiken voor spam of andere verboden activiteiten.</p>
-
-    <h2>14. Domeinnamen</h2>
-    <p>Servura kan domeinregistratie en DNS-beheer verzorgen. Het eigendom van het domein blijft bij de Klant.</p>
-
-    <h2>15. Migraties</h2>
-    <p>Migraties worden op aanvraag uitgevoerd. Wij informeren vooraf over mogelijke risico's en kosten.</p>
-
-    <h2>16. Technisch beheer</h2>
-    <p>Technisch beheer omvat onder meer updates, monitoring en beveiligingsmaatregelen. De exacte omvang staat in het gekozen pakket.</p>
-
-    <h2>17. Verboden gebruik</h2>
-    <p>Zie de <a href="{{ route('legal.acceptable-use') }}">Acceptable Use Policy</a> voor een lijst van verboden activiteiten.</p>
-
-    <h2>18. Excessief resourcegebruik</h2>
-    <p>Bij excessief gebruik dat andere klanten hindert, nemen wij contact op. Bij ernstige situaties kunnen wij tijdelijk maatregelen treffen.</p>
-
-    <h2>19. Opschorting</h2>
-    <p>Servura mag diensten opschorten bij niet-betaling of ernstig misbruik, conform de algemene voorwaarden.</p>
-
-    <h2>20. Misbruik</h2>
-    <p>Misbruik kan worden gemeld via <a href="{{ route('legal.abuse') }}">Misbruik melden</a>.</p>
-
-    <h2>21. Beëindiging</h2>
-    <p>Beëindiging verloopt conform de algemene voorwaarden en de overeengekomen opzegtermijn.</p>
-
-    <h2>22. Data-export</h2>
-    <p>De Klant kan voor beëindiging een export van eigen gegevens aanvragen.</p>
-
-    <h2>23. Verwijdering van gegevens</h2>
-    <p>Na beëindiging worden gegevens binnen een redelijke termijn verwijderd, tenzij een wettelijke bewaarplicht geldt.</p>
-
-    <h2>24. Aansprakelijkheid</h2>
-    <p>De aansprakelijkheid van Servura is beperkt conform de algemene voorwaarden.</p>
-
-    <h2>25. Eventuele SLA</h2>
-    <p>Een Service Level Agreement geldt alleen indien deze schriftelijk of via de offerte is overeengekomen.</p>
+    <h2>Artikel 12 — Service Level Agreement</h2>
+    <ul>
+        <li>Een SLA geldt alleen wanneer deze uitdrukkelijk schriftelijk onderdeel is gemaakt van de overeenkomst.</li>
+        <li>De SLA beschrijft ten minste:
+            <ul>
+                <li>het beschikbaarheidspercentage;</li>
+                <li>de meetmethode;</li>
+                <li>onderhoudsvensters;</li>
+                <li>responstijden;</li>
+                <li>prioriteitscategorieën;</li>
+                <li>eventuele hersteltijden;</li>
+                <li>uitzonderingen;</li>
+                <li>eventuele service credits.</li>
+            </ul>
+        </li>
+        <li>Marketinguitingen of algemene streefpercentages vormen geen SLA tenzij zij uitdrukkelijk als garantie zijn overeengekomen.</li>
+    </ul>
 @endsection
