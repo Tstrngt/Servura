@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomerService;
 use App\Models\DomainRegistration;
+use App\Models\Invoice;
+use Illuminate\Support\Facades\DB;
 
 class DomainRegistrationController extends Controller
 {
@@ -30,5 +33,103 @@ class DomainRegistrationController extends Controller
         $domainRegistration->load(['user', 'order', 'customerService']);
 
         return view('admin.domains.show', compact('domainRegistration'));
+    }
+
+    public function destroy(DomainRegistration $domainRegistration)
+    {
+        $this->authorizeOwner();
+
+        if (! $this->canDelete($domainRegistration)) {
+            return redirect()->route('admin.domains.index')
+                ->with('error', 'Dit domein kan niet worden verwijderd omdat het al betaald, actief of gekoppeld is aan een actieve hostingdienst.');
+        }
+
+        DB::transaction(function () use ($domainRegistration) {
+            $customerService = $domainRegistration->customerService;
+
+            if ($customerService) {
+                $this->removeUnpaidInvoiceLines($customerService);
+                $this->removeOrderLines($customerService);
+                $customerService->delete();
+            }
+
+            $domainRegistration->delete();
+        });
+
+        return redirect()->route('admin.domains.index')
+            ->with('success', 'Domeinregistratie is verwijderd.');
+    }
+
+    private function canDelete(DomainRegistration $domainRegistration): bool
+    {
+        $deletableStatuses = [
+            DomainRegistration::STATUS_PENDING,
+            DomainRegistration::STATUS_AWAITING_PAYMENT,
+            DomainRegistration::STATUS_REGISTRATION_FAILED,
+            DomainRegistration::STATUS_TRANSFER_PENDING,
+            DomainRegistration::STATUS_TRANSFER_FAILED,
+            DomainRegistration::STATUS_CANCELLED,
+        ];
+
+        if (! in_array($domainRegistration->status, $deletableStatuses, true)) {
+            return false;
+        }
+
+        $customerService = $domainRegistration->customerService;
+        if ($customerService && $customerService->status !== 'suspended') {
+            return false;
+        }
+
+        if ($customerService && $customerService->provisioning_status !== 'pending_payment') {
+            return false;
+        }
+
+        $hostedService = $domainRegistration->hostedCustomerService;
+        if ($hostedService && $hostedService->status === 'active') {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function removeUnpaidInvoiceLines(CustomerService $customerService): void
+    {
+        $invoices = $customerService->invoices()->where('status', '!=', 'betaald')->get();
+
+        foreach ($invoices as $invoice) {
+            $invoice->lines()->where('customer_service_id', $customerService->id)->delete();
+
+            if ($invoice->lines()->count() === 0) {
+                $invoice->delete();
+            } else {
+                $this->recalculateInvoiceTotals($invoice);
+            }
+        }
+    }
+
+    private function removeOrderLines(CustomerService $customerService): void
+    {
+        $orders = $customerService->orders()->get();
+
+        foreach ($orders as $order) {
+            $order->lines()->where('customer_service_id', $customerService->id)->delete();
+
+            if ($order->lines()->count() === 0) {
+                $order->delete();
+            }
+        }
+    }
+
+    private function recalculateInvoiceTotals(Invoice $invoice): void
+    {
+        $subtotal = (float) $invoice->lines()->sum('total');
+        $vat = round($subtotal * ($invoice->vat_percentage / 100), 2);
+        $total = $subtotal + $vat;
+
+        $invoice->update([
+            'subtotal' => $subtotal,
+            'vat_amount' => $vat,
+            'total' => $total,
+        ]);
     }
 }

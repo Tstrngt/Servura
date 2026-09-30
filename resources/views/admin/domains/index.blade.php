@@ -53,6 +53,13 @@
                                 <td class="px-4 py-3 text-sm text-slate-600">{{ $domain->expires_at?->format('d-m-Y') ?? '-' }}</td>
                                 <td class="px-4 py-3 text-center text-sm">
                                     <a href="{{ route('admin.domains.show', $domain) }}" class="text-primary-600 hover:text-primary-800 font-medium">Details</a>
+                                    @if(in_array($domain->status, [\App\Models\DomainRegistration::STATUS_PENDING, \App\Models\DomainRegistration::STATUS_AWAITING_PAYMENT, \App\Models\DomainRegistration::STATUS_REGISTRATION_FAILED, \App\Models\DomainRegistration::STATUS_TRANSFER_PENDING, \App\Models\DomainRegistration::STATUS_TRANSFER_FAILED, \App\Models\DomainRegistration::STATUS_CANCELLED], true))
+                                        <form action="{{ route('admin.domains.destroy', $domain) }}" method="POST" class="inline-block ml-3" onsubmit="return confirm('Weet u zeker dat u dit niet-betaalde domein wilt verwijderen?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-800 font-medium">Verwijderen</button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
