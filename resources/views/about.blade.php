@@ -15,6 +15,7 @@
             'initial' => 'T',
             'color' => 'from-primary-500 to-primary-700',
             'image' => 'images/tim-van-gorkom.jpg',
+            'portfolio_image' => 'images/tim-portfolio.png',
             'portfolio_url' => 'https://tstrngt.github.io/portofolio/',
         ],
         [
@@ -35,6 +36,7 @@
             'portfolio_summary' => 'Ontwerpt duidelijke en gebruiksvriendelijke interfaces die aansluiten bij merk, doelgroep en doelstelling.',
             'initial' => 'I',
             'color' => 'from-accent-500 to-accent-700',
+            'portfolio_image' => 'images/isis-portfolio.png',
             'portfolio_url' => 'https://isisvandijk.github.io/Portfolio/',
         ],
     ];
