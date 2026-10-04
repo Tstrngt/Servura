@@ -403,6 +403,41 @@ class SettingController extends Controller
         return back()->with('success', 'E-mailtemplate is opgeslagen.');
     }
 
+    public function previewEmailTemplate(string $key)
+    {
+        $this->authorizeOwner();
+
+        abort_unless(array_key_exists($key, \App\Support\EmailTemplateRegistry::TEMPLATES), 404);
+
+        $subject = BillingSetting::valueFor("email_template_{$key}_subject")
+            ?: \App\Support\EmailTemplateRegistry::SUBJECTS[$key];
+        $html = BillingSetting::valueFor("email_template_{$key}_html")
+            ?: \App\Support\EmailTemplateRegistry::HTML[$key];
+
+        $variables = [
+            '{{klant_naam}}' => 'Jan Jansen',
+            '{{klant_email}}' => 'jan@voorbeeld.nl',
+            '{{ticket_nummer}}' => 'TCK-2026-00042',
+            '{{ticket_titel}}' => 'Vraag over mijn hostingpakket',
+            '{{reactie}}' => 'Bedankt voor uw melding. We hebben het probleem opgelost en uw dienst draait weer naar behoren.',
+            '{{factuur_nummer}}' => 'INV-2026-0102',
+            '{{offerte_nummer}}' => 'OFF-2026-0031',
+            '{{bedrag}}' => '24,95',
+            '{{dienst_naam}}' => 'Webhosting Plus',
+            '{{domein}}' => 'voorbeeld.nl',
+            '{{gebruikersnaam}}' => 'voorbeeld',
+            '{{wachtwoord}}' => 'Geheim123!',
+            '{{reden}}' => 'Openstaande factuur niet op tijd voldaan',
+            '{{actie_url}}' => url('/'),
+            '{{site_naam}}' => config('site.name', config('app.name')),
+        ];
+
+        return view('emails.custom', [
+            'subject' => strtr($subject, $variables),
+            'html' => strtr($html, $variables),
+        ]);
+    }
+
     public function integrations()
     {
         $this->authorizeOwner();

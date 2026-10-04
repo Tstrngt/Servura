@@ -293,6 +293,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/mail/test', [SettingController::class, 'sendTestMail'])->name('mail.test');
             Route::get('/emailtemplates', [SettingController::class, 'emailTemplates'])->name('email-templates');
             Route::put('/emailtemplates', [SettingController::class, 'updateEmailTemplates'])->name('email-templates.update');
+            Route::get('/emailtemplates/preview/{key}', [SettingController::class, 'previewEmailTemplate'])->name('email-templates.preview');
             Route::get('/betalingen', [SettingController::class, 'payments'])->name('payments');
             Route::put('/betalingen', [SettingController::class, 'updatePayments'])->name('payments.update');
             Route::get('/facturatie', [AdminBillingSettingsController::class, 'edit'])->name('billing');
