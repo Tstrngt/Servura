@@ -14,7 +14,8 @@
             'portfolio_summary' => 'Richt zich op hosting, serverbeheer en de technische infrastructuur achter websites en online diensten.',
             'initial' => 'T',
             'color' => 'from-primary-500 to-primary-700',
-            'portfolio_url' => '#tim-portfolio',
+            'image' => 'images/tim-van-gorkom.jpg',
+            'portfolio_url' => 'https://tstrngt.github.io/portofolio/',
         ],
         [
             'name' => 'Dirk van Gelderen',
