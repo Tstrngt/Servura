@@ -46,6 +46,17 @@ interface DomainProvider
     public function transferDomain(string $domain, string $authCode, array $contacts = [], array $nameservers = []): void;
 
     /**
+     * Cancel a domain at the provider. $endTime is 'end' (end of current
+     * period) or 'immediately' for providers that support it.
+     */
+    public function cancelDomain(string $domain, string $endTime = 'end'): void;
+
+    /**
+     * Undo a scheduled cancellation so the domain renews again.
+     */
+    public function uncancelDomain(string $domain): void;
+
+    /**
      * Fetch domain details from the provider.
      *
      * @return array<string, mixed>

@@ -193,9 +193,11 @@ class DomainController extends Controller
             'auto_renew' => ['required', 'boolean'],
         ]);
 
-        $domain->update(['auto_renew' => $validated['auto_renew']]);
+        $result = app(DomainService::class)->setAutoRenew($domain, (bool) $validated['auto_renew'], $request->user());
 
-        return back()->with('success', 'Automatische verlenging is '.($domain->auto_renew ? 'ingeschakeld' : 'uitgeschakeld').'.');
+        return $result['success']
+            ? back()->with('success', $result['message'])
+            : back()->with('error', $result['message']);
     }
 
     public function requestInternalTransfer(Request $request, DomainRegistration $domain)
@@ -281,11 +283,11 @@ class DomainController extends Controller
     {
         $this->authorizeView($domain);
 
-        $domain->update([
-            'auto_renew' => false,
-        ]);
+        $result = app(DomainService::class)->cancelDomain($domain, request()->user());
 
-        return back()->with('success', 'Het domein wordt niet automatisch verlengd. Het blijft actief tot de einddatum.');
+        return $result['success']
+            ? back()->with('success', $result['message'])
+            : back()->with('error', $result['message']);
     }
 
     public function linkHosting(Request $request, DomainRegistration $domain, DomainHostingService $hostingService)

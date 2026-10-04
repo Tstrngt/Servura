@@ -62,6 +62,16 @@ class DemoDomainProvider implements DomainProvider
         // No-op in demo mode.
     }
 
+    public function cancelDomain(string $domain, string $endTime = 'end'): void
+    {
+        // No-op in demo mode.
+    }
+
+    public function uncancelDomain(string $domain): void
+    {
+        // No-op in demo mode.
+    }
+
     public function getDomainInfo(string $domain): array
     {
         $overview = DomainMockData::overview($domain);

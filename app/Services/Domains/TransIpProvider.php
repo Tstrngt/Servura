@@ -8,6 +8,7 @@ use Throwable;
 use Transip\Api\Library\Entity\Domain\DnsEntry;
 use Transip\Api\Library\Entity\Domain\Nameserver;
 use Transip\Api\Library\Entity\Domain\WhoisContact;
+use Transip\Api\Library\Entity\Domain as TransipDomain;
 use Transip\Api\Library\Entity\DomainCheckResult as TransipDomainCheckResult;
 use Transip\Api\Library\Exception\ApiException;
 use Transip\Api\Library\Exception\HttpBadResponseException;
@@ -136,6 +137,50 @@ class TransIpProvider implements DomainProvider
         }
 
         $this->client()->domain()->transfer($domain, $authCode, $contacts, $nameservers);
+    }
+
+    public function cancelDomain(string $domain, string $endTime = 'end'): void
+    {
+        $domain = $this->normalizeDomain($domain);
+
+        if ($this->isTestDomain($domain)) {
+            Log::info('TransIP dummy domain cancellation simulated.', ['domain' => $domain, 'end_time' => $endTime]);
+
+            return;
+        }
+
+        $this->client()->domain()->cancel($domain, $endTime);
+    }
+
+    public function uncancelDomain(string $domain): void
+    {
+        $domain = $this->normalizeDomain($domain);
+
+        if ($this->isTestDomain($domain)) {
+            Log::info('TransIP dummy domain uncancel simulated.', ['domain' => $domain]);
+
+            return;
+        }
+
+        $entity = $this->client()->domain()->getByName($domain, ['nameservers', 'contacts']);
+
+        $this->client()->domain()->update(new TransipDomain([
+            'name' => $entity->getName(),
+            'authCode' => $entity->getAuthCode(),
+            'isTransferLocked' => $entity->isTransferLocked(),
+            'registrationDate' => $entity->getRegistrationDate(),
+            'renewalDate' => $entity->getRenewalDate(),
+            'isWhitelabel' => $entity->isWhitelabel(),
+            'cancellationDate' => null,
+            'cancellationStatus' => null,
+            'isDnsOnly' => $entity->isDnsOnly(),
+            'hasAutoDns' => $entity->getHasAutoDns(),
+            'hasDnsSec' => $entity->isHasDnsSec(),
+            'status' => $entity->getStatus(),
+            'tags' => $entity->getTags(),
+            'nameservers' => array_map(fn ($ns) => $ns->jsonSerialize(), $entity->getNameservers()),
+            'contacts' => array_map(fn ($c) => $c->jsonSerialize(), $entity->getContacts()),
+        ]));
     }
 
     public function getDomainInfo(string $domain): array

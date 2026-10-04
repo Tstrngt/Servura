@@ -33,6 +33,10 @@ class Kernel extends ConsoleKernel
             ->name('services:delete-cancelled-accounts')
             ->dailyAt('03:45')
             ->withoutOverlapping();
+        $schedule->command('domains:sync')
+            ->name('domains:sync')
+            ->dailyAt('04:15')
+            ->withoutOverlapping();
     }
 
     /**

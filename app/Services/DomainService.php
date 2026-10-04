@@ -175,6 +175,66 @@ class DomainService
         return $code;
     }
 
+    public function cancelDomain(DomainRegistration $domain, ?User $user = null): array
+    {
+        $provider = DomainProviderFactory::forDomain($domain->domain_name);
+
+        if (! $provider || ! $provider->isConfigured()) {
+            return ['success' => false, 'message' => 'Domeinprovider is niet geconfigureerd.'];
+        }
+
+        try {
+            $provider->cancelDomain($domain->domain_name, 'end');
+        } catch (Throwable $e) {
+            Log::warning('Domain cancellation at provider failed', [
+                'domain_registration_id' => $domain->id,
+                'domain' => $domain->domain_name,
+                'error' => $e->getMessage(),
+            ]);
+            $this->logAudit($domain, action: 'domain_cancelled', status: 'failed', note: $e->getMessage(), user: $user);
+
+            return ['success' => false, 'message' => 'Opzeggen bij de provider is mislukt: '.$e->getMessage()];
+        }
+
+        $domain->update(['auto_renew' => false]);
+        $this->logAudit($domain, action: 'domain_cancelled', status: 'completed', note: 'Domein opgezegd bij provider (einddatum).', user: $user);
+
+        return ['success' => true, 'message' => 'Het domein is opgezegd bij TransIP en loopt af op de einddatum.'];
+    }
+
+    public function setAutoRenew(DomainRegistration $domain, bool $autoRenew, ?User $user = null): array
+    {
+        $provider = DomainProviderFactory::forDomain($domain->domain_name);
+
+        if (! $provider || ! $provider->isConfigured()) {
+            return ['success' => false, 'message' => 'Domeinprovider is niet geconfigureerd.'];
+        }
+
+        try {
+            if ($autoRenew) {
+                $provider->uncancelDomain($domain->domain_name);
+            } else {
+                $provider->cancelDomain($domain->domain_name, 'end');
+            }
+        } catch (Throwable $e) {
+            Log::warning('Domain auto-renew toggle at provider failed', [
+                'domain_registration_id' => $domain->id,
+                'domain' => $domain->domain_name,
+                'auto_renew' => $autoRenew,
+                'error' => $e->getMessage(),
+            ]);
+            $this->logAudit($domain, action: 'auto_renew_updated', status: 'failed', after: ['auto_renew' => $autoRenew], note: $e->getMessage(), user: $user);
+
+            return ['success' => false, 'message' => 'Wijziging bij de provider is mislukt: '.$e->getMessage()];
+        }
+
+        $before = ['auto_renew' => $domain->auto_renew];
+        $domain->update(['auto_renew' => $autoRenew]);
+        $this->logAudit($domain, action: 'auto_renew_updated', status: 'completed', before: $before, after: ['auto_renew' => $autoRenew], user: $user);
+
+        return ['success' => true, 'message' => 'Automatische verlenging is '.($autoRenew ? 'ingeschakeld' : 'uitgeschakeld').'.'];
+    }
+
     public function tldCapabilities(DomainRegistration $domain): array
     {
         $provider = DomainProviderFactory::forDomain($domain->domain_name);
