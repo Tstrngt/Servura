@@ -6,6 +6,8 @@ use App\Models\BillingSetting;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use Transip\Api\Library\Entity\Domain\DnsEntry;
+use Transip\Api\Library\Entity\Domain\Nameserver;
+use Transip\Api\Library\Entity\Domain\WhoisContact;
 use Transip\Api\Library\Entity\DomainCheckResult as TransipDomainCheckResult;
 use Transip\Api\Library\Exception\ApiException;
 use Transip\Api\Library\Exception\HttpBadResponseException;
