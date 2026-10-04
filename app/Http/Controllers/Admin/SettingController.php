@@ -55,11 +55,6 @@ class SettingController extends Controller
         $this->authorizeOwner();
 
         $validated = $request->validate([
-            'site_name' => 'required|string|max:255',
-            'contact_email' => 'nullable|email|max:255',
-            'contact_phone' => 'nullable|string|max:30',
-            'contact_address' => 'nullable|string|max:500',
-            'site_location' => 'nullable|string|max:255',
             'date_format' => ['required', Rule::in(['d-m-Y', 'd/m/Y', 'Y-m-d', 'm/d/Y'])],
             'default_country' => 'required|string|size:2',
             'default_language' => ['required', Rule::in(['nl', 'en', 'de', 'fr'])],
@@ -92,6 +87,22 @@ class SettingController extends Controller
         foreach ($validated as $key => $value) {
             BillingSetting::setValue($key, is_bool($value) ? ($value ? '1' : '0') : ($value ?? ''));
         }
+
+        // Bedrijfsgegevens zijn de enige bron; houd de oude losse sleutels in sync
+        // zodat bestaande views/config ze niet dubbel hoeven te kennen.
+        if (filled($validated['company_trade_name'] ?? null)) {
+            BillingSetting::setValue('site_name', $validated['company_trade_name']);
+        }
+        BillingSetting::setValue('contact_email', $validated['company_email'] ?? '');
+        BillingSetting::setValue('contact_phone', $validated['company_phone'] ?? '');
+        BillingSetting::setValue('contact_address', trim(implode(', ', array_filter([
+            $validated['company_address'] ?? '',
+            trim(($validated['company_postal_code'] ?? '').' '.($validated['company_city'] ?? '')),
+        ]))));
+        BillingSetting::setValue('site_location', trim(implode(', ', array_filter([
+            $validated['company_city'] ?? '',
+            $validated['company_country'] ?? '',
+        ]))));
 
         return back()->with('success', 'Algemene instellingen zijn opgeslagen.');
     }

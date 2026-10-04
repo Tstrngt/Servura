@@ -32,28 +32,8 @@
             @csrf
             @method('PUT')
             <h2 class="text-lg font-semibold text-slate-900">Algemeen</h2>
-            <p class="mt-1 text-sm text-slate-600">Basisgegevens van het platform en contactinformatie.</p>
+            <p class="mt-1 text-sm text-slate-600">Platforminstellingen voor taal, land en datumweergave. Bedrijfs- en contactgegevens stel je hieronder één keer in.</p>
             <div class="mt-6 grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-                <div class="form-group">
-                    <label class="form-label" for="site_name">Sitenaam</label>
-                    <input class="form-input" id="site_name" name="site_name" type="text" required value="{{ old('site_name', $settings['site_name']) }}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="contact_email">Contact e-mailadres</label>
-                    <input class="form-input" id="contact_email" name="contact_email" type="email" value="{{ old('contact_email', $settings['contact_email']) }}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="contact_phone">Telefoonnummer</label>
-                    <input class="form-input" id="contact_phone" name="contact_phone" type="text" value="{{ old('contact_phone', $settings['contact_phone']) }}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="contact_address">Adres</label>
-                    <input class="form-input" id="contact_address" name="contact_address" type="text" value="{{ old('contact_address', $settings['contact_address']) }}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="site_location">Locatie (bijv. "Amsterdam, NL")</label>
-                    <input class="form-input" id="site_location" name="site_location" type="text" value="{{ old('site_location', $settings['site_location']) }}">
-                </div>
                 <div class="form-group">
                     <label class="form-label" for="date_format">Datumformaat</label>
                     <select class="form-input" id="date_format" name="date_format" required>
@@ -93,7 +73,7 @@
 
             <div class="mt-8 border-t border-slate-200 pt-6">
                 <h3 class="text-base font-semibold text-slate-900">Bedrijfsgegevens</h3>
-                <p class="mt-1 text-sm text-slate-600">Deze gegevens worden gebruikt op de footer, contactpagina en juridische pagina's.</p>
+                <p class="mt-1 text-sm text-slate-600">Deze gegevens worden gebruikt op de footer, contactpagina, e-mails en juridische pagina's. Je vult ze slechts één keer in.</p>
                 <div class="mt-4 grid grid-cols-1 gap-x-5 sm:grid-cols-2">
                     <div class="form-group">
                         <label class="form-label" for="company_legal_name">Juridische bedrijfsnaam</label>
@@ -102,6 +82,7 @@
                     <div class="form-group">
                         <label class="form-label" for="company_trade_name">Handelsnaam</label>
                         <input class="form-input" id="company_trade_name" name="company_trade_name" type="text" value="{{ old('company_trade_name', $settings['company_trade_name']) }}" placeholder="Servura">
+                        <p class="mt-1 text-xs text-slate-500">Wordt ook als sitenaam gebruikt.</p>
                     </div>
                     <div class="form-group sm:col-span-2">
                         <label class="form-label" for="company_address">Adres</label>
@@ -129,7 +110,8 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="company_email">Zakelijk e-mailadres</label>
-                        <input class="form-input" id="company_email" name="company_email" type="email" value="{{ old('company_email', $settings['company_email']) }}" placeholder="Leeg laten om contact-e-mail te gebruiken">
+                        <input class="form-input" id="company_email" name="company_email" type="email" value="{{ old('company_email', $settings['company_email']) }}" placeholder="support@servura.nl">
+                        <p class="mt-1 text-xs text-slate-500">Dit is het contactadres dat op de site en in e-mails wordt getoond.</p>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="company_phone">Telefoonnummer</label>

@@ -93,9 +93,20 @@ class AppServiceProvider extends ServiceProvider
     private function configureSiteSettings(): void
     {
         try {
+            $siteName = BillingSetting::valueFor('site_name')
+                ?: BillingSetting::valueFor('company_trade_name', config('app.name'));
+
+            $location = BillingSetting::valueFor('site_location');
+            if (blank($location)) {
+                $location = trim(implode(', ', array_filter([
+                    BillingSetting::valueFor('company_city', ''),
+                    BillingSetting::valueFor('company_country', ''),
+                ])));
+            }
+
             Config::set('site', [
-                'name' => BillingSetting::valueFor('site_name', config('app.name')),
-                'location' => BillingSetting::valueFor('site_location', ''),
+                'name' => $siteName,
+                'location' => $location,
                 'date_format' => BillingSetting::valueFor('date_format', 'd-m-Y'),
                 'default_country' => BillingSetting::valueFor('default_country', 'NL'),
                 'default_language' => BillingSetting::valueFor('default_language', 'nl'),
