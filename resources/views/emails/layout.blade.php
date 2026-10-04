@@ -10,8 +10,9 @@
         .wrapper { max-width: 600px; margin: 0 auto; padding: 32px 16px; }
         .card { background: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); }
         .header { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 55%, #38bdf8 130%); color: #ffffff; padding: 36px 40px; }
-        .header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.2px; }
-        .header p { margin: 8px 0 0; font-size: 13px; color: #dbeafe; }
+        .header img { display: block; width: 170px; height: auto; border: 0; }
+        .header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.2px; color: #ffffff; }
+        .header p { margin: 12px 0 0; font-size: 13px; color: #dbeafe; }
         .content { padding: 36px 40px 28px; line-height: 1.7; font-size: 15px; color: #334155; }
         .content p { margin: 0 0 16px; }
         .content a { color: #2563eb; }
@@ -27,7 +28,12 @@
     <div class="wrapper">
         <div class="card">
             <div class="header">
-                <h1>{{ config('site.name', config('app.name')) }}</h1>
+                @php
+                    $siteName = config('site.name', config('app.name'));
+                    $baseUrl = rtrim(config('company.website') ?: config('app.url'), '/');
+                    $logoUrl = $baseUrl . '/images/servura-logo.png';
+                @endphp
+                <img src="{{ $logoUrl }}" alt="{{ $siteName }}" width="170">
                 <p>Hosting, domeinen en websites onder één dak</p>
             </div>
             <div class="content">
