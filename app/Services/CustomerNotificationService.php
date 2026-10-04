@@ -173,6 +173,7 @@ class CustomerNotificationService
         $invoice = $data['invoice'] ?? ($data['order']->invoice ?? null);
         $quote = $data['quote'] ?? null;
         $service = $data['service'] ?? null;
+        $server = $service?->service?->serverConnection;
         $url = $data['verificationUrl'] ?? $data['orderUrl'] ?? $data['loginUrl'] ?? $data['dashboardUrl'] ?? $data['ticketUrl'] ?? $data['invoiceUrl'] ?? $data['quoteUrl'] ?? '';
 
         return [
@@ -183,6 +184,12 @@ class CustomerNotificationService
             '{{dienst_naam}}' => e($service?->service?->title ?? ''), '{{domein}}' => e($service?->domain ?? ''),
             '{{gebruikersnaam}}' => e($service?->external_username ?? ''), '{{wachtwoord}}' => e($service?->external_password ?? ''),
             '{{reden}}' => e($data['reason'] ?? ''), '{{actie_url}}' => e($url), '{{site_naam}}' => e(config('site.name', config('app.name'))),
+            '{{directadmin_url}}' => e($server?->url ?? ''),
+            '{{ftp_host}}' => e($server?->ftp_host ?: ($service?->domain ? 'ftp.'.$service->domain : '')),
+            '{{nameserver_1}}' => e($server?->nameserver_1 ?? ''),
+            '{{nameserver_2}}' => e($server?->nameserver_2 ?? ''),
+            '{{nameserver_3}}' => e($server?->nameserver_3 ?? ''),
+            '{{server_ip}}' => e($server?->shared_ip ?? ''),
         ];
     }
 

@@ -26,7 +26,7 @@ class EmailTemplateRegistry
         'account-created' => '<p>Hallo {{klant_naam}},</p><p>Leuk dat u er bent! Uw account bij {{site_naam}} is aangemaakt met het door u gekozen wachtwoord.</p><p><a class="button" href="{{actie_url}}">E-mailadres bevestigen</a></p><p class="small">Werkt de knop niet? Kopieer deze link in uw browser: {{actie_url}}</p>',
         'verify-email' => '<p>Hallo {{klant_naam}},</p><p>Nog één stapje: bevestig uw e-mailadres om uw account volledig te activeren.</p><p><a class="button" href="{{actie_url}}">E-mailadres bevestigen</a></p><p class="small">Werkt de knop niet? Kopieer deze link in uw browser: {{actie_url}}</p>',
         'order-placed' => '<p>Hallo {{klant_naam}},</p><p>Bedankt voor uw bestelling bij {{site_naam}}! Wij gaan direct voor u aan de slag.</p><p><a class="button" href="{{actie_url}}">Bestelling bekijken</a></p><p>Heeft u vragen? Reageer via het klantportaal, wij denken graag mee.</p>',
-        'hosting-activated' => '<p>Hallo {{klant_naam}},</p><p>Goed nieuws: uw hostingpakket <strong>{{dienst_naam}}</strong> is actief!</p><div class="box"><strong>Inloggegevens</strong><br>Domein: {{domein}}<br>Gebruikersnaam: {{gebruikersnaam}}<br>Wachtwoord: {{wachtwoord}}</div><p><a class="button" href="{{actie_url}}">Inloggen op DirectAdmin</a></p><p class="small">Bewaar deze gegevens goed en wijzig uw wachtwoord na de eerste keer inloggen.</p>',
+        'hosting-activated' => '<p>Hallo {{klant_naam}},</p><p>Goed nieuws: uw hostingpakket <strong>{{dienst_naam}}</strong> is actief!</p><div class="box"><strong>Inloggegevens</strong><br>Domein: {{domein}}<br>Gebruikersnaam: {{gebruikersnaam}}<br>Wachtwoord: {{wachtwoord}}<br>DirectAdmin: {{directadmin_url}}</div><div class="box"><strong>Servergegevens</strong><br>FTP-host: {{ftp_host}}<br>Server-IP: {{server_ip}}<br>Nameserver 1: {{nameserver_1}}<br>Nameserver 2: {{nameserver_2}}<br>Nameserver 3: {{nameserver_3}}</div><p><a class="button" href="{{actie_url}}">Inloggen op DirectAdmin</a></p><p class="small">Bewaar deze gegevens goed en wijzig uw wachtwoord na de eerste keer inloggen.</p>',
         'service-suspended' => '<p>Hallo {{klant_naam}},</p><p>Uw dienst <strong>{{dienst_naam}}</strong> is tijdelijk opgeschort.</p><div class="box"><strong>Reden:</strong> {{reden}}</div><p><a class="button" href="{{actie_url}}">Klantportaal openen</a></p><p>Vragen hierover? Neem gerust contact met ons op.</p>',
         'ticket-created' => '<p>Hallo {{klant_naam}},</p><p>Dank voor uw bericht! We hebben uw aanvraag <strong>{{ticket_nummer}}</strong> in behandeling genomen.</p><div class="box">{{ticket_titel}}</div><p><a class="button" href="{{actie_url}}">Aanvraag bekijken</a></p><p class="small">We reageren zo snel mogelijk — u krijgt een e-mail zodra er een reactie is.</p>',
         'ticket-replied' => '<p>Hallo {{klant_naam}},</p><p>Er is gereageerd op uw aanvraag <strong>{{ticket_nummer}}</strong>.</p><div class="box">{{reactie}}</div><p><a class="button" href="{{actie_url}}">Bekijk en reageer</a></p>',
@@ -40,6 +40,8 @@ class EmailTemplateRegistry
         '{{klant_naam}}', '{{klant_email}}', '{{ticket_nummer}}', '{{ticket_titel}}',
         '{{reactie}}', '{{factuur_nummer}}', '{{offerte_nummer}}', '{{bedrag}}',
         '{{dienst_naam}}', '{{domein}}', '{{gebruikersnaam}}', '{{wachtwoord}}',
+        '{{directadmin_url}}', '{{ftp_host}}', '{{nameserver_1}}', '{{nameserver_2}}',
+        '{{nameserver_3}}', '{{server_ip}}',
         '{{reden}}', '{{actie_url}}', '{{site_naam}}',
     ];
 }

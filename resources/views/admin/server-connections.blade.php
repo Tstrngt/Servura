@@ -23,6 +23,12 @@
                     <div class="form-group"><label class="form-label" for="shared_ip">Gedeeld IP *</label><input class="form-input" id="shared_ip" name="shared_ip" required value="{{ old('shared_ip') }}"></div>
                     <div class="form-group"><label class="form-label" for="timeout">Timeout</label><input class="form-input" id="timeout" name="timeout" type="number" min="5" max="120" value="{{ old('timeout', 20) }}"></div>
                 </div>
+                <div class="grid grid-cols-1 gap-x-4 sm:grid-cols-3">
+                    <div class="form-group"><label class="form-label" for="nameserver_1">Nameserver 1</label><input class="form-input" id="nameserver_1" name="nameserver_1" value="{{ old('nameserver_1') }}" placeholder="ns1.servura.nl"></div>
+                    <div class="form-group"><label class="form-label" for="nameserver_2">Nameserver 2</label><input class="form-input" id="nameserver_2" name="nameserver_2" value="{{ old('nameserver_2') }}" placeholder="ns2.servura.nl"></div>
+                    <div class="form-group"><label class="form-label" for="nameserver_3">Nameserver 3</label><input class="form-input" id="nameserver_3" name="nameserver_3" value="{{ old('nameserver_3') }}" placeholder="ns3.servura.nl"></div>
+                </div>
+                <div class="form-group"><label class="form-label" for="ftp_host">FTP-host</label><input class="form-input" id="ftp_host" name="ftp_host" value="{{ old('ftp_host') }}" placeholder="ftp.servura.nl"></div>
                 <div class="mb-5 flex flex-wrap gap-5 text-sm text-slate-700"><label class="flex items-center gap-2"><input type="checkbox" name="verify_ssl" value="1" checked class="rounded border-slate-300 text-primary-600"> SSL verifiëren</label><label class="flex items-center gap-2"><input type="checkbox" name="is_active" value="1" checked class="rounded border-slate-300 text-primary-600"> Actief</label></div>
                 <button type="submit" class="btn btn-primary w-full">Serverkoppeling toevoegen</button>
             </form>
@@ -48,6 +54,10 @@
                                 <div class="form-group"><label class="form-label">Nieuw wachtwoord</label><input class="form-input" name="password" type="password" autocomplete="new-password" placeholder="Ongewijzigd laten"></div>
                                 <div class="form-group"><label class="form-label">Gedeeld IP</label><input class="form-input" name="shared_ip" required value="{{ $connection->shared_ip }}"></div>
                                 <div class="form-group"><label class="form-label">Timeout</label><input class="form-input" name="timeout" type="number" min="5" max="120" value="{{ $connection->timeout }}"></div>
+                                <div class="form-group"><label class="form-label">Nameserver 1</label><input class="form-input" name="nameserver_1" value="{{ $connection->nameserver_1 }}"></div>
+                                <div class="form-group"><label class="form-label">Nameserver 2</label><input class="form-input" name="nameserver_2" value="{{ $connection->nameserver_2 }}"></div>
+                                <div class="form-group"><label class="form-label">Nameserver 3</label><input class="form-input" name="nameserver_3" value="{{ $connection->nameserver_3 }}"></div>
+                                <div class="form-group"><label class="form-label">FTP-host</label><input class="form-input" name="ftp_host" value="{{ $connection->ftp_host }}"></div>
                                 <div class="flex items-center gap-5 text-sm text-slate-700 md:col-span-2"><label class="flex items-center gap-2"><input type="checkbox" name="verify_ssl" value="1" {{ $connection->verify_ssl ? 'checked' : '' }} class="rounded border-slate-300 text-primary-600"> SSL verifiëren</label><label class="flex items-center gap-2"><input type="checkbox" name="is_active" value="1" {{ $connection->is_active ? 'checked' : '' }} class="rounded border-slate-300 text-primary-600"> Actief</label></div>
                             </div>
                             @if($connection->last_test_message)<p class="mb-4 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">Laatste test: {{ $connection->last_test_message }} @if($connection->last_tested_at)({{ $connection->last_tested_at->format('d-m-Y H:i') }})@endif</p>@endif

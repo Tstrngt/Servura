@@ -13,6 +13,7 @@ class ServerConnection extends Model
 
     protected $fillable = [
         'name', 'provider', 'url', 'username', 'password', 'shared_ip', 'verify_ssl',
+        'nameserver_1', 'nameserver_2', 'nameserver_3', 'ftp_host',
         'timeout', 'settings', 'is_active', 'last_tested_at', 'last_test_status', 'last_test_message',
     ];
 
