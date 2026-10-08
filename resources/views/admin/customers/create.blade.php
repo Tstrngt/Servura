@@ -266,7 +266,8 @@
                                 <input 
                                     type="checkbox" 
                                     id="is_active" 
-                                    name="is_active" 
+                                    name="is_active"
+                                    value="1"
                                     class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                                     {{ old('is_active', true) ? 'checked' : '' }}
                                 >

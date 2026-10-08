@@ -73,6 +73,8 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        $request->merge(['is_active' => $request->boolean('is_active')]);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
