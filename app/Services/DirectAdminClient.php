@@ -73,6 +73,11 @@ class DirectAdminClient
     /**
      * Check whether a user account exists on the server.
      */
+    public function getUserConfig(string $username): array
+    {
+        return $this->request('CMD_API_SHOW_USER_CONFIG', ['user' => $username]);
+    }
+
     public function userExists(string $username): bool
     {
         try {

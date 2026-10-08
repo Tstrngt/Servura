@@ -66,6 +66,9 @@
 <!-- Customer Details Content -->
 <div class="bg-gray-50 min-h-screen lg:pl-64">
     <div class="mx-auto w-full max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8">
+        @if(session('success'))<div class="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800 ring-1 ring-emerald-200">{{ session('success') }}</div>@endif
+        @if(session('error'))<div class="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800 ring-1 ring-red-200">{{ session('error') }}</div>@endif
+        @if($errors->any())<div class="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800 ring-1 ring-red-200"><strong>Controleer de invoer.</strong><ul class="mt-1 list-disc pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
         <!-- Header -->
         <div class="px-4 py-6 sm:px-0">
             <div class="overflow-hidden">
@@ -290,7 +293,8 @@
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-medium text-gray-900">Diensten</h3>
                             <div class="flex items-center gap-2">
-                                <button type="button" onclick="openServiceModal('assign')" class="btn btn-outline text-sm">Dienst Toewijzen</button>
+                                <button type="button" onclick="openServiceModal('assign')" class="btn btn-outline text-sm">Nieuwe dienst toewijzen</button>
+                                <button type="button" onclick="openServiceModal('import-da')" class="btn btn-outline text-sm">Bestaand DA-account koppelen</button>
                                 <a href="{{ route('admin.financial.quotes.create') }}" class="btn btn-primary text-sm">Offerte Aanmaken</a>
                             </div>
                         </div>
@@ -385,6 +389,35 @@
                                 <button type="button" onclick="closeServiceModal('assign')" class="btn btn-outline">Annuleren</button>
                                 <button type="submit" class="btn btn-primary">Toewijzen</button>
                             </div>
+                        </form>
+                    </div>
+                </div>
+
+                {{-- Bestaand DirectAdmin-account koppelen --}}
+                <div id="serviceModal-import-da" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/60 p-4 backdrop-blur-sm">
+                    <div class="relative mx-auto my-6 w-full max-w-3xl rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200">
+                        <div class="flex items-start justify-between border-b border-slate-200 px-6 py-4">
+                            <div><h3 class="text-lg font-semibold text-slate-900">Bestaand DirectAdmin-account koppelen</h3><p class="mt-1 max-w-2xl text-xs leading-5 text-slate-500">Controleert gebruiker, pakket en domein op DirectAdmin. Er wordt geen account aangemaakt, geen factuur gegenereerd en geen e-mail verzonden.</p></div>
+                            <button type="button" onclick="closeServiceModal('import-da')" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600" aria-label="Sluiten"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                        </div>
+                        <form method="POST" action="{{ route('admin.customers.services.import-directadmin', $customer) }}" class="space-y-5 px-6 py-5">
+                            @csrf
+                            <input type="hidden" name="import_existing_directadmin" value="1">
+                            <div class="rounded-xl bg-sky-50 p-4 text-sm leading-6 text-sky-900 ring-1 ring-sky-200"><strong>Veilige import:</strong> Servura leest het bestaande account alleen ter controle. DirectAdmin-gegevens en het wachtwoord blijven ongewijzigd.</div>
+                            <div><label class="form-label" for="import_service_id">Servura-product *</label><select id="import_service_id" name="service_id" class="form-input" required><option value="">Kies het gekoppelde maatwerkproduct…</option>@foreach($availableServices->where('fulfillment_type', 'directadmin') as $availableService)<option value="{{ $availableService->id }}" @selected(old('service_id') == $availableService->id)>{{ $availableService->title }} - {{ $availableService->provider_package ?: $availableService->directadmin_package }}</option>@endforeach</select></div>
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div><label class="form-label" for="import_external_username">Bestaande DA-gebruikersnaam *</label><input id="import_external_username" name="external_username" class="form-input" required value="{{ old('external_username') }}" autocomplete="off"></div>
+                                <div><label class="form-label" for="import_domain">Hoofddomein *</label><input id="import_domain" name="domain" class="form-input" required value="{{ old('domain') }}" placeholder="stc-de-rijnstreek.nl"></div>
+                                <div><label class="form-label" for="import_price">Terugkerend bedrag excl. btw *</label><input id="import_price" type="number" name="price" min="0" step="0.01" class="form-input" required value="{{ old('price') }}"></div>
+                                <div><label class="form-label" for="import_billing_cycle">Facturatiecyclus *</label><select id="import_billing_cycle" name="billing_cycle" class="form-input" required>@foreach($billingCycles as $cycle => $label)<option value="{{ $cycle }}" @selected(old('billing_cycle', 'yearly') === $cycle)>{{ $label }}</option>@endforeach</select></div>
+                                <div><label class="form-label" for="import_start_date">Oorspronkelijke startdatum *</label><input id="import_start_date" type="date" name="start_date" class="form-input" required value="{{ old('start_date') }}"></div>
+                                <div><label class="form-label" for="import_period_start">Huidige periode vanaf *</label><input id="import_period_start" type="date" name="current_period_start" class="form-input" required value="{{ old('current_period_start') }}"></div>
+                                <div><label class="form-label" for="import_period_end">Betaald t/m</label><input id="import_period_end" type="date" name="current_period_end" class="form-input" value="{{ old('current_period_end') }}"></div>
+                                <div><label class="form-label" for="import_next_invoice">Eerste factuurdatum in Servura</label><input id="import_next_invoice" type="date" name="next_invoice_date" class="form-input" value="{{ old('next_invoice_date') }}"></div>
+                                <div><label class="form-label" for="import_payment_method">Betaalmethode *</label><select id="import_payment_method" name="payment_method" class="form-input"><option value="payment_link">Factuur met betaallink</option><option value="auto_debit">Automatische incasso</option></select></div>
+                            </div>
+                            <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="auto_renew" value="1" checked class="rounded border-slate-300 text-primary-600"> Automatisch verlengen en vanaf de eerste factuurdatum factureren</label>
+                            <div class="flex justify-end gap-3 border-t border-slate-200 pt-4"><button type="button" onclick="closeServiceModal('import-da')" class="btn btn-outline">Annuleren</button><button type="submit" class="btn btn-primary" onclick="return confirm('Bestaand DirectAdmin-account controleren en koppelen? Er wordt niets op DirectAdmin gewijzigd.')">Account controleren en koppelen</button></div>
                         </form>
                     </div>
                 </div>
@@ -627,5 +660,8 @@ document.addEventListener('click', function (e) {
         document.body.style.overflow = '';
     }
 });
+@if(old('import_existing_directadmin'))
+document.addEventListener('DOMContentLoaded', function () { openServiceModal('import-da'); });
+@endif
 </script>
 @endsection

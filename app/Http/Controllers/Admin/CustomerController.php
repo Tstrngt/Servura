@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\AuditLog;
 use App\Models\CustomerService;
 use App\Models\Invoice;
 use App\Models\Service;
 use App\Models\ServicePrice;
 use App\Models\Ticket;
+use App\Services\DirectAdminClient;
 use App\Services\RenewalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -340,6 +342,97 @@ class CustomerController extends Controller
         return redirect()
             ->route('admin.customers.show', [$customer, 'tab' => 'services'])
             ->with('success', "Dienst \"{$service->title}\" is toegewezen en factuur is automatisch aangemaakt.");
+    }
+
+    public function importExistingService(Request $request, User $customer, DirectAdminClient $directAdmin)
+    {
+        $this->authorize('hosting.edit');
+        abort_unless($customer->isCustomer(), 404);
+
+        $validated = $request->validate([
+            'service_id' => ['required', 'exists:services,id'],
+            'external_username' => ['required', 'string', 'max:32', 'regex:/^[a-z][a-z0-9_-]+$/'],
+            'domain' => ['required', 'string', 'max:253', 'regex:/^(?!-)(?:[a-z0-9-]{1,63}\.)+[a-z]{2,63}$/i'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'billing_cycle' => ['required', Rule::in(array_keys(ServicePrice::CYCLES))],
+            'start_date' => ['required', 'date'],
+            'current_period_start' => ['required', 'date'],
+            'current_period_end' => ['required_unless:billing_cycle,one_time', 'nullable', 'date', 'after_or_equal:current_period_start'],
+            'next_invoice_date' => ['required_if:auto_renew,1', 'nullable', 'date', 'after_or_equal:current_period_start'],
+            'payment_method' => ['required', Rule::in(['auto_debit', 'payment_link'])],
+            'auto_renew' => ['nullable', 'boolean'],
+        ]);
+
+        $service = Service::with('serverConnection')->findOrFail($validated['service_id']);
+        if ($service->fulfillment_type !== 'directadmin' || ! $service->serverConnection) {
+            return back()->withInput()->with('error', 'Kies een DirectAdmin-product met een geldige serverkoppeling.');
+        }
+        if (! $service->serverConnection->is_active) {
+            return back()->withInput()->with('error', 'De gekoppelde DirectAdmin-server is niet actief.');
+        }
+
+        $duplicate = CustomerService::where('external_username', $validated['external_username'])
+            ->whereHas('service', fn ($query) => $query->where('server_connection_id', $service->server_connection_id))
+            ->exists();
+        if ($duplicate) {
+            return back()->withInput()->with('error', 'Dit DirectAdmin-account is al aan een Servura-dienst gekoppeld.');
+        }
+
+        try {
+            $config = $directAdmin->using($service->serverConnection)->getUserConfig($validated['external_username']);
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return back()->withInput()->with('error', 'Het DirectAdmin-account kon niet worden gecontroleerd: '.$exception->getMessage());
+        }
+
+        $actualPackage = trim((string) ($config['package'] ?? ''));
+        $expectedPackage = trim((string) ($service->provider_package ?: $service->directadmin_package));
+        if ($actualPackage === '' || strcasecmp($actualPackage, $expectedPackage) !== 0) {
+            return back()->withInput()->with('error', "Pakketcontrole mislukt. DirectAdmin gebruikt ‘{$actualPackage}’, Servura verwacht ‘{$expectedPackage}’.");
+        }
+        $actualDomain = strtolower(trim((string) ($config['domain'] ?? '')));
+        $domain = strtolower($validated['domain']);
+        if ($actualDomain !== '' && $actualDomain !== $domain) {
+            return back()->withInput()->with('error', "Domeincontrole mislukt. DirectAdmin gebruikt ‘{$actualDomain}’, het formulier bevat ‘{$domain}’.");
+        }
+
+        $autoRenew = ($validated['auto_renew'] ?? false) && $validated['billing_cycle'] !== 'one_time';
+        $customerService = DB::transaction(function () use ($validated, $customer, $service, $domain, $autoRenew) {
+            return CustomerService::create([
+                'user_id' => $customer->id,
+                'service_id' => $service->id,
+                'domain' => $domain,
+                'external_username' => $validated['external_username'],
+                'status' => 'active',
+                'provisioning_status' => 'active',
+                'provisioning_error' => null,
+                'provisioned_at' => $validated['start_date'],
+                'price' => $validated['price'],
+                'price_type' => $service->price_type ?: $validated['billing_cycle'],
+                'billing_cycle' => $validated['billing_cycle'],
+                'start_date' => $validated['start_date'],
+                'current_period_start' => $validated['current_period_start'],
+                'current_period_end' => $validated['current_period_end'] ?? null,
+                'next_invoice_date' => $autoRenew ? ($validated['next_invoice_date'] ?? null) : null,
+                'end_date' => $validated['billing_cycle'] === 'one_time' ? ($validated['current_period_end'] ?? null) : null,
+                'auto_renew' => $autoRenew,
+                'payment_method' => $validated['payment_method'],
+                'notes' => 'Bestaand DirectAdmin-account geïmporteerd zonder provisioning.',
+            ]);
+        });
+
+        AuditLog::record('existing_directadmin_service_imported', $customerService, null, [
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'server_connection_id' => $service->server_connection_id,
+            'external_username' => $validated['external_username'],
+            'domain' => $domain,
+            'provider_package' => $actualPackage,
+        ]);
+
+        return redirect()->route('admin.customers.show', [$customer, 'tab' => 'services'])
+            ->with('success', "Bestaand DirectAdmin-account ‘{$validated['external_username']}’ is gekoppeld zonder provisioning, factuur of e-mail.");
     }
 
     public function updateServiceRenewal(Request $request, User $customer, CustomerService $service)
