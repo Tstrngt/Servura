@@ -133,7 +133,7 @@ class DirectAdminClient
 
     public function resetPassword(string $username, string $password): array
     {
-        return $this->request('CMD_API_PASSWD', [
+        return $this->request('CMD_API_USER_PASSWD', [
             'username' => $username,
             'passwd' => $password,
             'passwd2' => $password,

@@ -77,6 +77,22 @@ class ExistingDirectAdminServiceImportTest extends TestCase
             && $request['user'] === 'stcrijn' && $request['json'] === 'yes');
     }
 
+    public function test_reseller_password_reset_uses_user_password_endpoint(): void
+    {
+        [, , $service] = $this->setupRecords();
+        Http::fake([
+            'https://server.example.test:2222/CMD_API_USER_PASSWD' => Http::response(['error' => 0, 'text' => 'Password Changed']),
+        ]);
+
+        app(DirectAdminClient::class)->using($service->serverConnection)->resetPassword('stcrijn', 'NieuwVeiligWachtwoord123!');
+
+        Http::assertSent(fn ($request) => $request->method() === 'POST'
+            && $request->url() === 'https://server.example.test:2222/CMD_API_USER_PASSWD'
+            && $request['username'] === 'stcrijn'
+            && $request['passwd'] === 'NieuwVeiligWachtwoord123!'
+            && $request['passwd2'] === 'NieuwVeiligWachtwoord123!');
+    }
+
     private function setupRecords(): array
     {
         $admin = User::factory()->create(['role' => 'admin']);
