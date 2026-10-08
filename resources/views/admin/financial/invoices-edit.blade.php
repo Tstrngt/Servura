@@ -79,43 +79,50 @@ document.addEventListener('DOMContentLoaded', function() {
     var lineCount = 0;
     var container = document.getElementById('invoice-lines');
 
-    function createLine(description, quantity, unitPrice) {
+    function createLine(description, quantity, unitPrice, vatRate, discount, reference, periodStart, periodEnd) {
         var i = lineCount++;
         var row = document.createElement('div');
-        row.className = 'grid grid-cols-12 gap-3 mb-3 items-center';
+        row.className = 'grid grid-cols-12 gap-3 mb-4 items-end rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200';
         row.id = 'line-' + i;
         row.innerHTML =
             '<div class="col-span-5"><input type="text" name="lines[' + i + '][description]" class="form-input w-full text-sm" value="' + (description || '').replace(/"/g, '&quot;') + '" required></div>' +
             '<div class="col-span-1"><input type="number" name="lines[' + i + '][quantity]" class="form-input w-full text-sm line-qty" value="' + (quantity || 1) + '" min="1" required></div>' +
-            '<div class="col-span-2"><input type="number" name="lines[' + i + '][unit_price]" class="form-input w-full text-sm line-price" value="' + (unitPrice || 0) + '" step="0.01" min="0" required></div>' +
+            '<div class="col-span-2"><input type="number" name="lines[' + i + '][unit_price]" class="form-input w-full text-sm line-price" value="' + (unitPrice || 0) + '" step="0.01" {{ $invoice->document_type === 'credit' ? 'max="0"' : 'min="0"' }} required></div>' +
             '<div class="col-span-2 text-sm font-medium line-total">€0,00</div>' +
-            '<div class="col-span-2"><button type="button" class="remove-line text-red-500 hover:text-red-700" data-line="' + i + '"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>';
+            '<div class="col-span-2"><button type="button" class="remove-line text-red-500 hover:text-red-700" data-line="' + i + '">Verwijder</button></div>' +
+            '<div class="col-span-3"><label class="text-xs text-slate-500">Dienst / domein</label><input type="text" name="lines[' + i + '][service_reference]" class="form-input w-full" value="' + (reference || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '"></div>' +
+            '<div class="col-span-2"><label class="text-xs text-slate-500">Periode vanaf</label><input type="date" name="lines[' + i + '][period_start]" class="form-input w-full" value="' + (periodStart || '') + '"></div>' +
+            '<div class="col-span-2"><label class="text-xs text-slate-500">Periode t/m</label><input type="date" name="lines[' + i + '][period_end]" class="form-input w-full" value="' + (periodEnd || '') + '"></div>' +
+            '<div class="col-span-2"><label class="text-xs text-slate-500">Btw %</label><input type="number" name="lines[' + i + '][vat_percentage]" class="form-input w-full line-vat" value="' + (vatRate ?? 21) + '" step="0.01" min="0" max="100"></div>' +
+            '<div class="col-span-2"><label class="text-xs text-slate-500">Korting excl.</label><input type="number" name="lines[' + i + '][discount_amount]" class="form-input w-full line-discount" value="' + (discount || 0) + '" step="0.01" {{ $invoice->document_type === 'credit' ? 'max="0"' : 'min="0"' }}></div>';
         container.appendChild(row);
         recalc();
     }
 
     function recalc() {
-        var subtotal = 0;
+        var subtotal = 0, discount = 0, vat = 0;
         container.querySelectorAll('[id^="line-"]').forEach(function(row) {
             var qty = parseFloat(row.querySelector('.line-qty').value) || 0;
             var price = parseFloat(row.querySelector('.line-price').value) || 0;
+            var lineDiscount = parseFloat(row.querySelector('.line-discount').value) || 0;
+            var rate = parseFloat(row.querySelector('.line-vat').value) || 0;
             var total = qty * price;
-            subtotal += total;
-            row.querySelector('.line-total').textContent = formatEuro(total);
+            subtotal += total; discount += lineDiscount; vat += Math.round((total - lineDiscount) * rate) / 100;
+            row.querySelector('.line-total').textContent = formatEuro(total - lineDiscount);
         });
         document.getElementById('calc-subtotal').textContent = formatEuro(subtotal);
-        document.getElementById('calc-vat').textContent = formatEuro(subtotal * 0.21);
-        document.getElementById('calc-total').textContent = formatEuro(subtotal * 1.21);
+        document.getElementById('calc-vat').textContent = formatEuro(vat);
+        document.getElementById('calc-total').textContent = formatEuro(subtotal - discount + vat);
     }
 
     function formatEuro(val) { return '\u20AC' + val.toFixed(2).replace('.', ','); }
 
-    document.getElementById('add-line-btn').addEventListener('click', function() { createLine('', 1, 0); });
-    container.addEventListener('click', function(e) { var btn = e.target.closest('.remove-line'); if (btn) { document.getElementById('line-' + btn.getAttribute('data-line')).remove(); recalc(); } });
-    container.addEventListener('input', function(e) { if (e.target.classList.contains('line-qty') || e.target.classList.contains('line-price')) recalc(); });
+    document.getElementById('add-line-btn').addEventListener('click', function() { createLine('', 1, 0, 21, 0, '', '', ''); });
+    container.addEventListener('click', function(e) { var btn = e.target.closest('.remove-line'); if (btn && container.children.length > 1) { document.getElementById('line-' + btn.getAttribute('data-line')).remove(); recalc(); } });
+    container.addEventListener('input', function(e) { if (e.target.matches('.line-qty, .line-price, .line-vat, .line-discount')) recalc(); });
 
     @foreach($invoice->lines as $line)
-    createLine(@json($line->description), {{ $line->quantity }}, {{ $line->unit_price }});
+    createLine(@json($line->description), {{ $line->quantity }}, {{ $line->unit_price }}, {{ $line->vat_percentage ?? $invoice->vat_percentage }}, {{ $line->discount_amount ?? 0 }}, @json($line->service_reference), @json($line->period_start?->format('Y-m-d')), @json($line->period_end?->format('Y-m-d')));
     @endforeach
 });
 </script>

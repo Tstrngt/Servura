@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function createLine() {
         var i = lineCount++;
         var row = document.createElement('div');
-        row.className = 'grid grid-cols-12 gap-3 mb-3 items-end';
+        row.className = 'grid grid-cols-12 gap-3 mb-4 items-end rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200';
         row.id = 'line-' + i;
         row.innerHTML =
             '<div class="col-span-6">' +
@@ -101,25 +101,32 @@ document.addEventListener('DOMContentLoaded', function() {
             '<div class="col-span-3">' +
                 '<input type="number" name="lines[' + i + '][unit_price]" class="form-input w-full line-price" value="0" step="0.01" min="0" required>' +
             '</div>' +
-            '<div class="col-span-1">' +
-                '<button type="button" class="remove-line text-red-500 hover:text-red-700 p-2" data-line="' + i + '">' +
-                    '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>' +
-                '</button>' +
-            '</div>';
+            '<div class="col-span-1"><button type="button" class="remove-line text-red-500 hover:text-red-700 p-2" data-line="' + i + '">Verwijder</button></div>' +
+            '<div class="col-span-3"><label class="text-xs text-slate-500">Dienst / domein</label><input type="text" name="lines[' + i + '][service_reference]" class="form-input w-full" placeholder="voorbeeld.nl"></div>' +
+            '<div class="col-span-2"><label class="text-xs text-slate-500">Periode vanaf</label><input type="date" name="lines[' + i + '][period_start]" class="form-input w-full"></div>' +
+            '<div class="col-span-2"><label class="text-xs text-slate-500">Periode t/m</label><input type="date" name="lines[' + i + '][period_end]" class="form-input w-full"></div>' +
+            '<div class="col-span-2"><label class="text-xs text-slate-500">Btw %</label><input type="number" name="lines[' + i + '][vat_percentage]" class="form-input w-full line-vat" value="21" step="0.01" min="0" max="100"></div>' +
+            '<div class="col-span-2"><label class="text-xs text-slate-500">Korting excl.</label><input type="number" name="lines[' + i + '][discount_amount]" class="form-input w-full line-discount" value="0" step="0.01" min="0"></div>';
         container.appendChild(row);
         recalc();
     }
 
     function recalc() {
         var subtotal = 0;
+        var discount = 0;
+        var vat = 0;
         var rows = container.querySelectorAll('[id^="line-"]');
         rows.forEach(function(row) {
             var qty = parseFloat(row.querySelector('.line-qty').value) || 0;
             var price = parseFloat(row.querySelector('.line-price').value) || 0;
-            subtotal += qty * price;
+            var lineDiscount = parseFloat(row.querySelector('.line-discount').value) || 0;
+            var rate = parseFloat(row.querySelector('.line-vat').value) || 0;
+            var lineSubtotal = qty * price;
+            subtotal += lineSubtotal;
+            discount += lineDiscount;
+            vat += Math.round((lineSubtotal - lineDiscount) * rate) / 100;
         });
-        var vat = subtotal * 0.21;
-        var total = subtotal + vat;
+        var total = subtotal - discount + vat;
         document.getElementById('calc-subtotal').textContent = formatEuro(subtotal);
         document.getElementById('calc-vat').textContent = formatEuro(vat);
         document.getElementById('calc-total').textContent = formatEuro(total);
@@ -146,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     container.addEventListener('input', function(e) {
-        if (e.target.classList.contains('line-qty') || e.target.classList.contains('line-price')) {
+        if (e.target.classList.contains('line-qty') || e.target.classList.contains('line-price') || e.target.classList.contains('line-vat') || e.target.classList.contains('line-discount')) {
             recalc();
         }
     });

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Services\MolliePaymentService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 
 class InvoiceController extends Controller
@@ -46,17 +45,13 @@ class InvoiceController extends Controller
         return view('customer.invoices.show', compact('invoice'));
     }
 
-    public function download(Invoice $invoice)
+    public function download(Invoice $invoice, \App\Services\InvoiceDocumentService $documents)
     {
         if ($invoice->user_id !== Auth::id()) {
             abort(403);
         }
 
-        $invoice->load(['lines', 'user']);
-
-        return Pdf::loadView('pdf.invoice', compact('invoice'))
-            ->setPaper('a4')
-            ->download($invoice->invoice_number.'.pdf');
+        return $documents->pdf($invoice)->download($invoice->invoice_number.'.pdf');
     }
 
     public function pay(Invoice $invoice, MolliePaymentService $mollieService)

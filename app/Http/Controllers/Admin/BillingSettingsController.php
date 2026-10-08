@@ -19,6 +19,8 @@ class BillingSettingsController extends Controller
             'default_vat_rate' => BillingSetting::decimal('default_vat_rate', 21.0),
             'country_vat_enabled' => BillingSetting::boolean('country_vat_enabled'),
             'invoice_due_days' => BillingSetting::integer('invoice_due_days', 14),
+            'invoice_number_prefix' => BillingSetting::valueFor('invoice_number_prefix', 'FAC'),
+            'credit_number_prefix' => BillingSetting::valueFor('credit_number_prefix', 'CR'),
             'suspension_grace_days' => BillingSetting::integer('suspension_grace_days', 7),
             'business_country' => BillingSetting::valueFor('business_country', 'NL'),
             'da_delete_after_days' => BillingSetting::integer('da_delete_after_days', 30),
@@ -52,6 +54,8 @@ class BillingSettingsController extends Controller
         $validated = $request->validate([
             'default_vat_rate' => 'required|numeric|min:0|max:100',
             'invoice_due_days' => 'required|integer|min:1|max:90',
+            'invoice_number_prefix' => 'required|alpha_num|max:10',
+            'credit_number_prefix' => 'required|alpha_num|max:10',
             'suspension_grace_days' => 'required|integer|min:0|max:90',
             'business_country' => 'required|string|size:2',
             'country_vat_enabled' => 'boolean',
@@ -60,6 +64,8 @@ class BillingSettingsController extends Controller
 
         BillingSetting::setValue('default_vat_rate', $validated['default_vat_rate']);
         BillingSetting::setValue('invoice_due_days', $validated['invoice_due_days']);
+        BillingSetting::setValue('invoice_number_prefix', strtoupper($validated['invoice_number_prefix']));
+        BillingSetting::setValue('credit_number_prefix', strtoupper($validated['credit_number_prefix']));
         BillingSetting::setValue('suspension_grace_days', $validated['suspension_grace_days']);
         BillingSetting::setValue('da_delete_after_days', $validated['da_delete_after_days']);
         BillingSetting::setValue('business_country', strtoupper($validated['business_country']));

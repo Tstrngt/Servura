@@ -13,6 +13,7 @@
                     <h1 class="text-2xl font-bold text-gray-900">Instellingen</h1>
                     <p class="mt-1 text-sm text-gray-600">Facturatie, BTW en automatische opschoning.</p>
                 </div>
+                <a href="{{ route('admin.financial.invoice-design.edit') }}" class="btn btn-primary">Factuurontwerp bekijken</a>
             </div>
         </div>
 
@@ -55,6 +56,14 @@
                     <div class="form-group">
                         <label class="form-label" for="invoice_due_days">Betaaltermijn (dagen)</label>
                         <input class="form-input" id="invoice_due_days" name="invoice_due_days" type="number" min="1" max="90" required value="{{ old('invoice_due_days', $settings['invoice_due_days']) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="invoice_number_prefix">Prefix factuurnummer</label>
+                        <input class="form-input" id="invoice_number_prefix" name="invoice_number_prefix" maxlength="10" required value="{{ old('invoice_number_prefix', $settings['invoice_number_prefix']) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="credit_number_prefix">Prefix creditfactuur</label>
+                        <input class="form-input" id="credit_number_prefix" name="credit_number_prefix" maxlength="10" required value="{{ old('credit_number_prefix', $settings['credit_number_prefix']) }}">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="suspension_grace_days">Respijt na vervaldatum (dagen)</label>

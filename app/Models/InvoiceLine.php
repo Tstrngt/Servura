@@ -15,6 +15,11 @@ class InvoiceLine extends Model
         'quantity',
         'unit_price',
         'total',
+        'vat_percentage',
+        'discount_amount',
+        'period_start',
+        'period_end',
+        'service_reference',
         'customer_service_id',
         'sort_order',
     ];
@@ -22,6 +27,10 @@ class InvoiceLine extends Model
     protected $casts = [
         'unit_price' => 'decimal:2',
         'total' => 'decimal:2',
+        'vat_percentage' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'period_start' => 'date',
+        'period_end' => 'date',
     ];
 
     public function invoice()

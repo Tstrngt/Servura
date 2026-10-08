@@ -24,6 +24,7 @@ class StaffController extends Controller
         'Dashboard' => ['dashboard.view'],
         'Klanten' => ['customers.view', 'customers.edit', 'customers.delete'],
         'Bestellingen & betalingen' => ['orders.view', 'orders.edit', 'payments.manage', 'refunds.process'],
+        'Facturen' => ['invoices.view', 'invoices.download', 'invoices.drafts.manage', 'invoices.send', 'invoices.credit.create', 'invoice.settings.edit', 'invoice.design.publish'],
         'Domeinen' => ['domains.view', 'domains.edit', 'domains.dns.manage', 'domains.nameservers.edit', 'domains.holder.edit', 'domains.authcode.view', 'domains.cancel'],
         'Hosting' => ['hosting.view', 'hosting.edit', 'hosting.provision', 'hosting.directadmin.login', 'hosting.terminate'],
         'Juridisch' => ['legal.view', 'legal.edit', 'legal.publish'],

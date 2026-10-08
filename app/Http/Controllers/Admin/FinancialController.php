@@ -20,7 +20,9 @@ class FinancialController extends Controller
 
     public function invoices(Request $request)
     {
-        $query = Invoice::with('user');
+        $this->authorize('invoices.view');
+        $query = Invoice::with(['user', 'customerService.service'])
+            ->withSum(['transactions as paid_amount_sum' => fn ($q) => $q->where('status', 'voltooid')->where('type', 'inkomst')], 'amount');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -32,6 +34,17 @@ class FinancialController extends Controller
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+        if ($request->filled('date_from')) {
+            $query->whereDate('invoice_date', '>=', $request->date('date_from'));
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('invoice_date', '<=', $request->date('date_to'));
+        }
+        if ($request->filled('service')) {
+            $service = $request->string('service');
+            $query->whereHas('lines', fn ($q) => $q->where('description', 'like', "%{$service}%")
+                ->orWhere('service_reference', 'like', "%{$service}%"));
         }
 
         $invoices = $query->latest('invoice_date')->paginate(15);

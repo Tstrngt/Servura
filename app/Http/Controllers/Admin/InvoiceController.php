@@ -9,7 +9,6 @@ use App\Models\TransactionLog;
 use App\Models\User;
 use App\Services\InvoiceService;
 use App\Services\MolliePaymentService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -22,6 +21,7 @@ class InvoiceController extends Controller
 
     public function create()
     {
+        $this->authorize('invoices.drafts.manage');
         $customers = User::customers()->orderBy('name')->get();
 
         return view('admin.financial.invoices-create', compact('customers'));
@@ -29,6 +29,7 @@ class InvoiceController extends Controller
 
     public function store(Request $request, InvoiceService $invoiceService)
     {
+        $this->authorize('invoices.drafts.manage');
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'notes' => 'nullable|string',
@@ -36,6 +37,11 @@ class InvoiceController extends Controller
             'lines.*.description' => 'required|string|max:255',
             'lines.*.quantity' => 'required|integer|min:1',
             'lines.*.unit_price' => 'required|numeric|min:0',
+            'lines.*.vat_percentage' => 'nullable|numeric|min:0|max:100',
+            'lines.*.discount_amount' => 'nullable|numeric|min:0',
+            'lines.*.period_start' => 'nullable|date',
+            'lines.*.period_end' => 'nullable|date|after_or_equal:lines.*.period_start',
+            'lines.*.service_reference' => 'nullable|string|max:255',
         ]);
 
         $invoice = $invoiceService->createManual(
@@ -49,17 +55,16 @@ class InvoiceController extends Controller
             ->with('success', "Factuur {$invoice->invoice_number} aangemaakt.");
     }
 
-    public function download(Invoice $invoice)
+    public function download(Invoice $invoice, \App\Services\InvoiceDocumentService $documents)
     {
-        $invoice->load(['lines', 'user']);
+        $this->authorize('invoices.download');
 
-        return Pdf::loadView('pdf.invoice', compact('invoice'))
-            ->setPaper('a4')
-            ->download($invoice->invoice_number.'.pdf');
+        return $documents->pdf($invoice)->download($invoice->invoice_number.'.pdf');
     }
 
     public function show(Invoice $invoice)
     {
+        $this->authorize('invoices.view');
         $invoice->load(['user', 'lines', 'transactions', 'quote']);
         $logs = TransactionLog::where('loggable_type', Invoice::class)
             ->where('loggable_id', $invoice->id)
@@ -71,6 +76,8 @@ class InvoiceController extends Controller
 
     public function edit(Invoice $invoice)
     {
+        $this->authorize('invoices.drafts.manage');
+        abort_unless($invoice->status === 'concept', 422, 'Alleen conceptfacturen kunnen worden bewerkt. Maak voor een uitgegeven factuur een creditfactuur.');
         $invoice->load('lines');
         $customers = User::customers()->orderBy('name')->get();
 
@@ -79,13 +86,20 @@ class InvoiceController extends Controller
 
     public function update(Request $request, Invoice $invoice, InvoiceService $invoiceService)
     {
+        $this->authorize('invoices.drafts.manage');
+        abort_unless($invoice->status === 'concept', 422, 'Alleen conceptfacturen kunnen worden bewerkt.');
         $request->validate([
             'notes' => 'nullable|string',
             'internal_notes' => 'nullable|string',
             'lines' => 'required|array|min:1',
             'lines.*.description' => 'required|string|max:255',
             'lines.*.quantity' => 'required|integer|min:1',
-            'lines.*.unit_price' => 'required|numeric|min:0',
+            'lines.*.unit_price' => $invoice->document_type === 'credit' ? 'required|numeric|max:0' : 'required|numeric|min:0',
+            'lines.*.vat_percentage' => 'nullable|numeric|min:0|max:100',
+            'lines.*.discount_amount' => $invoice->document_type === 'credit' ? 'nullable|numeric|max:0' : 'nullable|numeric|min:0',
+            'lines.*.period_start' => 'nullable|date',
+            'lines.*.period_end' => 'nullable|date|after_or_equal:lines.*.period_start',
+            'lines.*.service_reference' => 'nullable|string|max:255',
         ]);
 
         // Delete old lines and re-create
@@ -97,6 +111,11 @@ class InvoiceController extends Controller
                 'quantity' => $line['quantity'] ?? 1,
                 'unit_price' => $line['unit_price'],
                 'total' => $total,
+                'vat_percentage' => $line['vat_percentage'] ?? $invoice->vat_percentage,
+                'discount_amount' => $line['discount_amount'] ?? 0,
+                'period_start' => $line['period_start'] ?? null,
+                'period_end' => $line['period_end'] ?? null,
+                'service_reference' => $line['service_reference'] ?? null,
                 'sort_order' => $i,
             ]);
         }
@@ -121,6 +140,8 @@ class InvoiceController extends Controller
 
     public function destroy(Invoice $invoice)
     {
+        $this->authorize('invoices.drafts.manage');
+        abort_unless($invoice->status === 'concept', 422, 'Uitgegeven facturen kunnen niet worden verwijderd. Gebruik een creditfactuur.');
         $invoiceNumber = $invoice->invoice_number;
         $invoice->delete();
 
@@ -130,11 +151,15 @@ class InvoiceController extends Controller
 
     public function updateStatus(Request $request, Invoice $invoice, MolliePaymentService $payments)
     {
+        $this->authorize(in_array($request->input('status'), ['betaald', 'in_behandeling'], true) ? 'payments.manage' : 'invoices.send');
         $request->validate([
             'status' => 'required|in:concept,verzonden,openstaand,vervallen,te_laat,betaald,geannuleerd,gecrediteerd,in_behandeling',
         ]);
 
         $oldStatus = $invoice->status;
+        if (in_array($request->status, ['openstaand', 'verzonden'], true) && ! in_array($oldStatus, ['openstaand', 'verzonden', 'betaald'], true)) {
+            app(\App\Services\InvoiceDocumentService::class)->issue($invoice);
+        }
         $invoice->update([
             'status' => $request->status,
             'paid_at' => $request->status === 'betaald' ? ($invoice->paid_at ?? now()) : $invoice->paid_at,
@@ -162,6 +187,7 @@ class InvoiceController extends Controller
 
     public function storeNote(Request $request, Invoice $invoice)
     {
+        $this->authorize('invoices.view');
         $request->validate(['internal_notes' => 'required|string']);
 
         $existing = $invoice->internal_notes;
@@ -175,11 +201,16 @@ class InvoiceController extends Controller
 
     public function storePayment(Request $request, Invoice $invoice, MolliePaymentService $payments)
     {
+        $this->authorize('payments.manage');
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'payment_method' => 'required|in:bank,ideal,contant,overig',
             'description' => 'nullable|string',
         ]);
+
+        if ((float) $request->amount > $invoice->outstanding_amount) {
+            return back()->withErrors(['amount' => 'Het bedrag mag niet hoger zijn dan het openstaande bedrag van €'.number_format($invoice->outstanding_amount, 2, ',', '.').'.']);
+        }
 
         Transaction::create([
             'transaction_number' => Transaction::generateNumber(),
@@ -214,6 +245,8 @@ class InvoiceController extends Controller
 
     public function markSent(Invoice $invoice)
     {
+        $this->authorize('invoices.send');
+        app(\App\Services\InvoiceDocumentService::class)->issue($invoice);
         $invoice->update([
             'status' => 'openstaand',
             'sent_at' => now(),
@@ -233,8 +266,37 @@ class InvoiceController extends Controller
         return back()->with('success', 'Factuur is gemarkeerd als openstaand.');
     }
 
+    public function createCredit(Invoice $invoice)
+    {
+        $this->authorize('invoices.credit.create');
+        abort_if($invoice->status === 'concept' || $invoice->document_type === 'credit', 422, 'Deze factuur kan niet worden gecrediteerd.');
+        $invoice->load(['lines', 'user']);
+
+        $credit = \Illuminate\Support\Facades\DB::transaction(function () use ($invoice) {
+            $credit = Invoice::create([
+                'invoice_number' => Invoice::generateCreditNumber(), 'document_type' => 'credit', 'credited_invoice_id' => $invoice->id,
+                'user_id' => $invoice->user_id, 'invoice_date' => now(), 'due_date' => now(), 'vat_percentage' => $invoice->vat_percentage,
+                'status' => 'concept', 'notes' => "Credit voor {$invoice->invoice_number}",
+            ]);
+            foreach ($invoice->lines as $i => $line) {
+                $credit->lines()->create([
+                    'description' => 'Credit: '.$line->description, 'quantity' => $line->quantity, 'unit_price' => -abs((float) $line->unit_price),
+                    'total' => -abs((float) $line->total), 'vat_percentage' => $line->vat_percentage, 'discount_amount' => -abs((float) $line->discount_amount),
+                    'period_start' => $line->period_start, 'period_end' => $line->period_end, 'service_reference' => $line->service_reference,
+                    'customer_service_id' => $line->customer_service_id, 'sort_order' => $i,
+                ]);
+            }
+            $credit->recalculate();
+            return $credit;
+        });
+        \App\Models\AuditLog::record('credit_invoice_created', $credit, null, ['credited_invoice' => $invoice->invoice_number]);
+
+        return redirect()->route('admin.financial.invoices.show', $credit)->with('success', 'Conceptcreditfactuur aangemaakt. Controleer deze voordat je hem uitgeeft.');
+    }
+
     public function markPaid(Invoice $invoice, MolliePaymentService $payments)
     {
+        $this->authorize('payments.manage');
         $invoice->update([
             'status' => 'betaald',
             'paid_at' => now(),

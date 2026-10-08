@@ -56,6 +56,10 @@ class InvoiceService
                 'quantity' => 1,
                 'unit_price' => $price,
                 'total' => $price,
+                'vat_percentage' => $invoice->vat_percentage,
+                'period_start' => $customerService->current_period_start,
+                'period_end' => $customerService->current_period_end,
+                'service_reference' => $customerService->domain,
                 'customer_service_id' => $customerService->id,
                 'sort_order' => $i,
             ]);
@@ -109,6 +113,10 @@ class InvoiceService
             'quantity' => 1,
             'unit_price' => $price,
             'total' => $price,
+            'vat_percentage' => $invoice->vat_percentage,
+            'period_start' => $customerService->current_period_start,
+            'period_end' => $customerService->current_period_end,
+            'service_reference' => $customerService->domain,
             'customer_service_id' => $customerService->id,
             'sort_order' => 0,
         ]);
@@ -150,6 +158,11 @@ class InvoiceService
                 'quantity' => $line['quantity'] ?? 1,
                 'unit_price' => $line['unit_price'],
                 'total' => $total,
+                'vat_percentage' => $line['vat_percentage'] ?? $invoice->vat_percentage,
+                'discount_amount' => $line['discount_amount'] ?? 0,
+                'period_start' => $line['period_start'] ?? null,
+                'period_end' => $line['period_end'] ?? null,
+                'service_reference' => $line['service_reference'] ?? null,
                 'customer_service_id' => $line['customer_service_id'] ?? null,
                 'sort_order' => $i,
             ]);

@@ -23,11 +23,12 @@
                 </div>
                 <div class="flex items-center space-x-3">
                     <a href="{{ route('admin.financial.invoices.download', $invoice) }}" class="btn btn-outline text-sm">PDF downloaden</a>
-                    <a href="{{ route('admin.financial.invoices.edit', $invoice) }}" class="btn btn-outline text-sm">Bewerken</a>
-                    <form method="POST" action="{{ route('admin.financial.invoices.destroy', $invoice) }}" onsubmit="return confirm('Weet je zeker dat je deze factuur wilt verwijderen?')">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="btn btn-outline text-red-600 border-red-300 hover:bg-red-50 text-sm">Verwijderen</button>
-                    </form>
+                    @if($invoice->status === 'concept')
+                        <a href="{{ route('admin.financial.invoices.edit', $invoice) }}" class="btn btn-outline text-sm">Bewerken</a>
+                        <form method="POST" action="{{ route('admin.financial.invoices.destroy', $invoice) }}" onsubmit="return confirm('Deze conceptfactuur verwijderen?')">@csrf @method('DELETE')<button type="submit" class="btn btn-outline text-red-600 border-red-300 hover:bg-red-50 text-sm">Verwijderen</button></form>
+                    @elseif($invoice->document_type !== 'credit')
+                        <form method="POST" action="{{ route('admin.financial.invoices.credit', $invoice) }}" onsubmit="return confirm('Een conceptcreditfactuur maken voor {{ $invoice->invoice_number }}?')">@csrf<button type="submit" class="btn btn-outline text-sm">Creditfactuur maken</button></form>
+                    @endif
                     <a href="{{ route('admin.financial.invoices') }}" class="text-sm text-gray-500 hover:text-gray-700">Terug</a>
                 </div>
             </div>

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DomainRegistrationController as AdminDomainRegist
 use App\Http\Controllers\Admin\DomainTldController as AdminDomainTldController;
 use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
+use App\Http\Controllers\Admin\InvoiceDesignController as AdminInvoiceDesignController;
 use App\Http\Controllers\Admin\QuoteController as AdminQuoteController;
 use App\Http\Controllers\Admin\ServerConnectionController as AdminServerConnectionController;
 use App\Http\Controllers\Admin\ServiceCancellationController;
@@ -261,6 +262,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/invoices/{invoice}', [AdminInvoiceController::class, 'show'])->name('invoices.show');
             Route::post('/invoices/{invoice}/mark-sent', [AdminInvoiceController::class, 'markSent'])->name('invoices.mark-sent');
             Route::post('/invoices/{invoice}/mark-paid', [AdminInvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
+            Route::post('/invoices/{invoice}/credit', [AdminInvoiceController::class, 'createCredit'])->name('invoices.credit');
             Route::get('/transactions', [FinancialController::class, 'transactions'])->name('transactions');
             Route::get('/transactions/{transaction}/edit', [AdminTransactionController::class, 'edit'])->name('transactions.edit');
             Route::put('/transactions/{transaction}', [AdminTransactionController::class, 'update'])->name('transactions.update');
@@ -283,6 +285,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/logs', [FinancialController::class, 'logs'])->name('logs');
             Route::get('/billing-settings', [AdminBillingSettingsController::class, 'edit'])->name('billing-settings.edit');
             Route::put('/billing-settings', [AdminBillingSettingsController::class, 'update'])->name('billing-settings.update');
+            Route::get('/invoice-design', [AdminInvoiceDesignController::class, 'edit'])->name('invoice-design.edit');
+            Route::put('/invoice-design', [AdminInvoiceDesignController::class, 'update'])->name('invoice-design.update');
+            Route::get('/invoice-design/preview', [AdminInvoiceDesignController::class, 'preview'])->name('invoice-design.preview');
+            Route::post('/invoice-design/publish', [AdminInvoiceDesignController::class, 'publish'])->name('invoice-design.publish');
+            Route::post('/invoice-design/{version}/restore', [AdminInvoiceDesignController::class, 'restore'])->name('invoice-design.restore');
         });
 
         Route::prefix('settings')->name('settings.')->group(function () {

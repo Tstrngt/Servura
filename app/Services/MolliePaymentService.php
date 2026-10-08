@@ -29,10 +29,15 @@ class MolliePaymentService
      */
     public function createPayment(Invoice $invoice, ?string $method = null, bool $establishMandate = false, ?string $cardToken = null): string
     {
+        $outstanding = $invoice->outstanding_amount;
+        if ($outstanding <= 0) {
+            throw new \RuntimeException('Deze factuur heeft geen openstaand bedrag.');
+        }
+
         $payload = [
             'amount' => [
                 'currency' => 'EUR',
-                'value' => number_format($invoice->total, 2, '.', ''),
+                'value' => number_format($outstanding, 2, '.', ''),
             ],
             'description' => "Factuur {$invoice->invoice_number}",
             'redirectUrl' => route('customer.invoices.payment.return', $invoice),
@@ -410,58 +415,47 @@ class MolliePaymentService
         }
 
         $invoiceId = $payment->metadata->invoice_id;
-        $invoice = Invoice::findOrFail($invoiceId);
 
-        if ($payment->isPaid()) {
-            if ($invoice->status === 'betaald') {
-                $this->finalizePaidInvoice($invoice);
-
-                return;
+        DB::transaction(function () use ($invoiceId, $payment, $paymentId) {
+            $invoice = Invoice::query()->lockForUpdate()->findOrFail($invoiceId);
+            if ($invoice->mollie_payment_id !== $paymentId) {
+                throw new \RuntimeException('Mollie betaling hoort niet bij deze factuur.');
             }
 
-            $invoice->update([
-                'status' => 'betaald',
-                'paid_at' => now(),
-            ]);
-
-            Transaction::create([
-                'transaction_number' => Transaction::generateNumber(),
-                'user_id' => $invoice->user_id,
-                'invoice_id' => $invoice->id,
-                'amount' => $invoice->total,
-                'type' => 'inkomst',
-                'payment_method' => $payment->method ?? 'mollie',
-                'status' => 'voltooid',
-                'description' => "Betaling factuur {$invoice->invoice_number}",
-                'transaction_date' => now(),
-                'reference' => $paymentId,
-            ]);
-
-            $this->finalizePaidInvoice($invoice);
-
-            TransactionLog::create([
-                'user_id' => $invoice->user_id,
-                'loggable_type' => Invoice::class,
-                'loggable_id' => $invoice->id,
-                'action' => 'betaald',
-                'description' => "Factuur {$invoice->invoice_number} betaald via Mollie",
-                'metadata' => ['mollie_payment_id' => $paymentId],
-            ]);
-        } elseif ($payment->isFailed() || $payment->isExpired() || $payment->isCanceled()) {
-            // Reset to verzonden so customer can try again
-            if ($invoice->status !== 'betaald') {
-                $invoice->update(['status' => 'verzonden']);
+            if ($payment->isPaid()) {
+                if (Transaction::where('reference', $paymentId)->exists()) {
+                    return;
+                }
+                $amount = (float) ($payment->amount->value ?? 0);
+                Transaction::create([
+                    'transaction_number' => Transaction::generateNumber(), 'user_id' => $invoice->user_id,
+                    'invoice_id' => $invoice->id, 'amount' => $amount, 'type' => 'inkomst',
+                    'payment_method' => $payment->method ?? 'mollie', 'status' => 'voltooid',
+                    'description' => "Betaling factuur {$invoice->invoice_number}", 'transaction_date' => now(), 'reference' => $paymentId,
+                ]);
+                $totalPaid = (float) $invoice->transactions()->where('status', 'voltooid')->where('type', 'inkomst')->sum('amount');
+                $isPaid = $totalPaid >= (float) $invoice->total;
+                $invoice->update(['status' => $isPaid ? 'betaald' : 'verzonden', 'paid_at' => $isPaid ? now() : null]);
+                if ($isPaid) {
+                    $this->finalizePaidInvoice($invoice);
+                }
+                TransactionLog::create([
+                    'user_id' => $invoice->user_id, 'loggable_type' => Invoice::class, 'loggable_id' => $invoice->id,
+                    'action' => $isPaid ? 'betaald' : 'deelbetaling',
+                    'description' => "Mollie-betaling van €".number_format($amount, 2, ',', '.')." verwerkt voor {$invoice->invoice_number}",
+                    'metadata' => ['mollie_payment_id' => $paymentId],
+                ]);
+            } elseif ($payment->isFailed() || $payment->isExpired() || $payment->isCanceled()) {
+                if ($invoice->status !== 'betaald') {
+                    $invoice->update(['status' => 'verzonden', 'payment_url' => null]);
+                }
+                TransactionLog::create([
+                    'user_id' => $invoice->user_id, 'loggable_type' => Invoice::class, 'loggable_id' => $invoice->id,
+                    'action' => 'betaling_mislukt', 'description' => "Betaling voor factuur {$invoice->invoice_number} mislukt/geannuleerd",
+                    'metadata' => ['mollie_payment_id' => $paymentId, 'status' => $payment->status],
+                ]);
             }
-
-            TransactionLog::create([
-                'user_id' => $invoice->user_id,
-                'loggable_type' => Invoice::class,
-                'loggable_id' => $invoice->id,
-                'action' => 'betaling_mislukt',
-                'description' => "Betaling voor factuur {$invoice->invoice_number} mislukt/geannuleerd",
-                'metadata' => ['mollie_payment_id' => $paymentId, 'status' => $payment->status],
-            ]);
-        }
+        });
     }
 
     /**

@@ -11,10 +11,12 @@ class Invoice extends Model
 
     protected $fillable = [
         'invoice_number',
+        'document_type',
         'user_id',
         'invoice_date',
         'due_date',
         'subtotal',
+        'discount_amount',
         'vat_amount',
         'total',
         'vat_percentage',
@@ -29,6 +31,10 @@ class Invoice extends Model
         'quote_id',
         'renewal_key',
         'customer_service_id',
+        'invoice_design_version_id',
+        'credited_invoice_id',
+        'issuer_snapshot',
+        'customer_snapshot',
         'period_start',
         'period_end',
     ];
@@ -37,7 +43,10 @@ class Invoice extends Model
         'invoice_date' => 'date',
         'due_date' => 'date',
         'subtotal' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
         'vat_amount' => 'decimal:2',
+        'issuer_snapshot' => 'array',
+        'customer_snapshot' => 'array',
         'total' => 'decimal:2',
         'vat_percentage' => 'decimal:2',
         'sent_at' => 'datetime',
@@ -89,6 +98,32 @@ class Invoice extends Model
         return $this->belongsTo(CustomerService::class);
     }
 
+    public function designVersion()
+    {
+        return $this->belongsTo(InvoiceDesignVersion::class, 'invoice_design_version_id');
+    }
+
+    public function creditedInvoice()
+    {
+        return $this->belongsTo(self::class, 'credited_invoice_id');
+    }
+
+    public function creditInvoices()
+    {
+        return $this->hasMany(self::class, 'credited_invoice_id');
+    }
+
+    public function getPaidAmountAttribute(): float
+    {
+        return max(0, (float) $this->transactions()->where('status', 'voltooid')->where('type', 'inkomst')->sum('amount')
+            - (float) $this->transactions()->where('status', 'terugbetaald')->sum('amount'));
+    }
+
+    public function getOutstandingAmountAttribute(): float
+    {
+        return max(0, (float) $this->total - $this->paid_amount);
+    }
+
     public function dunningEvents()
     {
         return $this->hasMany(InvoiceDunningEvent::class);
@@ -132,19 +167,33 @@ class Invoice extends Model
 
     public function recalculate()
     {
-        $subtotal = $this->lines()->sum('total');
-        $vatAmount = round($subtotal * ($this->vat_percentage / 100), 2);
+        $lines = $this->lines()->get();
+        $subtotal = $lines->sum('total');
+        $discount = $lines->sum('discount_amount');
+        $vatAmount = $lines->sum(fn ($line) => round(((float) $line->total - (float) $line->discount_amount) * ((float) ($line->vat_percentage ?? $this->vat_percentage) / 100), 2));
         $this->update([
             'subtotal' => $subtotal,
+            'discount_amount' => $discount,
             'vat_amount' => $vatAmount,
-            'total' => $subtotal + $vatAmount,
+            'total' => $subtotal - $discount + $vatAmount,
         ]);
+    }
+
+    public static function generateCreditNumber(): string
+    {
+        $year = date('Y');
+        $prefix = BillingSetting::valueFor('credit_number_prefix', 'CR');
+        $last = static::where('invoice_number', 'like', "{$prefix}-{$year}-%")->orderByDesc('invoice_number')->first();
+        $num = $last ? (int) substr($last->invoice_number, -4) + 1 : 1;
+
+        return sprintf('%s-%s-%04d', $prefix, $year, $num);
     }
 
     public static function generateNumber(): string
     {
         $year = date('Y');
-        $last = static::where('invoice_number', 'like', "FAC-{$year}-%")
+        $prefix = BillingSetting::valueFor('invoice_number_prefix', 'FAC');
+        $last = static::where('invoice_number', 'like', "{$prefix}-{$year}-%")
             ->orderByDesc('invoice_number')
             ->first();
 
@@ -154,6 +203,6 @@ class Invoice extends Model
             $num = 1;
         }
 
-        return sprintf('FAC-%s-%04d', $year, $num);
+        return sprintf('%s-%s-%04d', $prefix, $year, $num);
     }
 }

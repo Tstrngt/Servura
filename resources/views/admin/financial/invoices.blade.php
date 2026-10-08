@@ -35,8 +35,11 @@
                         @endforeach
                     </select>
                 </div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Dienst</label><input type="text" name="service" value="{{ request('service') }}" placeholder="Domein of dienst..." class="form-input w-52"></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Vanaf</label><input type="date" name="date_from" value="{{ request('date_from') }}" class="form-input"></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Tot</label><input type="date" name="date_to" value="{{ request('date_to') }}" class="form-input"></div>
                 <button type="submit" class="btn btn-outline">Filteren</button>
-                @if(request()->hasAny(['search', 'status']))
+                @if(request()->hasAny(['search', 'status', 'service', 'date_from', 'date_to']))
                     <a href="{{ route('admin.financial.invoices') }}" class="text-sm text-gray-500 hover:text-gray-700">Reset</a>
                 @endif
             </form>
@@ -54,7 +57,9 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Klant</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vervaldatum</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Bedrag</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Totaal</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Betaald</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Openstaand</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acties</th>
                                 </tr>
@@ -71,7 +76,10 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $invoice->invoice_date->format('d-m-Y') }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $invoice->due_date->format('d-m-Y') }}</td>
+                                        @php($paid = (float) ($invoice->paid_amount_sum ?? 0))
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">€{{ number_format($invoice->total, 2, ',', '.') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-emerald-700 text-right">€{{ number_format($paid, 2, ',', '.') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900 text-right">€{{ number_format(max(0, (float)$invoice->total - $paid), 2, ',', '.') }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $invoice->statusLabel['color'] }}-100 text-{{ $invoice->statusLabel['color'] }}-800">
                                                 {{ $invoice->statusLabel['text'] }}

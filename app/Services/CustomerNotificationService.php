@@ -112,7 +112,7 @@ class CustomerNotificationService
             'invoice' => $invoice,
             'invoiceUrl' => route('customer.invoices.show', $invoice),
         ], [[
-            'data' => Pdf::loadView('pdf.invoice', compact('invoice'))->setPaper('a4')->output(),
+            'data' => app(InvoiceDocumentService::class)->pdf($invoice)->output(),
             'name' => $invoice->invoice_number.'.pdf',
         ]]);
     }
@@ -138,7 +138,7 @@ class CustomerNotificationService
             'invoice' => $invoice,
             'invoiceUrl' => route('customer.invoices.show', $invoice),
         ], [[
-            'data' => Pdf::loadView('pdf.invoice', compact('invoice'))->setPaper('a4')->output(),
+            'data' => app(InvoiceDocumentService::class)->pdf($invoice)->output(),
             'name' => $invoice->invoice_number.'.pdf',
         ]]);
     }
