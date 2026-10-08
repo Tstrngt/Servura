@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\DirectAdminClient;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Mockery;
 use Tests\TestCase;
@@ -57,6 +58,23 @@ class ExistingDirectAdminServiceImportTest extends TestCase
 
         $this->assertDatabaseCount('customer_services', 0);
         $this->assertDatabaseCount('invoices', 0);
+    }
+
+    public function test_user_config_is_requested_with_get_query_parameter(): void
+    {
+        [, , $service] = $this->setupRecords();
+        Http::fake([
+            'https://server.example.test:2222/CMD_API_SHOW_USER_CONFIG*' => Http::response([
+                'package' => 'Custom_STC_De_Rijnstreek', 'domain' => 'stc-de-rijnstreek.nl',
+            ]),
+        ]);
+
+        $config = app(DirectAdminClient::class)->using($service->serverConnection)->getUserConfig('stcrijn');
+
+        $this->assertSame('Custom_STC_De_Rijnstreek', $config['package']);
+        Http::assertSent(fn ($request) => $request->method() === 'GET'
+            && str_starts_with($request->url(), 'https://server.example.test:2222/CMD_API_SHOW_USER_CONFIG?')
+            && $request['user'] === 'stcrijn' && $request['json'] === 'yes');
     }
 
     private function setupRecords(): array

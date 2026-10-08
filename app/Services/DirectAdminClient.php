@@ -75,13 +75,13 @@ class DirectAdminClient
      */
     public function getUserConfig(string $username): array
     {
-        return $this->request('CMD_API_SHOW_USER_CONFIG', ['user' => $username]);
+        return $this->get('CMD_API_SHOW_USER_CONFIG', ['user' => $username]);
     }
 
     public function userExists(string $username): bool
     {
         try {
-            $result = $this->request('CMD_API_SHOW_USER_CONFIG', ['user' => $username]);
+            $result = $this->get('CMD_API_SHOW_USER_CONFIG', ['user' => $username]);
 
             if (filled($result)) {
                 return true;
@@ -91,7 +91,7 @@ class DirectAdminClient
         }
 
         try {
-            $result = $this->request('CMD_API_SHOW_USERS');
+            $result = $this->get('CMD_API_SHOW_USERS');
             $list = $result['list'] ?? $result;
 
             return is_array($list) && in_array($username, $list, true);
@@ -140,7 +140,26 @@ class DirectAdminClient
         ]);
     }
 
-    private function request(string $endpoint, array $data, int $timeoutSeconds = null): array
+    private function get(string $endpoint, array $query = [], int $timeoutSeconds = null): array
+    {
+        if (!$this->isConfigured()) {
+            throw new \RuntimeException('DirectAdmin is niet geconfigureerd.');
+        }
+
+        try {
+            $response = $this->http($timeoutSeconds)->get(
+                rtrim($this->value('url'), '/') . '/' . $endpoint,
+                $query + ['json' => 'yes']
+            );
+            $response->throw();
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('DirectAdmin-verzoek mislukt: ' . $e->getMessage(), 0, $e);
+        }
+
+        return $this->parseResponse($response->body());
+    }
+
+    private function request(string $endpoint, array $data = [], int $timeoutSeconds = null): array
     {
         if (!$this->isConfigured()) {
             throw new \RuntimeException('DirectAdmin is niet geconfigureerd.');
