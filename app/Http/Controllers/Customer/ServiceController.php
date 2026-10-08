@@ -168,8 +168,11 @@ class ServiceController extends Controller
     {
         $this->authorizeView($customerService);
 
-        if ($customerService->service->fulfillment_type !== 'directadmin' || ! $customerService->external_username || ! $customerService->external_password || ! $customerService->service->serverConnection) {
-            return back()->with('error', 'Direct inloggen is alleen beschikbaar voor actieve DirectAdmin-diensten.');
+        if ($customerService->service->fulfillment_type !== 'directadmin' || ! $customerService->external_username || ! $customerService->service->serverConnection) {
+            return back()->with('error', 'Deze dienst heeft geen volledige DirectAdmin-koppeling.');
+        }
+        if (! $customerService->external_password) {
+            return back()->with('error', 'Stel eerst eenmalig het DirectAdmin-wachtwoord opnieuw in. Daarna werkt direct inloggen.');
         }
 
         $serverUrl = rtrim($customerService->service->serverConnection->url, '/');

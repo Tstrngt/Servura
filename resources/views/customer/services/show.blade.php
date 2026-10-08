@@ -250,17 +250,19 @@
                         <h2 class="text-lg font-semibold">DirectAdmin</h2>
                         <p class="mt-1 text-sm text-slate-300">Open het controlepaneel voor dit hostingaccount.</p>
 
-                        <form action="{{ route('customer.services.directadmin-login', $customerService) }}" method="POST" target="_blank" class="mt-5">
-                            @csrf
-                            <button type="submit" class="w-full inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-500 transition-colors">
-                                Open DirectAdmin
-                            </button>
-                        </form>
+                        @if($customerService->external_password)
+                            <form action="{{ route('customer.services.directadmin-login', $customerService) }}" method="POST" target="_blank" class="mt-5">
+                                @csrf
+                                <button type="submit" class="w-full inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-500 transition-colors">Open DirectAdmin</button>
+                            </form>
+                        @else
+                            <div class="mt-5 rounded-xl bg-amber-400/10 p-3 text-sm leading-5 text-amber-200 ring-1 ring-amber-300/20">Dit bestaande account is veilig gekoppeld zonder het oude wachtwoord over te nemen. Stel hieronder eenmalig een nieuw DirectAdmin-wachtwoord in om direct inloggen te activeren.</div>
+                        @endif
 
                         <form action="{{ route('customer.services.reset-password', $customerService) }}" method="POST" class="mt-3" onsubmit="return confirm('Weet je zeker dat je het DirectAdmin-wachtwoord opnieuw wilt instellen?')">
                             @csrf
                             <button type="submit" class="w-full inline-flex items-center justify-center rounded-lg bg-white/10 px-4 py-3 text-sm font-semibold text-white ring-1 ring-white/15 hover:bg-white/15 transition-colors">
-                                Wachtwoord resetten
+                                {{ $customerService->external_password ? 'Wachtwoord resetten' : 'DirectAdmin-wachtwoord instellen' }}
                             </button>
                         </form>
 
