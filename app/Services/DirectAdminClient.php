@@ -198,11 +198,7 @@ class DirectAdminClient
             throw new \RuntimeException($message);
         }
 
-        if (!$hasError && $success !== '' && stripos($success, 'Login OK') !== false) {
-            return $result;
-        }
-
-        if (!$hasError && $success === '') {
+        if (!$hasError) {
             return $result;
         }
 

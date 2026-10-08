@@ -81,7 +81,7 @@ class ExistingDirectAdminServiceImportTest extends TestCase
     {
         [, , $service] = $this->setupRecords();
         Http::fake([
-            'https://server.example.test:2222/CMD_API_USER_PASSWD' => Http::response(['error' => 0, 'text' => 'Password Changed']),
+            'https://server.example.test:2222/CMD_API_USER_PASSWD' => Http::response(['result' => '', 'success' => 'Password Changed']),
         ]);
 
         app(DirectAdminClient::class)->using($service->serverConnection)->resetPassword('stcrijn', 'NieuwVeiligWachtwoord123!');
