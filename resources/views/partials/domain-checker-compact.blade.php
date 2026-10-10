@@ -5,9 +5,9 @@
         error = '';
         result = null;
         fetch('{{ route('api.domains.check') }}?name=' + encodeURIComponent(query.trim()))
-            .then(r => r.json())
+            .then(async r => { const data = await r.json(); if (!r.ok) throw new Error(data.message || 'De domeincontrole kon niet worden uitgevoerd.'); return data; })
             .then(data => { result = data; })
-            .catch(() => { error = 'Er ging iets mis. Probeer het later opnieuw.'; })
+            .catch(e => { error = e.message || 'Er ging iets mis. Probeer het later opnieuw.'; })
             .finally(() => { loading = false; });
     " class="flex flex-col sm:flex-row gap-3">
         <label for="domain-checker-name" class="sr-only">Bedrijfsnaam of domeinnaam</label>

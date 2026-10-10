@@ -29,11 +29,20 @@ class DomainController extends Controller
                 'name' => $name,
                 'results' => [],
                 'status' => 'unconfigured',
+                'message' => 'De actieve domeinprovider is nog niet volledig geconfigureerd.',
             ], 503);
         }
 
         $tlds = DomainTld::active()->with('servicePrice.service')->get();
         $domainService = Service::where('fulfillment_type', 'domain')->first();
+        if ($tlds->isEmpty()) {
+            return response()->json([
+                'name' => $name,
+                'results' => [],
+                'status' => 'no_tlds',
+                'message' => 'Er zijn geen actieve domeinextensies ingesteld.',
+            ], 422);
+        }
         $cacheKeyBase = 'domain_suggest_'.preg_replace('/[^a-z0-9-]/', '', $name);
 
         try {
@@ -99,7 +108,7 @@ class DomainController extends Controller
                 'name' => $name,
                 'results' => [],
                 'status' => 'error',
-                'message' => 'Er ging iets mis. Probeer het later opnieuw.',
+                'message' => 'De domeincontrole bij '.$provider->name().' is mislukt: '.\Illuminate\Support\Str::limit($e->getMessage(), 300),
             ], 500);
         }
     }
