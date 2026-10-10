@@ -12,6 +12,8 @@
             <h1 class="mt-2 text-2xl font-bold text-gray-900">{{ $domainRegistration->domain_name }}</h1>
         </div>
 
+        @if(session('success'))<div class="mb-4 rounded-xl bg-green-50 p-4 text-sm text-green-700 ring-1 ring-green-200">{{ session('success') }}</div>@endif
+        @if(session('error'))<div class="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700 ring-1 ring-red-200">{{ session('error') }}</div>@endif
         @php $label = $domainRegistration->statusLabel; @endphp
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div class="lg:col-span-2 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
@@ -85,8 +87,14 @@
 
                 @if($domainRegistration->error_message)
                     <div class="mt-6 rounded-lg bg-red-50 p-4 ring-1 ring-red-200">
-                        <h3 class="text-sm font-semibold text-red-800">TransIP-fout</h3>
+                        <h3 class="text-sm font-semibold text-red-800">Providerfout</h3>
                         <p class="mt-1 text-sm text-red-700">{{ $domainRegistration->error_message }}</p>
+                        @if(in_array($domainRegistration->status, [\App\Models\DomainRegistration::STATUS_REGISTRATION_FAILED, \App\Models\DomainRegistration::STATUS_TRANSFER_FAILED], true))
+                            <form method="POST" action="{{ route('admin.domains.retry', $domainRegistration) }}" class="mt-4" onsubmit="return confirm('De reeds betaalde domeinactie opnieuw bij de provider uitvoeren?')">
+                                @csrf
+                                <button type="submit" class="btn btn-primary text-sm">Opnieuw proberen</button>
+                            </form>
+                        @endif
                     </div>
                 @endif
             </div>

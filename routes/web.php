@@ -235,6 +235,7 @@ Route::middleware('auth')->group(function () {
         // Domeinregistraties
         Route::get('/domeinen', [AdminDomainRegistrationController::class, 'index'])->name('domains.index');
         Route::get('/domeinen/{domainRegistration}', [AdminDomainRegistrationController::class, 'show'])->name('domains.show');
+        Route::post('/domeinen/{domainRegistration}/opnieuw-proberen', [AdminDomainRegistrationController::class, 'retry'])->name('domains.retry');
         Route::delete('/domeinen/{domainRegistration}', [AdminDomainRegistrationController::class, 'destroy'])->name('domains.destroy');
 
         Route::get('/mijn-profiel', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');

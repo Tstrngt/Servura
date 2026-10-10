@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerService;
 use App\Models\DomainRegistration;
+use App\Models\AuditLog;
 use App\Models\Invoice;
+use App\Services\DomainRegistrationService;
 use Illuminate\Support\Facades\DB;
 
 class DomainRegistrationController extends Controller
@@ -33,6 +35,36 @@ class DomainRegistrationController extends Controller
         $domainRegistration->load(['user', 'order', 'customerService']);
 
         return view('admin.domains.show', compact('domainRegistration'));
+    }
+
+    public function retry(DomainRegistration $domainRegistration, DomainRegistrationService $service)
+    {
+        $this->authorizeOwner();
+        abort_unless(in_array($domainRegistration->status, [
+            DomainRegistration::STATUS_REGISTRATION_FAILED,
+            DomainRegistration::STATUS_TRANSFER_FAILED,
+        ], true), 422);
+
+        $domainRegistration->loadMissing(['customerService', 'order.invoice']);
+        $invoice = $domainRegistration->order?->invoice;
+        abort_unless($invoice && ($invoice->status === 'betaald' || (float) $invoice->total <= 0), 422, 'Alleen een betaalde registratie kan opnieuw worden geprobeerd.');
+        abort_unless($domainRegistration->customerService, 422, 'Gekoppelde dienst ontbreekt.');
+
+        $result = $domainRegistration->type === DomainRegistration::TYPE_TRANSFER
+            ? $service->transfer($domainRegistration->customerService)
+            : $service->register($domainRegistration->customerService);
+
+        AuditLog::record('domain.registration.retried', $domainRegistration, null, [
+            'status' => $result->status,
+            'provider' => $result->provider,
+        ]);
+
+        return back()->with(
+            $result->status === DomainRegistration::STATUS_ACTIVE ? 'success' : 'error',
+            $result->status === DomainRegistration::STATUS_ACTIVE
+                ? 'Domeinregistratie is alsnog succesvol uitgevoerd.'
+                : 'De provider heeft de registratie opnieuw geweigerd: '.$result->error_message
+        );
     }
 
     public function destroy(DomainRegistration $domainRegistration)

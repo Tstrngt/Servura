@@ -243,7 +243,17 @@ class DomainService
             return [];
         }
 
-        return $provider->getTldCapabilities($domain->tld);
+        try {
+            return $provider->getTldCapabilities($domain->tld);
+        } catch (Throwable $e) {
+            Log::warning('Domain TLD capabilities fetch failed', [
+                'domain_registration_id' => $domain->id,
+                'domain' => $domain->domain_name,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
     }
 
     /**

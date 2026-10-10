@@ -42,7 +42,7 @@ class OpenProviderClient
             ->asJson()
             ->withToken($this->token())
             ->timeout(30)
-            ->retry(2, 250);
+            ->retry(3, 1000);
     }
 
     private function token(): string
