@@ -69,7 +69,12 @@ class OpenProviderIntegrationTest extends TestCase
         $this->assertSame('NL654321-NL', $user->fresh()->openprovider_handle);
         Http::assertSent(fn ($request) => $request->url() === 'https://api.sandbox.openprovider.nl/v1beta/customers'
             && $request['name']['first_name'] === 'Jan'
-            && $request['address']['country'] === 'NL');
+            && $request['address']['country'] === 'NL'
+            && $request['phone'] === [
+                'country_code' => '+31',
+                'area_code' => '6',
+                'subscriber_number' => '12345678',
+            ]);
     }
 
     public function test_registration_uses_configured_handle_and_nameservers(): void

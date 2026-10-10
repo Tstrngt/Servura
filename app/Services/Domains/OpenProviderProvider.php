@@ -56,11 +56,7 @@ class OpenProviderProvider implements DomainProvider
         $parts = preg_split('/\s+/', trim($user->name), 2);
         $firstName = $parts[0] ?? 'Klant';
         $lastName = $parts[1] ?? $firstName;
-        $phone = preg_replace('/\D+/', '', (string) $user->phone);
-        $countryCode = strtoupper((string) $user->country) === 'NL' ? '+31' : '';
-        if ($countryCode === '+31') {
-            $phone = str_starts_with($phone, '31') ? substr($phone, 2) : ltrim($phone, '0');
-        }
+        $phone = $this->phonePayload((string) $user->phone, (string) $user->country);
         $data = $this->client->request('POST', 'customers', [
             'name' => [
                 'first_name' => $firstName,
@@ -77,11 +73,7 @@ class OpenProviderProvider implements DomainProvider
             'email' => $user->email,
             'company_name' => (string) $user->company,
             'vat' => (string) $user->vat_number,
-            'phone' => [
-                'country_code' => $countryCode,
-                'area_code' => '',
-                'subscriber_number' => $phone,
-            ],
+            'phone' => $phone,
             'locale' => 'nl_NL',
             'comments' => 'Automatisch aangemaakt door Servura voor klant '.$user->id,
         ]);
@@ -288,6 +280,32 @@ class OpenProviderProvider implements DomainProvider
 
             return ['name' => $name, 'seq_nr' => $index + 1];
         })->filter(fn ($nameserver) => filled($nameserver['name']))->values()->all();
+    }
+
+    private function phonePayload(string $number, string $country): array
+    {
+        $digits = preg_replace('/\D+/', '', $number);
+        if ($digits === '') {
+            throw new RuntimeException('Een telefoonnummer is verplicht om de klant bij Openprovider aan te maken.');
+        }
+
+        if (strtoupper($country) === 'NL') {
+            if (str_starts_with($digits, '0031')) {
+                $digits = substr($digits, 4);
+            } elseif (str_starts_with($digits, '31')) {
+                $digits = substr($digits, 2);
+            }
+            $digits = ltrim($digits, '0');
+            $areaLength = str_starts_with($digits, '6') ? 1 : 2;
+
+            return [
+                'country_code' => '+31',
+                'area_code' => substr($digits, 0, $areaLength),
+                'subscriber_number' => substr($digits, $areaLength),
+            ];
+        }
+
+        throw new RuntimeException('Gebruik voor Openprovider een Nederlands telefoonnummer met landcode.');
     }
 
     private function customerHandle(): string
