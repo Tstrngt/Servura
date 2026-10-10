@@ -88,4 +88,31 @@ class AdminCustomerCreationTest extends TestCase
             ->assertOk()
             ->assertSee('Uw Servura-account');
     }
+
+    public function test_authorized_admin_can_send_standard_password_reset_and_verification_emails(): void
+    {
+        $owner = User::factory()->create(['role' => 'admin']);
+        $customer = User::factory()->create(['role' => 'customer', 'email_verified_at' => null]);
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        foreach (['password-reset', 'verify-email'] as $template) {
+            $this->actingAs($owner)
+                ->post(route('admin.customers.emails.standard', $customer), ['template' => $template])
+                ->assertRedirect(route('admin.customers.show', [$customer, 'tab' => 'emails']))
+                ->assertSessionHas('success');
+        }
+
+        $this->assertDatabaseHas('password_reset_tokens', ['email' => $customer->email]);
+        $this->assertDatabaseHas('customer_email_logs', [
+            'user_id' => $customer->id,
+            'template' => 'password-reset',
+            'status' => 'sent',
+        ]);
+        $this->assertDatabaseHas('customer_email_logs', [
+            'user_id' => $customer->id,
+            'template' => 'verify-email',
+            'status' => 'sent',
+        ]);
+        $this->assertNotNull($customer->fresh()->email_verification_token);
+    }
 }

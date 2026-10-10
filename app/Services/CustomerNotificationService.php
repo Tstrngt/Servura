@@ -12,6 +12,7 @@ use App\Models\TicketReply;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
 /**
@@ -37,6 +38,16 @@ class CustomerNotificationService
         $html = '<p>'.nl2br(e($message)).'</p>';
 
         return $this->deliver($user, $subject, view('emails.custom', compact('html', 'subject'))->render(), null, auth()->id());
+    }
+
+    public function passwordReset(User $user): bool
+    {
+        $token = Password::broker()->createToken($user);
+
+        return $this->send($user, 'password-reset', [
+            'user' => $user,
+            'resetUrl' => route('password.reset', ['token' => $token, 'email' => $user->email]),
+        ]);
     }
 
     public function orderPlaced(User $user, mixed $order): void
@@ -207,7 +218,7 @@ class CustomerNotificationService
         $quote = $data['quote'] ?? null;
         $service = $data['service'] ?? null;
         $server = $service?->service?->serverConnection;
-        $url = $data['verificationUrl'] ?? $data['orderUrl'] ?? $data['loginUrl'] ?? $data['dashboardUrl'] ?? $data['ticketUrl'] ?? $data['invoiceUrl'] ?? $data['quoteUrl'] ?? '';
+        $url = $data['verificationUrl'] ?? $data['resetUrl'] ?? $data['orderUrl'] ?? $data['loginUrl'] ?? $data['dashboardUrl'] ?? $data['ticketUrl'] ?? $data['invoiceUrl'] ?? $data['quoteUrl'] ?? '';
 
         return [
             '{{klant_naam}}' => e($user->name), '{{klant_email}}' => e($user->email),
@@ -231,6 +242,7 @@ class CustomerNotificationService
         return match ($view) {
             'account-created' => 'Welkom bij '.config('site.name', config('app.name')).' — bevestig uw e-mailadres',
             'verify-email' => 'Bevestig uw e-mailadres',
+            'password-reset' => 'Stel een nieuw wachtwoord in',
             'order-placed' => 'Bedankt voor uw bestelling',
             'hosting-activated' => 'Uw hostingaccount is actief',
             'service-suspended' => 'Uw dienst is tijdelijk opgeschort',

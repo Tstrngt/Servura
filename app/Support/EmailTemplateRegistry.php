@@ -6,6 +6,7 @@ class EmailTemplateRegistry
 {
     public const TEMPLATES = [
         'account-created' => 'Account aangemaakt', 'verify-email' => 'E-mailadres bevestigen',
+        'password-reset' => 'Wachtwoord opnieuw instellen',
         'order-placed' => 'Bestelling geplaatst', 'hosting-activated' => 'Hosting geactiveerd',
         'service-suspended' => 'Dienst opgeschort', 'ticket-created' => 'Ticket ontvangen',
         'ticket-replied' => 'Ticketreactie', 'ticket-closed' => 'Ticket gesloten',
@@ -15,6 +16,7 @@ class EmailTemplateRegistry
 
     public const SUBJECTS = [
         'account-created' => 'Welkom bij {{site_naam}} — bevestig uw e-mailadres', 'verify-email' => 'Bevestig uw e-mailadres',
+        'password-reset' => 'Stel een nieuw wachtwoord in',
         'order-placed' => 'Bedankt voor uw bestelling', 'hosting-activated' => 'Uw hostingaccount is actief',
         'service-suspended' => 'Uw dienst is tijdelijk opgeschort', 'ticket-created' => 'We hebben uw aanvraag ontvangen',
         'ticket-replied' => 'Er is gereageerd op uw aanvraag', 'ticket-closed' => 'Uw aanvraag is gesloten',
@@ -25,6 +27,7 @@ class EmailTemplateRegistry
     public const HTML = [
         'account-created' => '<p>Hallo {{klant_naam}},</p><p>Leuk dat u er bent! Uw account bij {{site_naam}} is aangemaakt met het door u gekozen wachtwoord.</p><p><a class="button" href="{{actie_url}}">E-mailadres bevestigen</a></p><p class="small">Werkt de knop niet? Kopieer deze link in uw browser: {{actie_url}}</p>',
         'verify-email' => '<p>Hallo {{klant_naam}},</p><p>Nog één stapje: bevestig uw e-mailadres om uw account volledig te activeren.</p><p><a class="button" href="{{actie_url}}">E-mailadres bevestigen</a></p><p class="small">Werkt de knop niet? Kopieer deze link in uw browser: {{actie_url}}</p>',
+        'password-reset' => '<p>Hallo {{klant_naam}},</p><p>Er is een verzoek gedaan om het wachtwoord van uw account opnieuw in te stellen.</p><p><a class="button" href="{{actie_url}}">Nieuw wachtwoord instellen</a></p><p class="small">Heeft u dit niet aangevraagd? Dan kunt u deze e-mail negeren. De link verloopt automatisch.</p>',
         'order-placed' => '<p>Hallo {{klant_naam}},</p><p>Bedankt voor uw bestelling bij {{site_naam}}! Wij gaan direct voor u aan de slag.</p><p><a class="button" href="{{actie_url}}">Bestelling bekijken</a></p><p>Heeft u vragen? Reageer via het klantportaal, wij denken graag mee.</p>',
         'hosting-activated' => '<p>Hallo {{klant_naam}},</p><p>Goed nieuws: uw hostingpakket <strong>{{dienst_naam}}</strong> is actief!</p><div class="box"><strong>Inloggegevens</strong><br>Domein: {{domein}}<br>Gebruikersnaam: {{gebruikersnaam}}<br>Wachtwoord: {{wachtwoord}}<br>DirectAdmin: {{directadmin_url}}</div><div class="box"><strong>Servergegevens</strong><br>FTP-host: {{ftp_host}}<br>Server-IP: {{server_ip}}<br>Nameserver 1: {{nameserver_1}}<br>Nameserver 2: {{nameserver_2}}<br>Nameserver 3: {{nameserver_3}}</div><p><a class="button" href="{{actie_url}}">Inloggen op DirectAdmin</a></p><p class="small">Bewaar deze gegevens goed en wijzig uw wachtwoord na de eerste keer inloggen.</p>',
         'service-suspended' => '<p>Hallo {{klant_naam}},</p><p>Uw dienst <strong>{{dienst_naam}}</strong> is tijdelijk opgeschort.</p><div class="box"><strong>Reden:</strong> {{reden}}</div><p><a class="button" href="{{actie_url}}">Klantportaal openen</a></p><p>Vragen hierover? Neem gerust contact met ons op.</p>',

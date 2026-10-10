@@ -183,19 +183,42 @@ class CustomerController extends Controller
                 : 'E-mail kon niet worden verzonden. Bekijk de foutmelding in het e-maillogboek.');
     }
 
-    public function resendWelcomeEmail(Request $request, User $customer, CustomerNotificationService $notifications)
+    public function sendStandardEmail(Request $request, User $customer, CustomerNotificationService $notifications)
     {
         abort_unless($customer->isCustomer(), 404);
         abort_unless($request->user()->can('customer-emails.send'), 403);
 
-        $sent = $notifications->accountCreated($customer);
-        AuditLog::record('customer.welcome_email.resent', $customer, null, ['status' => $sent ? 'sent' : 'failed']);
+        $validated = $request->validate([
+            'template' => ['required', Rule::in(['account-created', 'verify-email', 'password-reset'])],
+        ]);
+
+        if ($validated['template'] === 'verify-email' && $customer->email_verified_at) {
+            return back()->with('error', 'Het e-mailadres van deze klant is al bevestigd.');
+        }
+
+        $sent = match ($validated['template']) {
+            'account-created' => $notifications->accountCreated($customer),
+            'verify-email' => $notifications->sendEmailVerification($customer),
+            'password-reset' => $notifications->passwordReset($customer),
+        };
+
+        AuditLog::record('customer.standard_email.sent', $customer, null, [
+            'template' => $validated['template'],
+            'status' => $sent ? 'sent' : 'failed',
+        ]);
 
         return redirect()
             ->route('admin.customers.show', [$customer, 'tab' => 'emails'])
             ->with($sent ? 'success' : 'error', $sent
-                ? 'Welkomstmail is opnieuw verzonden.'
-                : 'Welkomstmail kon niet worden verzonden. Bekijk de foutmelding in het e-maillogboek.');
+                ? 'Standaard e-mail is succesvol verzonden.'
+                : 'E-mail kon niet worden verzonden. Bekijk de foutmelding in het e-maillogboek.');
+    }
+
+    public function resendWelcomeEmail(Request $request, User $customer, CustomerNotificationService $notifications)
+    {
+        $request->merge(['template' => 'account-created']);
+
+        return $this->sendStandardEmail($request, $customer, $notifications);
     }
 
     /**

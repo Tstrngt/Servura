@@ -572,17 +572,25 @@
                     <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
                         @can('customer-emails.send')
                             <div class="rounded-lg bg-white p-6 shadow lg:col-span-2">
-                                <div class="flex items-start justify-between gap-4">
-                                    <div>
-                                        <h3 class="text-lg font-medium text-gray-900">Nieuwe e-mail</h3>
-                                        <p class="mt-1 text-sm text-gray-500">Wordt verzonden naar {{ $customer->email }}.</p>
-                                    </div>
-                                    <form method="POST" action="{{ route('admin.customers.emails.welcome', $customer) }}">
-                                        @csrf
-                                        <button class="btn btn-outline text-sm" type="submit">Welkomstmail opnieuw</button>
-                                    </form>
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900">Nieuwe e-mail</h3>
+                                    <p class="mt-1 text-sm text-gray-500">Wordt verzonden naar {{ $customer->email }}.</p>
                                 </div>
-                                <form method="POST" action="{{ route('admin.customers.emails.send', $customer) }}" class="mt-6 space-y-4">
+                                <form method="POST" action="{{ route('admin.customers.emails.standard', $customer) }}" class="mt-6 rounded-xl border border-sky-200 bg-sky-50 p-4">
+                                    @csrf
+                                    <label for="standard_email_template" class="form-label">Standaard e-mail</label>
+                                    <select id="standard_email_template" name="template" class="form-input" required>
+                                        <option value="account-created">Welkomstmail / account aangemaakt</option>
+                                        @if(!$customer->email_verified_at)
+                                            <option value="verify-email">E-mailadres bevestigen</option>
+                                        @endif
+                                        <option value="password-reset">Wachtwoord opnieuw instellen</option>
+                                    </select>
+                                    <p class="mt-2 text-xs leading-5 text-sky-800">Links voor verificatie en wachtwoordherstel worden bij verzending opnieuw en veilig aangemaakt.</p>
+                                    <button class="btn btn-outline mt-3 text-sm" type="submit" onclick="return confirm('Deze standaard e-mail nu naar de klant verzenden?')">Standaard e-mail verzenden</button>
+                                </form>
+                                <div class="my-6 flex items-center gap-3"><div class="h-px flex-1 bg-gray-200"></div><span class="text-xs font-medium uppercase tracking-wide text-gray-400">of eigen bericht</span><div class="h-px flex-1 bg-gray-200"></div></div>
+                                <form method="POST" action="{{ route('admin.customers.emails.send', $customer) }}" class="space-y-4">
                                     @csrf
                                     <div>
                                         <label for="email_subject" class="form-label">Onderwerp</label>
