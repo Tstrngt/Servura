@@ -28,6 +28,7 @@ class User extends Authenticatable
         'vat_number',
         'profile_logo_path',
         'mollie_customer_id',
+        'openprovider_handle',
         'role',
         'is_active',
         'last_login_at',

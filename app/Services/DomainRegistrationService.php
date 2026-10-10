@@ -7,6 +7,7 @@ use App\Models\CustomerService;
 use App\Models\DomainRegistration;
 use App\Models\DomainTld;
 use App\Services\Domains\DomainProviderFactory;
+use App\Services\Domains\OpenProviderProvider;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -56,7 +57,9 @@ class DomainRegistrationService
                 return $this->fail($domainRegistration, 'Domein is inmiddels niet meer beschikbaar: '.$availability->status, DomainRegistration::TYPE_REGISTRATION);
             }
 
-            $contact = $this->buildRegistrantContact($user);
+            $contact = $provider instanceof OpenProviderProvider
+                ? ['handle' => $provider->ensureCustomerHandle($user)]
+                : $this->buildRegistrantContact($user);
             $nameservers = $this->buildNameservers();
 
             $provider->registerDomain($customerService->domain, [$contact], $nameservers);
@@ -132,7 +135,9 @@ class DomainRegistrationService
         }
 
         try {
-            $contact = $this->buildRegistrantContact($user);
+            $contact = $provider instanceof OpenProviderProvider
+                ? ['handle' => $provider->ensureCustomerHandle($user)]
+                : $this->buildRegistrantContact($user);
             $nameservers = $this->buildNameservers();
 
             $provider->transferDomain($customerService->domain, $authCode, [$contact], $nameservers);

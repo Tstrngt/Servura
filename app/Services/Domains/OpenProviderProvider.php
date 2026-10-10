@@ -3,6 +3,7 @@
 namespace App\Services\Domains;
 
 use App\Models\BillingSetting;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Throwable;
@@ -46,6 +47,54 @@ class OpenProviderProvider implements DomainProvider
         }
     }
 
+    public function ensureCustomerHandle(User $user): string
+    {
+        if ($user->openprovider_handle) {
+            return $user->openprovider_handle;
+        }
+
+        $parts = preg_split('/\s+/', trim($user->name), 2);
+        $firstName = $parts[0] ?? 'Klant';
+        $lastName = $parts[1] ?? $firstName;
+        $phone = preg_replace('/\D+/', '', (string) $user->phone);
+        $countryCode = strtoupper((string) $user->country) === 'NL' ? '+31' : '';
+        if ($countryCode === '+31') {
+            $phone = str_starts_with($phone, '31') ? substr($phone, 2) : ltrim($phone, '0');
+        }
+        $data = $this->client->request('POST', 'customers', [
+            'name' => [
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'full_name' => trim($user->name),
+            ],
+            'address' => [
+                'street' => (string) $user->street,
+                'number' => (string) $user->house_number,
+                'zipcode' => (string) $user->postal_code,
+                'city' => (string) $user->city,
+                'country' => strtoupper((string) $user->country),
+            ],
+            'email' => $user->email,
+            'company_name' => (string) $user->company,
+            'vat' => (string) $user->vat_number,
+            'phone' => [
+                'country_code' => $countryCode,
+                'area_code' => '',
+                'subscriber_number' => $phone,
+            ],
+            'locale' => 'nl_NL',
+            'comments' => 'Automatisch aangemaakt door Servura voor klant '.$user->id,
+        ]);
+        $handle = $data['handle'] ?? null;
+        if (! $handle) {
+            throw new RuntimeException('Openprovider heeft geen klanthandle teruggegeven.');
+        }
+
+        $user->forceFill(['openprovider_handle' => $handle])->save();
+
+        return $handle;
+    }
+
     public function checkAvailability(string $domain): DomainCheckResult
     {
         [$name, $extension] = $this->splitDomain($domain);
@@ -77,12 +126,12 @@ class OpenProviderProvider implements DomainProvider
 
     public function registerDomain(string $domain, array $contacts = [], array $nameservers = []): void
     {
-        $this->client->request('POST', 'domains', $this->domainPayload($domain, $nameservers));
+        $this->client->request('POST', 'domains', $this->domainPayload($domain, $nameservers, $contacts));
     }
 
     public function transferDomain(string $domain, string $authCode, array $contacts = [], array $nameservers = []): void
     {
-        $this->client->request('POST', 'domains/transfer', $this->domainPayload($domain, $nameservers) + ['auth_code' => $authCode]);
+        $this->client->request('POST', 'domains/transfer', $this->domainPayload($domain, $nameservers, $contacts) + ['auth_code' => $authCode]);
     }
 
     public function cancelDomain(string $domain, string $endTime = 'end'): void
@@ -189,10 +238,10 @@ class OpenProviderProvider implements DomainProvider
         return $data['results'][0] ?? [];
     }
 
-    private function domainPayload(string $domain, array $nameservers): array
+    private function domainPayload(string $domain, array $nameservers, array $contacts = []): array
     {
         [$name, $extension] = $this->splitDomain($domain);
-        $handle = $this->customerHandle();
+        $handle = $contacts[0]['handle'] ?? $this->customerHandle();
 
         if (! $handle) {
             throw new RuntimeException('Openprovider-klanthandle ontbreekt.');
