@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\DomainTld;
 use App\Models\Service;
+use App\Models\ServicePrice;
 use App\Services\Domains\DomainProviderFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -46,10 +47,20 @@ class DomainController extends Controller
                     return $provider->checkAvailability($domain)->toArray();
                 });
 
-                $servicePrice = $domainService ? $tld->servicePrice : null;
-                $transferPrice = $domainService
-                    ? $domainService->prices()->where('tld', $tld->extension)->where('billing_cycle', 'one_time')->where('is_enabled', true)->first()
+                $servicePrice = $domainService
+                    ? $domainService->prices()->where('tld', $tld->extension)->where('billing_cycle', 'yearly')->where('is_enabled', true)->first()
                     : null;
+                $transferPrice = null;
+                if ($domainService && (float) $tld->transfer_price > 0) {
+                    $transferPrice = ServicePrice::updateOrCreate(
+                        [
+                            'service_id' => $domainService->id,
+                            'tld' => $tld->extension,
+                            'billing_cycle' => 'one_time',
+                        ],
+                        ['price' => $tld->transfer_price, 'is_enabled' => true]
+                    );
+                }
 
                 $results[] = [
                     'domain' => $availability['domain'] ?? $domain,
