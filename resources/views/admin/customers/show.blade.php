@@ -99,6 +99,12 @@
                             </div>
                         </div>
                         <div class="flex space-x-3">
+                            @can('customers.impersonate')
+                                <form method="POST" action="{{ route('admin.customers.impersonate', $customer) }}" class="inline" onsubmit="return confirm('Klantportaal openen als deze klant? Alle handelingen blijven onder uw verantwoordelijkheid vallen.')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary" @disabled(!$customer->is_active)>Inloggen als klant</button>
+                                </form>
+                            @endcan
                             <form method="POST" action="{{ route('admin.customers.toggle-status', $customer) }}" class="inline">
                                 @csrf
                                 <button type="submit" class="btn {{ $customer->is_active ? 'btn-outline' : 'btn-primary' }}">

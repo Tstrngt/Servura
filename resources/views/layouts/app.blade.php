@@ -44,6 +44,18 @@
     <meta name="twitter:image" content="@yield('twitter:image', asset('images/og-image.jpg'))">
 </head>
 <body class="bg-gray-50" x-data="{ mobileMenu: false }">
+    @if(session()->has('impersonator_id'))
+        <div class="sticky top-0 z-[80] flex items-center justify-between gap-4 bg-amber-300 px-4 py-3 text-sm font-medium text-amber-950 shadow-md sm:px-6">
+            <div>
+                U bekijkt Servura als <strong>{{ Auth::user()->name }}</strong>.
+                <span class="hidden font-normal sm:inline">Wijzigingen worden uitgevoerd op het account van deze klant.</span>
+            </div>
+            <form method="POST" action="{{ route('impersonation.stop') }}">
+                @csrf
+                <button type="submit" class="whitespace-nowrap rounded-lg bg-amber-950 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-900">Terug naar admin</button>
+            </form>
+        </div>
+    @endif
     <!-- Page transition loader (only on public/customer pages) -->
     @unless(request()->routeIs('admin.*'))
     <div id="page-loader" data-turbo-permanent class="fixed inset-0 z-[60] flex items-center justify-center bg-white/95 backdrop-blur-sm transition-opacity duration-500">

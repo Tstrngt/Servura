@@ -33,6 +33,7 @@ use App\Http\Controllers\Customer\ProfileController;
 use App\Http\Controllers\Customer\QuoteController as CustomerQuoteController;
 use App\Http\Controllers\Customer\TicketController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImpersonationController;
 use App\Http\Controllers\LegalController;
 use App\Http\Controllers\MollieWebhookController;
 use App\Http\Controllers\NewsletterController;
@@ -115,6 +116,7 @@ Route::get('/email/verificatie/{token}', [VerifyEmailController::class, 'verify'
 // Authenticated routes
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::post('/impersonatie/stoppen', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
     Route::post('/email/verificatie/opnieuw', [VerifyEmailController::class, 'resend'])->name('verification.send');
 
     // Customer routes
@@ -213,6 +215,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/customers/{customer}', [AdminCustomerController::class, 'update'])->name('customers.update');
         Route::delete('/customers/{customer}', [AdminCustomerController::class, 'destroy'])->name('customers.destroy');
         Route::post('/customers/{customer}/toggle-status', [AdminCustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
+        Route::post('/customers/{customer}/impersonate', [ImpersonationController::class, 'start'])->name('customers.impersonate');
         Route::post('/customers/{customer}/reset-password', [AdminCustomerController::class, 'resetPassword'])->name('customers.reset-password');
         Route::post('/customers/{customer}/emails', [AdminCustomerController::class, 'sendEmail'])->name('customers.emails.send');
         Route::post('/customers/{customer}/emails/standard', [AdminCustomerController::class, 'sendStandardEmail'])->name('customers.emails.standard');

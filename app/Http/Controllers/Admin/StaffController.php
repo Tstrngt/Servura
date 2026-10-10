@@ -22,7 +22,7 @@ class StaffController extends Controller
 
     private const PERMISSION_GROUPS = [
         'Dashboard' => ['dashboard.view'],
-        'Klanten' => ['customers.view', 'customers.edit', 'customers.delete'],
+        'Klanten' => ['customers.view', 'customers.edit', 'customers.delete', 'customers.impersonate', 'customer-emails.view', 'customer-emails.send'],
         'Bestellingen & betalingen' => ['orders.view', 'orders.edit', 'payments.manage', 'refunds.process'],
         'Facturen' => ['invoices.view', 'invoices.download', 'invoices.drafts.manage', 'invoices.send', 'invoices.credit.create', 'invoice.settings.edit', 'invoice.design.publish'],
         'Domeinen' => ['domains.view', 'domains.edit', 'domains.dns.manage', 'domains.nameservers.edit', 'domains.holder.edit', 'domains.authcode.view', 'domains.cancel'],
