@@ -29,7 +29,7 @@ class DomainRegistrationService
                 'domain_name' => $customerService->domain,
                 'tld' => $this->extractTld($customerService->domain),
                 'status' => DomainRegistration::STATUS_AWAITING_PAYMENT,
-                'provider' => 'transip',
+                'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
                 'registration_price' => $customerService->price,
                 'renewal_price' => $this->resolveRenewalPrice($customerService),
                 'auto_renew' => true,
@@ -75,7 +75,7 @@ class DomainRegistrationService
                 'domain' => $customerService->domain,
                 'customer_service_id' => $customerService->id,
                 'user_id' => $user->id,
-                'provider' => 'transip',
+                'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
             ]);
 
             return $domainRegistration;
@@ -84,7 +84,7 @@ class DomainRegistrationService
                 'domain' => $customerService->domain,
                 'customer_service_id' => $customerService->id,
                 'user_id' => $user->id,
-                'provider' => 'transip',
+                'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
                 'exception' => get_class($e),
                 'message' => $e->getMessage(),
             ]);
@@ -106,7 +106,7 @@ class DomainRegistrationService
                 'domain_name' => $customerService->domain,
                 'tld' => $this->extractTld($customerService->domain),
                 'status' => DomainRegistration::STATUS_TRANSFER_PENDING,
-                'provider' => 'transip',
+                'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
                 'transfer_price' => $customerService->price,
                 'auto_renew' => true,
                 'type' => DomainRegistration::TYPE_TRANSFER,
@@ -152,7 +152,7 @@ class DomainRegistrationService
                 'domain' => $customerService->domain,
                 'customer_service_id' => $customerService->id,
                 'user_id' => $user->id,
-                'provider' => 'transip',
+                'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
             ]);
 
             return $domainRegistration;
@@ -161,7 +161,7 @@ class DomainRegistrationService
                 'domain' => $customerService->domain,
                 'customer_service_id' => $customerService->id,
                 'user_id' => $user->id,
-                'provider' => 'transip',
+                'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
                 'exception' => get_class($e),
                 'message' => $e->getMessage(),
             ]);
@@ -301,7 +301,7 @@ class DomainRegistrationService
      */
     private function buildNameservers(): array
     {
-        $raw = BillingSetting::valueFor('transip_default_nameservers', '');
+        $raw = BillingSetting::valueFor('domain_default_nameservers', BillingSetting::valueFor('transip_default_nameservers', ''));
         $hosts = array_filter(array_map('trim', explode(',', $raw)));
 
         if (empty($hosts)) {

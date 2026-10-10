@@ -78,7 +78,7 @@ class DomainDnsService
         }
 
         if (! $this->canManage($domain)) {
-            return ['success' => false, 'message' => 'DNS kan alleen worden beheerd wanneer het domein Servura/TransIP nameservers gebruikt.'];
+            return ['success' => false, 'message' => 'DNS kan alleen worden beheerd wanneer het domein de ingestelde Servura/Openprovider-nameservers gebruikt.'];
         }
 
         $before = ['dns_entries' => $this->records($domain)];

@@ -15,6 +15,15 @@
         @include('admin.partials.settings-nav')
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <a href="{{ route('admin.settings.openprovider') }}" class="group relative rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-slate-900">Openprovider</h2>
+                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset {{ $openprovider['configured'] ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' : 'bg-slate-50 text-slate-600 ring-slate-500/10' }}">{{ $openprovider['configured'] ? 'Ingesteld' : 'Niet ingesteld' }}</span>
+                </div>
+                <p class="mt-2 text-sm text-slate-600">Domeinchecks, registraties, verhuizingen en DNS via Openprovider.</p>
+                <p class="mt-4 text-sm text-slate-500">Status: <span class="font-medium text-slate-700">{{ $openprovider['last_status'] }}</span>@if($openprovider['last_checked_at'])<span class="block text-xs text-slate-400">Laatste check: {{ $openprovider['last_checked_at'] }}</span>@endif</p>
+                <div class="mt-5 flex items-center text-sm font-semibold text-primary-600 group-hover:text-primary-700">Instellingen <span aria-hidden="true" class="ml-1">→</span></div>
+            </a>
             <a href="{{ route('admin.settings.transip') }}" class="group relative rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold text-slate-900">TransIP</h2>

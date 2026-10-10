@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BillingSetting;
 use App\Models\CustomerService;
 use App\Models\DomainRegistration;
 use App\Models\DomainTld;
@@ -549,7 +550,7 @@ class CheckoutController extends Controller
                 'status' => $item['mode'] === 'transfer'
                     ? DomainRegistration::STATUS_TRANSFER_PENDING
                     : DomainRegistration::STATUS_AWAITING_PAYMENT,
-                'provider' => 'transip',
+                'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
                 'registration_price' => $item['mode'] === 'register' ? $item['price'] : null,
                 'transfer_price' => $item['mode'] === 'transfer' ? $item['price'] : null,
                 'renewal_price' => $this->resolveRenewalPrice($domain),
@@ -591,7 +592,7 @@ class CheckoutController extends Controller
             'status' => $mode === 'transfer'
                 ? DomainRegistration::STATUS_TRANSFER_PENDING
                 : DomainRegistration::STATUS_AWAITING_PAYMENT,
-            'provider' => 'transip',
+            'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
             'registration_price' => $mode === 'register' ? $customerService->price : null,
             'transfer_price' => $mode === 'transfer' ? $customerService->price : null,
             'renewal_price' => $this->resolveRenewalPrice($domain),

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\DomainTldController as AdminDomainTldController;
 use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Admin\InvoiceDesignController as AdminInvoiceDesignController;
+use App\Http\Controllers\Admin\OpenProviderSettingController;
 use App\Http\Controllers\Admin\QuoteController as AdminQuoteController;
 use App\Http\Controllers\Admin\ServerConnectionController as AdminServerConnectionController;
 use App\Http\Controllers\Admin\ServiceCancellationController;
@@ -324,6 +325,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/beveiliging', [SettingController::class, 'security'])->name('security');
             Route::put('/beveiliging', [SettingController::class, 'updateSecurity'])->name('security.update');
             Route::get('/integraties', [SettingController::class, 'integrations'])->name('integrations');
+            Route::get('/integraties/openprovider', [OpenProviderSettingController::class, 'index'])->name('openprovider');
+            Route::put('/integraties/openprovider', [OpenProviderSettingController::class, 'update'])->name('openprovider.update');
+            Route::get('/integraties/openprovider/test', [OpenProviderSettingController::class, 'test'])->name('openprovider.test');
             Route::get('/integraties/transip', [TransIpSettingController::class, 'index'])->name('transip');
             Route::put('/integraties/transip', [TransIpSettingController::class, 'update'])->name('transip.update');
             Route::get('/integraties/transip/test', [TransIpSettingController::class, 'test'])->name('transip.test');

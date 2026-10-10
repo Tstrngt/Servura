@@ -455,8 +455,15 @@ class SettingController extends Controller
             'last_status' => BillingSetting::valueFor('transip_last_status', 'Nog niet getest'),
             'last_checked_at' => BillingSetting::valueFor('transip_last_checked_at', ''),
         ];
+        $openprovider = [
+            'enabled' => BillingSetting::boolean('openprovider_enabled'),
+            'configured' => BillingSetting::valueFor('openprovider_username', '') !== ''
+                && BillingSetting::encryptedValueFor('openprovider_password', '') !== '',
+            'last_status' => BillingSetting::valueFor('openprovider_last_status', 'Nog niet getest'),
+            'last_checked_at' => BillingSetting::valueFor('openprovider_last_checked_at', ''),
+        ];
 
-        return view('admin.settings.integrations', compact('transip'));
+        return view('admin.settings.integrations', compact('transip', 'openprovider'));
     }
 
     private function authorizeOwner(): void

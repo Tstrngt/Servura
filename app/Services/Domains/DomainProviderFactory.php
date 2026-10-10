@@ -2,7 +2,7 @@
 
 namespace App\Services\Domains;
 
-use Illuminate\Contracts\Container\BindingResolutionException;
+use App\Models\BillingSetting;
 
 class DomainProviderFactory
 {
@@ -10,6 +10,7 @@ class DomainProviderFactory
     {
         return match ($providerName) {
             'transip' => app(TransIpProvider::class),
+            'openprovider' => app(OpenProviderProvider::class),
             'demo' => app(DemoDomainProvider::class),
             default => null,
         };
@@ -17,7 +18,7 @@ class DomainProviderFactory
 
     public static function default(): ?DomainProvider
     {
-        return static::make('transip');
+        return static::make(BillingSetting::valueFor('domain_provider', 'transip'));
     }
 
     /**
