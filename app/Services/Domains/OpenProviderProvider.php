@@ -203,7 +203,6 @@ class OpenProviderProvider implements DomainProvider
             'owner_handle' => $handle,
             'admin_handle' => $handle,
             'tech_handle' => $handle,
-            'billing_handle' => $handle,
             'autorenew' => 'on',
             'period' => 1,
             'unit' => 'y',
