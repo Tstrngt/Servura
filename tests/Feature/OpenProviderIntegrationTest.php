@@ -57,6 +57,8 @@ class OpenProviderIntegrationTest extends TestCase
         Http::assertSent(fn ($request) => $request->url() === 'https://api.sandbox.openprovider.nl/v1beta/domains'
             && $request['owner_handle'] === 'XX123456-XX'
             && $request['domain'] === ['name' => 'voorbeeld', 'extension' => 'nl']
+            && $request['period'] === 1
+            && $request['unit'] === 'y'
             && $request['name_servers'][0]['name'] === 'ns1.openprovider.nl');
     }
 }

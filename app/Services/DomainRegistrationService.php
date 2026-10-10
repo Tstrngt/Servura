@@ -89,7 +89,7 @@ class DomainRegistrationService
                 'message' => $e->getMessage(),
             ]);
 
-            return $this->fail($domainRegistration, 'TransIP fout: '.$e->getMessage(), DomainRegistration::TYPE_REGISTRATION);
+            return $this->fail($domainRegistration, 'Domeinproviderfout: '.$e->getMessage(), DomainRegistration::TYPE_REGISTRATION);
         }
     }
 
@@ -166,7 +166,7 @@ class DomainRegistrationService
                 'message' => $e->getMessage(),
             ]);
 
-            return $this->fail($domainRegistration, 'TransIP fout: '.$e->getMessage(), DomainRegistration::TYPE_TRANSFER);
+            return $this->fail($domainRegistration, 'Domeinproviderfout: '.$e->getMessage(), DomainRegistration::TYPE_TRANSFER);
         }
     }
 

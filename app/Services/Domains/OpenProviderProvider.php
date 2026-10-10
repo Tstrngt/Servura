@@ -205,6 +205,8 @@ class OpenProviderProvider implements DomainProvider
             'tech_handle' => $handle,
             'billing_handle' => $handle,
             'autorenew' => 'on',
+            'period' => 1,
+            'unit' => 'y',
             'name_servers' => $this->nameserverPayload($nameservers),
         ];
     }
