@@ -252,6 +252,10 @@ class CheckoutController extends Controller
                     : null,
             ]);
 
+            DomainRegistration::whereIn('customer_service_id', collect($customerServices)->pluck('id'))
+                ->whereNull('order_id')
+                ->update(['order_id' => $order->id]);
+
             foreach ($customerServices as $i => $customerService) {
                 OrderLine::create([
                     'order_id' => $order->id,

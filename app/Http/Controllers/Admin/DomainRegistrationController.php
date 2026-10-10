@@ -45,9 +45,15 @@ class DomainRegistrationController extends Controller
             DomainRegistration::STATUS_TRANSFER_FAILED,
         ], true), 422);
 
-        $domainRegistration->loadMissing(['customerService', 'order.invoice']);
-        $invoice = $domainRegistration->order?->invoice;
-        abort_unless($invoice && ($invoice->status === 'betaald' || (float) $invoice->total <= 0), 422, 'Alleen een betaalde registratie kan opnieuw worden geprobeerd.');
+        $domainRegistration->loadMissing(['customerService.invoices.transactions', 'order.invoice.transactions']);
+        $invoice = $domainRegistration->order?->invoice
+            ?? $domainRegistration->customerService?->invoices->sortByDesc('created_at')->first();
+        $isSettled = $invoice && (
+            $invoice->status === 'betaald'
+            || $invoice->paid_at !== null
+            || $invoice->outstanding_amount <= 0.005
+        );
+        abort_unless($isSettled, 422, 'Alleen een betaalde registratie kan opnieuw worden geprobeerd.');
         abort_unless($domainRegistration->customerService, 422, 'Gekoppelde dienst ontbreekt.');
 
         $result = $domainRegistration->type === DomainRegistration::TYPE_TRANSFER
