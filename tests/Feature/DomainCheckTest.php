@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\BillingSetting;
 use App\Models\DomainTld;
+use App\Models\Service;
+use App\Models\ServicePrice;
 use App\Services\Domains\DomainCheckResult;
 use App\Services\Domains\DomainProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,6 +54,14 @@ class DomainCheckTest extends TestCase
         DomainTld::factory()->create(['extension' => '.eu', 'registration_price' => 7.99, 'is_active' => true, 'sort_order' => 3]);
         DomainTld::factory()->create(['extension' => '.net', 'registration_price' => 12.99, 'is_active' => false, 'sort_order' => 4]);
         DomainTld::factory()->create(['extension' => '.be', 'registration_price' => 8.99, 'is_active' => true, 'sort_order' => 5]);
+        $domainService = Service::where('fulfillment_type', 'domain')->firstOrFail();
+        ServicePrice::create([
+            'service_id' => $domainService->id,
+            'billing_cycle' => 'one_time',
+            'tld' => '.com',
+            'price' => 5.99,
+            'is_enabled' => true,
+        ]);
 
         $provider = Mockery::mock(DomainProvider::class);
         $provider->shouldReceive('isConfigured')->andReturn(true);
@@ -73,5 +83,8 @@ class DomainCheckTest extends TestCase
         $response->assertJsonPath('results.0.domain', 'voorbeeld.nl');
         $response->assertJsonPath('results.0.available', true);
         $response->assertJsonPath('results.0.price', '9,99');
+        $occupied = collect($response->json('results'))->firstWhere('domain', 'voorbeeld.com');
+        $this->assertFalse($occupied['available']);
+        $this->assertStringContainsString('mode=transfer', $occupied['transfer_url']);
     }
 }

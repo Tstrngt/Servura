@@ -45,6 +45,9 @@
                                 <a x-show="item.available && item.checkout_url" :href="item.checkout_url" class="btn btn-primary btn-sm px-2 py-1 text-[10px]">
                                     Bestel
                                 </a>
+                                <a x-show="!item.available && item.transfer_url" :href="item.transfer_url" class="rounded-md bg-sky-100 px-2 py-1 text-[10px] font-semibold text-sky-800 hover:bg-sky-200">
+                                    Verhuizen
+                                </a>
                             </div>
                         </li>
                     </template>

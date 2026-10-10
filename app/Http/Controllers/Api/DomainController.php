@@ -47,6 +47,9 @@ class DomainController extends Controller
                 });
 
                 $servicePrice = $domainService ? $tld->servicePrice : null;
+                $transferPrice = $domainService
+                    ? $domainService->prices()->where('tld', $tld->extension)->where('billing_cycle', 'one_time')->where('is_enabled', true)->first()
+                    : null;
 
                 $results[] = [
                     'domain' => $availability['domain'] ?? $domain,
@@ -57,7 +60,11 @@ class DomainController extends Controller
                     'price_raw' => (float) $tld->registration_price,
                     'service_price_id' => $servicePrice?->id,
                     'checkout_url' => $servicePrice
-                        ? route('checkout.show', ['service' => $domainService->slug]).'?domain='.urlencode($availability['domain']).'&tld='.urlencode($tld->extension)
+                        ? route('checkout.show', ['service' => $domainService->slug]).'?domain='.urlencode($availability['domain']).'&tld='.urlencode($tld->extension).'&mode=register'
+                        : null,
+                    'transfer_price' => number_format((float) $tld->transfer_price, 2, ',', '.'),
+                    'transfer_url' => $transferPrice
+                        ? route('checkout.show', ['service' => $domainService->slug]).'?domain='.urlencode($availability['domain']).'&tld='.urlencode($tld->extension).'&mode=transfer'
                         : null,
                 ];
             }

@@ -63,6 +63,9 @@
                                     <a x-show="item.available && item.checkout_url" :href="item.checkout_url" class="inline-flex items-center justify-center rounded-full bg-primary-600 px-2.5 py-1.5 text-[14px] font-semibold leading-none text-white shadow-sm transition-[background-color,transform] duration-150 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:scale-[0.97]">
                                         Bestel
                                     </a>
+                                    <a x-show="!item.available && item.transfer_url" :href="item.transfer_url" class="inline-flex items-center justify-center rounded-full bg-sky-100 px-2.5 py-1.5 text-[12px] font-semibold leading-none text-sky-800 transition-colors hover:bg-sky-200">
+                                        Verhuizen
+                                    </a>
                                 </div>
                             </li>
                         </template>

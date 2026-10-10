@@ -51,6 +51,9 @@
                                         <a x-show="item.available && item.checkout_url" :href="item.checkout_url" class="btn btn-primary btn-sm px-4 py-2 text-sm">
                                             Bestellen
                                         </a>
+                                        <a x-show="!item.available && item.transfer_url" :href="item.transfer_url" class="btn btn-outline btn-sm px-4 py-2 text-sm">
+                                            Verhuizen
+                                        </a>
                                     </div>
                                 </div>
                             </template>

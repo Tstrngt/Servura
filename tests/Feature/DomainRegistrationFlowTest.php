@@ -49,6 +49,13 @@ class DomainRegistrationFlowTest extends TestCase
             'price' => 9.99,
             'is_enabled' => true,
         ]);
+        ServicePrice::create([
+            'service_id' => $service->id,
+            'billing_cycle' => 'one_time',
+            'tld' => '.nl',
+            'price' => 5.99,
+            'is_enabled' => true,
+        ]);
 
         return [$service, $tld, $price];
     }
@@ -524,6 +531,49 @@ class DomainRegistrationFlowTest extends TestCase
         $this->assertSame(DomainRegistration::TYPE_TRANSFER, $registration->type);
         $this->assertSame(DomainRegistration::STATUS_TRANSFER_PENDING, $registration->status);
         $this->assertSame('ABC123', $registration->auth_code);
+        $this->get(route('customer.domains.index'))
+            ->assertOk()
+            ->assertSee('teverhuizen.nl')
+            ->assertSee('Verhuizing in afwachting');
+    }
+
+    public function test_customer_can_start_standalone_transfer_from_checker_checkout(): void
+    {
+        [$domainService, $tld] = $this->setupDomainServiceAndTld();
+        $tld->update(['transfer_price' => 5.99]);
+        $user = User::factory()->create([
+            'role' => 'customer',
+            'country' => 'NL',
+            'street' => 'Teststraat',
+            'house_number' => '1',
+            'postal_code' => '1234AB',
+            'city' => 'Amsterdam',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('checkout.show', $domainService).'?domain=teverhuizen.nl&tld=.nl&mode=transfer')
+            ->assertOk()
+            ->assertSee('Domeinverhuizing')
+            ->assertSee('Verhuiscode');
+
+        $response = $this->post(route('checkout.store', $domainService), [
+            'auth_code' => 'TRANSFER-123',
+            'name' => $user->name,
+            'street' => 'Teststraat',
+            'house_number' => '1',
+            'postal_code' => '1234AB',
+            'city' => 'Amsterdam',
+            'country' => 'NL',
+            'payment_method' => 'payment_link',
+            'mollie_method' => 'ideal',
+            'terms' => '1',
+        ]);
+
+        $response->assertRedirect();
+        $registration = DomainRegistration::where('domain_name', 'teverhuizen.nl')->firstOrFail();
+        $this->assertSame(DomainRegistration::TYPE_TRANSFER, $registration->type);
+        $this->assertSame('TRANSFER-123', $registration->auth_code);
+        $this->assertSame($user->id, $registration->user_id);
     }
 
     public function test_domain_registration_is_not_listed_on_customer_services_index(): void

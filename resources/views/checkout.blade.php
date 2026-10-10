@@ -74,6 +74,18 @@
 
             <form id="checkout-form" x-ref="checkoutForm" action="{{ route('checkout.store', $service) }}" method="POST" data-turbo="false" @submit="submitCheckout($event)">
                 @csrf
+                @if($isDomainOrder && $primaryItem['mode'] === 'transfer')
+                    <section class="mb-8 rounded-2xl border border-sky-200 bg-sky-50 p-6">
+                        <span class="text-xs font-semibold uppercase tracking-wide text-sky-700">Domeinverhuizing</span>
+                        <h2 class="mt-2 text-lg font-semibold text-slate-900">{{ $primaryItem['domain'] }} naar Servura verhuizen</h2>
+                        <p class="mt-2 text-sm leading-6 text-slate-600">Vraag de verhuiscode op bij uw huidige provider. Na betaling starten wij de verhuizing en wordt het domein automatisch zichtbaar in uw klantportaal.</p>
+                        <div class="mt-5">
+                            <label for="auth_code" class="form-label">Verhuiscode (authcode) *</label>
+                            <input id="auth_code" name="auth_code" type="text" required autocomplete="off" class="form-input max-w-xl" value="{{ old('auth_code') }}">
+                            @error('cart.0.auth_code')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                        </div>
+                    </section>
+                @endif
                 <section class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
                     <h2 class="text-lg font-semibold text-slate-900">Factuurgegevens</h2>
 

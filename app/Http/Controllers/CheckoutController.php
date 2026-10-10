@@ -42,7 +42,7 @@ class CheckoutController extends Controller
         $countries = TaxService::COUNTRIES;
         $countryRates = $taxService->ratesForCheckout();
 
-        $prefill = $request->only(['domain', 'tld', 'price']);
+        $prefill = $request->only(['domain', 'tld', 'price', 'mode']);
         if ($service->fulfillment_type === 'domain' && $request->filled('domain')) {
             $prefill['domain'] = $request->input('domain');
             $prefill['tld'] = $request->input('tld');
@@ -308,6 +308,16 @@ class CheckoutController extends Controller
         $cart = CheckoutCart::get($request);
 
         if (! empty($cart)) {
+            if ($request->filled('auth_code')) {
+                foreach ($cart as &$item) {
+                    if (($item['mode'] ?? null) === 'transfer' || ($item['domain_mode'] ?? null) === 'transfer') {
+                        $item['auth_code'] = $request->input('auth_code');
+                    }
+                }
+                unset($item);
+                CheckoutCart::set($cart, $request);
+            }
+
             return $cart;
         }
 
@@ -450,6 +460,10 @@ class CheckoutController extends Controller
 
             if ($item['service']->fulfillment_type === 'domain' && ! $this->validDomain($domain)) {
                 $errors["cart.{$index}"] = 'Voer een geldige domeinnaam in.';
+            }
+
+            if ($item['service']->fulfillment_type === 'domain' && $item['mode'] === 'transfer' && blank($item['auth_code'])) {
+                $errors["cart.{$index}.auth_code"] = 'Een verhuiscode is verplicht voor een domeinverhuizing.';
             }
 
             if ($item['service']->fulfillment_type === 'directadmin') {

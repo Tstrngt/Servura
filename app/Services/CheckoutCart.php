@@ -34,7 +34,7 @@ class CheckoutCart
         $request ??= request();
         $cart = self::get($request);
 
-        if (empty($cart)) {
+        if (empty($cart) || ($service->fulfillment_type === 'domain' && ! empty($prefill['domain']))) {
             $cart = [self::makeItem($service, $prefill)];
             self::set($cart, $request);
         }
@@ -150,7 +150,9 @@ class CheckoutCart
         $item = [
             'service_id' => $service->id,
             'service_price_id' => $prefill['service_price_id'] ?? null,
-            'mode' => $service->fulfillment_type === 'domain' ? 'register' : 'none',
+            'mode' => $service->fulfillment_type === 'domain' && in_array($prefill['mode'] ?? null, ['register', 'transfer'], true)
+                ? $prefill['mode']
+                : ($service->fulfillment_type === 'domain' ? 'register' : 'none'),
         ];
 
         if ($service->fulfillment_type === 'domain') {
