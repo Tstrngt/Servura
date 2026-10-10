@@ -214,6 +214,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/customers/{customer}', [AdminCustomerController::class, 'destroy'])->name('customers.destroy');
         Route::post('/customers/{customer}/toggle-status', [AdminCustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
         Route::post('/customers/{customer}/reset-password', [AdminCustomerController::class, 'resetPassword'])->name('customers.reset-password');
+        Route::post('/customers/{customer}/emails', [AdminCustomerController::class, 'sendEmail'])->name('customers.emails.send');
+        Route::post('/customers/{customer}/emails/welcome', [AdminCustomerController::class, 'resendWelcomeEmail'])->name('customers.emails.welcome');
         Route::get('/customers/{customer}/services', [AdminCustomerController::class, 'services'])->name('customers.services');
         Route::post('/customers/{customer}/services', [AdminCustomerController::class, 'storeService'])->name('customers.services.store');
         Route::post('/customers/{customer}/services/import-directadmin', [AdminCustomerController::class, 'importExistingService'])->name('customers.services.import-directadmin');

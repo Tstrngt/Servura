@@ -251,6 +251,11 @@
                     <a href="{{ route('admin.customers.show', [$customer, 'tab' => 'invoices']) }}" class="{{ request('tab') === 'invoices' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                         Facturen ({{ $stats['total_invoices'] ?? 0 }})
                     </a>
+                    @can('customer-emails.view')
+                        <a href="{{ route('admin.customers.show', [$customer, 'tab' => 'emails']) }}" class="{{ request('tab') === 'emails' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            E-mails ({{ $emailLogs->count() }})
+                        </a>
+                    @endcan
                     <a href="{{ route('admin.customers.show', [$customer, 'tab' => 'tickets']) }}" class="{{ request('tab') === 'tickets' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                         Tickets ({{ $stats['total_tickets'] }})
                     </a>
@@ -561,6 +566,75 @@
                         @endif
                     </div>
                 </div>
+
+            @elseif(request('tab') === 'emails')
+                @can('customer-emails.view')
+                    <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
+                        @can('customer-emails.send')
+                            <div class="rounded-lg bg-white p-6 shadow lg:col-span-2">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                        <h3 class="text-lg font-medium text-gray-900">Nieuwe e-mail</h3>
+                                        <p class="mt-1 text-sm text-gray-500">Wordt verzonden naar {{ $customer->email }}.</p>
+                                    </div>
+                                    <form method="POST" action="{{ route('admin.customers.emails.welcome', $customer) }}">
+                                        @csrf
+                                        <button class="btn btn-outline text-sm" type="submit">Welkomstmail opnieuw</button>
+                                    </form>
+                                </div>
+                                <form method="POST" action="{{ route('admin.customers.emails.send', $customer) }}" class="mt-6 space-y-4">
+                                    @csrf
+                                    <div>
+                                        <label for="email_subject" class="form-label">Onderwerp</label>
+                                        <input id="email_subject" name="subject" class="form-input" maxlength="255" required value="{{ old('subject') }}">
+                                    </div>
+                                    <div>
+                                        <label for="email_message" class="form-label">Bericht</label>
+                                        <textarea id="email_message" name="message" rows="10" class="form-input" maxlength="20000" required>{{ old('message') }}</textarea>
+                                        <p class="mt-1 text-xs text-gray-500">De Servura e-mailopmaak en handtekening worden automatisch toegepast.</p>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">E-mail verzenden</button>
+                                </form>
+                            </div>
+                        @endcan
+                        <div class="rounded-lg bg-white shadow {{ auth()->user()->can('customer-emails.send') ? 'lg:col-span-3' : 'lg:col-span-5' }}">
+                            <div class="border-b border-gray-200 px-6 py-4">
+                                <h3 class="text-lg font-medium text-gray-900">Verzendhistorie</h3>
+                                <p class="mt-1 text-sm text-gray-500">De laatste 100 e-mails en verzendpogingen.</p>
+                            </div>
+                            <div class="divide-y divide-gray-200">
+                                @forelse($emailLogs as $emailLog)
+                                    <details class="group px-6 py-4">
+                                        <summary class="flex cursor-pointer list-none items-start justify-between gap-4">
+                                            <div class="min-w-0">
+                                                <div class="truncate text-sm font-medium text-gray-900">{{ $emailLog->subject }}</div>
+                                                <div class="mt-1 text-xs text-gray-500">
+                                                    {{ $emailLog->sent_at?->format('d-m-Y H:i') ?? $emailLog->created_at->format('d-m-Y H:i') }}
+                                                    · {{ $emailLog->template ? 'Systeemmail' : 'Handmatig' }}
+                                                    @if($emailLog->sender) · door {{ $emailLog->sender->name }} @endif
+                                                </div>
+                                            </div>
+                                            <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {{ $emailLog->status === 'sent' ? 'bg-green-100 text-green-800' : ($emailLog->status === 'failed' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800') }}">
+                                                {{ $emailLog->status === 'sent' ? 'Verzonden' : ($emailLog->status === 'failed' ? 'Mislukt' : 'Bezig') }}
+                                            </span>
+                                        </summary>
+                                        <div class="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm">
+                                            <div class="mb-3 text-xs text-gray-500">Aan: {{ $emailLog->recipient_name }} &lt;{{ $emailLog->recipient_email }}&gt;</div>
+                                            @if($emailLog->error_message)
+                                                <div class="mb-3 rounded-md bg-red-50 p-3 text-red-800">{{ $emailLog->error_message }}</div>
+                                            @endif
+                                            <iframe class="h-96 w-full rounded-md bg-white" sandbox srcdoc="{{ $emailLog->body_html }}" title="Voorbeeld van {{ $emailLog->subject }}"></iframe>
+                                        </div>
+                                    </details>
+                                @empty
+                                    <p class="px-6 py-10 text-center text-sm text-gray-500">Voor deze klant zijn nog geen e-mails geregistreerd.</p>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    @php abort(403) @endphp
+                @endcan
 
             @elseif(request('tab') === 'tickets')
                 <!-- Tickets Tab -->

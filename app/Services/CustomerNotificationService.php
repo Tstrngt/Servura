@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\BillingSetting;
+use App\Models\CustomerEmailLog;
 use App\Models\CustomerService;
 use App\Models\Invoice;
 use App\Models\Quote;
@@ -11,6 +12,7 @@ use App\Models\TicketReply;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 /**
  * Customer-facing transactional e-mails.
@@ -18,12 +20,23 @@ use Illuminate\Support\Facades\Mail;
  */
 class CustomerNotificationService
 {
-    public function accountCreated(User $user): void
+    public function accountCreated(User $user): bool
     {
-        $this->send($user, 'account-created', [
+        if (!$user->email_verification_token) {
+            $user->update(['email_verification_token' => Str::random(48)]);
+        }
+
+        return $this->send($user, 'account-created', [
             'user' => $user,
             'verificationUrl' => route('verification.verify', ['token' => $user->email_verification_token]),
         ]);
+    }
+
+    public function custom(User $user, string $subject, string $message): bool
+    {
+        $html = '<p>'.nl2br(e($message)).'</p>';
+
+        return $this->deliver($user, $subject, view('emails.custom', compact('html', 'subject'))->render(), null, auth()->id());
     }
 
     public function orderPlaced(User $user, mixed $order): void
@@ -143,27 +156,47 @@ class CustomerNotificationService
         ]]);
     }
 
-    private function send(User $user, string $view, array $data, array $attachments = []): void
+    private function send(User $user, string $view, array $data, array $attachments = []): bool
     {
+        $subject = BillingSetting::valueFor("email_template_{$view}_subject", '') ?: $this->subjectFor($view);
+        $customHtml = BillingSetting::valueFor("email_template_{$view}_html", '');
+        $variables = $this->variables($user, $data);
+        $subject = strtr($subject, $variables);
+        $rendered = $customHtml !== ''
+            ? view('emails.custom', ['html' => strtr($customHtml, $variables), 'subject' => $subject])->render()
+            : view("emails.{$view}", $data)->render();
+
+        return $this->deliver($user, $subject, $rendered, $view, auth()->id(), $attachments, data_get($data, 'service.external_password'));
+    }
+
+    private function deliver(User $user, string $subject, string $rendered, ?string $template, ?int $sentBy, array $attachments = [], ?string $secret = null): bool
+    {
+        $log = CustomerEmailLog::create([
+            'user_id' => $user->id,
+            'sent_by' => $sentBy,
+            'template' => $template,
+            'recipient_email' => $user->email,
+            'recipient_name' => $user->name,
+            'subject' => $subject,
+            'body_html' => $secret ? str_replace(e($secret), '[AFGESCHERMD]', $rendered) : $rendered,
+            'status' => 'pending',
+        ]);
+
         try {
-            $subject = BillingSetting::valueFor("email_template_{$view}_subject", '') ?: $this->subjectFor($view);
-            $customHtml = BillingSetting::valueFor("email_template_{$view}_html", '');
-            $variables = $this->variables($user, $data);
-            $subject = strtr($subject, $variables);
-            $callback = function ($message) use ($user, $subject, $attachments) {
+            Mail::html($rendered, function ($message) use ($user, $subject, $attachments) {
                 $message->to($user->email, $user->name)->subject($subject);
                 foreach ($attachments as $attachment) {
                     $message->attachData($attachment['data'], $attachment['name'], ['mime' => 'application/pdf']);
                 }
-            };
+            });
+            $log->update(['status' => 'sent', 'sent_at' => now()]);
 
-            if ($customHtml !== '') {
-                Mail::send('emails.custom', ['html' => strtr($customHtml, $variables), 'subject' => $subject], $callback);
-            } else {
-                Mail::send("emails.{$view}", $data, $callback);
-            }
+            return true;
         } catch (\Throwable $e) {
+            $log->update(['status' => 'failed', 'error_message' => Str::limit($e->getMessage(), 2000)]);
             report($e);
+
+            return false;
         }
     }
 

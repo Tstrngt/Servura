@@ -2,13 +2,22 @@
 
 namespace Tests\Feature;
 
+use App\Models\CustomerEmailLog;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class AdminCustomerCreationTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Mail::fake();
+    }
 
     public function test_owner_can_create_an_active_customer_from_admin_form(): void
     {
@@ -30,6 +39,12 @@ class AdminCustomerCreationTest extends TestCase
         $response->assertSessionHasNoErrors();
         $this->assertTrue($customer->isCustomer());
         $this->assertTrue($customer->is_active);
+        $this->assertNotNull($customer->email_verification_token);
+        $this->assertDatabaseHas('customer_email_logs', [
+            'user_id' => $customer->id,
+            'template' => 'account-created',
+            'status' => 'sent',
+        ]);
     }
 
     public function test_owner_can_create_an_inactive_customer_from_admin_form(): void
@@ -48,5 +63,29 @@ class AdminCustomerCreationTest extends TestCase
             'role' => 'customer',
             'is_active' => false,
         ]);
+    }
+
+    public function test_authorized_admin_can_send_and_review_customer_email(): void
+    {
+        $owner = User::factory()->create(['role' => 'admin']);
+        $customer = User::factory()->create(['role' => 'customer']);
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $response = $this->actingAs($owner)->post(route('admin.customers.emails.send', $customer), [
+            'subject' => 'Uw Servura-account',
+            'message' => "Hallo,\nDit is een testbericht.",
+        ]);
+
+        $response->assertRedirect(route('admin.customers.show', [$customer, 'tab' => 'emails']));
+        $response->assertSessionHas('success');
+        $log = CustomerEmailLog::where('user_id', $customer->id)->firstOrFail();
+        $this->assertSame('sent', $log->status);
+        $this->assertSame($owner->id, $log->sent_by);
+        $this->assertStringContainsString('Dit is een testbericht.', $log->body_html);
+
+        $this->actingAs($owner)
+            ->get(route('admin.customers.show', [$customer, 'tab' => 'emails']))
+            ->assertOk()
+            ->assertSee('Uw Servura-account');
     }
 }

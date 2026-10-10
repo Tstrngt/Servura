@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\Service;
 use App\Models\ServicePrice;
 use App\Models\Ticket;
+use App\Services\CustomerNotificationService;
 use App\Services\DirectAdminClient;
 use App\Services\RenewalService;
 use Illuminate\Http\Request;
@@ -105,10 +106,14 @@ class CustomerController extends Controller
         $validated['password'] = Hash::make($validated['password']);
 
         $customer = User::create($validated);
+        $sent = app(CustomerNotificationService::class)->accountCreated($customer);
+        AuditLog::record('customer.created', $customer, null, ['email' => $customer->email, 'welcome_email_sent' => $sent]);
 
         return redirect()
             ->route('admin.customers.show', $customer)
-            ->with('success', 'Klant is succesvol aangemaakt.');
+            ->with($sent ? 'success' : 'warning', $sent
+                ? 'Klant is succesvol aangemaakt en de welkomstmail is verzonden.'
+                : 'Klant is aangemaakt, maar de welkomstmail kon niet worden verzonden. Bekijk het e-maillogboek.');
     }
 
     /**
@@ -150,8 +155,47 @@ class CustomerController extends Controller
         $invoices = Invoice::where('user_id', $customer->id)->latest('invoice_date')->get();
 
         $billingCycles = ServicePrice::CYCLES;
+        $emailLogs = $customer->emailLogs()->with('sender')->latest()->limit(100)->get();
 
-        return view('admin.customers.show', compact('customer', 'stats', 'availableServices', 'invoices', 'billingCycles'));
+        return view('admin.customers.show', compact('customer', 'stats', 'availableServices', 'invoices', 'billingCycles', 'emailLogs'));
+    }
+
+    public function sendEmail(Request $request, User $customer, CustomerNotificationService $notifications)
+    {
+        abort_unless($customer->isCustomer(), 404);
+        abort_unless($request->user()->can('customer-emails.send'), 403);
+
+        $validated = $request->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|max:20000',
+        ]);
+
+        $sent = $notifications->custom($customer, $validated['subject'], $validated['message']);
+        AuditLog::record('customer.email.sent', $customer, null, [
+            'subject' => $validated['subject'],
+            'status' => $sent ? 'sent' : 'failed',
+        ]);
+
+        return redirect()
+            ->route('admin.customers.show', [$customer, 'tab' => 'emails'])
+            ->with($sent ? 'success' : 'error', $sent
+                ? 'E-mail is succesvol verzonden.'
+                : 'E-mail kon niet worden verzonden. Bekijk de foutmelding in het e-maillogboek.');
+    }
+
+    public function resendWelcomeEmail(Request $request, User $customer, CustomerNotificationService $notifications)
+    {
+        abort_unless($customer->isCustomer(), 404);
+        abort_unless($request->user()->can('customer-emails.send'), 403);
+
+        $sent = $notifications->accountCreated($customer);
+        AuditLog::record('customer.welcome_email.resent', $customer, null, ['status' => $sent ? 'sent' : 'failed']);
+
+        return redirect()
+            ->route('admin.customers.show', [$customer, 'tab' => 'emails'])
+            ->with($sent ? 'success' : 'error', $sent
+                ? 'Welkomstmail is opnieuw verzonden.'
+                : 'Welkomstmail kon niet worden verzonden. Bekijk de foutmelding in het e-maillogboek.');
     }
 
     /**
