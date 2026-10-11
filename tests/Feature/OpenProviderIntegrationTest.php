@@ -61,6 +61,24 @@ class OpenProviderIntegrationTest extends TestCase
         $this->assertSame('11.00', $tld->fresh()->transfer_price);
     }
 
+    public function test_openprovider_checks_multiple_domains_in_one_request(): void
+    {
+        Http::fake([
+            'https://api.sandbox.openprovider.nl/v1beta/auth/login' => Http::response(['code' => 0, 'data' => ['token' => 'sandbox-token']], 200),
+            'https://api.sandbox.openprovider.nl/v1beta/domains/check' => Http::response(['code' => 0, 'data' => ['results' => [
+                ['domain' => 'voorbeeld.nl', 'status' => 'free'],
+                ['domain' => 'voorbeeld.com', 'status' => 'active'],
+            ]]], 200),
+        ]);
+
+        $results = DomainProviderFactory::default()->checkAvailabilityBatch(['voorbeeld.nl', 'voorbeeld.com']);
+
+        $this->assertTrue($results['voorbeeld.nl']->available);
+        $this->assertFalse($results['voorbeeld.com']->available);
+        Http::assertSentCount(2);
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/domains/check') && count($request['domains']) === 2);
+    }
+
     public function test_factory_resolves_openprovider_and_checks_domain_through_sandbox_api(): void
     {
         Http::fake([

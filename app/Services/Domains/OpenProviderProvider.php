@@ -94,21 +94,34 @@ class OpenProviderProvider implements DomainProvider
 
     public function checkAvailability(string $domain): DomainCheckResult
     {
-        [$name, $extension] = $this->splitDomain($domain);
+        return $this->checkAvailabilityBatch([$domain])[$domain];
+    }
+
+    public function checkAvailabilityBatch(array $domains): array
+    {
+        $requested = collect($domains)->map(function (string $domain) {
+            [$name, $extension] = $this->splitDomain($domain);
+
+            return ['domain' => $domain, 'name' => $name, 'extension' => $extension];
+        });
         $data = $this->client->request('POST', 'domains/check', [
-            'domains' => [['name' => $name, 'extension' => $extension]],
+            'domains' => $requested->map(fn ($domain) => ['name' => $domain['name'], 'extension' => $domain['extension']])->values()->all(),
             'with_price' => true,
         ]);
-        $result = $data['results'][0] ?? [];
-        $status = strtolower((string) ($result['status'] ?? 'unknown'));
+        $results = collect($data['results'] ?? [])->keyBy(fn ($result) => strtolower($result['domain'] ?? ''));
 
-        return new DomainCheckResult(
-            domain: $domain,
-            available: $status === 'free',
-            status: $status,
-            tld: $extension,
-            actions: []
-        );
+        return $requested->mapWithKeys(function ($domain) use ($results) {
+            $result = $results->get($domain['domain'], []);
+            $status = strtolower((string) ($result['status'] ?? 'unknown'));
+
+            return [$domain['domain'] => new DomainCheckResult(
+                domain: $domain['domain'],
+                available: $status === 'free',
+                status: $status,
+                tld: $domain['extension'],
+                actions: []
+            )];
+        })->all();
     }
 
     public function suggest(string $name, array $tlds = []): array

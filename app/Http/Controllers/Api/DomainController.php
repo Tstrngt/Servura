@@ -52,14 +52,30 @@ class DomainController extends Controller
 
         try {
             $results = [];
+            $availabilityByDomain = [];
+            $missingDomains = [];
+            foreach ($tlds as $tld) {
+                $domain = $name.'.'.ltrim($tld->extension, '.');
+                $cached = Cache::get($cacheKeyBase.'_'.ltrim($tld->extension, '.'));
+                $cached ? $availabilityByDomain[$domain] = $cached : $missingDomains[] = $domain;
+            }
+            if ($missingDomains && method_exists($provider, 'checkAvailabilityBatch')) {
+                foreach ($provider->checkAvailabilityBatch($missingDomains) as $domain => $availability) {
+                    $data = $availability->toArray();
+                    $availabilityByDomain[$domain] = $data;
+                    Cache::put($cacheKeyBase.'_'.ltrim(strstr($domain, '.'), '.'), $data, now()->addMinutes(5));
+                }
+            } else {
+                foreach ($missingDomains as $domain) {
+                    $data = $provider->checkAvailability($domain)->toArray();
+                    $availabilityByDomain[$domain] = $data;
+                    Cache::put($cacheKeyBase.'_'.ltrim(strstr($domain, '.'), '.'), $data, now()->addMinutes(5));
+                }
+            }
 
             foreach ($tlds as $tld) {
                 $domain = $name.'.'.ltrim($tld->extension, '.');
-                $cacheKey = $cacheKeyBase.'_'.ltrim($tld->extension, '.');
-
-                $availability = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($provider, $domain) {
-                    return $provider->checkAvailability($domain)->toArray();
-                });
+                $availability = $availabilityByDomain[$domain];
 
                 $servicePrice = $domainService
                     ? $domainService->prices()->where('tld', $tld->extension)->where('billing_cycle', 'yearly')->where('is_enabled', true)->first()
