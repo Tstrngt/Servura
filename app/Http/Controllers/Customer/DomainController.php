@@ -56,7 +56,9 @@ class DomainController extends Controller
         if ($providerDataStale) {
             SyncDomainInfoFromProvider::dispatchAfterResponse($domain->id);
         }
-        if ($providerDataStale || ! Cache::has("domain.management.contacts.{$domain->id}")) {
+        if ($providerDataStale
+            || ! Cache::has("domain.management.contacts.{$domain->id}")
+            || ! Cache::has("domain.management.dns.{$domain->id}")) {
             SyncDomainManagementData::dispatchAfterResponse($domain->id);
         }
 

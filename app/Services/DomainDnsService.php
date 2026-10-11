@@ -6,6 +6,7 @@ use App\Models\DomainAuditLog;
 use App\Models\DomainRegistration;
 use App\Models\User;
 use App\Services\Domains\DomainProviderFactory;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -86,6 +87,9 @@ class DomainDnsService
         try {
             DB::transaction(function () use ($domain, $records, $provider, $user, $before) {
                 $provider->setDnsEntries($domain->domain_name, $records);
+                Cache::forget("domain.management.dns.{$domain->id}");
+                $refreshedRecords = $this->records($domain);
+                Cache::put("domain.management.dns.{$domain->id}", $refreshedRecords, now()->addMinutes(5));
 
                 DomainAuditLog::create([
                     'domain_registration_id' => $domain->id,
@@ -93,7 +97,7 @@ class DomainDnsService
                     'action' => 'dns_records_updated',
                     'status' => 'completed',
                     'before' => $before,
-                    'after' => ['dns_entries' => $this->records($domain)],
+                    'after' => ['dns_entries' => $refreshedRecords],
                     'note' => 'DNS-records gewijzigd via provider.',
                     'ip_address' => request()?->ip(),
                 ]);
