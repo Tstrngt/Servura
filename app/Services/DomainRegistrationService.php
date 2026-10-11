@@ -69,6 +69,7 @@ class DomainRegistrationService
                     'status' => DomainRegistration::STATUS_ACTIVE,
                     'registered_at' => now(),
                     'expires_at' => now()->addYear(),
+                    'error_message' => null,
                 ]);
 
                 $this->activateCustomerService($customerService);
@@ -148,6 +149,7 @@ class DomainRegistrationService
                     'registered_at' => now(),
                     'expires_at' => now()->addYear(),
                     'auth_code' => null,
+                    'error_message' => null,
                 ]);
 
                 $this->activateCustomerService($customerService);

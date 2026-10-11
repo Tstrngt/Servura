@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\SyncDomainInfoFromProvider;
+use App\Jobs\SyncDomainManagementData;
 use App\Jobs\UpdateDomainDnsRecords;
 use App\Jobs\UpdateDomainHolderContacts;
 use App\Jobs\UpdateDomainNameservers;
@@ -15,6 +16,7 @@ use App\Services\DomainHostingService;
 use App\Services\DomainService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -45,15 +47,15 @@ class DomainController extends Controller
     ) {
         $this->authorizeView($domain);
 
-        $domain->load(['customerService', 'hostedCustomerService', 'auditLogs']);
+        $domain->load(['user', 'customerService', 'hostedCustomerService', 'auditLogs']);
 
-        // Sync provider info when stale so the page shows real data.
-        if (
-            $domain->provider_info_synced_at === null
-            || $domain->provider_info_synced_at->lt(now()->subMinutes(5))
-        ) {
-            $domainService->syncInfo($domain);
-            $domain->refresh();
+        $providerDataStale = $domain->provider_info_synced_at === null
+            || $domain->provider_info_synced_at->lt(now()->subMinutes(5));
+        if ($providerDataStale) {
+            SyncDomainInfoFromProvider::dispatchAfterResponse($domain->id);
+        }
+        if ($providerDataStale || ! Cache::has("domain.management.contacts.{$domain->id}")) {
+            SyncDomainManagementData::dispatchAfterResponse($domain->id);
         }
 
         $label = $domain->statusLabel;
@@ -73,13 +75,16 @@ class DomainController extends Controller
                 : 'Niet gesynchroniseerd',
         ];
 
-        $holderContacts = $domainService->contacts($domain);
+        $holderContacts = Cache::get("domain.management.contacts.{$domain->id}", $this->localHolderContacts($domain->user));
         $nameservers = $domain->current_nameservers ?? [];
-        $dnsManaged = $dnsService->canManage($domain);
-        $dnsRecords = $dnsManaged ? $dnsService->records($domain) : [];
+        $dnsManaged = Cache::get("domain.management.dns_managed.{$domain->id}", (bool) $domain->is_dns_managed_by_servura);
+        $dnsRecords = $dnsManaged ? Cache::get("domain.management.dns.{$domain->id}", []) : [];
         $hosting = $hostingService->details($domain);
         $availableHostingServices = $hosting['linked'] ? [] : $hostingService->availableServicesFor($domain);
-        $tldCapabilities = $domainService->tldCapabilities($domain);
+        $tldCapabilities = Cache::get("domain.management.capabilities.{$domain->id}", [
+            'can_set_nameservers' => true,
+            'can_set_contacts' => true,
+        ]);
 
         return view('customer.domains.show', compact(
             'domain',
@@ -99,6 +104,7 @@ class DomainController extends Controller
         $this->authorizeView($domain);
 
         SyncDomainInfoFromProvider::dispatch($domain->id);
+        SyncDomainManagementData::dispatch($domain->id);
 
         return back()->with('success', 'Domeingegevens worden opgehaald van de provider.');
     }
@@ -316,6 +322,32 @@ class DomainController extends Controller
         return $result['success']
             ? back()->with('success', $result['message'])
             : back()->with('error', $result['message']);
+    }
+
+    private function localHolderContacts(?User $user): array
+    {
+        if (! $user) {
+            return [];
+        }
+
+        $parts = preg_split('/\s+/', trim($user->name), 2);
+        $contact = [
+            'first_name' => $parts[0] ?? '',
+            'last_name' => $parts[1] ?? '',
+            'company_name' => $user->company ?? '',
+            'company_kvk' => $user->kvk_number ?? '',
+            'street' => $user->street ?? '',
+            'number' => $user->house_number ?? '',
+            'postal_code' => $user->postal_code ?? '',
+            'city' => $user->city ?? '',
+            'country' => $user->country ?? '',
+            'email' => $user->email,
+            'phone_number' => $user->phone ?? '',
+        ];
+
+        return collect(['registrant', 'administrative', 'technical'])
+            ->map(fn ($type) => ['type' => $type] + $contact)
+            ->all();
     }
 
     private function authorizeView(DomainRegistration $domain): void

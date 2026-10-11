@@ -85,7 +85,7 @@
                     </div>
                 </dl>
 
-                @if($domainRegistration->error_message)
+                @if($domainRegistration->error_message && in_array($domainRegistration->status, [\App\Models\DomainRegistration::STATUS_REGISTRATION_FAILED, \App\Models\DomainRegistration::STATUS_TRANSFER_FAILED], true))
                     <div class="mt-6 rounded-lg bg-red-50 p-4 ring-1 ring-red-200">
                         <h3 class="text-sm font-semibold text-red-800">Providerfout</h3>
                         <p class="mt-1 text-sm text-red-700">{{ $domainRegistration->error_message }}</p>
