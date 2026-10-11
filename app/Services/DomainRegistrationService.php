@@ -31,6 +31,9 @@ class DomainRegistrationService
                 'tld' => $this->extractTld($customerService->domain),
                 'status' => DomainRegistration::STATUS_AWAITING_PAYMENT,
                 'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
+                'provider_environment' => BillingSetting::valueFor('domain_provider', 'transip') === 'openprovider'
+                    ? BillingSetting::valueFor('openprovider_environment', 'sandbox')
+                    : null,
                 'registration_price' => $customerService->price,
                 'renewal_price' => $this->resolveRenewalPrice($customerService),
                 'auto_renew' => true,
@@ -50,6 +53,9 @@ class DomainRegistrationService
         }
 
         [$provider, $user] = $this->prepareProvider($domainRegistration, $customerService);
+        $providerEnvironment = $provider instanceof OpenProviderProvider
+            ? BillingSetting::valueFor('openprovider_environment', 'sandbox')
+            : null;
 
         try {
             $availability = $provider->checkAvailability($customerService->domain);
@@ -64,9 +70,10 @@ class DomainRegistrationService
 
             $provider->registerDomain($customerService->domain, [$contact], $nameservers);
 
-            DB::transaction(function () use ($domainRegistration, $customerService) {
+            DB::transaction(function () use ($domainRegistration, $customerService, $providerEnvironment) {
                 $domainRegistration->update([
                     'status' => DomainRegistration::STATUS_ACTIVE,
+                    'provider_environment' => $providerEnvironment,
                     'registered_at' => now(),
                     'expires_at' => now()->addYear(),
                     'error_message' => null,
@@ -111,6 +118,9 @@ class DomainRegistrationService
                 'tld' => $this->extractTld($customerService->domain),
                 'status' => DomainRegistration::STATUS_TRANSFER_PENDING,
                 'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
+                'provider_environment' => BillingSetting::valueFor('domain_provider', 'transip') === 'openprovider'
+                    ? BillingSetting::valueFor('openprovider_environment', 'sandbox')
+                    : null,
                 'transfer_price' => $customerService->price,
                 'auto_renew' => true,
                 'type' => DomainRegistration::TYPE_TRANSFER,
@@ -129,6 +139,9 @@ class DomainRegistrationService
         }
 
         [$provider, $user] = $this->prepareProvider($domainRegistration, $customerService);
+        $providerEnvironment = $provider instanceof OpenProviderProvider
+            ? BillingSetting::valueFor('openprovider_environment', 'sandbox')
+            : null;
 
         $authCode = $domainRegistration->auth_code;
         if (empty($authCode)) {
@@ -143,9 +156,10 @@ class DomainRegistrationService
 
             $provider->transferDomain($customerService->domain, $authCode, [$contact], $nameservers);
 
-            DB::transaction(function () use ($domainRegistration, $customerService) {
+            DB::transaction(function () use ($domainRegistration, $customerService, $providerEnvironment) {
                 $domainRegistration->update([
                     'status' => DomainRegistration::STATUS_TRANSFER_ACTIVE,
+                    'provider_environment' => $providerEnvironment,
                     'registered_at' => now(),
                     'expires_at' => now()->addYear(),
                     'auth_code' => null,

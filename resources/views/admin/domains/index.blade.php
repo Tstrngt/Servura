@@ -59,11 +59,12 @@
                                             @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:text-red-800 font-medium">Verwijderen</button>
                                         </form>
-                                    @elseif(\App\Models\BillingSetting::valueFor('openprovider_environment', 'sandbox') === 'sandbox' && strcasecmp((string) $domain->provider, 'Openprovider') === 0)
-                                        <form action="{{ route('admin.domains.destroy', $domain) }}" method="POST" class="inline-block ml-3" onsubmit="return confirm('Dit sandboxdomein wordt alleen lokaal uit Servura verwijderd. Openprovider blijft ongewijzigd. Doorgaan?');">
+                                    @elseif(strcasecmp((string) $domain->provider, 'Openprovider') === 0 && $domain->provider_environment !== 'production')
+                                        <form action="{{ route('admin.domains.destroy', $domain) }}" method="POST" class="inline-block ml-3" onsubmit="const confirmation = prompt('Typ de exacte domeinnaam om deze lokale sandboxregistratie te verwijderen. Openprovider blijft ongewijzigd.'); if (confirmation !== @js($domain->domain_name)) { alert('De ingevoerde domeinnaam klopt niet. Er is niets verwijderd.'); return false; } this.elements.confirm_domain.value = confirmation; return true;">
                                             @csrf
                                             @method('DELETE')
                                             <input type="hidden" name="local_only" value="1">
+                                            <input type="hidden" name="confirm_domain" value="">
                                             <button type="submit" class="text-amber-600 hover:text-amber-800 font-medium">Lokaal verwijderen</button>
                                         </form>
                                     @endif

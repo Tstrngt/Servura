@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\BillingSetting;
+use App\Models\AuditLog;
 use App\Models\CustomerService;
 use App\Models\DomainRegistration;
-use App\Models\AuditLog;
 use App\Models\Invoice;
 use App\Services\DomainRegistrationService;
 use Illuminate\Http\Request;
@@ -87,14 +86,19 @@ class DomainRegistrationController extends Controller
 
         if ($request->boolean('local_only')) {
             abort_unless(
-                BillingSetting::valueFor('openprovider_environment', 'sandbox') === 'sandbox'
-                    && strcasecmp((string) $domainRegistration->provider, 'Openprovider') === 0,
+                strcasecmp((string) $domainRegistration->provider, 'Openprovider') === 0
+                    && $domainRegistration->provider_environment !== 'production',
                 403,
                 'Alleen Openprovider-sandboxregistraties kunnen lokaal worden verwijderd.'
             );
+            abort_unless(
+                strcasecmp((string) $request->input('confirm_domain'), $domainRegistration->domain_name) === 0,
+                422,
+                'Bevestig de lokale verwijdering door de exacte domeinnaam in te voeren.'
+            );
             abort_if($domainRegistration->hostedCustomerService?->status === 'active', 422, 'Ontkoppel eerst de actieve hostingdienst.');
 
-            $snapshot = $domainRegistration->only(['domain_name', 'provider', 'status', 'external_id']);
+            $snapshot = $domainRegistration->only(['domain_name', 'provider', 'provider_environment', 'status', 'external_id']);
             DB::transaction(function () use ($domainRegistration) {
                 $customerService = $domainRegistration->customerService;
 

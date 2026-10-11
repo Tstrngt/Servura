@@ -51,6 +51,7 @@ class DomainRegistration extends Model
         'tld',
         'status',
         'provider',
+        'provider_environment',
         'registration_price',
         'renewal_price',
         'transfer_price',

@@ -276,6 +276,7 @@ class OpenProviderIntegrationTest extends TestCase
     public function test_owner_can_remove_openprovider_sandbox_domain_locally(): void
     {
         Http::fake();
+        BillingSetting::setValue('openprovider_environment', 'production');
         $account = User::factory()->create(['role' => 'admin', 'is_active' => true]);
         $owner = clone $account;
         $owner->role = 'owner';
@@ -285,18 +286,43 @@ class OpenProviderIntegrationTest extends TestCase
             'tld' => '.nl',
             'status' => DomainRegistration::STATUS_ACTIVE,
             'provider' => 'Openprovider',
+            'provider_environment' => 'sandbox',
             'registration_price' => 10,
         ]);
 
         $this->actingAs($owner)->delete(route('admin.domains.destroy', $domain), [
             'local_only' => '1',
+            'confirm_domain' => 'sandbox-test.nl',
         ])->assertRedirect(route('admin.domains.index'));
 
         $this->assertDatabaseMissing('domain_registrations', ['id' => $domain->id]);
         Http::assertNotSent(fn ($request) => $request->method() === 'DELETE');
     }
 
-    public function test_local_domain_removal_is_blocked_outside_sandbox(): void
+    public function test_owner_can_remove_legacy_openprovider_domain_after_exact_confirmation(): void
+    {
+        BillingSetting::setValue('openprovider_environment', 'production');
+        $account = User::factory()->create(['role' => 'admin', 'is_active' => true]);
+        $owner = clone $account;
+        $owner->role = 'owner';
+        $domain = DomainRegistration::create([
+            'user_id' => $account->id,
+            'domain_name' => 'legacy-sandbox.nl',
+            'tld' => '.nl',
+            'status' => DomainRegistration::STATUS_ACTIVE,
+            'provider' => 'Openprovider',
+            'registration_price' => 10,
+        ]);
+
+        $this->actingAs($owner)->delete(route('admin.domains.destroy', $domain), [
+            'local_only' => '1',
+            'confirm_domain' => 'legacy-sandbox.nl',
+        ])->assertRedirect(route('admin.domains.index'));
+
+        $this->assertDatabaseMissing('domain_registrations', ['id' => $domain->id]);
+    }
+
+    public function test_local_domain_removal_is_blocked_for_production_registration(): void
     {
         BillingSetting::setValue('openprovider_environment', 'production');
         $account = User::factory()->create(['role' => 'admin', 'is_active' => true]);
@@ -308,11 +334,13 @@ class OpenProviderIntegrationTest extends TestCase
             'tld' => '.nl',
             'status' => DomainRegistration::STATUS_ACTIVE,
             'provider' => 'Openprovider',
+            'provider_environment' => 'production',
             'registration_price' => 10,
         ]);
 
         $this->actingAs($owner)->delete(route('admin.domains.destroy', $domain), [
             'local_only' => '1',
+            'confirm_domain' => 'production-test.nl',
         ])->assertForbidden();
 
         $this->assertDatabaseHas('domain_registrations', ['id' => $domain->id]);

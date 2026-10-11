@@ -8,6 +8,7 @@ use App\Models\DomainRegistration;
 use App\Models\User;
 use App\Services\Domains\DemoDomain;
 use App\Services\Domains\DomainProviderFactory;
+use App\Services\Domains\OpenProviderProvider;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -55,6 +56,9 @@ class DomainService
             'current_nameservers' => $nameservers,
             'is_dns_managed_by_servura' => $isManaged,
             'registrar_lock' => $info['is_transfer_locked'] ?? false,
+            'provider_environment' => $provider instanceof OpenProviderProvider
+                ? BillingSetting::valueFor('openprovider_environment', 'sandbox')
+                : null,
             'external_id' => $info['external_id'] ?? $domain->external_id,
             'provider_info_synced_at' => now(),
         ]);
