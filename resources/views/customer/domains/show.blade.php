@@ -314,7 +314,7 @@ $registrant = $holderContacts[0] ?? [];
                         protectedRecord(record) { return ['SOA', 'NS'].includes((record.type || '').toUpperCase()); },
                         normalizeName(name) {
                             const value = String(name || '').trim().replace(/\.$/, '').toLowerCase();
-                            return value === '@' || value === '' ? this.domainName : (value.endsWith('.' + this.domainName) ? value : value + '.' + this.domainName);
+                            return value === '@' || value === '' || value === this.domainName ? this.domainName : (value.endsWith('.' + this.domainName) ? value : value + '.' + this.domainName);
                         },
                         openRecord(index = null) {
                             const record = index === null ? {name: '@', type: 'A', expire: 3600, content: '', priority: null} : {...this.records[index]};

@@ -193,35 +193,46 @@ class DomainController extends Controller
             'record_index' => ['nullable', 'integer', 'min:0'],
         ]);
 
-        $records = $dnsService->fetchRecords($domain);
-        if ($records === null) {
+        $currentRecords = $dnsService->fetchRecords($domain);
+        if ($currentRecords === null) {
             return back()->with('error', 'De huidige DNS-records konden niet bij Openprovider worden opgehaald. Probeer het later opnieuw.');
         }
+        $desiredRecords = $currentRecords;
 
         $index = is_numeric($request->input('record_index')) ? (int) $request->input('record_index') : null;
+        if ($index !== null && isset($currentRecords[$index]) && in_array(strtoupper($currentRecords[$index]['type'] ?? ''), ['SOA', 'NS'], true)) {
+            return back()->with('error', 'SOA- en NS-records worden door Servura beheerd en kunnen hier niet worden aangepast.');
+        }
 
         if ($request->input('dns_action') === 'save') {
             $validated = $request->validate([
                 'record.name' => ['required', 'string', 'max:255'],
-                'record.type' => ['required', 'in:A,AAAA,CNAME,MX,TXT,SRV,CAA,NS,SOA'],
+                'record.type' => ['required', 'in:A,AAAA,CNAME,MX,TXT,SRV,CAA'],
                 'record.expire' => ['required', 'integer', 'min:60'],
                 'record.content' => ['required', 'string', 'max:255'],
                 'record.priority' => ['nullable', 'integer', 'min:0', 'max:65535', 'required_if:record.type,MX,SRV'],
             ]);
 
-            if ($index === null || ! isset($records[$index])) {
-                $records[] = $validated['record'];
+            $record = $validated['record'];
+            $record['name'] = strtolower(trim((string) $record['name'], '.'));
+            $record['name'] = $record['name'] === '@' || $record['name'] === $domain->domain_name ? $domain->domain_name : (str_ends_with($record['name'], '.'.$domain->domain_name) ? $record['name'] : $record['name'].'.'.$domain->domain_name);
+            $record['type'] = strtoupper($record['type']);
+            $record['expire'] = (int) $record['expire'];
+            $record['priority'] = isset($record['priority']) ? (int) $record['priority'] : null;
+
+            if ($index === null || ! isset($currentRecords[$index])) {
+                $desiredRecords[] = $record;
             } else {
-                $records[$index] = $validated['record'];
+                $desiredRecords[$index] = $record;
             }
         } else {
-            if ($index === null || ! isset($records[$index])) {
+            if ($index === null || ! isset($currentRecords[$index])) {
                 return back()->with('error', 'Het DNS-record kon niet worden gevonden. Vernieuw de pagina en probeer het opnieuw.');
             }
-            array_splice($records, $index, 1);
+            array_splice($desiredRecords, $index, 1);
         }
 
-        $result = $dnsService->updateRecords($domain, array_values($records), Auth::user());
+        $result = $dnsService->updateRecords($domain, array_values($desiredRecords), Auth::user(), $currentRecords);
 
         if (! ($result['success'] ?? false)) {
             return back()->with('error', 'De DNS-records konden niet worden bijgewerkt: '.($result['message'] ?? 'onbekende providerfout'));

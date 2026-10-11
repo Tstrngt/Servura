@@ -205,12 +205,16 @@ class OpenProviderIntegrationTest extends TestCase
         Http::fake([
             'https://api.openprovider.eu/v1/auth/login' => Http::response(['code' => 0, 'data' => ['token' => 'production-token']], 200),
             'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl/records?*' => Http::response(['code' => 0, 'data' => ['results' => [
+                ['name' => 'voorbeeld.nl', 'type' => 'SOA', 'value' => 'ns1.openprovider.nl dns@openprovider.eu 2026101106 10800 3600 604800 3600', 'ttl' => 86400],
+                ['name' => 'voorbeeld.nl', 'type' => 'NS', 'value' => 'ns1.openprovider.nl', 'ttl' => 3600],
                 ['name' => 'voorbeeld.nl', 'type' => 'A', 'value' => '192.0.2.1', 'ttl' => 3600],
             ]]], 200),
             'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl' => Http::response(['code' => 0, 'data' => ['success' => true]], 200),
         ]);
 
         DomainProviderFactory::default()->setDnsEntries('voorbeeld.nl', [
+            ['name' => 'voorbeeld.nl', 'type' => 'SOA', 'content' => 'ns1.openprovider.nl dns@openprovider.eu 2026101106 10800 3600 604800 3600', 'expire' => 86400],
+            ['name' => 'voorbeeld.nl', 'type' => 'NS', 'content' => 'ns1.openprovider.nl', 'expire' => 3600],
             ['name' => '@', 'type' => 'A', 'content' => '192.0.2.2', 'expire' => 3600],
             ['name' => 'www', 'type' => 'MX', 'content' => 'mail.example.test', 'expire' => 3600, 'priority' => '10'],
         ]);
@@ -220,6 +224,8 @@ class OpenProviderIntegrationTest extends TestCase
             && (int) $request['limit'] === 500);
         Http::assertSent(fn ($request) => $request->method() === 'PUT'
             && $request->url() === 'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl'
+            && count($request['records']['remove']) === 1
+            && count($request['records']['add']) === 2
             && $request['records']['remove'][0]['value'] === '192.0.2.1'
             && $request['records']['add'][0]['name'] === 'voorbeeld.nl'
             && $request['records']['add'][0]['value'] === '192.0.2.2'
@@ -258,7 +264,7 @@ class OpenProviderIntegrationTest extends TestCase
                 'expire' => 3600,
                 'content' => '192.0.2.2',
             ],
-        ])->assertRedirect();
+        ])->assertSessionHasNoErrors()->assertRedirect();
 
         Http::assertSent(fn ($request) => $request->method() === 'PUT'
             && $request->url() === 'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl'

@@ -92,8 +92,9 @@ interface DomainProvider
 
     /**
      * @param array<int, mixed> $dnsEntries
+     * @param array<int, mixed>|null $currentDnsEntries
      */
-    public function setDnsEntries(string $domain, array $dnsEntries): void;
+    public function setDnsEntries(string $domain, array $dnsEntries, ?array $currentDnsEntries = null): void;
 
     /**
      * Get the current authcode for a domain, if supported.

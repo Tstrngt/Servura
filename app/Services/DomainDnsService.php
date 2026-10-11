@@ -75,7 +75,7 @@ class DomainDnsService
         }
     }
 
-    public function updateRecords(DomainRegistration $domain, array $records, ?User $user = null): array
+    public function updateRecords(DomainRegistration $domain, array $records, ?User $user = null, ?array $currentRecords = null): array
     {
         $provider = DomainProviderFactory::forDomain($domain->domain_name);
 
@@ -87,17 +87,20 @@ class DomainDnsService
             return ['success' => false, 'message' => 'DNS kan alleen worden beheerd wanneer het domein de ingestelde Servura/Openprovider-nameservers gebruikt.'];
         }
 
-        $before = ['dns_entries' => $this->records($domain)];
+        $currentRecords ??= $this->fetchRecords($domain);
+        if ($currentRecords === null) {
+            return ['success' => false, 'message' => 'De huidige DNS-records konden niet bij de provider worden opgehaald.'];
+        }
+
+        $before = ['dns_entries' => $currentRecords];
 
         try {
-            DB::transaction(function () use ($domain, $records, $provider, $user, $before) {
-                $provider->setDnsEntries($domain->domain_name, $records);
+            DB::transaction(function () use ($domain, $records, $provider, $user, $before, $currentRecords) {
+                $provider->setDnsEntries($domain->domain_name, $records, $currentRecords);
                 Cache::forget("domain.management.dns.{$domain->id}");
-                $refreshedRecords = $this->fetchRecords($domain);
-                if ($refreshedRecords !== null) {
-                    Cache::put("domain.management.dns.{$domain->id}", $refreshedRecords, now()->addMinutes(5));
-                    Cache::put("domain.management.dns_loaded.{$domain->id}", true, now()->addMinutes(5));
-                }
+                $refreshedRecords = $records;
+                Cache::put("domain.management.dns.{$domain->id}", $refreshedRecords, now()->addMinutes(5));
+                Cache::put("domain.management.dns_loaded.{$domain->id}", true, now()->addMinutes(5));
 
                 DomainAuditLog::create([
                     'domain_registration_id' => $domain->id,

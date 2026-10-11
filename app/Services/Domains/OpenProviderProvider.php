@@ -301,11 +301,11 @@ class OpenProviderProvider implements DomainProvider
         ])->all();
     }
 
-    public function setDnsEntries(string $domain, array $dnsEntries): void
+    public function setDnsEntries(string $domain, array $dnsEntries, ?array $currentDnsEntries = null): void
     {
         $format = function ($record) use ($domain) {
             $name = strtolower(trim((string) ($record['name'] ?? $domain), '.'));
-            $name = $name === '' || $name === '@' ? $domain : (str_ends_with($name, '.'.$domain) ? $name : $name.'.'.$domain);
+            $name = $name === '' || $name === '@' || $name === $domain ? $domain : (str_ends_with($name, '.'.$domain) ? $name : $name.'.'.$domain);
             $priority = $record['priority'] ?? $record['prio'] ?? null;
 
             return array_filter([
@@ -316,13 +316,40 @@ class OpenProviderProvider implements DomainProvider
                 'prio' => $priority === null ? null : (int) $priority,
             ], fn ($value) => $value !== null);
         };
-        $current = collect($this->getDnsEntries($domain))->map($format)->values()->all();
+        $signature = fn ($record) => json_encode($record, JSON_UNESCAPED_SLASHES);
+        $current = collect($currentDnsEntries ?? $this->getDnsEntries($domain))->map($format)->values()->all();
         $desired = collect($dnsEntries)->map($format)->values()->all();
+
+        $desiredSignatures = array_map($signature, $desired);
+        $remove = array_values(array_filter($current, function ($record) use (&$desiredSignatures, $signature) {
+            $position = array_search($signature($record), $desiredSignatures, true);
+            if ($position === false) {
+                return true;
+            }
+            unset($desiredSignatures[$position]);
+
+            return false;
+        }));
+
+        $currentSignatures = array_map($signature, $current);
+        $add = array_values(array_filter($desired, function ($record) use (&$currentSignatures, $signature) {
+            $position = array_search($signature($record), $currentSignatures, true);
+            if ($position === false) {
+                return true;
+            }
+            unset($currentSignatures[$position]);
+
+            return false;
+        }));
+
+        if ($remove === [] && $add === []) {
+            return;
+        }
 
         $this->client->request('PUT', 'dns/zones/'.$domain, [
             'name' => $domain,
             'type' => 'master',
-            'records' => ['remove' => $current, 'add' => $desired],
+            'records' => ['remove' => $remove, 'add' => $add],
         ]);
     }
 

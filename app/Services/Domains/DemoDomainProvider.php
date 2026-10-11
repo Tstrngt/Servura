@@ -140,7 +140,7 @@ class DemoDomainProvider implements DomainProvider
         return DomainMockData::dnsRecords();
     }
 
-    public function setDnsEntries(string $domain, array $dnsEntries): void
+    public function setDnsEntries(string $domain, array $dnsEntries, ?array $currentDnsEntries = null): void
     {
         // No-op in demo mode.
     }

@@ -376,7 +376,7 @@ class TransIpProvider implements DomainProvider
         ], $entries);
     }
 
-    public function setDnsEntries(string $domain, array $dnsEntries): void
+    public function setDnsEntries(string $domain, array $dnsEntries, ?array $currentDnsEntries = null): void
     {
         $domain = $this->normalizeDomain($domain);
 
