@@ -301,7 +301,49 @@ $registrant = $holderContacts[0] ?? [];
                 </div>
 
                 <!-- DNS Records -->
-                <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70" x-data="{ open: false, edit: false, records: {{ json_encode($dnsRecords) }} }">
+                <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70"
+                     x-data="{
+                        open: false,
+                        manage: false,
+                        modal: null,
+                        editIndex: null,
+                        deleteIndex: null,
+                        draft: {},
+                        records: {{ Illuminate\Support\Js::from($dnsRecords) }},
+                        domainName: {{ Illuminate\Support\Js::from($domain->domain_name) }},
+                        protectedRecord(record) { return ['SOA', 'NS'].includes((record.type || '').toUpperCase()); },
+                        normalizeName(name) {
+                            const value = String(name || '').trim().replace(/\.$/, '').toLowerCase();
+                            return value === '@' || value === '' ? this.domainName : (value.endsWith('.' + this.domainName) ? value : value + '.' + this.domainName);
+                        },
+                        openRecord(index = null) {
+                            const record = index === null ? {name: '@', type: 'A', expire: 3600, content: '', priority: null} : {...this.records[index]};
+                            this.editIndex = index;
+                            this.draft = {
+                                name: index === null ? '@' : this.shortName(record.name),
+                                type: record.type || 'A',
+                                expire: record.expire || 3600,
+                                content: record.content || '',
+                                priority: record.priority ?? null,
+                            };
+                            this.modal = 'record';
+                        },
+                        shortName(name) {
+                            return String(name || '').endsWith('.' + this.domainName) ? String(name).slice(0, -(this.domainName.length + 1)) : name;
+                        },
+                        saveRecord() {
+                            const normalized = {...this.draft, name: this.normalizeName(this.draft.name), expire: parseInt(this.draft.expire, 10), priority: this.draft.priority === '' ? null : this.draft.priority};
+                            if (this.editIndex === null) this.records.push(normalized); else this.records[this.editIndex] = normalized;
+                            this.modal = null;
+                            this.$nextTick(() => this.$refs.form.submit());
+                        },
+                        confirmDelete() {
+                            this.records.splice(this.deleteIndex, 1);
+                            this.deleteIndex = null;
+                            this.modal = null;
+                            this.$nextTick(() => this.$refs.form.submit());
+                        }
+                     }">
                     <button type="button" @click="open = !open" class="flex w-full items-center justify-between">
                         <div class="flex items-center gap-4">
                             <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
@@ -314,65 +356,89 @@ $registrant = $holderContacts[0] ?? [];
                         </div>
                         <svg class="h-5 w-5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
                     </button>
-                    <div x-show="open" class="pt-5">
+                    <div x-show="open" x-cloak class="pt-5">
                         @if(! $dnsManaged)
                             <p class="text-sm text-slate-500">Dit domein gebruikt externe nameservers. DNS wordt daarom niet via Servura beheerd.</p>
                         @else
-                            <div x-show="!edit" class="overflow-x-auto -mx-6 sm:mx-0 rounded-xl ring-1 ring-slate-200">
+                            <div class="overflow-x-auto -mx-6 sm:mx-0 rounded-xl ring-1 ring-slate-200">
                                 <table class="min-w-full divide-y divide-slate-100">
                                     <thead class="bg-slate-50">
                                         <tr>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Type</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Naam</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Waarde</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">TTL</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">Type</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">Naam</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">Waarde</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">TTL</th>
+                                            <th x-show="manage" class="px-4 py-3 text-right text-xs font-medium uppercase text-slate-500">Acties</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100 bg-white">
-                                        @forelse($dnsRecords as $entry)
+                                        <template x-for="(record, index) in records" :key="index">
                                             <tr class="text-sm">
-                                                <td class="px-4 py-3 font-medium text-slate-900">{{ $entry['type'] }}</td>
-                                                <td class="px-4 py-3 text-slate-600">{{ $entry['name'] }}</td>
-                                                <td class="px-4 py-3 font-mono text-slate-900">{{ $entry['content'] }}</td>
-                                                <td class="px-4 py-3 text-slate-600">{{ $entry['expire'] }}</td>
+                                                <td class="px-4 py-3 font-medium text-slate-900" x-text="record.type"></td>
+                                                <td class="px-4 py-3 text-slate-600" x-text="record.name"></td>
+                                                <td class="max-w-xs truncate px-4 py-3 font-mono text-slate-900" :title="record.content" x-text="record.content"></td>
+                                                <td class="px-4 py-3 text-slate-600" x-text="record.expire"></td>
+                                                <td x-show="manage" class="px-4 py-3">
+                                                    <div class="flex justify-end gap-1.5">
+                                                        <template x-if="protectedRecord(record)"><span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-400" title="Beheerd systeemrecord"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg></span></template>
+                                                        <template x-if="!protectedRecord(record)">
+                                                            <div class="flex gap-1.5">
+                                                                <button type="button" @click="openRecord(index)" class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-primary-50 hover:text-primary-700" title="Record wijzigen"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg></button>
+                                                                <button type="button" @click="deleteIndex=index; modal='delete'" class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100" title="Record verwijderen"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg></button>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </td>
                                             </tr>
-                                        @empty
-                                            <tr><td colspan="4" class="px-4 py-8 text-center text-sm text-slate-500">Geen DNS-records gevonden.</td></tr>
-                                        @endforelse
+                                        </template>
+                                        <template x-if="records.length === 0"><tr><td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">Geen DNS-records gevonden.</td></tr></template>
                                     </tbody>
                                 </table>
                             </div>
-                            <button type="button" @click="edit = true" class="mt-5 btn btn-primary">DNS-records beheren</button>
+                            <div class="mt-5 flex flex-wrap items-center gap-3">
+                                <button type="button" @click="manage = !manage" class="btn btn-primary" x-text="manage ? 'Beheer sluiten' : 'DNS-records beheren'"></button>
+                                <button x-show="manage" type="button" @click="openRecord()" class="btn btn-outline">+ Nieuw record</button>
+                                <p class="text-xs text-slate-500">Wijzigingen worden direct bij de registrar opgeslagen.</p>
+                            </div>
 
-                            <form x-show="edit" x-cloak method="POST" action="{{ route('customer.domains.dns.update', $domain) }}" class="space-y-3">
+                            <form x-ref="form" method="POST" action="{{ route('customer.domains.dns.update', $domain) }}" class="hidden">
                                 @csrf
                                 <template x-for="(record, index) in records" :key="index">
-                                    <div class="rounded-xl bg-slate-50 p-4">
-                                        <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
-                                            <div class="sm:col-span-2"><label class="block text-xs font-medium text-slate-600">Naam</label><input type="text" :name="`records[${index}][name]`" x-model="record.name" class="form-input mt-1 w-full" required></div>
-                                            <div><label class="block text-xs font-medium text-slate-600">Type</label><select :name="`records[${index}][type]`" x-model="record.type" class="form-select mt-1 w-full" required>
-                                                <option value="A">A</option>
-                                                <option value="AAAA">AAAA</option>
-                                                <option value="CNAME">CNAME</option>
-                                                <option value="MX">MX</option>
-                                                <option value="TXT">TXT</option>
-                                                <option value="SRV">SRV</option>
-                                                <option value="CAA">CAA</option>
-                                                <option value="NS">NS</option>
-                                            </select></div>
-                                            <div><label class="block text-xs font-medium text-slate-600">TTL</label><input type="number" :name="`records[${index}][expire]`" x-model="record.expire" class="form-input mt-1 w-full" min="60" required></div>
-                                            <div class="sm:col-span-5"><label class="block text-xs font-medium text-slate-600">Waarde</label><input type="text" :name="`records[${index}][content]`" x-model="record.content" class="form-input mt-1 w-full" required></div>
-                                        </div>
-                                        <button type="button" @click="records.splice(index, 1)" class="mt-3 text-xs font-semibold text-rose-600 hover:text-rose-800">Record verwijderen</button>
+                                    <div>
+                                        <input type="hidden" :name="`records[${index}][name]`" :value="record.name">
+                                        <input type="hidden" :name="`records[${index}][type]`" :value="record.type">
+                                        <input type="hidden" :name="`records[${index}][expire]`" :value="record.expire">
+                                        <input type="hidden" :name="`records[${index}][content]`" :value="record.content">
+                                        <input type="hidden" :name="`records[${index}][priority]`" :value="record.priority">
                                     </div>
                                 </template>
-                                <button type="button" @click="records.push({name:'', type:'A', expire:3600, content:''})" class="text-sm font-semibold text-primary-600 hover:text-primary-800">+ Record toevoegen</button>
-                                <div class="flex items-center gap-3 pt-2">
-                                    <button type="submit" class="btn btn-primary">DNS-records opslaan</button>
-                                    <button type="button" @click="edit = false" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
-                                </div>
-                                <p class="text-xs text-slate-500">De volledige set records wordt naar de provider verstuurd en na verwerking opnieuw opgehaald.</p>
                             </form>
+
+                            <template x-if="modal === 'record'">
+                                <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" @click.self="modal=null">
+                                    <form class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200" @submit.prevent="saveRecord()" @keydown.escape.window="modal=null">
+                                        <h3 class="font-heading text-lg font-bold text-slate-900" x-text="editIndex === null ? 'DNS-record toevoegen' : 'DNS-record wijzigen'"></h3>
+                                        <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                                            <div><label class="form-label">Naam</label><input x-model="draft.name" required class="form-input mt-1 w-full" placeholder="@"></div>
+                                            <div><label class="form-label">Type</label><select x-model="draft.type" class="form-select mt-1 w-full"><option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>TXT</option><option>SRV</option><option>CAA</option></select></div>
+                                            <div><label class="form-label">TTL</label><input type="number" min="60" x-model="draft.expire" required class="form-input mt-1 w-full"></div>
+                                            <div x-show="['MX','SRV'].includes(draft.type)"><label class="form-label">Prioriteit</label><input type="number" min="0" x-model="draft.priority" :required="['MX','SRV'].includes(draft.type)" class="form-input mt-1 w-full"></div>
+                                            <div class="sm:col-span-2"><label class="form-label">Waarde</label><input x-model="draft.content" required class="form-input mt-1 w-full font-mono"></div>
+                                        </div>
+                                        <div class="mt-6 flex justify-end gap-3"><button type="button" @click="modal=null" class="btn btn-outline">Annuleren</button><button type="submit" class="btn btn-primary">Opslaan</button></div>
+                                    </form>
+                                </div>
+                            </template>
+
+                            <template x-if="modal === 'delete'">
+                                <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" @click.self="modal=null">
+                                    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200">
+                                        <h3 class="font-heading text-lg font-bold text-slate-900">DNS-record verwijderen?</h3>
+                                        <p class="mt-2 text-sm text-slate-600">Dit record wordt bij de registrar verwijderd. Deze actie kan niet ongedaan worden gemaakt.</p>
+                                        <div class="mt-6 flex justify-end gap-3"><button type="button" @click="modal=null" class="btn btn-outline">Annuleren</button><button type="button" @click="confirmDelete()" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Verwijderen</button></div>
+                                    </div>
+                                </div>
+                            </template>
                         @endif
                     </div>
                 </div>

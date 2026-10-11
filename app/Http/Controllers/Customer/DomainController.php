@@ -179,9 +179,10 @@ class DomainController extends Controller
         $validated = $request->validate([
             'records' => ['required', 'array'],
             'records.*.name' => ['required', 'string', 'max:255'],
-            'records.*.type' => ['required', 'in:A,AAAA,CNAME,MX,TXT,SRV,CAA,NS'],
+            'records.*.type' => ['required', 'in:A,AAAA,CNAME,MX,TXT,SRV,CAA,NS,SOA'],
             'records.*.expire' => ['required', 'integer', 'min:60'],
             'records.*.content' => ['required', 'string', 'max:255'],
+            'records.*.priority' => ['nullable', 'integer', 'min:0', 'max:65535'],
         ]);
 
         $records = array_values(array_filter($validated['records'], fn ($record) => filled($record['name']) && filled($record['content'])));

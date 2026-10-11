@@ -303,13 +303,19 @@ class OpenProviderProvider implements DomainProvider
 
     public function setDnsEntries(string $domain, array $dnsEntries): void
     {
-        $format = fn ($record) => array_filter([
-            'name' => ($record['name'] ?? '@') === '@' ? $domain : ($record['name'] ?? $domain),
-            'type' => strtoupper($record['type'] ?? 'A'),
-            'value' => $record['content'] ?? $record['value'] ?? '',
-            'ttl' => (int) ($record['expire'] ?? $record['ttl'] ?? 3600),
-            'prio' => $record['priority'] ?? $record['prio'] ?? null,
-        ], fn ($value) => $value !== null);
+        $format = function ($record) use ($domain) {
+            $name = strtolower(trim((string) ($record['name'] ?? $domain), '.'));
+            $name = $name === '' || $name === '@' ? $domain : (str_ends_with($name, '.'.$domain) ? $name : $name.'.'.$domain);
+            $priority = $record['priority'] ?? $record['prio'] ?? null;
+
+            return array_filter([
+                'name' => $name,
+                'type' => strtoupper($record['type'] ?? 'A'),
+                'value' => $record['content'] ?? $record['value'] ?? '',
+                'ttl' => (int) ($record['expire'] ?? $record['ttl'] ?? 3600),
+                'prio' => $priority === null ? null : (int) $priority,
+            ], fn ($value) => $value !== null);
+        };
         $current = collect($this->getDnsEntries($domain))->map($format)->values()->all();
         $desired = collect($dnsEntries)->map($format)->values()->all();
 
