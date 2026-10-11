@@ -56,6 +56,7 @@
                                     <span class="shrink-0 text-[10px] text-slate-500" x-show="item.available && item.price"><span x-show="item.is_promotion && item.regular_price" class="mr-1 line-through" x-text="'€ ' + item.regular_price"></span><span x-text="'€ ' + item.price + '/jr'"></span></span>
                                 </div>
                                 <div class="flex shrink-0 items-center gap-1.5">
+                                    <span x-show="item.available && item.is_promotion" class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold text-amber-800">Actie</span>
                                     <span class="inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"
                                           :class="item.available ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'"
                                           x-text="item.available ? 'Beschikbaar' : 'Bezet'">

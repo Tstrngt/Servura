@@ -388,6 +388,7 @@ class CheckoutController extends Controller
                     $resolvedItem['price_model'] = $priceModel;
                     $resolvedItem['price'] = (float) $priceModel->price;
                     $resolvedItem['tld'] = $tld;
+                    $this->addPromotionData($resolvedItem, $tld, ($item['mode'] ?? 'register') === 'transfer' ? 'transfer' : 'create');
                     $subtotal += $resolvedItem['price'];
                 }
             } else {
@@ -420,6 +421,7 @@ class CheckoutController extends Controller
                         $resolvedItem['domain_price_model'] = $domainPriceModel;
                         $resolvedItem['domain_price'] = (float) $domainPriceModel->price;
                         $resolvedItem['tld'] = $tld;
+                        $this->addPromotionData($resolvedItem, $tld, $item['domain_mode'] === 'transfer' ? 'transfer' : 'create', 'domain_');
                         $subtotal += $resolvedItem['domain_price'];
                     }
                 }
@@ -605,6 +607,26 @@ class CheckoutController extends Controller
         ]);
 
         return $customerService;
+    }
+
+    private function addPromotionData(array &$item, string $tld, string $operation, string $prefix = ''): void
+    {
+        $domainTld = DomainTld::where('extension', str_starts_with($tld, '.') ? $tld : '.'.$tld)->first();
+        if (! $domainTld) {
+            return;
+        }
+        $providerPrice = $domainTld->providerPrices()
+            ->where('environment', BillingSetting::valueFor('openprovider_environment', 'sandbox'))
+            ->where('operation', $operation)
+            ->where('period', 1)
+            ->first();
+        if (! $providerPrice?->is_promotion) {
+            return;
+        }
+
+        $item[$prefix.'is_promotion'] = true;
+        $item[$prefix.'regular_price'] = ceil(((float) $providerPrice->regular_cost * (1 + ((float) $providerPrice->markup_percentage / 100)) * 100) - 1.0E-9) / 100;
+        $item[$prefix.'promotion_ends_at'] = $providerPrice->promotion_ends_at;
     }
 
     private function checkExistingCustomer(Request $request): void

@@ -4,7 +4,7 @@
         @forelse($resolved['items'] as $index => $item)
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 rounded-xl border border-slate-200 p-4">
                 <div>
-                    <h3 class="font-heading font-bold text-slate-900">{{ $item['service']->title }}</h3>
+                    <div class="flex flex-wrap items-center gap-2"><h3 class="font-heading font-bold text-slate-900">{{ $item['service']->title }}</h3>@if($item['is_promotion'] ?? false)<span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">Actie</span>@endif</div>
                     @if($item['domain'])
                         <p class="text-sm text-slate-600">{{ $item['domain'] }}</p>
                     @endif
@@ -24,9 +24,12 @@
                     @error("cart.{$index}.auth_code")<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                 </div>
                 <div class="text-right">
+                    @if($item['is_promotion'] ?? false)<p class="text-xs text-slate-400 line-through">€ {{ number_format($item['regular_price'], 2, ',', '.') }}</p>@endif
                     <p class="font-semibold text-slate-900">€ {{ number_format($item['price'], 2, ',', '.') }}</p>
+                    @if(($item['is_promotion'] ?? false) && ($item['promotion_ends_at'] ?? null))<p class="text-xs text-amber-700">Actie t/m {{ $item['promotion_ends_at']->format('d-m-Y') }}</p>@endif
                     @if(($item['domain_price'] ?? 0) > 0)
-                        <p class="text-sm text-slate-600">+ € {{ number_format($item['domain_price'], 2, ',', '.') }} domein</p>
+                        @if($item['domain_is_promotion'] ?? false)<p class="text-xs text-slate-400 line-through">+ € {{ number_format($item['domain_regular_price'], 2, ',', '.') }} domein</p>@endif
+                        <p class="text-sm text-slate-600">+ € {{ number_format($item['domain_price'], 2, ',', '.') }} domein @if($item['domain_is_promotion'] ?? false)<span class="font-semibold text-amber-700">Actie</span>@endif</p>
                     @endif
                     @if(count($resolved['items']) > 1)
                         <form action="{{ route('checkout.cart.remove') }}" method="POST" class="mt-2 inline-block">
