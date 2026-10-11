@@ -54,6 +54,7 @@ class DomainService
             'current_nameservers' => $nameservers,
             'is_dns_managed_by_servura' => $isManaged,
             'registrar_lock' => $info['is_transfer_locked'] ?? false,
+            'external_id' => $info['external_id'] ?? $domain->external_id,
             'provider_info_synced_at' => now(),
         ]);
 
@@ -72,7 +73,8 @@ class DomainService
 
         if (! DemoDomain::is($domain->domain_name)) {
             $capabilities = $provider->getTldCapabilities($domain->tld);
-            if (! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETNAMESERVERS, $capabilities['capabilities'] ?? [], true)) {
+            if (! ($capabilities['can_set_nameservers'] ?? false)
+                && ! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETNAMESERVERS, $capabilities['capabilities'] ?? [], true)) {
                 return ['success' => false, 'message' => 'Deze extensie ondersteunt geen nameserverwijzigingen via de API.'];
             }
         }
@@ -123,7 +125,8 @@ class DomainService
 
         if (! DemoDomain::is($domain->domain_name)) {
             $capabilities = $provider->getTldCapabilities($domain->tld);
-            if (! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETCONTACTS, $capabilities['capabilities'] ?? [], true)) {
+            if (! ($capabilities['can_set_contacts'] ?? false)
+                && ! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETCONTACTS, $capabilities['capabilities'] ?? [], true)) {
                 return ['success' => false, 'message' => 'Deze extensie ondersteunt geen contactwijzigingen via de API.'];
             }
         }

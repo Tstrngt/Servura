@@ -77,6 +77,40 @@ class OpenProviderIntegrationTest extends TestCase
             ]);
     }
 
+    public function test_domain_info_and_holder_contacts_are_normalized_for_customer_portal(): void
+    {
+        Http::fake([
+            'https://api.sandbox.openprovider.nl/v1beta/auth/login' => Http::response(['code' => 0, 'data' => ['token' => 'sandbox-token']], 200),
+            'https://api.sandbox.openprovider.nl/v1beta/domains?*' => Http::response(['code' => 0, 'data' => ['results' => [['id' => 123]]]], 200),
+            'https://api.sandbox.openprovider.nl/v1beta/domains/123' => Http::response(['code' => 0, 'data' => [
+                'id' => 123,
+                'status' => 'ACT',
+                'active_date' => '2026-10-10 10:00:00',
+                'registry_expiration_date' => '2027-10-10 00:00:00',
+                'owner_handle' => 'NL654321-NL',
+                'admin_handle' => 'NL654321-NL',
+                'tech_handle' => 'NL654321-NL',
+                'name_servers' => [['name' => 'ns1.openprovider.nl'], ['name' => 'ns2.openprovider.be']],
+            ]], 200),
+            'https://api.sandbox.openprovider.nl/v1beta/customers/NL654321-NL' => Http::response(['code' => 0, 'data' => [
+                'name' => ['first_name' => 'Jan', 'last_name' => 'Jansen'],
+                'address' => ['street' => 'Teststraat', 'number' => '1', 'zipcode' => '1234AB', 'city' => 'Amsterdam', 'country' => 'NL'],
+                'email' => 'jan@example.test',
+                'phone' => ['country_code' => '+31', 'area_code' => '6', 'subscriber_number' => '12345678'],
+            ]], 200),
+        ]);
+
+        $provider = DomainProviderFactory::default();
+        $info = $provider->getDomainInfo('voorbeeld.nl');
+        $contacts = $provider->getContacts('voorbeeld.nl');
+
+        $this->assertSame([['hostname' => 'ns1.openprovider.nl'], ['hostname' => 'ns2.openprovider.be']], $info['nameservers']);
+        $this->assertSame('Jan', $contacts[0]['first_name']);
+        $this->assertSame('registrant', $contacts[0]['type']);
+        $this->assertSame('Teststraat', $contacts[0]['street']);
+        $this->assertSame('+31 6 12345678', $contacts[0]['phone_number']);
+    }
+
     public function test_registration_uses_configured_handle_and_nameservers(): void
     {
         Http::fake([

@@ -40,7 +40,7 @@ $registrant = $holderContacts[0] ?? [];
                                 <h2 class="font-heading text-2xl font-bold text-white break-words">{{ $overview['domain_name'] }}</h2>
                                 <span class="inline-flex items-center rounded-full bg-{{ $overview['status_color'] }}-100 px-3 py-1 text-xs font-semibold text-{{ $overview['status_color'] }}-800 shrink-0">{{ $overview['status'] }}</span>
                             </div>
-                            <p class="mt-1 text-sm text-slate-300">{{ $overview['provider'] }} &middot; {{ $overview['registration_date'] }} tot {{ $overview['expiry_date'] }}</p>
+                            <p class="mt-1 text-sm text-slate-300">Geregistreerd van {{ $overview['registration_date'] }} tot {{ $overview['expiry_date'] }}</p>
                         </div>
                         <div class="relative shrink-0">
                             <button type="button" @click="settingsOpen = !settingsOpen" class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/15" aria-label="Instellingen">
@@ -75,10 +75,6 @@ $registrant = $holderContacts[0] ?? [];
 
                     <div class="space-y-3">
                         <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
-                            <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Provider</span>
-                            <span class="text-sm font-semibold text-white text-right ml-4">{{ $overview['provider'] }}</span>
-                        </div>
-                        <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
                             <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Registratiedatum</span>
                             <span class="text-sm font-semibold text-white text-right ml-4">{{ $overview['registration_date'] }}</span>
                         </div>
@@ -101,10 +97,6 @@ $registrant = $holderContacts[0] ?? [];
                         <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
                             <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Nameservers</span>
                             <span class="text-sm font-semibold text-white text-right ml-4">{{ $overview['nameserver_status'] }}</span>
-                        </div>
-                        <div class="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
-                            <span class="text-xs font-medium uppercase tracking-wider text-slate-400">DNS</span>
-                            <span class="text-sm font-semibold text-white text-right ml-4">{{ $overview['dns_status'] }}</span>
                         </div>
                     </div>
                 </div>
@@ -266,7 +258,7 @@ $registrant = $holderContacts[0] ?? [];
                 </div>
 
                 <!-- Nameservers -->
-                <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70" x-data="{ open: false, edit: false, nameservers: {{ json_encode($nameservers) }} }">
+                <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70" x-data="{ open: false, edit: false, nameservers: {{ json_encode(array_pad(array_slice(array_values($nameservers), 0, 3), 3, ['hostname' => ''])) }} }">
                     <button type="button" @click="open = !open" class="flex w-full items-center justify-between">
                         <div class="flex items-center gap-4">
                             <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100">
@@ -282,9 +274,8 @@ $registrant = $holderContacts[0] ?? [];
                     <div x-show="open" class="pt-5">
                         <div x-show="!edit" class="space-y-2">
                             @forelse($nameservers as $ns)
-                                <div class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm">
+                                <div class="rounded-xl bg-slate-50 px-4 py-3 text-sm">
                                     <span class="font-medium text-slate-900">{{ $ns['hostname'] }}</span>
-                                    <span class="text-slate-500">{{ $ns['ipv4'] ?? '' }} {{ $ns['ipv6'] ?? '' }}</span>
                                 </div>
                             @empty
                                 <p class="text-sm text-slate-500">Geen nameservers gesynchroniseerd.</p>
@@ -293,17 +284,13 @@ $registrant = $holderContacts[0] ?? [];
                         </div>
                         <form x-show="edit" x-cloak method="POST" action="{{ route('customer.domains.nameservers.update', $domain) }}" class="space-y-3">
                             @csrf
-                            <template x-for="(n, index) in nameservers" :key="index">
-                                <div class="rounded-xl bg-slate-50 p-4">
-                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                        <div><label class="block text-xs font-medium text-slate-600">Hostname</label><input type="text" :name="`nameservers[${index}][hostname]`" x-model="n.hostname" class="form-input mt-1 w-full" required></div>
-                                        <div><label class="block text-xs font-medium text-slate-600">IPv4</label><input type="text" :name="`nameservers[${index}][ipv4]`" x-model="n.ipv4" class="form-input mt-1 w-full"></div>
-                                        <div><label class="block text-xs font-medium text-slate-600">IPv6</label><input type="text" :name="`nameservers[${index}][ipv6]`" x-model="n.ipv6" class="form-input mt-1 w-full"></div>
-                                    </div>
-                                    <button type="button" @click="nameservers.splice(index, 1)" class="mt-3 text-xs font-semibold text-rose-600 hover:text-rose-800">Verwijderen</button>
+                            <template x-for="(n, index) in nameservers.slice(0, 3)" :key="index">
+                                <div>
+                                    <label class="form-label" x-text="['Primaire nameserver', 'Secundaire nameserver', 'Tertiaire nameserver'][index]"></label>
+                                    <input type="text" :name="`nameservers[${index}][hostname]`" x-model="n.hostname" class="form-input mt-1 w-full" :required="index < 2" placeholder="ns1.voorbeeld.nl">
+                                    <p x-show="index === 2" class="mt-1 text-xs text-slate-500">Optioneel</p>
                                 </div>
                             </template>
-                            <button type="button" @click="nameservers.push({hostname:'', ipv4:null, ipv6:null})" class="text-sm font-semibold text-primary-600 hover:text-primary-800">+ Nameserver toevoegen</button>
                             <div class="flex items-center gap-3 pt-2">
                                 <button type="submit" class="btn btn-primary">Nameservers opslaan</button>
                                 <button type="button" @click="edit = false" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Annuleren</button>
@@ -321,7 +308,7 @@ $registrant = $holderContacts[0] ?? [];
                             </span>
                             <div class="text-left">
                                 <h3 class="font-heading text-lg font-bold text-slate-900">DNS-records</h3>
-                                <p class="text-sm text-slate-500">{{ count($dnsRecords) }} records &middot; {{ $overview['dns_status'] }}</p>
+                                <p class="text-sm text-slate-500">{{ count($dnsRecords) }} {{ count($dnsRecords) === 1 ? 'record' : 'records' }}</p>
                             </div>
                         </div>
                         <svg class="h-5 w-5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>

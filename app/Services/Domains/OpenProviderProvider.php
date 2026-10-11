@@ -142,10 +142,12 @@ class OpenProviderProvider implements DomainProvider
 
         return [
             'status' => $data['status'] ?? null,
-            'registered_at' => $data['active_date'] ?? $data['order_date'] ?? null,
-            'expires_at' => $data['expiration_date'] ?? $data['registry_expiration_date'] ?? null,
+            'registration_date' => $data['active_date'] ?? $data['order_date'] ?? null,
+            'renewal_date' => $data['expiration_date'] ?? $data['registry_expiration_date'] ?? $data['renewal_date'] ?? null,
             'auto_renew' => in_array(strtolower((string) ($data['autorenew'] ?? $data['renew'] ?? '')), ['on', '1', '2', 'true'], true),
-            'nameservers' => collect($data['name_servers'] ?? [])->pluck('name')->filter()->values()->all(),
+            'nameservers' => collect($data['name_servers'] ?? [])->map(fn ($nameserver) => [
+                'hostname' => $nameserver['name'] ?? null,
+            ])->filter(fn ($nameserver) => filled($nameserver['hostname']))->values()->all(),
             'can_edit_dns' => true,
             'external_id' => $data['id'] ?? null,
             'raw' => $data,
@@ -154,7 +156,7 @@ class OpenProviderProvider implements DomainProvider
 
     public function getNameservers(string $domain): array
     {
-        return $this->getDomainInfo($domain)['nameservers'] ?? [];
+        return collect($this->getDomainInfo($domain)['nameservers'] ?? [])->pluck('hostname')->all();
     }
 
     public function setNameservers(string $domain, array $nameservers): void
@@ -168,21 +170,68 @@ class OpenProviderProvider implements DomainProvider
     {
         $raw = $this->getDomainInfo($domain)['raw'] ?? [];
 
-        return collect(['owner', 'admin', 'tech', 'billing'])->map(fn ($type) => [
-            'type' => $type,
-            'handle' => $raw[$type.'_handle'] ?? null,
-        ])->filter(fn ($contact) => $contact['handle'])->values()->all();
+        return collect([
+            'registrant' => $raw['owner_handle'] ?? null,
+            'administrative' => $raw['admin_handle'] ?? null,
+            'technical' => $raw['tech_handle'] ?? null,
+        ])->filter()->map(function ($handle, $type) {
+            $customer = $this->client->request('GET', 'customers/'.$handle);
+            $name = $customer['name'] ?? [];
+            $address = $customer['address'] ?? [];
+            $phone = $customer['phone'] ?? [];
+
+            return [
+                'type' => $type,
+                'handle' => $handle,
+                'first_name' => $name['first_name'] ?? '',
+                'last_name' => $name['last_name'] ?? '',
+                'company_name' => $customer['company_name'] ?? '',
+                'company_kvk' => data_get($customer, 'additional_data.company_registration_number', ''),
+                'street' => $address['street'] ?? '',
+                'number' => trim(($address['number'] ?? '').' '.($address['suffix'] ?? '')),
+                'postal_code' => $address['zipcode'] ?? '',
+                'city' => $address['city'] ?? '',
+                'country' => $address['country'] ?? '',
+                'email' => $customer['email'] ?? '',
+                'phone_number' => trim(($phone['country_code'] ?? '').' '.($phone['area_code'] ?? '').' '.($phone['subscriber_number'] ?? '')),
+            ];
+        })->values()->all();
     }
 
     public function setContacts(string $domain, array $contacts): void
     {
-        $payload = [];
+        $raw = $this->getDomainInfo($domain)['raw'] ?? [];
+        $handleKeys = [
+            'registrant' => 'owner_handle',
+            'administrative' => 'admin_handle',
+            'technical' => 'tech_handle',
+        ];
+
         foreach ($contacts as $contact) {
-            if (! empty($contact['type']) && ! empty($contact['handle'])) {
-                $payload[$contact['type'].'_handle'] = $contact['handle'];
+            $handle = $raw[$handleKeys[$contact['type'] ?? ''] ?? ''] ?? null;
+            if (! $handle) {
+                continue;
             }
+
+            $name = trim(($contact['first_name'] ?? '').' '.($contact['last_name'] ?? ''));
+            $this->client->request('PUT', 'customers/'.$handle, [
+                'name' => [
+                    'first_name' => $contact['first_name'] ?? '',
+                    'last_name' => $contact['last_name'] ?? '',
+                    'full_name' => $name,
+                ],
+                'address' => [
+                    'street' => $contact['street'] ?? '',
+                    'number' => $contact['number'] ?? '',
+                    'zipcode' => $contact['postal_code'] ?? '',
+                    'city' => $contact['city'] ?? '',
+                    'country' => strtoupper($contact['country'] ?? ''),
+                ],
+                'email' => $contact['email'] ?? '',
+                'company_name' => $contact['company_name'] ?? '',
+                'phone' => $this->phonePayload($contact['phone_number'] ?? '', $contact['country'] ?? ''),
+            ]);
         }
-        $this->client->request('PUT', 'domains/'.$this->domainId($domain), $payload);
     }
 
     public function getDnsEntries(string $domain): array
@@ -193,7 +242,7 @@ class OpenProviderProvider implements DomainProvider
             'name' => $record['name'] ?? '@',
             'type' => strtoupper($record['type'] ?? 'A'),
             'content' => $record['value'] ?? $record['content'] ?? '',
-            'ttl' => (int) ($record['ttl'] ?? 3600),
+            'expire' => (int) ($record['ttl'] ?? 3600),
             'priority' => $record['priority'] ?? null,
         ])->all();
     }
@@ -204,7 +253,7 @@ class OpenProviderProvider implements DomainProvider
             'name' => $record['name'] ?? '@',
             'type' => strtoupper($record['type'] ?? 'A'),
             'value' => $record['content'] ?? $record['value'] ?? '',
-            'ttl' => (int) ($record['ttl'] ?? 3600),
+            'ttl' => (int) ($record['expire'] ?? $record['ttl'] ?? 3600),
             'priority' => $record['priority'] ?? null,
         ], fn ($value) => $value !== null))->values()->all();
 
@@ -227,7 +276,12 @@ class OpenProviderProvider implements DomainProvider
     {
         $data = $this->client->request('GET', 'extensions', ['name_pattern' => ltrim($tld, '.'), 'limit' => 1]);
 
-        return $data['results'][0] ?? [];
+        $extension = $data['results'][0] ?? [];
+
+        return $extension + [
+            'can_set_nameservers' => true,
+            'can_set_contacts' => true,
+        ];
     }
 
     private function domainPayload(string $domain, array $nameservers, array $contacts = []): array

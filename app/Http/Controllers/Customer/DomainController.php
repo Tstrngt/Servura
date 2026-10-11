@@ -62,7 +62,6 @@ class DomainController extends Controller
             'domain_name' => $domain->domain_name,
             'status' => $label['text'],
             'status_color' => $label['color'],
-            'provider' => strtoupper($domain->provider),
             'registration_date' => $domain->registered_at?->format('d-m-Y') ?? '-',
             'expiry_date' => $domain->expires_at?->format('d-m-Y') ?? '-',
             'auto_renew' => $domain->auto_renew,
@@ -72,7 +71,6 @@ class DomainController extends Controller
             'nameserver_status' => $domain->current_nameservers
                 ? collect($domain->current_nameservers)->pluck('hostname')->implode(', ')
                 : 'Niet gesynchroniseerd',
-            'dns_status' => $dnsService->canManage($domain) ? 'TransIP DNS' : 'Extern DNS',
         ];
 
         $holderContacts = $domainService->contacts($domain);
@@ -108,12 +106,16 @@ class DomainController extends Controller
     public function updateNameservers(Request $request, DomainRegistration $domain)
     {
         $this->authorizeView($domain);
+        $request->merge([
+            'nameservers' => array_values(array_filter(
+                $request->input('nameservers', []),
+                fn ($nameserver) => filled($nameserver['hostname'] ?? null)
+            )),
+        ]);
 
         $validated = $request->validate([
-            'nameservers' => ['required', 'array', 'min:1'],
-            'nameservers.*.hostname' => ['required', 'string', 'max:255'],
-            'nameservers.*.ipv4' => ['nullable', 'ipv4'],
-            'nameservers.*.ipv6' => ['nullable', 'ipv6'],
+            'nameservers' => ['required', 'array', 'min:2', 'max:3'],
+            'nameservers.*.hostname' => ['required', 'string', 'max:255', 'regex:/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i'],
         ]);
 
         $nameservers = array_values($validated['nameservers']);
