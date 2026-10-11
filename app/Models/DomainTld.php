@@ -32,6 +32,11 @@ class DomainTld extends Model
         return $query->where('is_active', true)->orderBy('sort_order')->orderBy('extension');
     }
 
+    public function providerPrices()
+    {
+        return $this->hasMany(DomainTldPrice::class);
+    }
+
     public function servicePrice()
     {
         return $this->hasOne(ServicePrice::class, 'tld', 'extension')

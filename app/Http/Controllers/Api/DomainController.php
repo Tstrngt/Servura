@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\BillingSetting;
 use App\Models\DomainTld;
 use App\Models\Service;
 use App\Models\ServicePrice;
@@ -33,7 +34,11 @@ class DomainController extends Controller
             ], 503);
         }
 
-        $tlds = DomainTld::active()->with('servicePrice.service')->get();
+        $environment = BillingSetting::valueFor('openprovider_environment', 'sandbox');
+        $tlds = DomainTld::active()->with([
+            'servicePrice.service',
+            'providerPrices' => fn ($query) => $query->where('environment', $environment)->where('period', 1),
+        ])->get();
         $domainService = Service::where('fulfillment_type', 'domain')->first();
         if ($tlds->isEmpty()) {
             return response()->json([
@@ -71,6 +76,7 @@ class DomainController extends Controller
                     );
                 }
 
+                $createProviderPrice = $tld->providerPrices->firstWhere('operation', 'create');
                 $results[] = [
                     'domain' => $availability['domain'] ?? $domain,
                     'available' => $availability['available'] ?? false,
@@ -78,6 +84,11 @@ class DomainController extends Controller
                     'tld' => ltrim($tld->extension, '.'),
                     'price' => number_format((float) $tld->registration_price, 2, ',', '.'),
                     'price_raw' => (float) $tld->registration_price,
+                    'regular_price' => $createProviderPrice?->is_promotion && $createProviderPrice->regular_cost !== null
+                        ? number_format(ceil(((float) $createProviderPrice->regular_cost * (1 + ((float) $createProviderPrice->markup_percentage / 100)) * 100) - 1.0E-9) / 100, 2, ',', '.')
+                        : null,
+                    'is_promotion' => (bool) $createProviderPrice?->is_promotion,
+                    'promotion_ends_at' => $createProviderPrice?->promotion_ends_at?->toIso8601String(),
                     'service_price_id' => $servicePrice?->id,
                     'checkout_url' => $servicePrice
                         ? route('checkout.show', ['service' => $domainService->slug]).'?domain='.urlencode($availability['domain']).'&tld='.urlencode($tld->extension).'&mode=register'

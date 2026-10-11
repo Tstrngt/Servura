@@ -116,6 +116,16 @@ class OpenProviderProvider implements DomainProvider
         return $this->client->request('GET', 'extensions', ['limit' => 1000])['results'] ?? [];
     }
 
+    public function getPrice(string $extension, string $operation, int $period = 1): array
+    {
+        return $this->client->request('GET', 'domains/prices', [
+            'domain.name' => 'servura-price-check',
+            'domain.extension' => ltrim($extension, '.'),
+            'operation' => $operation,
+            'period' => $period,
+        ]);
+    }
+
     public function registerDomain(string $domain, array $contacts = [], array $nameservers = []): void
     {
         $this->client->request('POST', 'domains', $this->domainPayload($domain, $nameservers, $contacts));

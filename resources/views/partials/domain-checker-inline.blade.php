@@ -53,7 +53,7 @@
                             <li class="flex items-center justify-between gap-3 py-1.5">
                                 <div class="flex min-w-0 items-baseline gap-1.5">
                                     <span class="truncate text-sm font-semibold text-slate-900" x-text="item.domain"></span>
-                                    <span class="shrink-0 text-[10px] text-slate-500" x-show="item.available && item.price" x-text="'€ ' + item.price + '/jr'"></span>
+                                    <span class="shrink-0 text-[10px] text-slate-500" x-show="item.available && item.price"><span x-show="item.is_promotion && item.regular_price" class="mr-1 line-through" x-text="'€ ' + item.regular_price"></span><span x-text="'€ ' + item.price + '/jr'"></span></span>
                                 </div>
                                 <div class="flex shrink-0 items-center gap-1.5">
                                     <span class="inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"

@@ -3,7 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\BillingSetting;
+use App\Models\DomainTld;
+use App\Models\DomainTldPrice;
 use App\Models\User;
+use App\Services\OpenProviderPriceSyncService;
 use App\Services\Domains\DomainProviderFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -24,6 +27,37 @@ class OpenProviderIntegrationTest extends TestCase
         BillingSetting::setValue('openprovider_username', 'api@example.test');
         BillingSetting::setEncryptedValue('openprovider_password', 'secret');
         BillingSetting::setValue('openprovider_customer_handle', 'XX123456-XX');
+    }
+
+    public function test_price_sync_applies_markup_and_promotion_per_operation(): void
+    {
+        $tld = DomainTld::factory()->create(['extension' => '.nl', 'registration_price' => 0, 'renewal_price' => 0, 'transfer_price' => 0]);
+        Http::fake(function ($request) {
+            if (str_ends_with($request->url(), '/auth/login')) {
+                return Http::response(['code' => 0, 'data' => ['token' => 'sandbox-token']], 200);
+            }
+            if (str_contains($request->url(), '/domains/prices')) {
+                $promotion = $request['operation'] === 'create';
+                return Http::response(['code' => 0, 'data' => [
+                    'is_premium' => false,
+                    'is_promotion' => $promotion,
+                    'price' => ['reseller' => ['currency' => 'EUR', 'price' => $promotion ? 8 : 10]],
+                    'tier_price' => ['reseller' => ['currency' => 'EUR', 'price' => 10]],
+                    'promotion_data' => $promotion ? ['start_date' => (string) now()->subDay()->timestamp, 'end_date' => (string) now()->addDay()->timestamp] : null,
+                ]], 200);
+            }
+            return Http::response(['code' => 0, 'data' => []], 200);
+        });
+
+        app(OpenProviderPriceSyncService::class)->run();
+
+        $create = DomainTldPrice::where('domain_tld_id', $tld->id)->where('operation', 'create')->firstOrFail();
+        $this->assertSame('8.0000', $create->effective_cost);
+        $this->assertSame('8.80', $create->calculated_sale_price);
+        $this->assertTrue($create->is_promotion);
+        $this->assertSame('8.80', $tld->fresh()->registration_price);
+        $this->assertSame('11.00', $tld->fresh()->renewal_price);
+        $this->assertSame('11.00', $tld->fresh()->transfer_price);
     }
 
     public function test_factory_resolves_openprovider_and_checks_domain_through_sandbox_api(): void

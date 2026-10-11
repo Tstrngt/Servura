@@ -41,7 +41,7 @@
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-100">
                                     <div>
                                         <span class="font-bold font-heading break-all block" x-text="item.domain"></span>
-                                        <span class="text-sm text-slate-500" x-show="item.available && item.price">€ <span x-text="item.price"></span> per jaar</span>
+                                        <span class="text-sm text-slate-500" x-show="item.available && item.price"><span x-show="item.is_promotion && item.regular_price" class="mr-1 line-through" x-text="'€ ' + item.regular_price"></span><span class="font-medium text-slate-700" x-text="'€ ' + item.price + ' per jaar'"></span></span>
                                     </div>
                                     <div class="flex items-center gap-3">
                                         <span class="shrink-0 inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold"

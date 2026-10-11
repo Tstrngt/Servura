@@ -37,6 +37,10 @@ class Kernel extends ConsoleKernel
             ->name('domains:sync')
             ->dailyAt('04:15')
             ->withoutOverlapping();
+        $schedule->command('domains:sync-prices')
+            ->name('domains:sync-prices')
+            ->everySixHours()
+            ->withoutOverlapping();
     }
 
     /**

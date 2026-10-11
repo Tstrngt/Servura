@@ -334,6 +334,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/integraties/transip/test', [TransIpSettingController::class, 'test'])->name('transip.test');
             Route::get('/domein-tlds', [AdminDomainTldController::class, 'index'])->name('domains.tlds.index');
             Route::post('/domein-tlds', [AdminDomainTldController::class, 'store'])->name('domains.tlds.store');
+            Route::put('/domein-tlds/prijsinstellingen', [AdminDomainTldController::class, 'updatePricingSettings'])->name('domains.tlds.pricing-settings');
+            Route::post('/domein-tlds/synchroniseren', [AdminDomainTldController::class, 'syncPrices'])->name('domains.tlds.sync-prices');
             Route::put('/domein-tlds/{tld}', [AdminDomainTldController::class, 'update'])->name('domains.tlds.update');
             Route::delete('/domein-tlds/{tld}', [AdminDomainTldController::class, 'destroy'])->name('domains.tlds.destroy');
             Route::get('/nieuwsbrief', [SettingController::class, 'newsletter'])->name('newsletter');

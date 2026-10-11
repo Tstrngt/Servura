@@ -35,7 +35,7 @@
                         <li class="flex items-center justify-between gap-3 py-2.5">
                             <div class="min-w-0">
                                 <span class="block text-sm font-semibold text-slate-900 truncate" x-text="item.domain"></span>
-                                <span class="text-xs text-slate-500" x-show="item.available && item.price" x-text="'€ ' + item.price + ' /jaar'"></span>
+                                <span class="text-xs text-slate-500" x-show="item.available && item.price"><span x-show="item.is_promotion && item.regular_price" class="mr-1 line-through" x-text="'€ ' + item.regular_price"></span><span x-text="'€ ' + item.price + ' /jaar'"></span></span>
                             </div>
                             <div class="flex shrink-0 items-center gap-2">
                                 <span class="inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"

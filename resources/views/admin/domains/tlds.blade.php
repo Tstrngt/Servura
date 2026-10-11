@@ -1,136 +1,74 @@
 @extends('layouts.app')
 
-@section('title', 'Domein TLD\'s - Servura Admin')
+@section('title', 'Domeinprijzen - Servura Admin')
 
 @section('content')
 @include('admin.partials.sidebar')
-
-<div class="bg-gray-50 min-h-screen lg:pl-64">
+<div class="min-h-screen bg-slate-50 lg:pl-64">
     <div class="mx-auto w-full max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8">
-        <div class="py-4">
-            <h1 class="text-2xl font-bold text-gray-900">Domein TLD's</h1>
-            <p class="mt-1 text-sm text-gray-600">Beheer beschikbare extensies, verkoopprijzen en sortering.</p>
+        <div class="flex flex-col gap-4 py-4 lg:flex-row lg:items-end lg:justify-between">
+            <div><h1 class="text-2xl font-bold text-slate-900">Domeinprijzen</h1><p class="mt-1 text-sm text-slate-600">Openprovider-inkoopprijzen met automatische opslag en promotieverwerking.</p></div>
+            <div class="flex gap-3">
+                <form method="POST" action="{{ route('admin.settings.domains.tlds.sync-prices') }}">@csrf<button class="btn btn-primary" type="submit">Nu synchroniseren</button></form>
+            </div>
+        </div>
+        @include('admin.partials.settings-nav')
+        @if(session('success'))<div class="mb-4 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800 ring-1 ring-emerald-200">{{ session('success') }}</div>@endif
+        @if($errors->any())<div class="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200"><ul class="list-disc pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+
+        <div class="mb-6 grid gap-4 lg:grid-cols-[1fr_360px]">
+            <div class="rounded-2xl bg-slate-950 p-5 text-white shadow-xl shadow-slate-900/10">
+                <div class="grid gap-4 sm:grid-cols-3">
+                    <div><div class="text-xs font-medium text-slate-400">Omgeving</div><div class="mt-1 font-semibold">{{ ucfirst($settings['environment']) }}</div></div>
+                    <div><div class="text-xs font-medium text-slate-400">Laatste synchronisatie</div><div class="mt-1 font-semibold">{{ $settings['last_sync_at'] ?: 'Nog niet uitgevoerd' }}</div></div>
+                    <div><div class="text-xs font-medium text-slate-400">Status</div><div class="mt-1 font-semibold">{{ $settings['last_sync_status'] }}</div></div>
+                </div>
+            </div>
+            <form method="POST" action="{{ route('admin.settings.domains.tlds.pricing-settings') }}" class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+                @csrf @method('PUT')
+                <label class="form-label" for="markup_percentage">Automatische opslag</label>
+                <div class="mt-2 flex items-center gap-3"><input id="markup_percentage" name="markup_percentage" type="number" min="0" max="500" step="0.01" value="{{ $settings['markup'] }}" class="form-input"><span class="font-semibold text-slate-500">%</span><button class="btn btn-outline" type="submit">Opslaan</button></div>
+                <p class="mt-2 text-xs text-slate-500">Verkoopprijs excl. btw = actuele inkoopprijs plus opslag, naar boven afgerond op centen.</p>
+            </form>
         </div>
 
-        @include('admin.partials.settings-nav')
+        <div class="mb-5 flex flex-col gap-3 rounded-xl bg-white p-4 ring-1 ring-slate-200 sm:flex-row sm:items-end sm:justify-between">
+            <form method="GET" class="flex flex-wrap items-end gap-3">
+                <div><label class="form-label" for="status">Status</label><select id="status" name="status" class="form-input"><option value="">Alle</option><option value="active" @selected(request('status') === 'active')>Actief</option><option value="inactive" @selected(request('status') === 'inactive')>Inactief</option></select></div>
+                <label class="flex items-center gap-2 pb-2 text-sm text-slate-700"><input type="checkbox" name="promotions" value="1" @checked(request()->boolean('promotions')) class="rounded border-slate-300 text-primary-600"> Alleen promoties</label>
+                <label class="flex items-center gap-2 pb-2 text-sm text-slate-700"><input type="checkbox" name="errors" value="1" @checked(request()->boolean('errors')) class="rounded border-slate-300 text-primary-600"> Alleen fouten</label>
+                <button class="btn btn-outline" type="submit">Filteren</button>
+            </form>
+            <details><summary class="cursor-pointer text-sm font-semibold text-primary-700">TLD toevoegen</summary><form method="POST" action="{{ route('admin.settings.domains.tlds.store') }}" class="mt-3 flex flex-wrap items-end gap-3">@csrf<div><label class="form-label">Extensie</label><input name="extension" placeholder=".nl" class="form-input" required></div><div><label class="form-label">Sortering</label><input name="sort_order" type="number" value="0" class="form-input w-24"></div><label class="flex items-center gap-2 pb-2 text-sm"><input type="checkbox" name="is_active" value="1" checked> Actief</label><button class="btn btn-primary" type="submit">Toevoegen</button></form></details>
+        </div>
 
-        @if(session('success'))
-            <div class="mb-4"><div class="rounded-md bg-green-50 p-4"><p class="text-sm text-green-700">{{ session('success') }}</p></div></div>
-        @endif
-        @if($errors->any())
-            <div class="mb-4"><div class="rounded-md bg-red-50 p-4">
-                <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
-                    @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
-                </ul>
-            </div></div>
-        @endif
-
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div class="lg:col-span-1">
-                <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-                    <h2 class="text-lg font-semibold text-slate-900 mb-4">TLD toevoegen</h2>
-                    <form action="{{ route('admin.settings.domains.tlds.store') }}" method="POST">
-                        @csrf
-                        <div class="space-y-4">
-                            <div>
-                                <label class="form-label" for="extension">Extensie</label>
-                                <input type="text" id="extension" name="extension" value="{{ old('extension') }}" placeholder=".nl" class="form-input" required>
-                                <p class="mt-1 text-xs text-slate-500">Begin met een punt, bijv. .nl</p>
-                            </div>
-                            <div>
-                                <label class="form-label" for="registration_price">Registratieprijs (€)</label>
-                                <input type="number" step="0.01" min="0" id="registration_price" name="registration_price" value="{{ old('registration_price') }}" class="form-input" required>
-                            </div>
-                            <div>
-                                <label class="form-label" for="renewal_price">Verlengprijs (€)</label>
-                                <input type="number" step="0.01" min="0" id="renewal_price" name="renewal_price" value="{{ old('renewal_price') }}" class="form-input" required>
-                            </div>
-                            <div>
-                                <label class="form-label" for="transfer_price">Transferprijs (€)</label>
-                                <input type="number" step="0.01" min="0" id="transfer_price" name="transfer_price" value="{{ old('transfer_price') }}" class="form-input">
-                            </div>
-                            <div>
-                                <label class="form-label" for="cost_price">Inkoopprijs (€)</label>
-                                <input type="number" step="0.01" min="0" id="cost_price" name="cost_price" value="{{ old('cost_price') }}" class="form-input">
-                            </div>
-                            <div>
-                                <label class="form-label" for="sort_order">Sortering</label>
-                                <input type="number" id="sort_order" name="sort_order" value="{{ old('sort_order', 0) }}" class="form-input">
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input type="checkbox" id="is_active" name="is_active" value="1" class="h-4 w-4 rounded border-slate-300 text-primary-600" {{ old('is_active', '1') ? 'checked' : '' }}>
-                                <label for="is_active" class="text-sm text-slate-700">Actief</label>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <button type="submit" class="btn btn-primary w-full">Toevoegen</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="lg:col-span-2">
-                <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200">
-                            <thead class="bg-slate-50">
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Extensie</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
-                                    <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Registratie</th>
-                                    <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Verlenging</th>
-                                    <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Transfer</th>
-                                    <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase">Actie</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-200 bg-white">
-                                @forelse($tlds as $tld)
-                                    <tr>
-                                        <form action="{{ route('admin.settings.domains.tlds.update', $tld) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <td class="px-4 py-3 align-top">
-                                                <input type="text" name="extension" value="{{ $tld->extension }}" class="form-input text-sm w-24" required>
-                                            </td>
-                                            <td class="px-4 py-3 align-top">
-                                                <select name="is_active" class="form-input text-sm">
-                                                    <option value="1" {{ $tld->is_active ? 'selected' : '' }}>Actief</option>
-                                                    <option value="0" {{ ! $tld->is_active ? 'selected' : '' }}>Inactief</option>
-                                                </select>
-                                            </td>
-                                            <td class="px-4 py-3 align-top">
-                                                <input type="number" step="0.01" min="0" name="registration_price" value="{{ number_format((float) $tld->registration_price, 2, '.', '') }}" class="form-input text-sm w-28 text-right" required>
-                                            </td>
-                                            <td class="px-4 py-3 align-top">
-                                                <input type="number" step="0.01" min="0" name="renewal_price" value="{{ number_format((float) $tld->renewal_price, 2, '.', '') }}" class="form-input text-sm w-28 text-right" required>
-                                            </td>
-                                            <td class="px-4 py-3 align-top">
-                                                <input type="number" step="0.01" min="0" name="transfer_price" value="{{ $tld->transfer_price ? number_format((float) $tld->transfer_price, 2, '.', '') : '' }}" class="form-input text-sm w-28 text-right">
-                                            </td>
-                                            <td class="px-4 py-3 align-top">
-                                                <div class="flex items-center justify-center gap-2">
-                                                    <input type="hidden" name="cost_price" value="{{ $tld->cost_price ? number_format((float) $tld->cost_price, 2, '.', '') : '' }}">
-                                                    <input type="hidden" name="sort_order" value="{{ $tld->sort_order }}">
-                                                    <button type="submit" class="text-sm font-medium text-primary-600 hover:text-primary-800">Opslaan</button>
-                                                    <button type="button" onclick="if(confirm('TLD verwijderen?')) { document.getElementById('delete-tld-{{ $tld->id }}').submit(); }" class="text-sm font-medium text-red-600 hover:text-red-800">Verwijderen</button>
-                                                </div>
-                                            </td>
-                                        </form>
-                                        <form id="delete-tld-{{ $tld->id }}" action="{{ route('admin.settings.domains.tlds.destroy', $tld) }}" method="POST" class="hidden">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500">Nog geen TLD's ingesteld.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+        <div class="space-y-4">
+            @forelse($tlds as $tld)
+                @php
+                    $prices = $tld->providerPrices->keyBy('operation');
+                    $create = $prices->get('create'); $renew = $prices->get('renew'); $transfer = $prices->get('transfer');
+                    $promotion = $prices->first(fn($price) => $price->is_promotion);
+                    $error = $prices->first(fn($price) => filled($price->sync_error));
+                @endphp
+                <form method="POST" action="{{ route('admin.settings.domains.tlds.update', $tld) }}" class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                    @csrf @method('PUT')
+                    <div class="grid gap-4 border-b border-slate-100 p-5 lg:grid-cols-[150px_1fr_auto] lg:items-center">
+                        <div class="flex items-center gap-3"><input name="extension" value="{{ $tld->extension }}" class="form-input w-24 font-semibold" required><select name="is_active" class="form-input"><option value="1" @selected($tld->is_active)>Actief</option><option value="0" @selected(!$tld->is_active)>Inactief</option></select></div>
+                        <div class="text-sm text-slate-500">@if($promotion)<span class="font-semibold text-emerald-700">Actieve promotie</span>@if($promotion->promotion_ends_at) tot {{ $promotion->promotion_ends_at->format('d-m-Y H:i') }}@endif @else Geen actieve promotie @endif</div>
+                        <div class="flex gap-2"><input type="hidden" name="sort_order" value="{{ $tld->sort_order }}"><button class="btn btn-primary text-sm" type="submit">Opslaan</button><button type="button" onclick="if(confirm('TLD verwijderen?')) document.getElementById('delete-tld-{{ $tld->id }}').submit()" class="btn btn-outline text-sm text-red-700">Verwijderen</button></div>
                     </div>
-                </div>
-            </div>
+                    <div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-5 py-3">Bewerking</th><th class="px-5 py-3">Inkoop</th><th class="px-5 py-3">Regulier</th><th class="px-5 py-3">Verkoop</th><th class="px-5 py-3">Handmatige override</th><th class="px-5 py-3">Synchronisatie</th></tr></thead><tbody class="divide-y divide-slate-100">
+                        @foreach(['create' => 'Registratie', 'renew' => 'Verlenging', 'transfer' => 'Transfer'] as $operation => $label)
+                            @php $price = $prices->get($operation); @endphp
+                            <tr><td class="px-5 py-4 font-semibold text-slate-900">{{ $label }}</td><td class="px-5 py-4 tabular-nums">{{ $price?->effective_cost !== null ? $price->currency.' '.number_format((float)$price->effective_cost, 4, ',', '.') : '-' }}</td><td class="px-5 py-4 tabular-nums">{{ $price?->regular_cost !== null ? $price->currency.' '.number_format((float)$price->regular_cost, 4, ',', '.') : '-' }}</td><td class="px-5 py-4 font-semibold tabular-nums">{{ $price?->sale_price !== null ? '€ '.number_format($price->sale_price, 2, ',', '.') : '-' }}</td><td class="px-5 py-4"><input type="number" min="0" step="0.01" name="override_{{ $operation }}" value="{{ $price?->override_sale_price }}" placeholder="Automatisch" class="form-input w-36"></td><td class="px-5 py-4 text-xs text-slate-500">{{ $price?->synced_at?->format('d-m-Y H:i') ?? 'Nog niet' }}</td></tr>
+                        @endforeach
+                    </tbody></table></div>
+                    @if($error)<div class="border-t border-red-100 bg-red-50 px-5 py-3 text-sm text-red-800">{{ $error->operation }}: {{ $error->sync_error }}</div>@endif
+                </form>
+                <form id="delete-tld-{{ $tld->id }}" method="POST" action="{{ route('admin.settings.domains.tlds.destroy', $tld) }}" class="hidden">@csrf @method('DELETE')</form>
+            @empty
+                <div class="rounded-2xl bg-white p-10 text-center text-sm text-slate-500 ring-1 ring-slate-200">Geen TLD's gevonden voor deze filters.</div>
+            @endforelse
         </div>
     </div>
 </div>
