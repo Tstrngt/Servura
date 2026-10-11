@@ -77,7 +77,10 @@ class DomainController extends Controller
 
         $holderContacts = Cache::get("domain.management.contacts.{$domain->id}", $this->localHolderContacts($domain->user));
         $nameservers = $domain->current_nameservers ?? [];
-        $dnsManaged = Cache::get("domain.management.dns_managed.{$domain->id}", (bool) $domain->is_dns_managed_by_servura);
+        $dnsManaged = Cache::get(
+            "domain.management.dns_managed.{$domain->id}",
+            (bool) $domain->is_dns_managed_by_servura || $domainService->nameserversAreManaged($nameservers)
+        );
         $dnsRecords = $dnsManaged ? Cache::get("domain.management.dns.{$domain->id}", []) : [];
         $hosting = $hostingService->details($domain);
         $availableHostingServices = $hosting['linked'] ? [] : $hostingService->availableServicesFor($domain);

@@ -8,6 +8,7 @@ use App\Models\DomainRegistration;
 use App\Models\User;
 use App\Services\Domains\DemoDomain;
 use App\Services\Domains\DomainProviderFactory;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -45,7 +46,7 @@ class DomainService
         $before = $this->snapshot($domain);
 
         $nameservers = $info['nameservers'] ?? [];
-        $isManaged = $this->isDnsManagedByServura($nameservers) || ($info['can_edit_dns'] ?? false);
+        $isManaged = $this->nameserversAreManaged($nameservers) || ($info['can_edit_dns'] ?? false);
 
         $domain->update([
             'status' => $this->mapProviderStatus($info['status'] ?? 'active'),
@@ -98,7 +99,7 @@ class DomainService
 
                 $domain->update([
                     'current_nameservers' => $nameservers,
-                    'is_dns_managed_by_servura' => $this->isDnsManagedByServura($nameservers),
+                    'is_dns_managed_by_servura' => $this->nameserversAreManaged($nameservers),
                     'provider_info_synced_at' => now(),
                 ]);
 
@@ -122,6 +123,9 @@ class DomainService
 
             return ['success' => false, 'message' => 'Wijziging mislukt: '.$e->getMessage()];
         }
+
+        Cache::forget("domain.management.dns_managed.{$domain->id}");
+        Cache::forget("domain.management.dns.{$domain->id}");
 
         return ['success' => true, 'message' => 'Nameservers bijgewerkt.'];
     }
@@ -338,14 +342,14 @@ class DomainService
         ];
     }
 
-    private function isDnsManagedByServura(array $nameservers): bool
+    public function nameserversAreManaged(array $nameservers): bool
     {
         if (empty($nameservers)) {
             return false;
         }
 
         try {
-            $raw = BillingSetting::valueFor('transip_default_nameservers', '');
+            $raw = BillingSetting::valueFor('domain_default_nameservers', BillingSetting::valueFor('transip_default_nameservers', ''));
         } catch (\Throwable $e) {
             return false;
         }
