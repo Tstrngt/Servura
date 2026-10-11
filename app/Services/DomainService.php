@@ -370,8 +370,9 @@ class DomainService
     private function mapProviderStatus(string $status): string
     {
         return match (strtolower($status)) {
-            'active' => DomainRegistration::STATUS_ACTIVE,
-            'pending' => DomainRegistration::STATUS_PENDING,
+            'active', 'act' => DomainRegistration::STATUS_ACTIVE,
+            'pending', 'req', 'pre' => DomainRegistration::STATUS_PENDING,
+            'del', 'deleted' => DomainRegistration::STATUS_CANCELLED,
             'transfer_active' => DomainRegistration::STATUS_TRANSFER_ACTIVE,
             'transfer_pending' => DomainRegistration::STATUS_TRANSFER_PENDING,
             default => $status,
