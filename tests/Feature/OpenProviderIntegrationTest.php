@@ -213,6 +213,9 @@ class OpenProviderIntegrationTest extends TestCase
             ['name' => '@', 'type' => 'A', 'content' => '192.0.2.2', 'expire' => 3600],
         ]);
 
+        Http::assertSent(fn ($request) => $request->method() === 'GET'
+            && str_starts_with($request->url(), 'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl/records')
+            && (int) $request['limit'] === 500);
         Http::assertSent(fn ($request) => $request->method() === 'PUT'
             && $request->url() === 'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl'
             && $request['records']['remove'][0]['value'] === '192.0.2.1'

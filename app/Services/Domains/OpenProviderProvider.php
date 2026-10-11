@@ -290,7 +290,7 @@ class OpenProviderProvider implements DomainProvider
 
     public function getDnsEntries(string $domain): array
     {
-        $data = $this->client->request('GET', 'dns/zones/'.$domain.'/records', ['limit' => 1000]);
+        $data = $this->client->request('GET', 'dns/zones/'.$domain.'/records', ['limit' => 500]);
 
         return collect($data['results'] ?? $data['records'] ?? [])->map(fn ($record) => [
             'name' => $record['name'] ?? '@',
