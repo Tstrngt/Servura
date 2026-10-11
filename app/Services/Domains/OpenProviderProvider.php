@@ -346,10 +346,19 @@ class OpenProviderProvider implements DomainProvider
             return;
         }
 
+        $toProviderRecord = function ($record) use ($domain) {
+            $record['name'] = $record['name'] === $domain ? '' : substr($record['name'], 0, -(strlen($domain) + 1));
+
+            return $record;
+        };
+
         $this->client->request('PUT', 'dns/zones/'.$domain, [
             'name' => $domain,
             'type' => 'master',
-            'records' => ['remove' => $remove, 'add' => $add],
+            'records' => [
+                'remove' => array_map($toProviderRecord, $remove),
+                'add' => array_map($toProviderRecord, $add),
+            ],
         ]);
     }
 

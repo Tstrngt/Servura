@@ -226,10 +226,11 @@ class OpenProviderIntegrationTest extends TestCase
             && $request->url() === 'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl'
             && count($request['records']['remove']) === 1
             && count($request['records']['add']) === 2
+            && $request['records']['remove'][0]['name'] === ''
             && $request['records']['remove'][0]['value'] === '192.0.2.1'
-            && $request['records']['add'][0]['name'] === 'voorbeeld.nl'
+            && $request['records']['add'][0]['name'] === ''
             && $request['records']['add'][0]['value'] === '192.0.2.2'
-            && $request['records']['add'][1]['name'] === 'www.voorbeeld.nl'
+            && $request['records']['add'][1]['name'] === 'www'
             && $request['records']['add'][1]['prio'] === 10);
         Http::assertNotSent(fn ($request) => $request->method() === 'PUT' && str_ends_with($request->url(), '/records'));
     }
@@ -268,7 +269,7 @@ class OpenProviderIntegrationTest extends TestCase
 
         Http::assertSent(fn ($request) => $request->method() === 'PUT'
             && $request->url() === 'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl'
-            && $request['records']['add'][0]['name'] === 'voorbeeld.nl'
+            && $request['records']['add'][0]['name'] === ''
             && $request['records']['add'][0]['value'] === '192.0.2.2');
     }
 
