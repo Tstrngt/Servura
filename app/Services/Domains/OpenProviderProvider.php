@@ -161,6 +161,15 @@ class OpenProviderProvider implements DomainProvider
 
     public function setNameservers(string $domain, array $nameservers): void
     {
+        if (BillingSetting::valueFor('openprovider_environment', 'sandbox') === 'sandbox') {
+            Log::info('Openprovider sandbox nameserver update simulated', [
+                'domain' => $domain,
+                'nameservers' => $this->nameserverPayload($nameservers),
+            ]);
+
+            return;
+        }
+
         $this->client->request('PUT', 'domains/'.$this->domainId($domain), [
             'name_servers' => $this->nameserverPayload($nameservers),
         ]);

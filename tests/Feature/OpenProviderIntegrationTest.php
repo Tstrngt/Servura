@@ -77,6 +77,18 @@ class OpenProviderIntegrationTest extends TestCase
             ]);
     }
 
+    public function test_sandbox_nameserver_update_is_simulated_without_slow_provider_request(): void
+    {
+        Http::fake();
+
+        DomainProviderFactory::default()->setNameservers('voorbeeld.nl', [
+            ['hostname' => 'ns1.voorbeeld.nl'],
+            ['hostname' => 'ns2.voorbeeld.nl'],
+        ]);
+
+        Http::assertNothingSent();
+    }
+
     public function test_domain_info_and_holder_contacts_are_normalized_for_customer_portal(): void
     {
         Http::fake([
