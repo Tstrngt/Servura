@@ -56,6 +56,8 @@ interface DomainProvider
      */
     public function uncancelDomain(string $domain): void;
 
+    public function setAutoRenew(string $domain, bool $enabled): void;
+
     /**
      * Fetch domain details from the provider.
      *

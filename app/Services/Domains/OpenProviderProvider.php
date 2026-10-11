@@ -171,7 +171,14 @@ class OpenProviderProvider implements DomainProvider
 
     public function uncancelDomain(string $domain): void
     {
-        $this->client->request('PUT', 'domains/'.$this->domainId($domain), ['autorenew' => 'on']);
+        $this->setAutoRenew($domain, true);
+    }
+
+    public function setAutoRenew(string $domain, bool $enabled): void
+    {
+        $this->client->request('PUT', 'domains/'.$this->domainId($domain), [
+            'autorenew' => $enabled ? 'on' : 'off',
+        ]);
     }
 
     public function getDomainInfo(string $domain): array

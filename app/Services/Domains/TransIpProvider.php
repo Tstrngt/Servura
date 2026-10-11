@@ -152,6 +152,11 @@ class TransIpProvider implements DomainProvider
         $this->client()->domain()->cancel($domain, $endTime);
     }
 
+    public function setAutoRenew(string $domain, bool $enabled): void
+    {
+        $enabled ? $this->uncancelDomain($domain) : $this->cancelDomain($domain, 'end');
+    }
+
     public function uncancelDomain(string $domain): void
     {
         $domain = $this->normalizeDomain($domain);

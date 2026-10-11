@@ -198,6 +198,23 @@ class OpenProviderIntegrationTest extends TestCase
         $this->assertSame('+31 6 12345678', $contacts[0]['phone_number']);
     }
 
+    public function test_disabling_auto_renew_updates_domain_without_deleting_it(): void
+    {
+        BillingSetting::setValue('openprovider_environment', 'production');
+        Http::fake([
+            'https://api.openprovider.eu/v1/auth/login' => Http::response(['code' => 0, 'data' => ['token' => 'production-token']], 200),
+            'https://api.openprovider.eu/v1/domains?*' => Http::response(['code' => 0, 'data' => ['results' => [['id' => 14841]]]], 200),
+            'https://api.openprovider.eu/v1/domains/14841' => Http::response(['code' => 0, 'data' => ['success' => true]], 200),
+        ]);
+
+        DomainProviderFactory::default()->setAutoRenew('voorbeeld.nl', false);
+
+        Http::assertSent(fn ($request) => $request->method() === 'PUT'
+            && $request->url() === 'https://api.openprovider.eu/v1/domains/14841'
+            && $request['autorenew'] === 'off');
+        Http::assertNotSent(fn ($request) => $request->method() === 'DELETE');
+    }
+
     public function test_registration_uses_configured_handle_and_nameservers(): void
     {
         Http::fake([

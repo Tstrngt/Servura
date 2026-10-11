@@ -240,11 +240,7 @@ class DomainService
         }
 
         try {
-            if ($autoRenew) {
-                $provider->uncancelDomain($domain->domain_name);
-            } else {
-                $provider->cancelDomain($domain->domain_name, 'end');
-            }
+            $provider->setAutoRenew($domain->domain_name, $autoRenew);
         } catch (Throwable $e) {
             Log::warning('Domain auto-renew toggle at provider failed', [
                 'domain_registration_id' => $domain->id,

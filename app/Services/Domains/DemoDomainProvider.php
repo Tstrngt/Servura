@@ -72,6 +72,10 @@ class DemoDomainProvider implements DomainProvider
         // No-op in demo mode.
     }
 
+    public function setAutoRenew(string $domain, bool $enabled): void
+    {
+    }
+
     public function getDomainInfo(string $domain): array
     {
         $overview = DomainMockData::overview($domain);
