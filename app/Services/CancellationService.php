@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\BillableItem;
 use App\Models\CustomerService;
+use App\Models\DomainRegistration;
 use App\Models\ServiceCancellationRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -82,6 +83,35 @@ class CancellationService
                 'auto_renew' => false,
                 'end_date' => $preview['effective_at'],
             ]);
+
+            return $request;
+        });
+    }
+
+    public function requestDomain(User $user, DomainRegistration $domain, ?string $reason, PortalTicketService $ticketService): ServiceCancellationRequest
+    {
+        $customerService = $domain->customerService;
+        if (! $customerService || $domain->user_id !== $user->id || $domain->status !== DomainRegistration::STATUS_ACTIVE) {
+            throw ValidationException::withMessages(['domain' => 'Dit domein kan niet worden opgezegd.']);
+        }
+        if ($customerService->cancellationRequests()->where('status', 'pending')->exists()) {
+            throw ValidationException::withMessages(['domain' => 'Er loopt al een opzegverzoek voor dit domein.']);
+        }
+
+        return DB::transaction(function () use ($user, $domain, $customerService, $reason, $ticketService) {
+            $effectiveAt = ($domain->expires_at ?? now()->addYear())->copy()->startOfDay();
+            $ticket = $ticketService->create($user, [
+                'title' => 'Opzegging domein '.$domain->domain_name,
+                'description' => 'Ik wil het domein '.$domain->domain_name.' opzeggen per '.$effectiveAt->format('d-m-Y').".\n\n".($reason ?: 'Geen aanvullende reden opgegeven.'),
+                'priority' => 'medium', 'category' => 'billing', 'request_type' => 'dienst_opzeggen',
+                'request_details' => ['service:'.$customerService->id, 'domain:'.$domain->id], 'page' => 'Mijn domeinen',
+            ]);
+            $request = $customerService->cancellationRequests()->create([
+                'user_id' => $user->id, 'ticket_id' => $ticket->id, 'status' => 'pending',
+                'policy_type' => 'domain_period_end', 'requested_at' => now(), 'effective_at' => $effectiveAt,
+                'original_end_date' => $customerService->end_date, 'estimated_usage_cost' => 0, 'reason' => $reason,
+            ]);
+            $customerService->update(['cancel_at_period_end' => true, 'cancelled_at' => now(), 'auto_renew' => false, 'end_date' => $effectiveAt]);
 
             return $request;
         });
@@ -244,6 +274,18 @@ class CancellationService
 
     private function suspendExternally(CustomerService $customerService): void
     {
+        if ($customerService->service?->fulfillment_type === 'domain') {
+            $domain = DomainRegistration::where('customer_service_id', $customerService->id)->first();
+            if ($domain) {
+                $result = app(DomainService::class)->cancelDomain($domain);
+                if (! $result['success']) {
+                    throw new \RuntimeException($result['message']);
+                }
+            }
+
+            return;
+        }
+
         try {
             app(ProvisioningService::class)->suspend($customerService);
         } catch (\Throwable $exception) {

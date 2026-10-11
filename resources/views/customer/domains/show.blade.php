@@ -180,11 +180,12 @@ $registrant = $holderContacts[0] ?? [];
                         <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(2,6,23,0.6)">
                             <form method="POST" action="{{ route('customer.domains.cancel', $domain) }}" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200" @click.away="window.location.hash=''">
                                 @csrf
-                                <h3 class="font-heading text-lg font-bold text-slate-900">Product opzeggen</h3>
-                                <p class="mt-2 text-sm text-rose-700">Het domein wordt niet automatisch verlengd en blijft actief tot de huidige einddatum. Deze actie is deels destructief.</p>
+                                <h3 class="font-heading text-lg font-bold text-slate-900">Opzegverzoek indienen</h3>
+                                <p class="mt-2 text-sm text-slate-600">Een medewerker controleert het verzoek voordat er een opzegging naar de registrar wordt gestuurd. Het domein blijft actief tijdens deze beoordeling.</p>
+                                <div class="mt-4"><label for="domain_cancel_reason" class="form-label">Reden (optioneel)</label><textarea id="domain_cancel_reason" name="reason" rows="3" maxlength="2000" class="form-input mt-1 w-full"></textarea></div>
                                 <div class="mt-6 flex justify-end gap-3">
                                     <a href="#" class="text-sm font-semibold text-slate-600 hover:text-slate-900" @click.prevent="window.location.hash=''">Annuleren</a>
-                                <button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Bevestigen</button>
+                                <button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Verzoek indienen</button>
                                 </div>
                             </form>
                         </div>

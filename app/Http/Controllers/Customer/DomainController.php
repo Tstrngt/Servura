@@ -11,9 +11,11 @@ use App\Jobs\UpdateDomainNameservers;
 use App\Models\DomainInternalTransfer;
 use App\Models\DomainRegistration;
 use App\Models\User;
+use App\Services\CancellationService;
 use App\Services\DomainDnsService;
 use App\Services\DomainHostingService;
 use App\Services\DomainService;
+use App\Services\PortalTicketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -296,15 +298,13 @@ class DomainController extends Controller
         return redirect()->route('customer.domains.show', $domain)->with('success', 'Domein is succesvol overgedragen naar jouw account.');
     }
 
-    public function cancel(DomainRegistration $domain)
+    public function cancel(Request $request, DomainRegistration $domain, CancellationService $cancellations, PortalTicketService $tickets)
     {
         $this->authorizeView($domain);
+        $validated = $request->validate(['reason' => ['nullable', 'string', 'max:2000']]);
+        $cancellations->requestDomain($request->user(), $domain, $validated['reason'] ?? null, $tickets);
 
-        $result = app(DomainService::class)->cancelDomain($domain, request()->user());
-
-        return $result['success']
-            ? back()->with('success', $result['message'])
-            : back()->with('error', $result['message']);
+        return back()->with('success', 'Uw opzegverzoek is ingediend en moet eerst door een medewerker worden goedgekeurd.');
     }
 
     public function linkHosting(Request $request, DomainRegistration $domain, DomainHostingService $hostingService)
