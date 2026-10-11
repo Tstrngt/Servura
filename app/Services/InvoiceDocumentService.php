@@ -63,9 +63,27 @@ class InvoiceDocumentService
         ]);
     }
 
+    public function issueWithPublishedDesignIfEligible(Invoice $invoice): void
+    {
+        if ($invoice->invoice_design_version_id) {
+            return;
+        }
+
+        $version = InvoiceDesignVersion::current();
+        if (! $version || ! $invoice->created_at || $version->published_at?->gt($invoice->created_at)) {
+            return;
+        }
+
+        $this->issue($invoice);
+        $invoice->refresh();
+    }
+
     public function pdf(Invoice $invoice, bool $draft = false)
     {
-        $invoice->loadMissing(['lines.customerService.service', 'user', 'transactions']);
+        if (! $draft) {
+            $this->issueWithPublishedDesignIfEligible($invoice);
+        }
+        $invoice->loadMissing(['lines.customerService.service', 'user', 'transactions', 'designVersion']);
         $view = ($draft || $invoice->invoice_design_version_id) ? 'pdf.invoice-professional' : 'pdf.invoice';
 
         return Pdf::loadView($view, $this->data($invoice, $draft))->setPaper('a4');

@@ -87,6 +87,23 @@ class ProfessionalInvoiceSystemTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['action' => 'invoice_design_published']);
     }
 
+    public function test_pdf_pins_published_design_for_invoice_created_after_publication(): void
+    {
+        config()->set('company', [
+            'legal_name' => 'Servura B.V.', 'trade_name' => 'Servura', 'address' => 'Teststraat 1', 'postal_code' => '1234 AB',
+            'city' => 'Leiden', 'country' => 'Nederland', 'kvk_number' => '12345678', 'vat_number' => 'NL123456789B01',
+            'email' => 'facturen@servura.nl', 'website' => 'https://servura.nl', 'phone' => '',
+        ]);
+        $published = InvoiceDesignVersion::create([
+            'version' => 1, 'status' => 'published', 'settings' => ['primary_color' => '#123456'], 'published_at' => now()->subMinute(),
+        ]);
+        $invoice = $this->invoice();
+
+        app(InvoiceDocumentService::class)->pdf($invoice);
+
+        $this->assertSame($published->id, $invoice->fresh()->invoice_design_version_id);
+    }
+
     public function test_draft_design_does_not_replace_published_version(): void
     {
         $published = InvoiceDesignVersion::create([
