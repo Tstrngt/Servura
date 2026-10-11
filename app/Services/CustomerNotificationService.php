@@ -52,10 +52,22 @@ class CustomerNotificationService
 
     public function orderPlaced(User $user, mixed $order): void
     {
-        $this->send($user, 'order-placed', [
+        $order->loadMissing(['lines.service', 'lines.customerService', 'invoice']);
+        $hasDomain = $order->lines->contains(fn ($line) => $line->service?->fulfillment_type === 'domain');
+        $hasHosting = $order->lines->contains(fn ($line) => $line->service?->fulfillment_type === 'directadmin');
+        $template = match (true) {
+            $hasHosting && $hasDomain => 'order-hosting-domain',
+            $hasHosting => 'order-hosting',
+            default => 'order-domain',
+        };
+
+        $this->send($user, $template, [
             'user' => $user,
             'order' => $order,
             'orderUrl' => route('customer.invoices.show', $order->invoice),
+            'domain' => $order->lines->first(fn ($line) => filled($line->customerService?->domain))?->customerService?->domain,
+            'hostingLine' => $order->lines->first(fn ($line) => $line->service?->fulfillment_type === 'directadmin'),
+            'domainLine' => $order->lines->first(fn ($line) => $line->service?->fulfillment_type === 'domain'),
         ]);
     }
 
@@ -217,6 +229,9 @@ class CustomerNotificationService
         $invoice = $data['invoice'] ?? ($data['order']->invoice ?? null);
         $quote = $data['quote'] ?? null;
         $service = $data['service'] ?? null;
+        $order = $data['order'] ?? null;
+        $hostingLine = $data['hostingLine'] ?? null;
+        $domainLine = $data['domainLine'] ?? null;
         $server = $service?->service?->serverConnection;
         $url = $data['verificationUrl'] ?? $data['resetUrl'] ?? $data['orderUrl'] ?? $data['loginUrl'] ?? $data['dashboardUrl'] ?? $data['ticketUrl'] ?? $data['invoiceUrl'] ?? $data['quoteUrl'] ?? '';
 
@@ -225,8 +240,12 @@ class CustomerNotificationService
             '{{ticket_nummer}}' => e($ticket?->ticket_number ?? ''), '{{ticket_titel}}' => e($ticket?->title ?? ''),
             '{{reactie}}' => nl2br(e($data['reply']->message ?? '')), '{{factuur_nummer}}' => e($invoice?->invoice_number ?? ''),
             '{{offerte_nummer}}' => e($quote?->quote_number ?? ''), '{{bedrag}}' => number_format((float) ($invoice?->total ?? $quote?->total ?? 0), 2, ',', '.'),
-            '{{dienst_naam}}' => e($service?->service?->title ?? ''), '{{domein}}' => e($service?->domain ?? ''),
+            '{{dienst_naam}}' => e($service?->service?->title ?? $hostingLine?->service?->title ?? ''), '{{domein}}' => e($service?->domain ?? $data['domain'] ?? ''),
             '{{gebruikersnaam}}' => e($service?->external_username ?? ''), '{{wachtwoord}}' => e($service?->external_password ?? ''),
+            '{{ordernummer}}' => e($order?->order_number ?? ''),
+            '{{hostingpakket}}' => e($hostingLine?->service?->title ?? ''),
+            '{{domeinactie}}' => e($domainLine?->description ?? ''),
+            '{{bestelbedrag}}' => number_format((float) ($order?->total ?? 0), 2, ',', '.'),
             '{{reden}}' => e($data['reason'] ?? ''), '{{actie_url}}' => e($url), '{{site_naam}}' => e(config('site.name', config('app.name'))),
             '{{directadmin_url}}' => e($server?->url ?? ''),
             '{{ftp_host}}' => e($server?->ftp_host ?: ($service?->domain ? 'ftp.'.$service->domain : '')),
@@ -243,7 +262,9 @@ class CustomerNotificationService
             'account-created' => 'Welkom bij '.config('site.name', config('app.name')).' — bevestig uw e-mailadres',
             'verify-email' => 'Bevestig uw e-mailadres',
             'password-reset' => 'Stel een nieuw wachtwoord in',
-            'order-placed' => 'Bedankt voor uw bestelling',
+            'order-domain' => 'Uw domeinbestelling is ontvangen',
+            'order-hosting' => 'Uw hostingbestelling is ontvangen',
+            'order-hosting-domain' => 'Uw hosting- en domeinbestelling is ontvangen',
             'hosting-activated' => 'Uw hostingaccount is actief',
             'service-suspended' => 'Uw dienst is tijdelijk opgeschort',
             'ticket-created' => 'We hebben uw aanvraag ontvangen',

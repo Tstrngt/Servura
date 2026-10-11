@@ -126,6 +126,11 @@ class DomainRegistrationFlowTest extends TestCase
         $this->assertSame('pending_payment', $customerService->provisioning_status);
         $this->assertNotNull($customerService->order);
         $this->assertNotNull($customerService->invoices()->first());
+        $this->assertDatabaseHas('customer_email_logs', [
+            'user_id' => $user->id,
+            'template' => 'order-domain',
+            'status' => 'sent',
+        ]);
     }
 
     public function test_domain_is_registered_after_payment(): void
@@ -416,6 +421,11 @@ class DomainRegistrationFlowTest extends TestCase
         $this->assertSame('bestaand.nl', $customerService->domain);
         $this->assertSame($hosting->id, $customerService->service_id);
         $this->assertSame('pending_payment', $customerService->provisioning_status);
+        $this->assertDatabaseHas('customer_email_logs', [
+            'user_id' => $user->id,
+            'template' => 'order-hosting',
+            'status' => 'sent',
+        ]);
     }
 
     public function test_customer_can_order_hosting_with_new_domain(): void
@@ -471,6 +481,11 @@ class DomainRegistrationFlowTest extends TestCase
         $order = Order::where('user_id', $user->id)->firstOrFail();
         $this->assertCount(2, $order->lines);
         $this->assertEqualsWithDelta(9.95 + 9.99, (float) $order->subtotal, 0.01);
+        $this->assertDatabaseHas('customer_email_logs', [
+            'user_id' => $user->id,
+            'template' => 'order-hosting-domain',
+            'status' => 'sent',
+        ]);
     }
 
     public function test_customer_can_order_domain_transfer_with_hosting(): void
