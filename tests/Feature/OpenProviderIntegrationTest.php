@@ -31,6 +31,7 @@ class OpenProviderIntegrationTest extends TestCase
 
     public function test_price_sync_applies_markup_and_promotion_per_operation(): void
     {
+        BillingSetting::setValue('openprovider_customer_handle', '');
         $tld = DomainTld::factory()->create(['extension' => '.nl', 'registration_price' => 0, 'renewal_price' => 0, 'transfer_price' => 0]);
         Http::fake(function ($request) {
             if (str_ends_with($request->url(), '/auth/login')) {

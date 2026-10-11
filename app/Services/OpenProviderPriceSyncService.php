@@ -19,8 +19,8 @@ class OpenProviderPriceSyncService
     public function run(): array
     {
         $provider = DomainProviderFactory::make('openprovider');
-        if (! $provider instanceof OpenProviderProvider || ! $provider->isConfigured()) {
-            throw new RuntimeException('Openprovider is niet volledig geconfigureerd.');
+        if (! $provider instanceof OpenProviderProvider || ! $provider->canAuthenticate()) {
+            throw new RuntimeException('Openprovider API-inloggegevens ontbreken voor de geselecteerde omgeving.');
         }
 
         $environment = BillingSetting::valueFor('openprovider_environment', 'sandbox');

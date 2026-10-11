@@ -21,7 +21,12 @@ class OpenProviderProvider implements DomainProvider
 
     public function isConfigured(): bool
     {
-        return $this->client->configured() && filled($this->customerHandle());
+        return $this->canAuthenticate() && filled($this->customerHandle());
+    }
+
+    public function canAuthenticate(): bool
+    {
+        return $this->client->configured();
     }
 
     public function isReadOnly(): bool
