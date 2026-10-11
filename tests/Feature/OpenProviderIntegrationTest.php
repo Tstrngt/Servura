@@ -198,6 +198,28 @@ class OpenProviderIntegrationTest extends TestCase
         $this->assertSame('+31 6 12345678', $contacts[0]['phone_number']);
     }
 
+    public function test_dns_updates_use_zone_endpoint_with_add_and_remove_sets(): void
+    {
+        BillingSetting::setValue('openprovider_environment', 'production');
+        Http::fake([
+            'https://api.openprovider.eu/v1/auth/login' => Http::response(['code' => 0, 'data' => ['token' => 'production-token']], 200),
+            'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl/records?*' => Http::response(['code' => 0, 'data' => ['results' => [
+                ['name' => 'voorbeeld.nl', 'type' => 'A', 'value' => '192.0.2.1', 'ttl' => 3600],
+            ]]], 200),
+            'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl' => Http::response(['code' => 0, 'data' => ['success' => true]], 200),
+        ]);
+
+        DomainProviderFactory::default()->setDnsEntries('voorbeeld.nl', [
+            ['name' => '@', 'type' => 'A', 'content' => '192.0.2.2', 'expire' => 3600],
+        ]);
+
+        Http::assertSent(fn ($request) => $request->method() === 'PUT'
+            && $request->url() === 'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl'
+            && $request['records']['remove'][0]['value'] === '192.0.2.1'
+            && $request['records']['add'][0]['value'] === '192.0.2.2');
+        Http::assertNotSent(fn ($request) => $request->method() === 'PUT' && str_ends_with($request->url(), '/records'));
+    }
+
     public function test_disabling_auto_renew_updates_domain_without_deleting_it(): void
     {
         BillingSetting::setValue('openprovider_environment', 'production');

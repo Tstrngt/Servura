@@ -184,7 +184,13 @@ class DomainController extends Controller
 
         $records = array_values(array_filter($validated['records'], fn ($record) => filled($record['name']) && filled($record['content'])));
 
-        UpdateDomainDnsRecords::dispatch($domain->id, $records, Auth::id());
+        try {
+            UpdateDomainDnsRecords::dispatch($domain->id, $records, Auth::id());
+        } catch (Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'De DNS-records konden niet worden bijgewerkt: '.$e->getMessage());
+        }
 
         return back()->with('info', 'DNS-wijziging is ingepland. De records worden verwerkt via de provider.');
     }

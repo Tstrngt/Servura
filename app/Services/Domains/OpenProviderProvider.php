@@ -297,21 +297,27 @@ class OpenProviderProvider implements DomainProvider
             'type' => strtoupper($record['type'] ?? 'A'),
             'content' => $record['value'] ?? $record['content'] ?? '',
             'expire' => (int) ($record['ttl'] ?? 3600),
-            'priority' => $record['priority'] ?? null,
+            'priority' => $record['prio'] ?? $record['priority'] ?? null,
         ])->all();
     }
 
     public function setDnsEntries(string $domain, array $dnsEntries): void
     {
-        $records = collect($dnsEntries)->map(fn ($record) => array_filter([
-            'name' => $record['name'] ?? '@',
+        $format = fn ($record) => array_filter([
+            'name' => ($record['name'] ?? '@') === '@' ? $domain : ($record['name'] ?? $domain),
             'type' => strtoupper($record['type'] ?? 'A'),
             'value' => $record['content'] ?? $record['value'] ?? '',
             'ttl' => (int) ($record['expire'] ?? $record['ttl'] ?? 3600),
-            'priority' => $record['priority'] ?? null,
-        ], fn ($value) => $value !== null))->values()->all();
+            'prio' => $record['priority'] ?? $record['prio'] ?? null,
+        ], fn ($value) => $value !== null);
+        $current = collect($this->getDnsEntries($domain))->map($format)->values()->all();
+        $desired = collect($dnsEntries)->map($format)->values()->all();
 
-        $this->client->request('PUT', 'dns/zones/'.$domain.'/records', ['records' => $records]);
+        $this->client->request('PUT', 'dns/zones/'.$domain, [
+            'name' => $domain,
+            'type' => 'master',
+            'records' => ['remove' => $current, 'add' => $desired],
+        ]);
     }
 
     public function getAuthCode(string $domain): ?string
