@@ -29,6 +29,8 @@ class User extends Authenticatable
         'profile_logo_path',
         'mollie_customer_id',
         'openprovider_handle',
+        'openprovider_sandbox_handle',
+        'openprovider_production_handle',
         'role',
         'is_active',
         'last_login_at',

@@ -120,6 +120,8 @@ class OpenProviderIntegrationTest extends TestCase
 
         $this->assertSame('NL654321-NL', $handle);
         $this->assertSame('NL654321-NL', $user->fresh()->openprovider_handle);
+        $this->assertSame('NL654321-NL', $user->fresh()->openprovider_sandbox_handle);
+        $this->assertNull($user->fresh()->openprovider_production_handle);
         Http::assertSent(fn ($request) => $request->url() === 'https://api.sandbox.openprovider.nl/v1beta/customers'
             && $request['name']['first_name'] === 'Jan'
             && $request['address']['country'] === 'NL'
@@ -128,6 +130,26 @@ class OpenProviderIntegrationTest extends TestCase
                 'area_code' => '6',
                 'subscriber_number' => '12345678',
             ]);
+    }
+
+    public function test_production_creates_separate_handle_instead_of_reusing_sandbox_handle(): void
+    {
+        BillingSetting::setValue('openprovider_environment', 'production');
+        $user = User::factory()->create([
+            'name' => 'Jan Jansen', 'email' => 'jan@example.test', 'phone' => '0612345678',
+            'street' => 'Teststraat', 'house_number' => '1', 'postal_code' => '1234AB', 'city' => 'Amsterdam', 'country' => 'NL',
+            'openprovider_handle' => 'SB123-NL', 'openprovider_sandbox_handle' => 'SB123-NL',
+        ]);
+        Http::fake([
+            'https://api.openprovider.eu/v1/auth/login' => Http::response(['code' => 0, 'data' => ['token' => 'production-token']], 200),
+            'https://api.openprovider.eu/v1/customers' => Http::response(['code' => 0, 'data' => ['handle' => 'PR456-NL']], 200),
+        ]);
+
+        $handle = DomainProviderFactory::default()->ensureCustomerHandle($user);
+
+        $this->assertSame('PR456-NL', $handle);
+        $this->assertSame('PR456-NL', $user->fresh()->openprovider_production_handle);
+        $this->assertSame('SB123-NL', $user->fresh()->openprovider_sandbox_handle);
     }
 
     public function test_sandbox_nameserver_update_is_simulated_without_slow_provider_request(): void

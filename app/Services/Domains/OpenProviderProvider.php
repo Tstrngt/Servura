@@ -54,8 +54,18 @@ class OpenProviderProvider implements DomainProvider
 
     public function ensureCustomerHandle(User $user): string
     {
-        if ($user->openprovider_handle) {
-            return $user->openprovider_handle;
+        $environment = BillingSetting::valueFor('openprovider_environment', 'sandbox');
+        $handleColumn = $environment === 'production' ? 'openprovider_production_handle' : 'openprovider_sandbox_handle';
+        if ($user->{$handleColumn}) {
+            return $user->{$handleColumn};
+        }
+        $defaultHandle = $this->customerHandle();
+        if ($environment === 'production'
+            && $defaultHandle
+            && strcasecmp($user->email, BillingSetting::valueFor('openprovider_username', '')) === 0) {
+            $user->forceFill([$handleColumn => $defaultHandle, 'openprovider_handle' => $defaultHandle])->save();
+
+            return $defaultHandle;
         }
 
         $parts = preg_split('/\s+/', trim($user->name), 2);
@@ -87,7 +97,7 @@ class OpenProviderProvider implements DomainProvider
             throw new RuntimeException('Openprovider heeft geen klanthandle teruggegeven.');
         }
 
-        $user->forceFill(['openprovider_handle' => $handle])->save();
+        $user->forceFill([$handleColumn => $handle, 'openprovider_handle' => $handle])->save();
 
         return $handle;
     }
