@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Jobs\SyncDomainInfoFromProvider;
 use App\Jobs\SyncDomainManagementData;
-use App\Jobs\UpdateDomainDnsRecords;
 use App\Jobs\UpdateDomainHolderContacts;
 use App\Jobs\UpdateDomainNameservers;
 use App\Models\DomainInternalTransfer;
@@ -185,30 +184,50 @@ class DomainController extends Controller
         return back()->with('info', 'Houderwijziging is ingepland. De status wordt bijgewerkt zodra de provider de wijziging heeft verwerkt.');
     }
 
-    public function updateDns(Request $request, DomainRegistration $domain)
+    public function updateDns(Request $request, DomainRegistration $domain, DomainDnsService $dnsService)
     {
         $this->authorizeView($domain);
 
-        $validated = $request->validate([
-            'records' => ['required', 'array'],
-            'records.*.name' => ['required', 'string', 'max:255'],
-            'records.*.type' => ['required', 'in:A,AAAA,CNAME,MX,TXT,SRV,CAA,NS,SOA'],
-            'records.*.expire' => ['required', 'integer', 'min:60'],
-            'records.*.content' => ['required', 'string', 'max:255'],
-            'records.*.priority' => ['nullable', 'integer', 'min:0', 'max:65535'],
+        $request->validate([
+            'dns_action' => ['required', 'in:save,delete'],
+            'record_index' => ['nullable', 'integer', 'min:0'],
         ]);
 
-        $records = array_values(array_filter($validated['records'], fn ($record) => filled($record['name']) && filled($record['content'])));
-
-        try {
-            UpdateDomainDnsRecords::dispatch($domain->id, $records, Auth::id());
-        } catch (Throwable $e) {
-            report($e);
-
-            return back()->with('error', 'De DNS-records konden niet worden bijgewerkt: '.$e->getMessage());
+        $records = $dnsService->fetchRecords($domain);
+        if ($records === null) {
+            return back()->with('error', 'De huidige DNS-records konden niet bij Openprovider worden opgehaald. Probeer het later opnieuw.');
         }
 
-        return back()->with('info', 'DNS-wijziging is ingepland. De records worden verwerkt via de provider.');
+        $index = is_numeric($request->input('record_index')) ? (int) $request->input('record_index') : null;
+
+        if ($request->input('dns_action') === 'save') {
+            $validated = $request->validate([
+                'record.name' => ['required', 'string', 'max:255'],
+                'record.type' => ['required', 'in:A,AAAA,CNAME,MX,TXT,SRV,CAA,NS,SOA'],
+                'record.expire' => ['required', 'integer', 'min:60'],
+                'record.content' => ['required', 'string', 'max:255'],
+                'record.priority' => ['nullable', 'integer', 'min:0', 'max:65535', 'required_if:record.type,MX,SRV'],
+            ]);
+
+            if ($index === null || ! isset($records[$index])) {
+                $records[] = $validated['record'];
+            } else {
+                $records[$index] = $validated['record'];
+            }
+        } else {
+            if ($index === null || ! isset($records[$index])) {
+                return back()->with('error', 'Het DNS-record kon niet worden gevonden. Vernieuw de pagina en probeer het opnieuw.');
+            }
+            array_splice($records, $index, 1);
+        }
+
+        $result = $dnsService->updateRecords($domain, array_values($records), Auth::user());
+
+        if (! ($result['success'] ?? false)) {
+            return back()->with('error', 'De DNS-records konden niet worden bijgewerkt: '.($result['message'] ?? 'onbekende providerfout'));
+        }
+
+        return back()->with('success', 'DNS-records zijn bijgewerkt bij de provider.');
     }
 
     public function authCode(Request $request, DomainRegistration $domain, DomainService $domainService)

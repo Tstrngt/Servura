@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\BillingSetting;
+use App\Models\DomainRegistration;
 use App\Models\DomainTld;
 use App\Models\DomainTldPrice;
 use App\Models\User;
@@ -225,6 +226,44 @@ class OpenProviderIntegrationTest extends TestCase
             && $request['records']['add'][1]['name'] === 'www.voorbeeld.nl'
             && $request['records']['add'][1]['prio'] === 10);
         Http::assertNotSent(fn ($request) => $request->method() === 'PUT' && str_ends_with($request->url(), '/records'));
+    }
+
+    public function test_customer_dns_edit_sends_zone_update_to_openprovider(): void
+    {
+        BillingSetting::setValue('openprovider_environment', 'production');
+        Http::fake([
+            'https://api.openprovider.eu/v1/auth/login' => Http::response(['code' => 0, 'data' => ['token' => 'production-token']], 200),
+            'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl/records?*' => Http::response(['code' => 0, 'data' => ['results' => [
+                ['name' => 'voorbeeld.nl', 'type' => 'A', 'value' => '192.0.2.1', 'ttl' => 3600],
+            ]]], 200),
+            'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl' => Http::response(['code' => 0, 'data' => ['success' => true]], 200),
+        ]);
+
+        $user = User::factory()->create(['role' => 'customer', 'is_active' => true]);
+        $domain = DomainRegistration::create([
+            'user_id' => $user->id,
+            'domain_name' => 'voorbeeld.nl',
+            'tld' => '.nl',
+            'status' => DomainRegistration::STATUS_ACTIVE,
+            'registration_price' => 10,
+            'is_dns_managed_by_servura' => true,
+        ]);
+
+        $this->actingAs($user)->post(route('customer.domains.dns.update', $domain), [
+            'dns_action' => 'save',
+            'record_index' => 0,
+            'record' => [
+                'name' => '@',
+                'type' => 'A',
+                'expire' => 3600,
+                'content' => '192.0.2.2',
+            ],
+        ])->assertRedirect();
+
+        Http::assertSent(fn ($request) => $request->method() === 'PUT'
+            && $request->url() === 'https://api.openprovider.eu/v1/dns/zones/voorbeeld.nl'
+            && $request['records']['add'][0]['name'] === 'voorbeeld.nl'
+            && $request['records']['add'][0]['value'] === '192.0.2.2');
     }
 
     public function test_disabling_auto_renew_updates_domain_without_deleting_it(): void

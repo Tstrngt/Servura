@@ -330,18 +330,6 @@ $registrant = $holderContacts[0] ?? [];
                         },
                         shortName(name) {
                             return String(name || '').endsWith('.' + this.domainName) ? String(name).slice(0, -(this.domainName.length + 1)) : name;
-                        },
-                        saveRecord() {
-                            const normalized = {...this.draft, name: this.normalizeName(this.draft.name), expire: parseInt(this.draft.expire, 10), priority: this.draft.priority === '' ? null : this.draft.priority};
-                            if (this.editIndex === null) this.records.push(normalized); else this.records[this.editIndex] = normalized;
-                            this.modal = null;
-                            this.$nextTick(() => this.$refs.form.submit());
-                        },
-                        confirmDelete() {
-                            this.records.splice(this.deleteIndex, 1);
-                            this.deleteIndex = null;
-                            this.modal = null;
-                            this.$nextTick(() => this.$refs.form.submit());
                         }
                      }">
                     <button type="button" @click="open = !open" class="flex w-full items-center justify-between">
@@ -401,29 +389,19 @@ $registrant = $holderContacts[0] ?? [];
                                 <p class="text-xs text-slate-500">Wijzigingen worden direct bij de registrar opgeslagen.</p>
                             </div>
 
-                            <form x-ref="form" method="POST" action="{{ route('customer.domains.dns.update', $domain) }}" class="hidden">
-                                @csrf
-                                <template x-for="(record, index) in records" :key="index">
-                                    <div>
-                                        <input type="hidden" :name="`records[${index}][name]`" :value="record.name">
-                                        <input type="hidden" :name="`records[${index}][type]`" :value="record.type">
-                                        <input type="hidden" :name="`records[${index}][expire]`" :value="record.expire">
-                                        <input type="hidden" :name="`records[${index}][content]`" :value="record.content">
-                                        <input type="hidden" :name="`records[${index}][priority]`" :value="record.priority">
-                                    </div>
-                                </template>
-                            </form>
-
                             <template x-if="modal === 'record'">
                                 <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" @click.self="modal=null">
-                                    <form class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200" @submit.prevent="saveRecord()" @keydown.escape.window="modal=null">
+                                    <form method="POST" action="{{ route('customer.domains.dns.update', $domain) }}" class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200" @keydown.escape.window="modal=null">
+                                        @csrf
+                                        <input type="hidden" name="dns_action" value="save">
+                                        <input type="hidden" name="record_index" :value="editIndex">
                                         <h3 class="font-heading text-lg font-bold text-slate-900" x-text="editIndex === null ? 'DNS-record toevoegen' : 'DNS-record wijzigen'"></h3>
                                         <div class="mt-5 grid gap-4 sm:grid-cols-2">
-                                            <div><label class="form-label">Naam</label><input x-model="draft.name" required class="form-input mt-1 w-full" placeholder="@"></div>
-                                            <div><label class="form-label">Type</label><select x-model="draft.type" class="form-select mt-1 w-full"><option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>TXT</option><option>SRV</option><option>CAA</option></select></div>
-                                            <div><label class="form-label">TTL</label><input type="number" min="60" x-model="draft.expire" required class="form-input mt-1 w-full"></div>
-                                            <div x-show="['MX','SRV'].includes(draft.type)"><label class="form-label">Prioriteit</label><input type="number" min="0" x-model="draft.priority" :required="['MX','SRV'].includes(draft.type)" class="form-input mt-1 w-full"></div>
-                                            <div class="sm:col-span-2"><label class="form-label">Waarde</label><input x-model="draft.content" required class="form-input mt-1 w-full font-mono"></div>
+                                            <div><label class="form-label">Naam</label><input name="record[name]" x-model="draft.name" required class="form-input mt-1 w-full" placeholder="@"></div>
+                                            <div><label class="form-label">Type</label><select name="record[type]" x-model="draft.type" class="form-select mt-1 w-full"><option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>TXT</option><option>SRV</option><option>CAA</option></select></div>
+                                            <div><label class="form-label">TTL</label><input type="number" min="60" name="record[expire]" x-model="draft.expire" required class="form-input mt-1 w-full"></div>
+                                            <div x-show="['MX','SRV'].includes(draft.type)"><label class="form-label">Prioriteit</label><input type="number" min="0" name="record[priority]" x-model="draft.priority" :required="['MX','SRV'].includes(draft.type)" class="form-input mt-1 w-full"></div>
+                                            <div class="sm:col-span-2"><label class="form-label">Waarde</label><input name="record[content]" x-model="draft.content" required class="form-input mt-1 w-full font-mono"></div>
                                         </div>
                                         <div class="mt-6 flex justify-end gap-3"><button type="button" @click="modal=null" class="btn btn-outline">Annuleren</button><button type="submit" class="btn btn-primary">Opslaan</button></div>
                                     </form>
@@ -432,11 +410,14 @@ $registrant = $holderContacts[0] ?? [];
 
                             <template x-if="modal === 'delete'">
                                 <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" @click.self="modal=null">
-                                    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200">
+                                    <form method="POST" action="{{ route('customer.domains.dns.update', $domain) }}" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200">
+                                        @csrf
+                                        <input type="hidden" name="dns_action" value="delete">
+                                        <input type="hidden" name="record_index" :value="deleteIndex">
                                         <h3 class="font-heading text-lg font-bold text-slate-900">DNS-record verwijderen?</h3>
                                         <p class="mt-2 text-sm text-slate-600">Dit record wordt bij de registrar verwijderd. Deze actie kan niet ongedaan worden gemaakt.</p>
-                                        <div class="mt-6 flex justify-end gap-3"><button type="button" @click="modal=null" class="btn btn-outline">Annuleren</button><button type="button" @click="confirmDelete()" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Verwijderen</button></div>
-                                    </div>
+                                        <div class="mt-6 flex justify-end gap-3"><button type="button" @click="modal=null" class="btn btn-outline">Annuleren</button><button type="submit" class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Verwijderen</button></div>
+                                    </form>
                                 </div>
                             </template>
                         @endif
