@@ -126,6 +126,7 @@ class DomainService
 
         Cache::forget("domain.management.dns_managed.{$domain->id}");
         Cache::forget("domain.management.dns.{$domain->id}");
+        Cache::forget("domain.management.dns_loaded.{$domain->id}");
 
         return ['success' => true, 'message' => 'Nameservers bijgewerkt.'];
     }

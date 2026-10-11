@@ -32,6 +32,11 @@ class SyncDomainManagementData implements ShouldQueue
         Cache::put("domain.management.contacts.{$domain->id}", $domains->contacts($domain), now()->addMinutes(15));
         Cache::put("domain.management.capabilities.{$domain->id}", $domains->tldCapabilities($domain), now()->addMinutes(15));
         Cache::put("domain.management.dns_managed.{$domain->id}", $dns->canManage($domain), now()->addMinutes(15));
-        Cache::put("domain.management.dns.{$domain->id}", $dns->records($domain), now()->addMinutes(5));
+
+        $dnsRecords = $dns->fetchRecords($domain);
+        if ($dnsRecords !== null) {
+            Cache::put("domain.management.dns.{$domain->id}", $dnsRecords, now()->addMinutes(5));
+            Cache::put("domain.management.dns_loaded.{$domain->id}", true, now()->addMinutes(5));
+        }
     }
 }

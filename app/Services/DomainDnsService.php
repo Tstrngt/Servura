@@ -20,12 +20,12 @@ class DomainDnsService
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function records(DomainRegistration $domain): array
+    public function fetchRecords(DomainRegistration $domain): ?array
     {
         $provider = DomainProviderFactory::forDomain($domain->domain_name);
 
         if (! $provider || ! $provider->isConfigured()) {
-            return [];
+            return null;
         }
 
         try {
@@ -37,8 +37,13 @@ class DomainDnsService
                 'error' => $e->getMessage(),
             ]);
 
-            return [];
+            return null;
         }
+    }
+
+    public function records(DomainRegistration $domain): array
+    {
+        return $this->fetchRecords($domain) ?? [];
     }
 
     public function canManage(DomainRegistration $domain): bool
@@ -88,8 +93,11 @@ class DomainDnsService
             DB::transaction(function () use ($domain, $records, $provider, $user, $before) {
                 $provider->setDnsEntries($domain->domain_name, $records);
                 Cache::forget("domain.management.dns.{$domain->id}");
-                $refreshedRecords = $this->records($domain);
-                Cache::put("domain.management.dns.{$domain->id}", $refreshedRecords, now()->addMinutes(5));
+                $refreshedRecords = $this->fetchRecords($domain);
+                if ($refreshedRecords !== null) {
+                    Cache::put("domain.management.dns.{$domain->id}", $refreshedRecords, now()->addMinutes(5));
+                    Cache::put("domain.management.dns_loaded.{$domain->id}", true, now()->addMinutes(5));
+                }
 
                 DomainAuditLog::create([
                     'domain_registration_id' => $domain->id,

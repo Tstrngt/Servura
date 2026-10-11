@@ -85,7 +85,20 @@ class DomainController extends Controller
             "domain.management.dns_managed.{$domain->id}",
             (bool) $domain->is_dns_managed_by_servura || $domainService->nameserversAreManaged($nameservers)
         );
-        $dnsRecords = $dnsManaged ? Cache::get("domain.management.dns.{$domain->id}", []) : [];
+        $dnsCacheKey = "domain.management.dns.{$domain->id}";
+        $dnsLoadedKey = "domain.management.dns_loaded.{$domain->id}";
+        $dnsRecords = $dnsManaged ? Cache::get($dnsCacheKey) : null;
+
+        if ($dnsManaged && ($dnsRecords === null || ($dnsRecords === [] && ! Cache::has($dnsLoadedKey)))) {
+            $fetchedDnsRecords = $dnsService->fetchRecords($domain);
+            if ($fetchedDnsRecords !== null) {
+                $dnsRecords = $fetchedDnsRecords;
+                Cache::put($dnsCacheKey, $fetchedDnsRecords, now()->addMinutes(5));
+                Cache::put($dnsLoadedKey, true, now()->addMinutes(5));
+            }
+        }
+
+        $dnsRecords = $dnsManaged ? ($dnsRecords ?? []) : [];
         $hosting = $hostingService->details($domain);
         $availableHostingServices = $hosting['linked'] ? [] : $hostingService->availableServicesFor($domain);
         $tldCapabilities = Cache::get("domain.management.capabilities.{$domain->id}", [
