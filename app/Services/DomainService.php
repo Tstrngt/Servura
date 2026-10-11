@@ -72,10 +72,21 @@ class DomainService
         }
 
         if (! DemoDomain::is($domain->domain_name)) {
-            $capabilities = $provider->getTldCapabilities($domain->tld);
-            if (! ($capabilities['can_set_nameservers'] ?? false)
-                && ! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETNAMESERVERS, $capabilities['capabilities'] ?? [], true)) {
-                return ['success' => false, 'message' => 'Deze extensie ondersteunt geen nameserverwijzigingen via de API.'];
+            try {
+                $capabilities = $provider->getTldCapabilities($domain->tld);
+                $explicitlyUnsupported = array_key_exists('can_set_nameservers', $capabilities)
+                    && $capabilities['can_set_nameservers'] === false;
+                $transIpCapabilities = $capabilities['capabilities'] ?? null;
+                if ($explicitlyUnsupported || (is_array($transIpCapabilities)
+                    && ! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETNAMESERVERS, $transIpCapabilities, true))) {
+                    return ['success' => false, 'message' => 'Deze extensie ondersteunt geen nameserverwijzigingen via de API.'];
+                }
+            } catch (Throwable $e) {
+                Log::info('TLD capabilities unavailable; attempting nameserver update directly', [
+                    'domain' => $domain->domain_name,
+                    'provider' => $provider->name(),
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 
@@ -124,10 +135,21 @@ class DomainService
         }
 
         if (! DemoDomain::is($domain->domain_name)) {
-            $capabilities = $provider->getTldCapabilities($domain->tld);
-            if (! ($capabilities['can_set_contacts'] ?? false)
-                && ! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETCONTACTS, $capabilities['capabilities'] ?? [], true)) {
-                return ['success' => false, 'message' => 'Deze extensie ondersteunt geen contactwijzigingen via de API.'];
+            try {
+                $capabilities = $provider->getTldCapabilities($domain->tld);
+                $explicitlyUnsupported = array_key_exists('can_set_contacts', $capabilities)
+                    && $capabilities['can_set_contacts'] === false;
+                $transIpCapabilities = $capabilities['capabilities'] ?? null;
+                if ($explicitlyUnsupported || (is_array($transIpCapabilities)
+                    && ! in_array(\Transip\Api\Library\Entity\Tld::CAPABILITY_CANSETCONTACTS, $transIpCapabilities, true))) {
+                    return ['success' => false, 'message' => 'Deze extensie ondersteunt geen contactwijzigingen via de API.'];
+                }
+            } catch (Throwable $e) {
+                Log::info('TLD capabilities unavailable; attempting contact update directly', [
+                    'domain' => $domain->domain_name,
+                    'provider' => $provider->name(),
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 

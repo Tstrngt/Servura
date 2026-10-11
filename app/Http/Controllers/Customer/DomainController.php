@@ -126,7 +126,13 @@ class DomainController extends Controller
 
         $nameservers = array_values($validated['nameservers']);
 
-        UpdateDomainNameservers::dispatch($domain->id, $nameservers, Auth::id());
+        try {
+            UpdateDomainNameservers::dispatch($domain->id, $nameservers, Auth::id());
+        } catch (Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'De nameservers konden niet worden bijgewerkt: '.$e->getMessage());
+        }
 
         return back()->with('info', 'Nameserverwijziging is ingepland. De status wordt bijgewerkt zodra de provider de wijziging heeft verwerkt.');
     }
