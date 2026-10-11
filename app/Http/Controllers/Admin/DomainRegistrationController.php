@@ -8,6 +8,7 @@ use App\Models\DomainRegistration;
 use App\Models\AuditLog;
 use App\Models\Invoice;
 use App\Services\DomainRegistrationService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DomainRegistrationController extends Controller
@@ -37,9 +38,15 @@ class DomainRegistrationController extends Controller
         return view('admin.domains.show', compact('domainRegistration'));
     }
 
-    public function retry(DomainRegistration $domainRegistration, DomainRegistrationService $service)
+    public function retry(Request $request, DomainRegistration $domainRegistration, DomainRegistrationService $service)
     {
         $this->authorizeOwner();
+        $validated = $request->validate([
+            'auth_code' => [$domainRegistration->type === DomainRegistration::TYPE_TRANSFER ? 'required' : 'nullable', 'string', 'max:255'],
+        ]);
+        if ($domainRegistration->type === DomainRegistration::TYPE_TRANSFER) {
+            $domainRegistration->update(['auth_code' => $validated['auth_code']]);
+        }
         abort_unless(in_array($domainRegistration->status, [
             DomainRegistration::STATUS_REGISTRATION_FAILED,
             DomainRegistration::STATUS_TRANSFER_FAILED,
