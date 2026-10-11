@@ -48,7 +48,7 @@
                         <dt class="text-slate-500">Order</dt>
                         <dd class="mt-1 font-medium text-slate-900">
                             @if($domainRegistration->order)
-                                <a href="{{ route('admin.invoices.show', $domainRegistration->order->invoice_id) }}" class="text-primary-600 hover:text-primary-800">{{ $domainRegistration->order->order_number }}</a>
+                                <a href="{{ route('admin.financial.invoices.show', $domainRegistration->order->invoice_id) }}" class="text-primary-600 hover:text-primary-800">{{ $domainRegistration->order->order_number }}</a>
                             @else
                                 -
                             @endif
