@@ -557,7 +557,7 @@ class CheckoutController extends Controller
                     ? DomainRegistration::STATUS_TRANSFER_PENDING
                     : DomainRegistration::STATUS_AWAITING_PAYMENT,
                 'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
-                'registration_price' => $item['mode'] === 'register' ? $item['price'] : null,
+                'registration_price' => $item['mode'] === 'register' ? $item['price'] : 0,
                 'transfer_price' => $item['mode'] === 'transfer' ? $item['price'] : null,
                 'renewal_price' => $this->resolveRenewalPrice($domain),
                 'auto_renew' => true,
@@ -599,7 +599,7 @@ class CheckoutController extends Controller
                 ? DomainRegistration::STATUS_TRANSFER_PENDING
                 : DomainRegistration::STATUS_AWAITING_PAYMENT,
             'provider' => BillingSetting::valueFor('domain_provider', 'transip'),
-            'registration_price' => $mode === 'register' ? $customerService->price : null,
+            'registration_price' => $mode === 'register' ? $customerService->price : 0,
             'transfer_price' => $mode === 'transfer' ? $customerService->price : null,
             'renewal_price' => $this->resolveRenewalPrice($domain),
             'auto_renew' => true,

@@ -545,6 +545,7 @@ class DomainRegistrationFlowTest extends TestCase
         $registration = DomainRegistration::where('customer_service_id', $domainServiceInstance->id)->firstOrFail();
         $this->assertSame(DomainRegistration::TYPE_TRANSFER, $registration->type);
         $this->assertSame(DomainRegistration::STATUS_TRANSFER_PENDING, $registration->status);
+        $this->assertSame(0.0, (float) $registration->registration_price);
         $this->assertSame('ABC123', $registration->auth_code);
         $this->get(route('customer.domains.index'))
             ->assertOk()
