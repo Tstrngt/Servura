@@ -127,7 +127,7 @@ class DomainController extends Controller
         $nameservers = array_values($validated['nameservers']);
 
         try {
-            UpdateDomainNameservers::dispatch($domain->id, $nameservers, Auth::id());
+            UpdateDomainNameservers::dispatchAfterResponse($domain->id, $nameservers, Auth::id());
         } catch (Throwable $e) {
             report($e);
 

@@ -71,7 +71,7 @@ class DomainService
             return ['success' => false, 'message' => 'Domeinprovider is niet geconfigureerd.'];
         }
 
-        if (! DemoDomain::is($domain->domain_name)) {
+        if (! DemoDomain::is($domain->domain_name) && $provider->name() !== 'Openprovider') {
             try {
                 $capabilities = $provider->getTldCapabilities($domain->tld);
                 $explicitlyUnsupported = array_key_exists('can_set_nameservers', $capabilities)
@@ -134,7 +134,7 @@ class DomainService
             return ['success' => false, 'message' => 'Domeinprovider is niet geconfigureerd.'];
         }
 
-        if (! DemoDomain::is($domain->domain_name)) {
+        if (! DemoDomain::is($domain->domain_name) && $provider->name() !== 'Openprovider') {
             try {
                 $capabilities = $provider->getTldCapabilities($domain->tld);
                 $explicitlyUnsupported = array_key_exists('can_set_contacts', $capabilities)
