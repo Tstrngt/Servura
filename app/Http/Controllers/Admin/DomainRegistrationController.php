@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BillingSetting;
 use App\Models\CustomerService;
 use App\Models\DomainRegistration;
 use App\Models\AuditLog;
@@ -80,9 +81,36 @@ class DomainRegistrationController extends Controller
         );
     }
 
-    public function destroy(DomainRegistration $domainRegistration)
+    public function destroy(Request $request, DomainRegistration $domainRegistration)
     {
         $this->authorizeOwner();
+
+        if ($request->boolean('local_only')) {
+            abort_unless(
+                BillingSetting::valueFor('openprovider_environment', 'sandbox') === 'sandbox'
+                    && strcasecmp((string) $domainRegistration->provider, 'Openprovider') === 0,
+                403,
+                'Alleen Openprovider-sandboxregistraties kunnen lokaal worden verwijderd.'
+            );
+            abort_if($domainRegistration->hostedCustomerService?->status === 'active', 422, 'Ontkoppel eerst de actieve hostingdienst.');
+
+            $snapshot = $domainRegistration->only(['domain_name', 'provider', 'status', 'external_id']);
+            DB::transaction(function () use ($domainRegistration) {
+                $customerService = $domainRegistration->customerService;
+
+                if ($customerService) {
+                    $this->removeUnpaidInvoiceLines($customerService);
+                    $this->removeOrderLines($customerService);
+                    $customerService->delete();
+                }
+
+                $domainRegistration->delete();
+            });
+            AuditLog::record('domain.registration.local_deleted', $domainRegistration, $snapshot, null, 'Sandboxdomein lokaal verwijderd; provider is niet gewijzigd.');
+
+            return redirect()->route('admin.domains.index')
+                ->with('success', 'Sandboxdomein is lokaal verwijderd. Openprovider is niet gewijzigd.');
+        }
 
         if (! $this->canDelete($domainRegistration)) {
             return redirect()->route('admin.domains.index')

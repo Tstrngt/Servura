@@ -59,6 +59,13 @@
                                             @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:text-red-800 font-medium">Verwijderen</button>
                                         </form>
+                                    @elseif(\App\Models\BillingSetting::valueFor('openprovider_environment', 'sandbox') === 'sandbox' && strcasecmp((string) $domain->provider, 'Openprovider') === 0)
+                                        <form action="{{ route('admin.domains.destroy', $domain) }}" method="POST" class="inline-block ml-3" onsubmit="return confirm('Dit sandboxdomein wordt alleen lokaal uit Servura verwijderd. Openprovider blijft ongewijzigd. Doorgaan?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="local_only" value="1">
+                                            <button type="submit" class="text-amber-600 hover:text-amber-800 font-medium">Lokaal verwijderen</button>
+                                        </form>
                                     @endif
                                 </td>
                             </tr>

@@ -273,6 +273,51 @@ class OpenProviderIntegrationTest extends TestCase
             && $request['records']['add'][0]['value'] === '192.0.2.2');
     }
 
+    public function test_owner_can_remove_openprovider_sandbox_domain_locally(): void
+    {
+        Http::fake();
+        $account = User::factory()->create(['role' => 'admin', 'is_active' => true]);
+        $owner = clone $account;
+        $owner->role = 'owner';
+        $domain = DomainRegistration::create([
+            'user_id' => $owner->id,
+            'domain_name' => 'sandbox-test.nl',
+            'tld' => '.nl',
+            'status' => DomainRegistration::STATUS_ACTIVE,
+            'provider' => 'Openprovider',
+            'registration_price' => 10,
+        ]);
+
+        $this->actingAs($owner)->delete(route('admin.domains.destroy', $domain), [
+            'local_only' => '1',
+        ])->assertRedirect(route('admin.domains.index'));
+
+        $this->assertDatabaseMissing('domain_registrations', ['id' => $domain->id]);
+        Http::assertNotSent(fn ($request) => $request->method() === 'DELETE');
+    }
+
+    public function test_local_domain_removal_is_blocked_outside_sandbox(): void
+    {
+        BillingSetting::setValue('openprovider_environment', 'production');
+        $account = User::factory()->create(['role' => 'admin', 'is_active' => true]);
+        $owner = clone $account;
+        $owner->role = 'owner';
+        $domain = DomainRegistration::create([
+            'user_id' => $account->id,
+            'domain_name' => 'production-test.nl',
+            'tld' => '.nl',
+            'status' => DomainRegistration::STATUS_ACTIVE,
+            'provider' => 'Openprovider',
+            'registration_price' => 10,
+        ]);
+
+        $this->actingAs($owner)->delete(route('admin.domains.destroy', $domain), [
+            'local_only' => '1',
+        ])->assertForbidden();
+
+        $this->assertDatabaseHas('domain_registrations', ['id' => $domain->id]);
+    }
+
     public function test_disabling_auto_renew_updates_domain_without_deleting_it(): void
     {
         BillingSetting::setValue('openprovider_environment', 'production');
