@@ -17,7 +17,7 @@
                 Klaar om online te groeien?
             </h1>
             <p class="text-lg md:text-xl text-white/80 leading-relaxed max-w-xl">
-                Vertel ons waar u naar op zoek bent. We nemen binnen 48 uur contact op voor een vrijblijvend gesprek.
+                Vertel ons waar u naar op zoek bent. We nemen binnen 1 werkdag contact op voor een vrijblijvend gesprek.
             </p>
         </div>
     </div>
@@ -67,7 +67,7 @@
                     <div class="relative">
                         <span class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-primary-700 mb-4">Direct contact</span>
                         <h2 class="font-heading text-3xl font-bold text-slate-900 mb-2">Stuur ons een bericht</h2>
-                        <p class="text-slate-500 mb-8">Vul het formulier in en we nemen binnen 48 uur contact op.</p>
+                        <p class="text-slate-500 mb-8">Vul het formulier in en we nemen binnen 1 werkdag contact op.</p>
 
                         <form action="{{ route('contact.store') }}" method="POST">
                             @csrf
@@ -149,22 +149,24 @@
 
             <!-- Info cards -->
             <div class="lg:col-span-5 xl:col-span-4 space-y-6">
-                <div class="group bg-white rounded-2xl p-6 ring-1 ring-slate-200 shadow-lg shadow-slate-900/5 hover:-translate-y-1 transition-all duration-300">
-                    <span class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100 text-primary-600 mb-4 group-hover:bg-primary-600 group-hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
-                    </span>
-                    <h3 class="font-heading font-semibold text-slate-900 mb-1">Telefoon</h3>
-                    <a href="tel:0612345678" class="text-primary-600 hover:text-primary-700 font-medium">06 123 456 78</a>
-                    <p class="text-sm text-slate-500 mt-1">Maandag t/m vrijdag, 9:00 - 17:00</p>
-                </div>
+                @if($contactPhone)
+                    <div class="group bg-white rounded-2xl p-6 ring-1 ring-slate-200 shadow-lg shadow-slate-900/5 hover:-translate-y-1 transition-all duration-300">
+                        <span class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100 text-primary-600 mb-4 group-hover:bg-primary-600 group-hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+                        </span>
+                        <h3 class="font-heading font-semibold text-slate-900 mb-1">Telefoon</h3>
+                        <a href="tel:{{ preg_replace('/[^+\d]/', '', $contactPhone) }}" class="text-primary-600 hover:text-primary-700 font-medium">{{ $contactPhone }}</a>
+                        <p class="text-sm text-slate-500 mt-1">Maandag t/m vrijdag, 9:00 - 17:00</p>
+                    </div>
+                @endif
 
                 <div class="group bg-white rounded-2xl p-6 ring-1 ring-slate-200 shadow-lg shadow-slate-900/5 hover:-translate-y-1 transition-all duration-300">
                     <span class="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent-100 text-accent-600 mb-4 group-hover:bg-accent-600 group-hover:text-white transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25H4.5a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15A2.25 2.25 0 002.25 6.75m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
                     </span>
                     <h3 class="font-heading font-semibold text-slate-900 mb-1">E-mail</h3>
-                    <a href="mailto:info@servura.nl" class="text-primary-600 hover:text-primary-700 font-medium">info@servura.nl</a>
-                    <p class="text-sm text-slate-500 mt-1">Binnen 48 uur reactie</p>
+                    <a href="mailto:{{ $contactEmail }}" class="text-primary-600 hover:text-primary-700 font-medium">{{ $contactEmail }}</a>
+                    <p class="text-sm text-slate-500 mt-1">Binnen 1 werkdag reactie</p>
                 </div>
 
                 <div class="group bg-white rounded-2xl p-6 ring-1 ring-slate-200 shadow-lg shadow-slate-900/5 hover:-translate-y-1 transition-all duration-300">
@@ -172,7 +174,7 @@
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </span>
                     <h3 class="font-heading font-semibold text-slate-900 mb-1">Reactietijd</h3>
-                    <p class="text-slate-700 font-medium">Binnen 48 uur</p>
+                    <p class="text-slate-700 font-medium">Binnen 1 werkdag</p>
                     <p class="text-sm text-slate-500 mt-1">Spoed? Bel ons direct</p>
                 </div>
 

@@ -13,7 +13,10 @@ class ContactController extends Controller
 {
     public function index()
     {
-        return view('contact');
+        return view('contact', [
+            'contactPhone' => config('company.phone'),
+            'contactEmail' => config('company.email'),
+        ]);
     }
 
     public function store(Request $request)

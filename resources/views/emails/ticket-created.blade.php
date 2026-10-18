@@ -4,7 +4,7 @@
 
 @section('content')
 <p>Hallo {{ $user->name }},</p>
-<p>We hebben uw aanvraag ontvangen. Binnen 48 uur nemen we contact met u op.</p>
+<p>We hebben uw aanvraag ontvangen. Binnen 1 werkdag nemen we contact met u op.</p>
 
 <div class="box">
     <strong>Ticketnummer:</strong> {{ $ticket->ticket_number }}<br>

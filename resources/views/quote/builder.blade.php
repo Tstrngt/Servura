@@ -36,7 +36,7 @@ $pageHelp = "Het aantal inbegrepen pagina's hangt af van uw pakket. Extra pagina
                 Offerte samenstellen
             </h1>
             <p class="text-lg md:text-xl text-white/80 leading-relaxed max-w-xl">
-                Geef uw wensen door en ontdek binnen 48 uur wat wij voor u kunnen betekenen. Geen verplichtingen.
+                Geef uw wensen door en ontdek binnen 1 werkdag wat wij voor u kunnen betekenen. Geen verplichtingen.
             </p>
         </div>
     </div>
@@ -56,7 +56,7 @@ $pageHelp = "Het aantal inbegrepen pagina's hangt af van uw pakket. Extra pagina
                     </svg>
                     <div>
                         <h3 class="font-heading font-semibold text-emerald-800">Bedankt voor uw aanvraag</h3>
-                        <p class="text-emerald-700 mt-1">We hebben uw offerte-aanvraag ontvangen en nemen binnen 48 uur contact met u op.</p>
+                        <p class="text-emerald-700 mt-1">We hebben uw offerte-aanvraag ontvangen en nemen binnen 1 werkdag contact met u op.</p>
                     </div>
                 </div>
             </div>
