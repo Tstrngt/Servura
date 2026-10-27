@@ -79,12 +79,13 @@ document.addEventListener('DOMContentLoaded', function() {
     var lineCount = 0;
     var container = document.getElementById('invoice-lines');
 
-    function createLine(description, quantity, unitPrice, vatRate, discount, reference, periodStart, periodEnd) {
+    function createLine(description, quantity, unitPrice, vatRate, discount, reference, periodStart, periodEnd, customerServiceId) {
         var i = lineCount++;
         var row = document.createElement('div');
         row.className = 'grid grid-cols-12 gap-3 mb-4 items-end rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200';
         row.id = 'line-' + i;
         row.innerHTML =
+            (customerServiceId ? '<input type="hidden" name="lines[' + i + '][customer_service_id]" value="' + customerServiceId + '">' : '') +
             '<div class="col-span-5"><input type="text" name="lines[' + i + '][description]" class="form-input w-full text-sm" value="' + (description || '').replace(/"/g, '&quot;') + '" required></div>' +
             '<div class="col-span-1"><input type="number" name="lines[' + i + '][quantity]" class="form-input w-full text-sm line-qty" value="' + (quantity || 1) + '" min="1" required></div>' +
             '<div class="col-span-2"><input type="number" name="lines[' + i + '][unit_price]" class="form-input w-full text-sm line-price" value="' + (unitPrice || 0) + '" step="0.01" {{ $invoice->document_type === 'credit' ? 'max="0"' : 'min="0"' }} required></div>' +
@@ -122,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
     container.addEventListener('input', function(e) { if (e.target.matches('.line-qty, .line-price, .line-vat, .line-discount')) recalc(); });
 
     @foreach($invoice->lines as $line)
-    createLine(@json($line->description), {{ $line->quantity }}, {{ $line->unit_price }}, {{ $line->vat_percentage ?? $invoice->vat_percentage }}, {{ $line->discount_amount ?? 0 }}, @json($line->service_reference), @json($line->period_start?->format('Y-m-d')), @json($line->period_end?->format('Y-m-d')));
+    createLine(@json($line->description), {{ $line->quantity }}, {{ $line->unit_price }}, {{ $line->vat_percentage ?? $invoice->vat_percentage }}, {{ $line->discount_amount ?? 0 }}, @json($line->service_reference), @json($line->period_start?->format('Y-m-d')), @json($line->period_end?->format('Y-m-d')), @json($line->customer_service_id));
     @endforeach
 });
 </script>

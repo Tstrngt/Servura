@@ -34,8 +34,11 @@ class DomainRegistrationController extends Controller
         $this->authorizeOwner();
 
         $domainRegistration->load(['user', 'order', 'customerService']);
+        $canRetry = in_array($domainRegistration->status, DomainRegistration::RETRYABLE_STATUSES, true)
+            && $domainRegistration->customerService
+            && $this->isSettled($domainRegistration);
 
-        return view('admin.domains.show', compact('domainRegistration'));
+        return view('admin.domains.show', compact('domainRegistration', 'canRetry'));
     }
 
     public function retry(Request $request, DomainRegistration $domainRegistration, DomainRegistrationService $service)
@@ -47,20 +50,9 @@ class DomainRegistrationController extends Controller
         if ($domainRegistration->type === DomainRegistration::TYPE_TRANSFER) {
             $domainRegistration->update(['auth_code' => $validated['auth_code']]);
         }
-        abort_unless(in_array($domainRegistration->status, [
-            DomainRegistration::STATUS_REGISTRATION_FAILED,
-            DomainRegistration::STATUS_TRANSFER_FAILED,
-        ], true), 422);
+        abort_unless(in_array($domainRegistration->status, DomainRegistration::RETRYABLE_STATUSES, true), 422);
 
-        $domainRegistration->loadMissing(['customerService.invoices.transactions', 'order.invoice.transactions']);
-        $invoice = $domainRegistration->order?->invoice
-            ?? $domainRegistration->customerService?->invoices->sortByDesc('created_at')->first();
-        $isSettled = $invoice && (
-            $invoice->status === 'betaald'
-            || $invoice->paid_at !== null
-            || $invoice->outstanding_amount <= 0.005
-        );
-        abort_unless($isSettled, 422, 'Alleen een betaalde registratie kan opnieuw worden geprobeerd.');
+        abort_unless($this->isSettled($domainRegistration), 422, 'Alleen een betaalde registratie kan opnieuw worden geprobeerd.');
         abort_unless($domainRegistration->customerService, 422, 'Gekoppelde dienst ontbreekt.');
 
         $result = $domainRegistration->type === DomainRegistration::TYPE_TRANSFER
@@ -135,6 +127,19 @@ class DomainRegistrationController extends Controller
 
         return redirect()->route('admin.domains.index')
             ->with('success', 'Domeinregistratie is verwijderd.');
+    }
+
+    private function isSettled(DomainRegistration $domainRegistration): bool
+    {
+        $domainRegistration->loadMissing(['customerService.invoices.transactions', 'order.invoice.transactions']);
+        $invoice = $domainRegistration->order?->invoice
+            ?? $domainRegistration->customerService?->invoices->sortByDesc('created_at')->first();
+
+        return $invoice && (
+            $invoice->status === 'betaald'
+            || $invoice->paid_at !== null
+            || $invoice->outstanding_amount <= 0.005
+        );
     }
 
     private function canDelete(DomainRegistration $domainRegistration): bool
