@@ -89,16 +89,22 @@
                     <div class="mt-6 rounded-lg bg-red-50 p-4 ring-1 ring-red-200">
                         <h3 class="text-sm font-semibold text-red-800">Providerfout</h3>
                         <p class="mt-1 text-sm text-red-700">{{ $domainRegistration->error_message }}</p>
-                        @if(in_array($domainRegistration->status, [\App\Models\DomainRegistration::STATUS_REGISTRATION_FAILED, \App\Models\DomainRegistration::STATUS_TRANSFER_FAILED], true))
-                            <form method="POST" action="{{ route('admin.domains.retry', $domainRegistration) }}" class="mt-4 space-y-3" onsubmit="return confirm('De reeds betaalde domeinactie opnieuw bij de provider uitvoeren?')">
-                                @csrf
-                                @if($domainRegistration->type === \App\Models\DomainRegistration::TYPE_TRANSFER)
-                                    <div><label for="retry_auth_code" class="form-label text-red-900">Nieuwe verhuiscode</label><input id="retry_auth_code" name="auth_code" type="text" required autocomplete="off" class="form-input mt-1 max-w-md" value="{{ old('auth_code') }}"><p class="mt-1 text-xs text-red-700">Vraag een actuele verhuiscode op bij de huidige registrar. De bestaande code wordt veilig vervangen.</p></div>
-                                @endif
-                                <button type="submit" class="btn btn-primary text-sm">Opnieuw proberen</button>
-                            </form>
-                        @endif
                     </div>
+                @elseif($canRetry)
+                    <div class="mt-6 rounded-lg bg-amber-50 p-4 ring-1 ring-amber-200">
+                        <h3 class="text-sm font-semibold text-amber-800">Betaald, nog niet bij provider</h3>
+                        <p class="mt-1 text-sm text-amber-700">De factuur is betaald, maar de domeinactie is nog niet bij de provider uitgevoerd.</p>
+                    </div>
+                @endif
+
+                @if($canRetry)
+                    <form method="POST" action="{{ route('admin.domains.retry', $domainRegistration) }}" class="mt-4 space-y-3" onsubmit="return confirm('De reeds betaalde domeinactie (opnieuw) bij de provider uitvoeren?')">
+                        @csrf
+                        @if($domainRegistration->type === \App\Models\DomainRegistration::TYPE_TRANSFER)
+                            <div><label for="retry_auth_code" class="form-label">Nieuwe verhuiscode</label><input id="retry_auth_code" name="auth_code" type="text" required autocomplete="off" class="form-input mt-1 max-w-md" value="{{ old('auth_code') }}"><p class="mt-1 text-xs text-slate-500">Vraag een actuele verhuiscode op bij de huidige registrar. De bestaande code wordt veilig vervangen.</p></div>
+                        @endif
+                        <button type="submit" class="btn btn-primary text-sm">{{ in_array($domainRegistration->status, [\App\Models\DomainRegistration::STATUS_REGISTRATION_FAILED, \App\Models\DomainRegistration::STATUS_TRANSFER_FAILED], true) ? 'Opnieuw proberen' : 'Nu bij provider uitvoeren' }}</button>
+                    </form>
                 @endif
             </div>
 

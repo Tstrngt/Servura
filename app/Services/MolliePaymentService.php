@@ -303,9 +303,15 @@ class MolliePaymentService
 
     public function finalizePaidInvoice(Invoice $invoice): void
     {
+        $orderServiceIds = Order::where('invoice_id', $invoice->id)
+            ->with('lines')
+            ->get()
+            ->flatMap(fn (Order $order) => $order->lines->pluck('customer_service_id')->push($order->customer_service_id));
+
         $serviceIds = $invoice->lines()
             ->whereNotNull('customer_service_id')
             ->pluck('customer_service_id')
+            ->merge($orderServiceIds)
             ->push($invoice->customer_service_id)
             ->filter()
             ->unique();
@@ -419,7 +425,14 @@ class MolliePaymentService
         DB::transaction(function () use ($invoiceId, $payment, $paymentId) {
             $invoice = Invoice::query()->lockForUpdate()->findOrFail($invoiceId);
             if ($invoice->mollie_payment_id !== $paymentId) {
-                throw new \RuntimeException('Mollie betaling hoort niet bij deze factuur.');
+                if (! $this->paymentWasStartedForInvoice($invoice, $paymentId)) {
+                    throw new \RuntimeException('Mollie betaling hoort niet bij deze factuur.');
+                }
+
+                // A newer payment replaced this one; only a late successful payment still counts.
+                if (! $payment->isPaid()) {
+                    return;
+                }
             }
 
             if ($payment->isPaid()) {
@@ -433,10 +446,11 @@ class MolliePaymentService
                     'payment_method' => $payment->method ?? 'mollie', 'status' => 'voltooid',
                     'description' => "Betaling factuur {$invoice->invoice_number}", 'transaction_date' => now(), 'reference' => $paymentId,
                 ]);
+                $wasPaid = $invoice->status === 'betaald';
                 $totalPaid = (float) $invoice->transactions()->where('status', 'voltooid')->where('type', 'inkomst')->sum('amount');
-                $isPaid = $totalPaid >= (float) $invoice->total;
-                $invoice->update(['status' => $isPaid ? 'betaald' : 'verzonden', 'paid_at' => $isPaid ? now() : null]);
-                if ($isPaid) {
+                $isPaid = $wasPaid || $totalPaid >= (float) $invoice->total;
+                $invoice->update(['status' => $isPaid ? 'betaald' : 'verzonden', 'paid_at' => $isPaid ? ($invoice->paid_at ?? now()) : null]);
+                if ($isPaid && ! $wasPaid) {
                     $this->finalizePaidInvoice($invoice);
                 }
                 TransactionLog::create([
@@ -456,6 +470,15 @@ class MolliePaymentService
                 ]);
             }
         });
+    }
+
+    private function paymentWasStartedForInvoice(Invoice $invoice, string $paymentId): bool
+    {
+        return TransactionLog::where('loggable_type', Invoice::class)
+            ->where('loggable_id', $invoice->id)
+            ->where('action', 'betaling_gestart')
+            ->where('metadata->mollie_payment_id', $paymentId)
+            ->exists();
     }
 
     /**
