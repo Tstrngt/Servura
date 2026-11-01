@@ -85,10 +85,19 @@ $docsRoutes = function (string $namePrefix) {
         ->name($namePrefix.'show');
 };
 
-Route::domain('docs.'.parse_url((string) config('app.url'), PHP_URL_HOST))
-    ->group(fn () => $docsRoutes('docs.'));
+// Wildcard-subdomain zodat docs.* werkt ongeacht de exacte APP_URL-host
+// (de {domain}-parameter wordt bewust genegeerd).
+Route::domain('docs.{domain}')->where(['domain' => '.+'])->group(function () {
+    Route::get('/', fn () => app(DocsController::class)->index());
+    Route::get('/zoeken', fn (Request $request) => app(DocsController::class)->search($request));
+    Route::get('/{category}', fn ($domain, $category) => app(DocsController::class)->category($category))
+        ->where('category', '[a-z0-9-]+');
+    Route::get('/{category}/{page}', fn ($domain, $category, $page) => app(DocsController::class)->show($category, $page))
+        ->where(['category' => '[a-z0-9-]+', 'page' => '[a-z0-9-]+']);
+});
+
 Route::prefix('docs')
-    ->group(fn () => $docsRoutes('docs.fallback.'));
+    ->group(fn () => $docsRoutes('docs.'));
 
 // Contact
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
