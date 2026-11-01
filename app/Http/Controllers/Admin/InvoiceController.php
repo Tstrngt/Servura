@@ -13,6 +13,12 @@ use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
+    /**
+     * Statussen waarin een factuur nog aangepast mag worden.
+     * Niet bewerkbaar: betaald, gecrediteerd, geannuleerd of met een lopende betaling.
+     */
+    private const EDITABLE_STATUSES = ['concept', 'verzonden', 'openstaand', 'vervallen', 'te_laat'];
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -77,7 +83,7 @@ class InvoiceController extends Controller
     public function edit(Invoice $invoice)
     {
         $this->authorize('invoices.drafts.manage');
-        abort_unless($invoice->status === 'concept', 422, 'Alleen conceptfacturen kunnen worden bewerkt. Maak voor een uitgegeven factuur een creditfactuur.');
+        abort_unless(in_array($invoice->status, self::EDITABLE_STATUSES, true), 422, 'Deze factuur kan niet worden bewerkt (betaald, gecrediteerd, geannuleerd of betaling in behandeling). Maak eventueel een creditfactuur.');
         $invoice->load('lines');
         $customers = User::customers()->orderBy('name')->get();
 
@@ -87,7 +93,7 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice, InvoiceService $invoiceService)
     {
         $this->authorize('invoices.drafts.manage');
-        abort_unless($invoice->status === 'concept', 422, 'Alleen conceptfacturen kunnen worden bewerkt.');
+        abort_unless(in_array($invoice->status, self::EDITABLE_STATUSES, true), 422, 'Deze factuur kan niet worden bewerkt (betaald, gecrediteerd, geannuleerd of betaling in behandeling).');
         $request->validate([
             'notes' => 'nullable|string',
             'internal_notes' => 'nullable|string',
@@ -100,6 +106,7 @@ class InvoiceController extends Controller
             'lines.*.period_start' => 'nullable|date',
             'lines.*.period_end' => 'nullable|date|after_or_equal:lines.*.period_start',
             'lines.*.service_reference' => 'nullable|string|max:255',
+            'lines.*.customer_service_id' => 'nullable|integer|exists:customer_services,id',
         ]);
 
         // Delete old lines and re-create
@@ -116,6 +123,7 @@ class InvoiceController extends Controller
                 'period_start' => $line['period_start'] ?? null,
                 'period_end' => $line['period_end'] ?? null,
                 'service_reference' => $line['service_reference'] ?? null,
+                'customer_service_id' => $line['customer_service_id'] ?? null,
                 'sort_order' => $i,
             ]);
         }

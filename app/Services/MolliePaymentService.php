@@ -310,6 +310,22 @@ class MolliePaymentService
             ->filter()
             ->unique();
 
+        // Fallback voor regels zonder gekoppelde dienst (bijv. na handmatig bewerken
+        // van de factuur): koppel via het domein in de servicereferentie.
+        $references = $invoice->lines()
+            ->whereNull('customer_service_id')
+            ->whereNotNull('service_reference')
+            ->pluck('service_reference')
+            ->filter();
+
+        if ($references->isNotEmpty()) {
+            $serviceIds = $serviceIds->merge(
+                CustomerService::where('user_id', $invoice->user_id)
+                    ->whereIn('domain', $references)
+                    ->pluck('id')
+            )->unique();
+        }
+
         foreach (CustomerService::whereIn('id', $serviceIds)->get() as $customerService) {
             $this->finalizeCustomerService($invoice, $customerService);
         }

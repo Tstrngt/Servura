@@ -82,10 +82,20 @@ class InvoiceController extends Controller
         return redirect($checkoutUrl);
     }
 
-    public function paymentReturn(Invoice $invoice)
+    public function paymentReturn(Invoice $invoice, MolliePaymentService $mollieService)
     {
         if ($invoice->user_id !== Auth::id()) {
             abort(403);
+        }
+
+        // De webhook kan iets later binnenkomen dan de redirect van Mollie.
+        // Controleer daarom direct de actuele betaalstatus bij Mollie.
+        if ($invoice->mollie_payment_id && $invoice->status !== 'betaald') {
+            try {
+                $mollieService->handleWebhook($invoice->mollie_payment_id);
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
         }
 
         $invoice->refresh();
