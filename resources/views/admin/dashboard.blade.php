@@ -190,83 +190,6 @@
             </div>
         </div>
 
-        <!-- Revenue Stats -->
-        <div class="px-4 py-6 sm:px-0">
-            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Maandelijkse Omzet
-                                    </dt>
-                                    <dd class="text-lg font-medium text-gray-900">
-                                        €{{ number_format($stats['monthly_revenue'], 2, ',', '.') }}
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-indigo-500 rounded-md flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Jaarlijkse Omzet
-                                    </dt>
-                                    <dd class="text-lg font-medium text-gray-900">
-                                        €{{ number_format($stats['yearly_revenue'], 2, ',', '.') }}
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-pink-500 rounded-md flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Ongelezen Berichten
-                                    </dt>
-                                    <dd class="text-lg font-medium text-gray-900">
-                                        {{ $stats['unread_messages'] }}
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Revenue Charts -->
         <div class="px-4 py-6 sm:px-0">
             @php
@@ -283,9 +206,9 @@
                     <div class="px-4 py-5 sm:p-6">
                         <div class="flex items-center justify-between mb-1">
                             <h3 class="text-lg leading-6 font-medium text-gray-900">Omzet laatste 30 dagen</h3>
-                            <span class="text-lg font-semibold text-gray-900">€{{ number_format($stats['revenue_this_month'], 2, ',', '.') }}</span>
+                            <span class="text-lg font-semibold text-gray-900">€{{ number_format($dailyRevenue->sum('total'), 2, ',', '.') }}</span>
                         </div>
-                        <p class="text-xs text-gray-400 mb-4">Totaal deze maand</p>
+                        <p class="text-xs text-gray-400 mb-4">Totaal laatste 30 dagen</p>
                         <svg viewBox="0 0 600 140" class="w-full h-40" preserveAspectRatio="none" role="img" aria-label="Omzetgrafiek laatste 30 dagen">
                             <polygon fill="rgba(99,102,241,0.12)" points="10,135 {{ $dailyPoints }} 590,135"></polygon>
                             <polyline fill="none" stroke="#6366f1" stroke-width="2" points="{{ $dailyPoints }}"></polyline>
@@ -311,10 +234,10 @@
                                     $x = 15 + $i * 47.5;
                                     $y = 140 - $barHeight;
                                 @endphp
-                                <rect x="{{ $x }}" y="{{ $y }}" width="32" height="{{ max($barHeight, 1) }}" rx="4" class="{{ $i + 1 === (int) now()->month ? 'fill-indigo-500' : 'fill-indigo-200' }}">
+                                <rect x="{{ $x }}" y="{{ $y }}" width="32" height="{{ max($barHeight, 1) }}" rx="4" fill="{{ $i + 1 === (int) now()->month ? '#6366f1' : '#c7d2fe' }}">
                                     <title>{{ $month['label'] }}: €{{ number_format($month['total'], 2, ',', '.') }}</title>
                                 </rect>
-                                <text x="{{ $x + 16 }}" y="158" text-anchor="middle" class="fill-gray-400" font-size="11">{{ $month['label'] }}</text>
+                                <text x="{{ $x + 16 }}" y="158" text-anchor="middle" fill="#9ca3af" font-size="11">{{ $month['label'] }}</text>
                             @endforeach
                         </svg>
                     </div>
