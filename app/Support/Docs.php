@@ -1,0 +1,184 @@
+<?php
+
+namespace App\Support;
+
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
+use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
+use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
+use League\CommonMark\MarkdownConverter;
+use Symfony\Component\Yaml\Yaml;
+use Illuminate\Support\Str;
+use Throwable;
+
+/**
+ * Markdown-gebaseerd documentatieplatform.
+ *
+ * Structuur:
+ *   resources/docs/{categorie}/_category.json   {"title","description","order","icon"}
+ *   resources/docs/{categorie}/{pagina}.md      YAML front matter: title, description, order
+ */
+class Docs
+{
+    public static function basePath(): string
+    {
+        return resource_path('docs');
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public static function categories(): array
+    {
+        $categories = [];
+
+        foreach (glob(self::basePath().'/*', GLOB_ONLYDIR) ?: [] as $dir) {
+            $slug = basename($dir);
+            $meta = [];
+            $metaFile = $dir.DIRECTORY_SEPARATOR.'_category.json';
+            if (is_file($metaFile)) {
+                $meta = json_decode((string) file_get_contents($metaFile), true) ?: [];
+            }
+
+            $categories[] = [
+                'slug' => $slug,
+                'title' => $meta['title'] ?? Str::headline(str_replace('-', ' ', $slug)),
+                'description' => $meta['description'] ?? '',
+                'order' => (int) ($meta['order'] ?? 100),
+                'pages' => self::pages($slug),
+            ];
+        }
+
+        usort($categories, fn ($a, $b) => [$a['order'], $a['title']] <=> [$b['order'], $b['title']]);
+
+        return $categories;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public static function pages(string $category): array
+    {
+        $pages = [];
+
+        foreach (glob(self::basePath().'/'.$category.'/*.md') ?: [] as $file) {
+            [$meta] = self::parse((string) file_get_contents($file));
+
+            $pages[] = [
+                'slug' => basename($file, '.md'),
+                'title' => $meta['title'] ?? Str::headline(basename($file, '.md')),
+                'description' => $meta['description'] ?? '',
+                'order' => (int) ($meta['order'] ?? 100),
+            ];
+        }
+
+        usort($pages, fn ($a, $b) => [$a['order'], $a['title']] <=> [$b['order'], $b['title']]);
+
+        return $pages;
+    }
+
+    public static function page(string $category, string $page): ?array
+    {
+        if (! preg_match('/^[a-z0-9-]+$/', $category) || ! preg_match('/^[a-z0-9-]+$/', $page)) {
+            return null;
+        }
+
+        $file = self::basePath().'/'.$category.'/'.$page.'.md';
+        if (! is_file($file)) {
+            return null;
+        }
+
+        [$meta, $body] = self::parse((string) file_get_contents($file));
+        $html = self::converter()->convert($body)->getContent();
+
+        return [
+            'slug' => $page,
+            'category' => $category,
+            'title' => $meta['title'] ?? Str::headline($page),
+            'description' => $meta['description'] ?? '',
+            'html' => $html,
+            'toc' => self::toc($html),
+        ];
+    }
+
+    /**
+     * URL naar een documentatiepagina. Op docs.servura.nl is de basis de root,
+     * op het hoofddomein valt alles onder /docs.
+     */
+    public static function url(string $category = '', string $page = ''): string
+    {
+        $base = str_starts_with((string) request()->getHost(), 'docs.') ? '' : '/docs';
+
+        return $base.($category === '' ? '' : '/'.$category).($page === '' ? '' : '/'.$page);
+    }
+
+    /**
+     * Splits YAML front matter van de markdown body.
+     *
+     * @return array{0: array<string, mixed>, 1: string}
+     */
+    private static function parse(string $raw): array
+    {
+        $meta = [];
+        $body = $raw;
+
+        if (preg_match('/\A---\s*\r?\n(.*?)\r?\n---\s*\r?\n?/s', $raw, $m)) {
+            try {
+                $meta = Yaml::parse($m[1]) ?: [];
+            } catch (Throwable $e) {
+                $meta = [];
+            }
+            $body = substr($raw, strlen($m[0]));
+        }
+
+        if (empty($meta['title']) && preg_match('/^#\s+(.+)$/m', $body, $m)) {
+            $meta['title'] = trim($m[1]);
+        }
+
+        return [$meta, $body];
+    }
+
+    private static function converter(): MarkdownConverter
+    {
+        $environment = new Environment([
+            'heading_permalink' => [
+                'html_class' => 'heading-anchor',
+                'insert' => 'before',
+                'id_prefix' => '',
+                'fragment_prefix' => '',
+                'symbol' => '',
+            ],
+        ]);
+        $environment->addExtension(new CommonMarkCoreExtension());
+        $environment->addExtension(new GithubFlavoredMarkdownExtension());
+        $environment->addExtension(new HeadingPermalinkExtension());
+
+        return new MarkdownConverter($environment);
+    }
+
+    /**
+     * Bouw een inhoudsopgave op uit de h2/h3-koppen in de gerenderde HTML,
+     * zodat de ankers exact overeenkomen met de door CommonMark gezette id's.
+     *
+     * @return array<int, array{level: int, id: string, title: string}>
+     */
+    private static function toc(string $html): array
+    {
+        preg_match_all('/<h([23])[^>]*>(.*?)<\/h\1>/is', $html, $m, PREG_SET_ORDER);
+
+        $toc = [];
+        foreach ($m as $h) {
+            // Het anker-id zit op een inner <a id="..."> van de heading-permalink.
+            if (! preg_match('/id="([^"]+)"/', $h[2], $idMatch)) {
+                continue;
+            }
+            $toc[] = [
+                'level' => (int) $h[1],
+                'id' => $idMatch[1],
+                'title' => trim(strip_tags($h[2])),
+            ];
+        }
+
+        return $toc;
+    }
+}

@@ -27,6 +27,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\DocsController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboard;
 use App\Http\Controllers\Customer\DomainController as CustomerDomainController;
 use App\Http\Controllers\Customer\InvoiceController as CustomerInvoiceController;
@@ -71,6 +72,17 @@ Route::post('/bestellen/cart/hosting', [CheckoutController::class, 'addHosting']
 Route::post('/bestellen/cart/domain', [CheckoutController::class, 'setDomain'])->name('checkout.cart.set-domain');
 Route::post('/bestellen/cart/price', [CheckoutController::class, 'setPrice'])->name('checkout.cart.set-price');
 Route::post('/bestellen/cart/remove', [CheckoutController::class, 'removeItem'])->name('checkout.cart.remove');
+
+// Documentatieplatform: primair op docs.servura.nl, met /docs als pad-fallback
+$docsRoutes = function () {
+    Route::get('/', [DocsController::class, 'index'])->name('docs.index');
+    Route::get('/{category}/{page}', [DocsController::class, 'show'])
+        ->where(['category' => '[a-z0-9-]+', 'page' => '[a-z0-9-]+'])
+        ->name('docs.show');
+};
+
+Route::domain('docs.'.parse_url((string) config('app.url'), PHP_URL_HOST))->group($docsRoutes);
+Route::prefix('docs')->group($docsRoutes);
 
 // Contact
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
