@@ -56,6 +56,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Documentatieplatform op docs.servura.nl — moet VOOR de publieke routes
+// staan, anders wint de ongeconstraintde '/'-route het op het subdomein.
+foreach (['docs.servura.nl', 'docs.{domain}'] as $docsDomain) {
+    Route::domain($docsDomain)->group(function () {
+        Route::get('/', fn () => app(DocsController::class)->index());
+        Route::get('/zoeken', fn (Request $request) => app(DocsController::class)->search($request));
+        Route::get('/{category}', function (...$params) {
+            return app(DocsController::class)->category(end($params));
+        })->where('category', '[a-z0-9-]+');
+        Route::get('/{category}/{page}', function (...$params) {
+            $page = array_pop($params);
+            $category = array_pop($params);
+
+            return app(DocsController::class)->show($category, $page);
+        })->where(['category' => '[a-z0-9-]+', 'page' => '[a-z0-9-]+']);
+    });
+}
+
 // Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -73,7 +91,7 @@ Route::post('/bestellen/cart/domain', [CheckoutController::class, 'setDomain'])-
 Route::post('/bestellen/cart/price', [CheckoutController::class, 'setPrice'])->name('checkout.cart.set-price');
 Route::post('/bestellen/cart/remove', [CheckoutController::class, 'removeItem'])->name('checkout.cart.remove');
 
-// Documentatieplatform: primair op docs.servura.nl, met /docs als pad-fallback
+// Documentatieplatform: /docs als pad-fallback op het hoofddomein
 $docsRoutes = function (string $namePrefix) {
     Route::get('/', [DocsController::class, 'index'])->name($namePrefix.'index');
     Route::get('/zoeken', [DocsController::class, 'search'])->name($namePrefix.'search');
@@ -84,17 +102,6 @@ $docsRoutes = function (string $namePrefix) {
         ->where(['category' => '[a-z0-9-]+', 'page' => '[a-z0-9-]+'])
         ->name($namePrefix.'show');
 };
-
-// Wildcard-subdomain zodat docs.* werkt ongeacht de exacte APP_URL-host
-// (de {domain}-parameter wordt bewust genegeerd).
-Route::domain('docs.{domain}')->where(['domain' => '.+'])->group(function () {
-    Route::get('/', fn () => app(DocsController::class)->index());
-    Route::get('/zoeken', fn (Request $request) => app(DocsController::class)->search($request));
-    Route::get('/{category}', fn ($domain, $category) => app(DocsController::class)->category($category))
-        ->where('category', '[a-z0-9-]+');
-    Route::get('/{category}/{page}', fn ($domain, $category, $page) => app(DocsController::class)->show($category, $page))
-        ->where(['category' => '[a-z0-9-]+', 'page' => '[a-z0-9-]+']);
-});
 
 Route::prefix('docs')
     ->group(fn () => $docsRoutes('docs.'));
