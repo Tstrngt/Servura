@@ -204,7 +204,7 @@ class Docs
         // Leid het hoofddomein af van de huidige host (docs.x → x); anders APP_URL.
         $host = (string) request()->getHost();
         $base = str_starts_with($host, 'docs.')
-            ? $request->getScheme().'://'.substr($host, 5)
+            ? request()->getScheme().'://'.substr($host, 5)
             : rtrim((string) config('app.url'), '/');
 
         return $base.route($routeName, $parameters, false);
