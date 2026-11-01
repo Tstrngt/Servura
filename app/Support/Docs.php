@@ -69,6 +69,8 @@ class Docs
                 'title' => $meta['title'] ?? Str::headline(basename($file, '.md')),
                 'description' => $meta['description'] ?? '',
                 'order' => (int) ($meta['order'] ?? 100),
+                'draft' => (bool) ($meta['draft'] ?? false),
+                'featured' => (bool) ($meta['featured'] ?? false),
             ];
         }
 
@@ -96,9 +98,90 @@ class Docs
             'category' => $category,
             'title' => $meta['title'] ?? Str::headline($page),
             'description' => $meta['description'] ?? '',
+            'draft' => (bool) ($meta['draft'] ?? false),
+            'last_reviewed' => $meta['last_reviewed'] ?? null,
             'html' => $html,
             'toc' => self::toc($html),
+            'related' => self::related($category, $meta['related'] ?? []),
         ];
+    }
+
+    /**
+     * Zoek in titels, omschrijvingen, zoekwoorden en artikelinhoud.
+     * Hoofdletterongevoelig; geeft lege lijst bij een lege query.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function search(string $query): array
+    {
+        $query = mb_strtolower(trim($query));
+        if ($query === '') {
+            return [];
+        }
+
+        $terms = array_filter(preg_split('/\s+/u', $query));
+        $results = [];
+
+        foreach (self::categories() as $category) {
+            foreach (glob(self::basePath().'/'.$category['slug'].'/*.md') ?: [] as $file) {
+                [$meta, $body] = self::parse((string) file_get_contents($file));
+
+                $haystack = mb_strtolower(implode("\n", [
+                    $meta['title'] ?? '',
+                    $meta['description'] ?? '',
+                    implode(' ', (array) ($meta['keywords'] ?? [])),
+                    $body,
+                ]));
+
+                $matched = array_filter($terms, fn ($term) => str_contains($haystack, $term));
+                if (empty($matched)) {
+                    continue;
+                }
+
+                $results[] = [
+                    'category' => $category['slug'],
+                    'category_title' => $category['title'],
+                    'slug' => basename($file, '.md'),
+                    'title' => $meta['title'] ?? Str::headline(basename($file, '.md')),
+                    'description' => $meta['description'] ?? '',
+                    'draft' => (bool) ($meta['draft'] ?? false),
+                    'score' => count($matched),
+                ];
+            }
+        }
+
+        usort($results, fn ($a, $b) => $b['score'] <=> $a['score']);
+
+        return $results;
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    private static function related(string $category, array $related): array
+    {
+        $pages = self::pages($category);
+        $resolved = [];
+
+        foreach ($related as $ref) {
+            // 'categorie/slug' of 'slug' binnen dezelfde categorie
+            if (str_contains((string) $ref, '/')) {
+                [$refCategory, $refSlug] = explode('/', (string) $ref, 2);
+                $refPages = self::pages($refCategory);
+                $match = collect($refPages)->firstWhere('slug', $refSlug);
+                if ($match) {
+                    $resolved[] = ['category' => $refCategory, 'slug' => $match['slug'], 'title' => $match['title']];
+                }
+                continue;
+            }
+
+            $match = collect($pages)->firstWhere('slug', $ref);
+            if ($match) {
+                $resolved[] = ['category' => $category, 'slug' => $match['slug'], 'title' => $match['title']];
+            }
+        }
+
+        return $resolved;
     }
 
     /**

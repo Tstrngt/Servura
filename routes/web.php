@@ -76,6 +76,10 @@ Route::post('/bestellen/cart/remove', [CheckoutController::class, 'removeItem'])
 // Documentatieplatform: primair op docs.servura.nl, met /docs als pad-fallback
 $docsRoutes = function () {
     Route::get('/', [DocsController::class, 'index'])->name('docs.index');
+    Route::get('/zoeken', [DocsController::class, 'search'])->name('docs.search');
+    Route::get('/{category}', [DocsController::class, 'category'])
+        ->where('category', '[a-z0-9-]+')
+        ->name('docs.category');
     Route::get('/{category}/{page}', [DocsController::class, 'show'])
         ->where(['category' => '[a-z0-9-]+', 'page' => '[a-z0-9-]+'])
         ->name('docs.show');
