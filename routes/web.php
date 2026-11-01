@@ -74,19 +74,21 @@ Route::post('/bestellen/cart/price', [CheckoutController::class, 'setPrice'])->n
 Route::post('/bestellen/cart/remove', [CheckoutController::class, 'removeItem'])->name('checkout.cart.remove');
 
 // Documentatieplatform: primair op docs.servura.nl, met /docs als pad-fallback
-$docsRoutes = function () {
-    Route::get('/', [DocsController::class, 'index'])->name('docs.index');
-    Route::get('/zoeken', [DocsController::class, 'search'])->name('docs.search');
+$docsRoutes = function (string $namePrefix) {
+    Route::get('/', [DocsController::class, 'index'])->name($namePrefix.'index');
+    Route::get('/zoeken', [DocsController::class, 'search'])->name($namePrefix.'search');
     Route::get('/{category}', [DocsController::class, 'category'])
         ->where('category', '[a-z0-9-]+')
-        ->name('docs.category');
+        ->name($namePrefix.'category');
     Route::get('/{category}/{page}', [DocsController::class, 'show'])
         ->where(['category' => '[a-z0-9-]+', 'page' => '[a-z0-9-]+'])
-        ->name('docs.show');
+        ->name($namePrefix.'show');
 };
 
-Route::domain('docs.'.parse_url((string) config('app.url'), PHP_URL_HOST))->group($docsRoutes);
-Route::prefix('docs')->group($docsRoutes);
+Route::domain('docs.'.parse_url((string) config('app.url'), PHP_URL_HOST))
+    ->group(fn () => $docsRoutes('docs.'));
+Route::prefix('docs')
+    ->group(fn () => $docsRoutes('docs.fallback.'));
 
 // Contact
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
