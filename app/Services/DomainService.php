@@ -345,31 +345,7 @@ class DomainService
 
     public function nameserversAreManaged(array $nameservers): bool
     {
-        if (empty($nameservers)) {
-            return false;
-        }
-
-        try {
-            $raw = BillingSetting::valueFor('domain_default_nameservers', BillingSetting::valueFor('transip_default_nameservers', ''));
-        } catch (\Throwable $e) {
-            return false;
-        }
-
-        $configured = array_map(
-            fn ($host) => mb_strtolower(trim($host)),
-            array_filter(preg_split('/[\r\n,]+/', $raw))
-        );
-
-        if (empty($configured)) {
-            return false;
-        }
-
-        $current = array_map(
-            fn ($ns) => mb_strtolower(trim($ns['hostname'] ?? '')),
-            $nameservers
-        );
-
-        return ! empty(array_intersect($current, $configured)) && empty(array_diff($current, $configured));
+        return \App\Support\ManagedNameservers::check($nameservers);
     }
 
     private function mapProviderStatus(string $status): string

@@ -13,6 +13,8 @@ class DomainHostingService
 {
     public function details(DomainRegistration $domain): array
     {
+        $this->autoLinkForDomain($domain);
+
         $hosting = $domain->hostedCustomerService;
 
         if (! $hosting) {
@@ -37,7 +39,7 @@ class DomainHostingService
         return CustomerService::where('user_id', $domain->user_id)
             ->whereNull('cancelled_at')
             ->where('status', '!=', 'cancelled')
-            ->whereHas('service', fn ($q) => $q->where('fulfillment_type', 'hosting'))
+            ->whereHas('service', fn ($q) => $q->where('fulfillment_type', 'directadmin'))
             ->whereDoesntHave('hostedDomainRegistrations')
             ->with('service')
             ->get()
@@ -52,7 +54,7 @@ class DomainHostingService
     {
         $service = CustomerService::where('user_id', $domain->user_id)
             ->where('id', $customerServiceId)
-            ->whereHas('service', fn ($q) => $q->where('fulfillment_type', 'hosting'))
+            ->whereHas('service', fn ($q) => $q->where('fulfillment_type', 'directadmin'))
             ->first();
 
         if (! $service) {
@@ -88,6 +90,78 @@ class DomainHostingService
         }
 
         return ['success' => true, 'message' => 'Hosting gekoppeld.'];
+    }
+
+    /**
+     * Koppel een domein automatisch aan het hostingpakket van dezelfde klant
+     * dat hetzelfde hoofddomein gebruikt.
+     */
+    public function autoLinkForDomain(DomainRegistration $domain): void
+    {
+        if ($domain->hosted_customer_service_id || ! $domain->domain_name) {
+            return;
+        }
+
+        $service = $this->matchingHostingService($domain->user_id, $domain->domain_name);
+        if (! $service) {
+            return;
+        }
+
+        $domain->update(['hosted_customer_service_id' => $service->id]);
+        $domain->unsetRelation('hostedCustomerService');
+
+        DomainAuditLog::create([
+            'domain_registration_id' => $domain->id,
+            'action' => 'hosting_linked',
+            'status' => 'completed',
+            'after' => ['customer_service_id' => $service->id],
+            'note' => 'Hosting automatisch gekoppeld op basis van hoofddomein.',
+            'ip_address' => request()?->ip(),
+        ]);
+    }
+
+    /**
+     * Koppel vanaf de hostingkant: vind de domeinregistratie van deze klant
+     * met hetzelfde hoofddomein en koppel die aan deze dienst.
+     */
+    public function autoLinkForService(CustomerService $service): void
+    {
+        if (! $service->domain) {
+            return;
+        }
+
+        $domain = DomainRegistration::where('user_id', $service->user_id)
+            ->whereNull('hosted_customer_service_id')
+            ->whereRaw('LOWER(domain_name) = ?', [mb_strtolower($service->domain)])
+            ->orderByDesc('id')
+            ->first();
+
+        if (! $domain) {
+            return;
+        }
+
+        $domain->update(['hosted_customer_service_id' => $service->id]);
+
+        DomainAuditLog::create([
+            'domain_registration_id' => $domain->id,
+            'action' => 'hosting_linked',
+            'status' => 'completed',
+            'after' => ['customer_service_id' => $service->id],
+            'note' => 'Hosting automatisch gekoppeld op basis van hoofddomein.',
+            'ip_address' => request()?->ip(),
+        ]);
+    }
+
+    private function matchingHostingService(int $userId, string $domainName): ?CustomerService
+    {
+        return CustomerService::where('user_id', $userId)
+            ->whereNull('cancelled_at')
+            ->where('status', '!=', 'cancelled')
+            ->whereHas('service', fn ($q) => $q->where('fulfillment_type', 'directadmin'))
+            ->whereRaw('LOWER(domain) = ?', [mb_strtolower($domainName)])
+            ->whereDoesntHave('hostedDomainRegistrations')
+            ->orderByDesc('id')
+            ->first();
     }
 
     public function unlink(DomainRegistration $domain, ?User $user = null): array

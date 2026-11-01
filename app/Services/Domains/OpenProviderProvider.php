@@ -185,15 +185,17 @@ class OpenProviderProvider implements DomainProvider
     {
         $data = $this->client->request('GET', 'domains/'.$this->domainId($domain));
 
+        $nameservers = collect($data['name_servers'] ?? [])->map(fn ($nameserver) => [
+            'hostname' => $nameserver['name'] ?? null,
+        ])->filter(fn ($nameserver) => filled($nameserver['hostname']))->values()->all();
+
         return [
             'status' => $data['status'] ?? null,
             'registration_date' => $data['active_date'] ?? $data['order_date'] ?? null,
             'renewal_date' => $data['expiration_date'] ?? $data['registry_expiration_date'] ?? $data['renewal_date'] ?? null,
             'auto_renew' => in_array(strtolower((string) ($data['autorenew'] ?? $data['renew'] ?? '')), ['on', '1', '2', 'true'], true),
-            'nameservers' => collect($data['name_servers'] ?? [])->map(fn ($nameserver) => [
-                'hostname' => $nameserver['name'] ?? null,
-            ])->filter(fn ($nameserver) => filled($nameserver['hostname']))->values()->all(),
-            'can_edit_dns' => true,
+            'nameservers' => $nameservers,
+            'can_edit_dns' => \App\Support\ManagedNameservers::check($nameservers),
             'external_id' => $data['id'] ?? null,
             'raw' => $data,
         ];

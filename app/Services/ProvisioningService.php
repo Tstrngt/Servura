@@ -76,6 +76,7 @@ class ProvisioningService
             ]);
             $this->log($customerService, 'directadmin_aangemaakt', 'DirectAdmin-account automatisch aangemaakt.');
             $this->sendCredentials($customerService->fresh(['user', 'service.serverConnection']));
+            app(DomainHostingService::class)->autoLinkForService($customerService->fresh());
         } catch (\Throwable $exception) {
             $message = $exception->getMessage();
             $isTimeout = stripos($message, 'timed out') !== false;

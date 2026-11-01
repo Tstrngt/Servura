@@ -48,6 +48,14 @@ class DomainDnsService
 
     public function canManage(DomainRegistration $domain): bool
     {
+        // Als de gesynchroniseerde nameservers bekend zijn en niet door ons
+        // worden beheerd (bijv. de nameservers van een gekoppelde
+        // webhostingserver), is DNS-beheer via dit portaal nooit mogelijk.
+        $nameservers = $domain->current_nameservers ?? [];
+        if (! empty($nameservers) && ! $this->domainService->nameserversAreManaged($nameservers)) {
+            return false;
+        }
+
         // If we already know Servura manages DNS from a previous sync, trust that.
         if ($domain->is_dns_managed_by_servura) {
             return true;

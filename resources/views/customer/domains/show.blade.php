@@ -346,7 +346,20 @@ $registrant = $holderContacts[0] ?? [];
                     </button>
                     <div x-show="open" x-cloak class="pt-5">
                         @if(! $dnsManaged)
-                            <p class="text-sm text-slate-500">Dit domein gebruikt externe nameservers. DNS wordt daarom niet via Servura beheerd.</p>
+                            <div class="rounded-xl bg-amber-50 p-4 ring-1 ring-amber-200">
+                                <div class="flex gap-3">
+                                    <svg class="h-5 w-5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
+                                    <div>
+                                        <p class="text-sm font-semibold text-amber-900">DNS-beheer via dit portaal is niet mogelijk</p>
+                                        <p class="mt-1 text-sm text-amber-800">
+                                            Dit domein is gekoppeld aan een secundaire (externe) DNS-server:
+                                            <span class="font-medium">{{ collect($nameservers)->pluck('hostname')->filter()->implode(', ') ?: 'onbekende nameservers' }}</span>.
+                                            De DNS-records worden daar beheerd en kunnen hier niet worden bekeken of aangepast.
+                                            Wil je DNS via Servura beheren? Zet dan de nameservers terug naar de Servura/Openprovider-nameservers.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         @else
                             <div class="overflow-x-auto -mx-6 sm:mx-0 rounded-xl ring-1 ring-slate-200">
                                 <table class="min-w-full divide-y divide-slate-100">
@@ -464,25 +477,6 @@ $registrant = $holderContacts[0] ?? [];
                                 <a href="{{ route('services.index') }}" class="btn btn-primary">Nieuw hostingpakket bestellen</a>
                             </div>
                         @endif
-                    </div>
-                </div>
-
-                <!-- Forwarding -->
-                <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/70" x-data="{ open: false }">
-                    <button type="button" @click="open = !open" class="flex w-full items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-rose-100">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
-                            </span>
-                            <div class="text-left">
-                                <h3 class="font-heading text-lg font-bold text-slate-900">Doorsturen</h3>
-                                <p class="text-sm text-slate-500">Nog niet geconfigureerd</p>
-                            </div>
-                        </div>
-                        <svg class="h-5 w-5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
-                    </button>
-                    <div x-show="open" class="pt-5">
-                        <p class="text-sm text-slate-500">URL-doorsturing is voorbereid in het model maar nog niet actief.</p>
                     </div>
                 </div>
 
