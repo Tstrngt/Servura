@@ -49,14 +49,14 @@
         @endforelse
     </div>
 
-    <!-- Contact CTA -->
+    <!-- Ticket CTA -->
     <div class="mt-12 rounded-2xl bg-slate-900 p-8 text-white sm:p-10">
         <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
             <div>
                 <h2 class="font-heading text-2xl font-bold">Kom je er niet uit?</h2>
-                <p class="mt-2 text-slate-300">Ons team helpt je graag verder via het ticketingsysteem of per e-mail.</p>
+                <p class="mt-2 text-slate-300">Stel je vraag via een ticket in het klantportaal, dan helpt ons team je verder.</p>
             </div>
-            <a href="{{ route('contact') }}" class="shrink-0 rounded-xl bg-primary-600 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-500">Contact opnemen</a>
+            <a href="{{ Docs::siteUrl('customer.tickets.create') }}" class="shrink-0 rounded-xl bg-primary-600 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-500">Ticket aanmaken</a>
         </div>
     </div>
 </section>

@@ -113,6 +113,15 @@ class Docs
     }
 
     /**
+     * Absolute URL naar een route op het hoofddomein (nodig omdat links op
+     * docs.servura.nl anders naar niet-bestaande docs-paden zouden wijzen).
+     */
+    public static function siteUrl(string $routeName, array $parameters = []): string
+    {
+        return rtrim((string) config('app.url'), '/').route($routeName, $parameters, false);
+    }
+
+    /**
      * Splits YAML front matter van de markdown body.
      *
      * @return array{0: array<string, mixed>, 1: string}
