@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomerService;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Models\TransactionLog;
@@ -106,8 +107,9 @@ class InvoiceController extends Controller
             'lines.*.period_start' => 'nullable|date',
             'lines.*.period_end' => 'nullable|date|after_or_equal:lines.*.period_start',
             'lines.*.service_reference' => 'nullable|string|max:255',
-            'lines.*.customer_service_id' => 'nullable|integer|exists:customer_services,id',
         ]);
+
+        $customerServiceIds = CustomerService::where('user_id', $invoice->user_id)->pluck('id')->all();
 
         // Delete old lines and re-create
         $invoice->lines()->delete();
@@ -123,7 +125,6 @@ class InvoiceController extends Controller
                 'period_start' => $line['period_start'] ?? null,
                 'period_end' => $line['period_end'] ?? null,
                 'service_reference' => $line['service_reference'] ?? null,
-                'customer_service_id' => $line['customer_service_id'] ?? null,
                 'sort_order' => $i,
             ]);
         }

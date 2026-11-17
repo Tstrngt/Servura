@@ -33,6 +33,9 @@ class OpenProviderPriceSyncService
                     $this->syncOperation($provider, $tld, $environment, $operation, 1, $markup);
                     $result['success']++;
                 } catch (Throwable $e) {
+                    if ($provider->isRateLimited()) {
+                        throw new RuntimeException('Prijssynchronisatie gestopt: Openprovider blokkeert de API tijdelijk wegens te veel verzoeken.', previous: $e);
+                    }
                     DomainTldPrice::updateOrCreate(
                         ['domain_tld_id' => $tld->id, 'environment' => $environment, 'operation' => $operation, 'period' => 1],
                         ['markup_percentage' => $markup, 'sync_error' => $e->getMessage()]

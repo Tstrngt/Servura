@@ -24,6 +24,11 @@ class OpenProviderProvider implements DomainProvider
         return $this->canAuthenticate() && filled($this->customerHandle());
     }
 
+    public function isRateLimited(): bool
+    {
+        return $this->client->isBlocked();
+    }
+
     public function canAuthenticate(): bool
     {
         return $this->client->configured();

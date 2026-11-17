@@ -62,6 +62,30 @@ class OpenProviderIntegrationTest extends TestCase
         $this->assertSame('11.00', $tld->fresh()->transfer_price);
     }
 
+    public function test_rate_limit_block_is_not_retried_and_stops_further_calls(): void
+    {
+        DomainTld::factory()->create(['extension' => '.nl']);
+        DomainTld::factory()->create(['extension' => '.com']);
+        Http::fake(function ($request) {
+            if (str_ends_with($request->url(), '/auth/login')) {
+                return Http::response(['code' => 0, 'data' => ['token' => 'sandbox-token']], 200);
+            }
+
+            return Http::response(['desc' => 'API access temporarily blocked because of excessive use', 'code' => 4007], 500);
+        });
+
+        try {
+            app(OpenProviderPriceSyncService::class)->run();
+            $this->fail('Price sync should stop when Openprovider blocks the API.');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('blokkeert', $e->getMessage());
+        }
+
+        Http::assertSentCount(2);
+        $this->expectExceptionMessage('tijdelijk geblokkeerd');
+        app(\App\Services\Domains\OpenProviderClient::class)->request('GET', 'domains');
+    }
+
     public function test_openprovider_checks_multiple_domains_in_one_request(): void
     {
         Http::fake([

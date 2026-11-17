@@ -26,6 +26,12 @@ class DomainRegistration extends Model
     public const TYPE_REGISTRATION = 'registration';
     public const TYPE_TRANSFER = 'transfer';
 
+    public const RETRYABLE_STATUSES = [
+        self::STATUS_AWAITING_PAYMENT,
+        self::STATUS_REGISTRATION_FAILED,
+        self::STATUS_TRANSFER_FAILED,
+    ];
+
     public const STATUSES = [
         self::STATUS_PENDING => 'In afwachting',
         self::STATUS_AWAITING_PAYMENT => 'Wacht op betaling',

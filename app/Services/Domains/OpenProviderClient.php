@@ -3,13 +3,19 @@
 namespace App\Services\Domains;
 
 use App\Models\BillingSetting;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 class OpenProviderClient
 {
+    public const RATE_LIMITED_CODE = 4007;
+
+    private const BLOCK_COOLDOWN_MINUTES = 15;
+
     public function configured(): bool
     {
         return BillingSetting::boolean('openprovider_enabled')
@@ -19,7 +25,9 @@ class OpenProviderClient
 
     public function request(string $method, string $path, array $data = []): array
     {
+        $this->guardAgainstBlock();
         $response = $this->http()->send($method, ltrim($path, '/'), $method === 'GET' ? ['query' => $data] : ['json' => $data]);
+        $this->rememberBlock($response);
         $response->throw();
         $payload = $response->json();
 
@@ -28,6 +36,11 @@ class OpenProviderClient
         }
 
         return $payload['data'] ?? [];
+    }
+
+    public function isBlocked(): bool
+    {
+        return Cache::has($this->blockKey());
     }
 
     public function clearToken(): void
@@ -42,12 +55,13 @@ class OpenProviderClient
             ->asJson()
             ->withToken($this->token())
             ->timeout(30)
-            ->retry(3, 1000);
+            ->retry(3, 1000, fn ($exception) => $exception instanceof ConnectionException, throw: false);
     }
 
     private function token(): string
     {
         return Cache::remember($this->tokenKey(), now()->addMinutes(50), function () {
+            $this->guardAgainstBlock();
             $response = Http::baseUrl($this->baseUrl())
                 ->acceptJson()
                 ->asJson()
@@ -57,6 +71,7 @@ class OpenProviderClient
                     'password' => BillingSetting::encryptedValueFor('openprovider_password', ''),
                     'ip' => '0.0.0.0',
                 ]);
+            $this->rememberBlock($response);
             $response->throw();
             $payload = $response->json();
 
@@ -66,6 +81,25 @@ class OpenProviderClient
 
             return $payload['data']['token'];
         });
+    }
+
+    private function guardAgainstBlock(): void
+    {
+        if ($this->isBlocked()) {
+            throw new RuntimeException('Openprovider API-toegang is tijdelijk geblokkeerd wegens te veel verzoeken; probeer het over enkele minuten opnieuw.');
+        }
+    }
+
+    private function rememberBlock(Response $response): void
+    {
+        if ((int) $response->json('code') === self::RATE_LIMITED_CODE) {
+            Cache::put($this->blockKey(), true, now()->addMinutes(self::BLOCK_COOLDOWN_MINUTES));
+        }
+    }
+
+    private function blockKey(): string
+    {
+        return 'openprovider.blocked.'.BillingSetting::valueFor('openprovider_environment', 'sandbox');
     }
 
     private function baseUrl(): string
