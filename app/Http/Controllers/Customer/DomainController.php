@@ -48,7 +48,10 @@ class DomainController extends Controller
     ) {
         $this->authorizeView($domain);
 
-        $domain->load(['user', 'customerService', 'hostedCustomerService', 'auditLogs']);
+        $domain->load(['user', 'customerService', 'auditLogs']);
+
+        $hostingService->autoLinkForDomain($domain);
+        $domain->load('hostedCustomerService');
 
         $providerDataStale = $domain->provider_info_synced_at === null
             || $domain->provider_info_synced_at->lt(now()->subMinutes(5));
@@ -80,10 +83,12 @@ class DomainController extends Controller
 
         $holderContacts = Cache::get("domain.management.contacts.{$domain->id}", $this->localHolderContacts($domain->user));
         $nameservers = $domain->current_nameservers ?? [];
-        $dnsManaged = Cache::get(
-            "domain.management.dns_managed.{$domain->id}",
-            (bool) $domain->is_dns_managed_by_servura || $domainService->nameserversAreManaged($nameservers)
-        );
+        $dnsManaged = ! empty($nameservers)
+            ? $domainService->nameserversAreManaged($nameservers)
+            : Cache::get(
+                "domain.management.dns_managed.{$domain->id}",
+                (bool) $domain->is_dns_managed_by_servura
+            );
         $dnsCacheKey = "domain.management.dns.{$domain->id}";
         $dnsLoadedKey = "domain.management.dns_loaded.{$domain->id}";
         $dnsRecords = $dnsManaged ? Cache::get($dnsCacheKey) : null;

@@ -433,9 +433,6 @@
             window.addEventListener('pageshow', function(e) {
                 if (e.persisted) hideLoader();
             });
-            window.addEventListener('beforeunload', function() {
-                loader.classList.remove('opacity-0', 'pointer-events-none');
-            });
 
             hideLoader();
         })();

@@ -71,9 +71,20 @@ class FinancialController extends Controller
         return redirect($batch->checkout_url);
     }
 
-    public function paymentReturn(PaymentBatch $paymentBatch)
+    public function paymentReturn(PaymentBatch $paymentBatch, MolliePaymentService $paymentService)
     {
         abort_unless($paymentBatch->user_id === Auth::id(), 403);
+
+        // De webhook kan iets later binnenkomen dan de redirect van Mollie.
+        // Controleer daarom direct de actuele betaalstatus bij Mollie.
+        if ($paymentBatch->mollie_payment_id && $paymentBatch->status !== 'paid') {
+            try {
+                $paymentService->handleWebhook($paymentBatch->mollie_payment_id);
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
+        }
+
         $paymentBatch->refresh();
 
         $status = match (true) {

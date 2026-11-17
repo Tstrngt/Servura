@@ -26,6 +26,7 @@
                 <h1 class="mt-6 font-heading text-2xl font-bold text-slate-900">Betaling geslaagd</h1>
                 <p class="mt-2 text-slate-600">We hebben uw betaling ontvangen. Uw bestelling wordt nu verwerkt.</p>
                 <a href="{{ $detailRoute }}" class="btn btn-primary mt-6 inline-flex justify-center w-full">Bekijk overzicht</a>
+                <script>sessionStorage.removeItem('paymentReturnPolls');</script>
 
             @elseif($status === 'failed')
                 <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
@@ -36,6 +37,7 @@
                 <h1 class="mt-6 font-heading text-2xl font-bold text-slate-900">Betaling mislukt of geannuleerd</h1>
                 <p class="mt-2 text-slate-600">De betaling is niet afgerond. U kunt het opnieuw proberen via uw factuur of betaaloverzicht.</p>
                 <a href="{{ $detailRoute }}" class="btn btn-primary mt-6 inline-flex justify-center w-full">Opnieuw betalen</a>
+                <script>sessionStorage.removeItem('paymentReturnPolls');</script>
 
             @else
                 <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
@@ -46,8 +48,17 @@
                 </div>
                 <h1 class="mt-6 font-heading text-2xl font-bold text-slate-900">Betaling verwerken</h1>
                 <p class="mt-2 text-slate-600">We wachten op de definitieve bevestiging van Mollie. Dit duurt meestal een paar seconden.</p>
-                <p class="mt-4 text-sm text-slate-500">Deze pagina hoeft u niet te vernieuwen. U ontvangt een e-mail zodra de betaling is bevestigd.</p>
+                <p class="mt-4 text-sm text-slate-500">Deze pagina vernieuwt automatisch. U ontvangt ook een e-mail zodra de betaling is bevestigd.</p>
                 <a href="{{ route('customer.dashboard') }}" class="btn btn-secondary mt-6 inline-flex justify-center w-full">Naar dashboard</a>
+                <script>
+                    (function () {
+                        var attempts = parseInt(sessionStorage.getItem('paymentReturnPolls') || '0', 10);
+                        if (attempts < 30) {
+                            sessionStorage.setItem('paymentReturnPolls', String(attempts + 1));
+                            setTimeout(function () { window.location.reload(); }, 4000);
+                        }
+                    })();
+                </script>
             @endif
         </div>
     </div>

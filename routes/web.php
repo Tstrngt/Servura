@@ -27,6 +27,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\DocsController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboard;
 use App\Http\Controllers\Customer\DomainController as CustomerDomainController;
 use App\Http\Controllers\Customer\InvoiceController as CustomerInvoiceController;
@@ -55,6 +56,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Documentatieplatform op docs.servura.nl — moet VOOR de publieke routes
+// staan, anders wint de ongeconstraintde '/'-route het op het subdomein.
+foreach (['docs.servura.nl', 'docs.{domain}'] as $docsDomain) {
+    Route::domain($docsDomain)->group(function () {
+        Route::get('/', fn () => app(DocsController::class)->index());
+        Route::get('/zoeken', fn (Request $request) => app(DocsController::class)->search($request));
+        Route::get('/{category}', function (...$params) {
+            return app(DocsController::class)->category(end($params));
+        })->where('category', '[a-z0-9-]+');
+        Route::get('/{category}/{page}', function (...$params) {
+            $page = array_pop($params);
+            $category = array_pop($params);
+
+            return app(DocsController::class)->show($category, $page);
+        })->where(['category' => '[a-z0-9-]+', 'page' => '[a-z0-9-]+']);
+    });
+}
+
 // Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -71,6 +90,21 @@ Route::post('/bestellen/cart/hosting', [CheckoutController::class, 'addHosting']
 Route::post('/bestellen/cart/domain', [CheckoutController::class, 'setDomain'])->name('checkout.cart.set-domain');
 Route::post('/bestellen/cart/price', [CheckoutController::class, 'setPrice'])->name('checkout.cart.set-price');
 Route::post('/bestellen/cart/remove', [CheckoutController::class, 'removeItem'])->name('checkout.cart.remove');
+
+// Documentatieplatform: /docs als pad-fallback op het hoofddomein
+$docsRoutes = function (string $namePrefix) {
+    Route::get('/', [DocsController::class, 'index'])->name($namePrefix.'index');
+    Route::get('/zoeken', [DocsController::class, 'search'])->name($namePrefix.'search');
+    Route::get('/{category}', [DocsController::class, 'category'])
+        ->where('category', '[a-z0-9-]+')
+        ->name($namePrefix.'category');
+    Route::get('/{category}/{page}', [DocsController::class, 'show'])
+        ->where(['category' => '[a-z0-9-]+', 'page' => '[a-z0-9-]+'])
+        ->name($namePrefix.'show');
+};
+
+Route::prefix('docs')
+    ->group(fn () => $docsRoutes('docs.'));
 
 // Contact
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');

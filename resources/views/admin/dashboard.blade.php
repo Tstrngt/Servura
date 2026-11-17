@@ -190,78 +190,56 @@
             </div>
         </div>
 
-        <!-- Revenue Stats -->
+        <!-- Revenue Charts -->
         <div class="px-4 py-6 sm:px-0">
-            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Maandelijkse Omzet
-                                    </dt>
-                                    <dd class="text-lg font-medium text-gray-900">
-                                        €{{ number_format($stats['monthly_revenue'], 2, ',', '.') }}
-                                    </dd>
-                                </dl>
-                            </div>
+            @php
+                $dailyMax = max(1, (float) $dailyRevenue->max('total'));
+                $dailyPoints = $dailyRevenue->values()->map(function ($day, $i) use ($dailyMax) {
+                    $x = 10 + $i * (580 / 29);
+                    $y = 125 - ($day['total'] / $dailyMax) * 105;
+                    return round($x, 1).','.round($y, 1);
+                })->implode(' ');
+                $monthlyMax = max(1, (float) $monthlyRevenue->max('total'));
+            @endphp
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Omzet laatste 30 dagen</h3>
+                            <span class="text-lg font-semibold text-gray-900">€{{ number_format($dailyRevenue->sum('total'), 2, ',', '.') }}</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-4">Totaal laatste 30 dagen</p>
+                        <svg viewBox="0 0 600 140" class="w-full h-40" preserveAspectRatio="none" role="img" aria-label="Omzetgrafiek laatste 30 dagen">
+                            <polygon fill="rgba(99,102,241,0.12)" points="10,135 {{ $dailyPoints }} 590,135"></polygon>
+                            <polyline fill="none" stroke="#6366f1" stroke-width="2" points="{{ $dailyPoints }}"></polyline>
+                        </svg>
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>{{ $dailyRevenue->first()['label'] }}</span>
+                            <span>{{ $dailyRevenue->last()['label'] }}</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-indigo-500 rounded-md flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Jaarlijkse Omzet
-                                    </dt>
-                                    <dd class="text-lg font-medium text-gray-900">
-                                        €{{ number_format($stats['yearly_revenue'], 2, ',', '.') }}
-                                    </dd>
-                                </dl>
-                            </div>
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center justify-between mb-1">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Omzet {{ now()->year }}</h3>
+                            <span class="text-lg font-semibold text-gray-900">€{{ number_format($stats['revenue_this_year'], 2, ',', '.') }}</span>
                         </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-pink-500 rounded-md flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Ongelezen Berichten
-                                    </dt>
-                                    <dd class="text-lg font-medium text-gray-900">
-                                        {{ $stats['unread_messages'] }}
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
+                        <p class="text-xs text-gray-400 mb-4">Totaal dit jaar</p>
+                        <svg viewBox="0 0 600 170" class="w-full h-44" role="img" aria-label="Omzetgrafiek per maand">
+                            @foreach($monthlyRevenue as $i => $month)
+                                @php
+                                    $barHeight = round(($month['total'] / $monthlyMax) * 120, 1);
+                                    $x = 15 + $i * 47.5;
+                                    $y = 140 - $barHeight;
+                                @endphp
+                                <rect x="{{ $x }}" y="{{ $y }}" width="32" height="{{ max($barHeight, 1) }}" rx="4" fill="{{ $i + 1 === (int) now()->month ? '#6366f1' : '#c7d2fe' }}">
+                                    <title>{{ $month['label'] }}: €{{ number_format($month['total'], 2, ',', '.') }}</title>
+                                </rect>
+                                <text x="{{ $x + 16 }}" y="158" text-anchor="middle" fill="#9ca3af" font-size="11">{{ $month['label'] }}</text>
+                            @endforeach
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -269,7 +247,7 @@
 
         <!-- Recent Activity Tables -->
         <div class="px-4 py-6 sm:px-0">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Recent Tickets -->
                 <div class="bg-white shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
@@ -355,6 +333,133 @@
                         @else
                             <div class="text-center py-4">
                                 <p class="text-sm text-gray-500">Geen ongelezen berichten</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Abuse Reports -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                Abuse Meldingen
+                            </h3>
+                            <a href="{{ route('admin.abuse-reports.index') }}" class="text-sm text-primary-600 hover:text-primary-500">
+                                Bekijk alles
+                            </a>
+                        </div>
+                        @if($abuseReports->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($abuseReports as $report)
+                                    <a href="{{ route('admin.abuse-reports.show', $report) }}" class="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-sm font-medium text-gray-900 truncate">
+                                                {{ $report->domain ?: ($report->url ?: 'Algemene melding') }}
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                {{ $report->category_label }}
+                                            </div>
+                                            <div class="text-xs text-gray-400">
+                                                {{ $report->created_at->diffForHumans() }}
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $report->status === 'new' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                                {{ $report->status_label }}
+                                            </span>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-4">
+                                <p class="text-sm text-gray-500">Geen openstaande meldingen</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Customers and Active Services -->
+        <div class="px-4 py-6 sm:px-0">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Recently Active Customers -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                Actieve Klanten
+                            </h3>
+                            <a href="{{ route('admin.customers.index') }}" class="text-sm text-primary-600 hover:text-primary-500">
+                                Bekijk alles
+                            </a>
+                        </div>
+                        @if($activeCustomers->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($activeCustomers as $customer)
+                                    <a href="{{ route('admin.customers.show', $customer) }}" class="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-8 w-8">
+                                                <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                    <span class="text-xs font-medium text-indigo-700">
+                                                        {{ substr($customer->name, 0, 2) }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="ml-3">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ $customer->name }}
+                                                </div>
+                                                <div class="text-xs text-gray-400">
+                                                    Laatst ingelogd {{ $customer->last_login_at->diffForHumans() }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-4">
+                                <p class="text-sm text-gray-500">Nog geen klanten ingelogd</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Active Services -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                Actieve Diensten
+                            </h3>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                {{ $stats['active_services'] }} actief
+                            </span>
+                        </div>
+                        @if($activeServices->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($activeServices as $service)
+                                    <a href="{{ route('admin.customers.show', [$service->user, 'tab' => 'services']) }}" class="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-sm font-medium text-gray-900 truncate">
+                                                {{ $service->service->title ?? 'Dienst' }}
+                                            </div>
+                                            <div class="text-sm text-gray-500 truncate">
+                                                {{ $service->user->name }}{{ $service->domain ? ' • '.$service->domain : '' }}
+                                            </div>
+                                        </div>
+                                        <div class="ml-4 text-sm text-gray-900 whitespace-nowrap">
+                                            €{{ number_format($service->price, 2, ',', '.') }}<span class="text-xs text-gray-400">/{{ $service->price_type === 'jaarlijks' ? 'jaar' : 'mnd' }}</span>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-4">
+                                <p class="text-sm text-gray-500">Geen actieve diensten</p>
                             </div>
                         @endif
                     </div>

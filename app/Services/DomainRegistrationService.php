@@ -66,7 +66,7 @@ class DomainRegistrationService
             $contact = $provider instanceof OpenProviderProvider
                 ? ['handle' => $provider->ensureCustomerHandle($user)]
                 : $this->buildRegistrantContact($user);
-            $nameservers = $this->buildNameservers();
+            $nameservers = $this->buildNameservers($customerService);
 
             $provider->registerDomain($customerService->domain, [$contact], $nameservers);
 
@@ -81,6 +81,8 @@ class DomainRegistrationService
 
                 $this->activateCustomerService($customerService);
             });
+
+            app(DomainHostingService::class)->autoLinkForDomain($domainRegistration);
 
             Log::info('Domain registration successful', [
                 'domain' => $customerService->domain,
@@ -152,7 +154,7 @@ class DomainRegistrationService
             $contact = $provider instanceof OpenProviderProvider
                 ? ['handle' => $provider->ensureCustomerHandle($user)]
                 : $this->buildRegistrantContact($user);
-            $nameservers = $this->buildNameservers();
+            $nameservers = $this->buildNameservers($customerService);
 
             $provider->transferDomain($customerService->domain, $authCode, [$contact], $nameservers);
 
@@ -168,6 +170,8 @@ class DomainRegistrationService
 
                 $this->activateCustomerService($customerService);
             });
+
+            app(DomainHostingService::class)->autoLinkForDomain($domainRegistration);
 
             Log::info('Domain transfer started', [
                 'domain' => $customerService->domain,
@@ -318,12 +322,21 @@ class DomainRegistrationService
     }
 
     /**
+     * Bepaal de nameservers voor een nieuwe registratie/verhuizing. Wanneer de
+     * klant een hostingpakket (DirectAdmin) op hetzelfde domein heeft, worden
+     * de nameservers van die server gebruikt zodat DNS direct op de
+     * webhostingserver draait.
+     *
      * @return Nameserver[]
      */
-    private function buildNameservers(): array
+    private function buildNameservers(CustomerService $customerService): array
     {
-        $raw = BillingSetting::valueFor('domain_default_nameservers', BillingSetting::valueFor('transip_default_nameservers', ''));
-        $hosts = array_filter(array_map('trim', explode(',', $raw)));
+        $hosts = $this->hostingServerNameservers($customerService);
+
+        if (empty($hosts)) {
+            $raw = BillingSetting::valueFor('domain_default_nameservers', BillingSetting::valueFor('transip_default_nameservers', ''));
+            $hosts = array_filter(array_map('trim', preg_split('/[\r\n,]+/', (string) $raw)));
+        }
 
         if (empty($hosts)) {
             return [];
@@ -332,5 +345,36 @@ class DomainRegistrationService
         return array_map(function (string $host) {
             return (new Nameserver())->setHostname($host);
         }, $hosts);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function hostingServerNameservers(CustomerService $customerService): array
+    {
+        if (! $customerService->domain) {
+            return [];
+        }
+
+        $hosting = CustomerService::where('user_id', $customerService->user_id)
+            ->where('id', '!=', $customerService->id)
+            ->whereNull('cancelled_at')
+            ->where('status', '!=', 'cancelled')
+            ->whereHas('service', fn ($q) => $q->where('fulfillment_type', 'directadmin'))
+            ->whereRaw('LOWER(domain) = ?', [mb_strtolower($customerService->domain)])
+            ->with('service.serverConnection')
+            ->orderByDesc('id')
+            ->first();
+
+        $connection = $hosting?->service?->serverConnection;
+        if (! $connection) {
+            return [];
+        }
+
+        return array_values(array_filter([
+            $connection->nameserver_1,
+            $connection->nameserver_2,
+            $connection->nameserver_3,
+        ]));
     }
 }

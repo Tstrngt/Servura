@@ -23,8 +23,10 @@
                 </div>
                 <div class="flex items-center space-x-3">
                     <a href="{{ route('admin.financial.invoices.download', $invoice) }}" class="btn btn-outline text-sm">PDF downloaden</a>
-                    @if($invoice->status === 'concept')
+                    @if(in_array($invoice->status, ['concept', 'verzonden', 'openstaand', 'vervallen', 'te_laat'], true))
                         <a href="{{ route('admin.financial.invoices.edit', $invoice) }}" class="btn btn-outline text-sm">Bewerken</a>
+                    @endif
+                    @if($invoice->status === 'concept')
                         <form method="POST" action="{{ route('admin.financial.invoices.destroy', $invoice) }}" onsubmit="return confirm('Deze conceptfactuur verwijderen?')">@csrf @method('DELETE')<button type="submit" class="btn btn-outline text-red-600 border-red-300 hover:bg-red-50 text-sm">Verwijderen</button></form>
                     @elseif($invoice->document_type !== 'credit')
                         <form method="POST" action="{{ route('admin.financial.invoices.credit', $invoice) }}" onsubmit="return confirm('Een conceptcreditfactuur maken voor {{ $invoice->invoice_number }}?')">@csrf<button type="submit" class="btn btn-outline text-sm">Creditfactuur maken</button></form>
